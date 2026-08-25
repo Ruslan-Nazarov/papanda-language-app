@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { SyntaxRole, Token } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
+import { Ionicons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
 import { explainSentenceWithAI } from '../services/aiService';
 
 const STRICT_ORDER: SyntaxRole[] = [
@@ -101,6 +103,11 @@ export default function SentenceTrainerScreen() {
   }, [targetSentenceInfo, sentences]);
   
   const currentSentence = filteredSentences[currentFilteredIndex];
+
+  // Clear AI explanation when switching to a different sentence
+  useEffect(() => {
+    setAiExplanation(null);
+  }, [currentSentence?.id]);
 
   const handleNextStep = () => {
     if (!currentSentence) return;
@@ -343,22 +350,7 @@ export default function SentenceTrainerScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
-      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20, position: 'relative'}}>
-        <Text style={[styles.header, {marginBottom: 0}]}>Разбор предложений</Text>
-        {filteredSentences.length > 0 && (
-          <TouchableOpacity 
-            onPress={handleExplainAI} 
-            disabled={isAiLoading}
-            style={{position: 'absolute', right: 0, padding: 5}}
-          >
-            {isAiLoading ? (
-              <ActivityIndicator size="small" color="#EAB308" />
-            ) : (
-              <Text style={{fontSize: 22}}>✨</Text>
-            )}
-          </TouchableOpacity>
-        )}
-      </View>
+      <Text style={styles.header}>Разбор предложений</Text>
       
       {/* Language Selector */}
       <View style={{height: 50, marginBottom: 10}}>
@@ -400,6 +392,25 @@ export default function SentenceTrainerScreen() {
       ) : (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text style={{color: '#999'}}>No sentences found for {activeLangObj?.label}</Text>
+        </View>
+      )}
+
+      {filteredSentences.length > 0 && (
+        <View style={{alignItems: 'center', marginVertical: 10}}>
+          <TouchableOpacity 
+            onPress={handleExplainAI} 
+            disabled={isAiLoading}
+            style={styles.aiButton}
+          >
+            {isAiLoading ? (
+              <ActivityIndicator size="small" color="#EAB308" />
+            ) : (
+              <>
+                <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
+                <Text style={styles.aiButtonText}>Объяснить структуру</Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
       )}
 
@@ -528,20 +539,25 @@ export default function SentenceTrainerScreen() {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalCard, {maxHeight: '80%'}]}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15}}>
-              <Text style={[styles.modalHeader, {marginBottom: 0}]}>✨ Объяснение ИИ</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Ionicons name="sparkles" size={24} color="#EAB308" style={{marginRight: 8}} />
+                <Text style={[styles.modalHeader, {marginBottom: 0}]}>Объяснение ИИ</Text>
+              </View>
               <TouchableOpacity onPress={() => setShowAiModal(false)} style={{padding: 5}}>
                 <Text style={{fontSize: 20, color: '#94A3B8'}}>✕</Text>
               </TouchableOpacity>
             </View>
             
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}>
               {isAiLoading ? (
                 <View style={{padding: 40, alignItems: 'center'}}>
                   <ActivityIndicator size="large" color="#007BFF" />
                   <Text style={{marginTop: 15, color: '#64748B'}}>Анализирую структуру...</Text>
                 </View>
               ) : (
-                <Text style={styles.aiText}>{aiExplanation}</Text>
+                <Markdown style={markdownStyles}>
+                  {aiExplanation || ''}
+                </Markdown>
               )}
             </ScrollView>
           </View>
@@ -603,5 +619,19 @@ const styles = StyleSheet.create({
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6 },
-  aiText: { fontSize: 15, lineHeight: 24, color: '#334155' }
+  aiButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: '#FDE047', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
+  aiButtonText: { color: '#B45309', fontWeight: '600', fontSize: 14 }
 });
+
+const markdownStyles = {
+  body: { fontSize: 15, lineHeight: 24, color: '#334155' },
+  heading1: { fontSize: 20, fontWeight: 'bold', color: '#1E293B', marginVertical: 10 },
+  heading2: { fontSize: 18, fontWeight: 'bold', color: '#1E293B', marginVertical: 8 },
+  strong: { fontWeight: 'bold', color: '#0F172A' },
+  em: { fontStyle: 'italic' },
+  blockquote: { borderLeftWidth: 4, borderLeftColor: '#E2E8F0', paddingLeft: 10, marginVertical: 10, opacity: 0.8 },
+  table: { borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 4, marginVertical: 10 },
+  tr: { borderBottomWidth: 1, borderColor: '#E2E8F0', flexDirection: 'row' },
+  th: { padding: 8, backgroundColor: '#F8FAFC', fontWeight: 'bold', flex: 1 },
+  td: { padding: 8, flex: 1 }
+} as any;

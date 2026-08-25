@@ -10,8 +10,8 @@ export async function explainSentenceWithAI(sentence: string, targetLanguage: st
     throw new Error('API ключ не найден. Проверьте файл .env');
   }
 
-  const userPrompt = `Объясни мне это предложение на языке ${targetLanguage}: "${sentence}".
-Его русский перевод: "${nativeTranslation}".`;
+  const userPrompt = `Пожалуйста, разбери это предложение (язык оригинала: ${targetLanguage}): "${sentence}".
+Его перевод: "${nativeTranslation}".`;
 
   try {
     const response = await fetch(GROQ_API_URL, {
@@ -21,7 +21,7 @@ export async function explainSentenceWithAI(sentence: string, targetLanguage: st
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'openai/gpt-oss-20b',
         messages: [
           { role: 'system', content: AI_SYSTEM_PROMPT },
           { role: 'user', content: userPrompt }
