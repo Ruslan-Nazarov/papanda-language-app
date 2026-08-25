@@ -1,0 +1,54 @@
+# Название книги
+title: "Как выучить много иностранных языков? Диалектический подход"
+author: "Назаров Руслан"
+copyright: "2026"
+
+# Ссылка на репозиторий
+repository:
+  url: https://github.com/Ruslan-Nazarov/handbook_Languages
+  path_to_book: ""
+  branch: main
+
+# Настройки исполнения
+execute:
+  execute_notebooks: off
+
+# Настройки парсинга
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
+    - html_image
+    - colon_fence
+
+# Настройки оформления
+html:
+  home_page_in_toc: true
+  logo: "logo.png"
+  favicon: "logo.png"
+  extra_css:
+    - _static/custom.css
+  use_edit_page_button: false
+  use_repository_button: true
+  use_issues_button: true
+  extra_navbar: |
+    <p>Powered by <a href="https://jupyterbook.org">Jupyter Book</a></p>
+
+metadata:
+  description: "Изучение иностранных языков с помощью диалектики"
+  keywords: "Языки, диалектика, лингвистика, Руслан Назаров"
+  image_path: "logo.png"
+
+sphinx:
+  config:
+    html_theme_options:
+      logo_only: false
+    html_js_files:
+      - ["https://www.googletagmanager.com/gtag/js?id=G-J21RBQ48WS", {"async": "async"}]
+      - "ga.js"
+      - "metrika.js"
+    html_extra_path: ["google3eee9c11b8197c7f.html"]
+    html_baseurl: "https://ruslan-nazarov.github.io/handbook_Languages/"
+    sitemap_url_scheme: "{link}"
+  extra_extensions:
+    - sphinx_sitemap

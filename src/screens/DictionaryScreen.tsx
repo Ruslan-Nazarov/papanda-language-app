@@ -1,19 +1,33 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Modal, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
+import EditWordModal from '../components/EditWordModal';
 
 export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, saveWordAssociation } = useStore();
+  const { words, activeLanguages, sentences } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   
-  // State for editing association
+  const wordsInSentences = useMemo(() => {
+    const set = new Set<string>();
+    sentences.forEach(s => {
+      s.words.forEach(w => {
+        if (w.is_in_my_dict) {
+          if (w.dictionary_word) set.add(w.dictionary_word.toLowerCase());
+          else if (w.text) set.add(w.text.toLowerCase());
+        }
+      });
+    });
+    return set;
+  }, [sentences]);
+  
+  // State for editing/adding
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
-  const [tempAssoc, setTempAssoc] = useState('');
 
   const filteredWords = useMemo(() => {
     if (!searchQuery.trim()) return words;
@@ -34,21 +48,14 @@ export default function DictionaryScreen() {
     });
   }, [words, searchQuery, activeLanguages]);
 
-  const openAssocEditor = (item: Word) => {
-    setEditingWord(item);
-    setTempAssoc(item.personal_association || '');
-  };
-
-  const saveAssoc = () => {
-    if (editingWord) {
-      const wordKey = editingWord.eng || editingWord.word || '';
-      saveWordAssociation(wordKey, tempAssoc);
-      setEditingWord(null);
-    }
+  const openEditor = (item?: Word) => {
+    setEditingWord(item || null);
+    setIsModalVisible(true);
   };
 
   const renderItem = ({ item }: { item: Word }) => {
     const wordKey = item.eng || item.word || '';
+    const isInTrainer = wordsInSentences.has(wordKey.toLowerCase());
 
     return (
       <View style={styles.card}>
@@ -61,7 +68,11 @@ export default function DictionaryScreen() {
           </View>
 
           <View style={styles.badges}>
+            <TouchableOpacity style={styles.editBtn} onPress={() => openEditor(item)}>
+              <Text style={styles.editBtnText}>✏️</Text>
+            </TouchableOpacity>
             {!!item.is_learned && <Text style={styles.badgeLearned}>Выучено</Text>}
+            {isInTrainer && <Text style={styles.badgeTrainer}>В тренажере</Text>}
             <Text style={styles.badgeCount}>{(item.count || 0)} пок.</Text>
           </View>
         </View>
@@ -85,26 +96,24 @@ export default function DictionaryScreen() {
         </View>
 
         {/* Personal Association */}
-        <TouchableOpacity 
-          style={styles.assocBox}
-          activeOpacity={0.7}
-          onPress={() => openAssocEditor(item)}
-        >
-          <View style={styles.assocHeader}>
+        {!!item.personal_association && (
+          <View style={styles.assocBox}>
             <Text style={styles.assocTitle}>💡 Личная ассоциация:</Text>
-            <Text style={styles.assocEditLink}>{item.personal_association ? 'ред.' : '+ добавить'}</Text>
+            <Text style={styles.assocContent}>{item.personal_association}</Text>
           </View>
-          <Text style={[styles.assocContent, !item.personal_association && styles.assocEmpty]}>
-            {item.personal_association || 'Нажмите, чтобы добавить ассоциацию для быстрого запоминания'}
-          </Text>
-        </TouchableOpacity>
+        )}
       </View>
     );
   };
 
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
-      <Text style={styles.header}>Словарь ({filteredWords.length})</Text>
+      <View style={styles.headerTitleRow}>
+        <Text style={styles.header}>Словарь ({filteredWords.length})</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={() => openEditor()}>
+          <Text style={styles.addBtnText}>+ Добавить</Text>
+        </TouchableOpacity>
+      </View>
       
       <View style={styles.searchBar}>
         <Text style={styles.searchIcon}>🔍</Text>
@@ -138,33 +147,11 @@ export default function DictionaryScreen() {
         }
       />
 
-      {/* Association Edit Modal */}
-      <Modal visible={!!editingWord} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Ассоциация для слова</Text>
-            <Text style={styles.modalWordName}>{editingWord?.ru} ({editingWord?.eng || editingWord?.word})</Text>
-
-            <TextInput
-              style={styles.modalInput}
-              multiline
-              autoFocus
-              placeholder="Введите личную ассоциацию или смысловой якорь..."
-              value={tempAssoc}
-              onChangeText={setTempAssoc}
-            />
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.modalBtn, styles.modalCancel]} onPress={() => setEditingWord(null)}>
-                <Text style={styles.modalCancelText}>Отмена</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, styles.modalSave]} onPress={saveAssoc}>
-                <Text style={styles.modalSaveText}>Сохранить</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <EditWordModal 
+        visible={isModalVisible} 
+        onClose={() => setIsModalVisible(false)} 
+        wordToEdit={editingWord} 
+      />
     </View>
   );
 }
@@ -175,13 +162,30 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#F8F9FA',
   },
+  headerTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    marginTop: 10,
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-    marginTop: 10,
     color: '#212529',
+  },
+  addBtn: {
+    backgroundColor: '#EBF5FF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#BEE3F8',
+  },
+  addBtnText: {
+    color: '#2B6CB0',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   searchBar: {
     flexDirection: 'row',
@@ -334,6 +338,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     overflow: 'hidden',
   },
+  badgeTrainer: {
+    backgroundColor: '#FFFBEB',
+    color: '#D97706',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    fontSize: 12,
+    fontWeight: 'bold',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
   emptyContainer: {
     padding: 40,
     alignItems: 'center',
@@ -343,68 +359,11 @@ const styles = StyleSheet.create({
     color: '#A0AEC0',
     textAlign: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+  editBtn: {
+    padding: 4,
+    marginRight: 4,
   },
-  modalCard: {
-    width: '100%',
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A202C',
-  },
-  modalWordName: {
-    fontSize: 14,
-    color: '#718096',
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: '#CBD5E0',
-    borderRadius: 10,
-    padding: 12,
-    minHeight: 90,
-    fontSize: 15,
-    textAlignVertical: 'top',
-    backgroundColor: '#F8FAFC',
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-  },
-  modalBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  modalCancel: {
-    backgroundColor: '#EDF2F7',
-  },
-  modalCancelText: {
-    color: '#4A5568',
-    fontWeight: '600',
-  },
-  modalSave: {
-    backgroundColor: '#007BFF',
-  },
-  modalSaveText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+  editBtnText: {
+    fontSize: 16,
   },
 });

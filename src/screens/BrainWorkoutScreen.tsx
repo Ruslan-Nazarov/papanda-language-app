@@ -4,44 +4,75 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
+import EditWordModal from '../components/EditWordModal';
+
+interface QueueItem {
+  word: Word;
+  langCode: string;
+}
 
 export default function BrainWorkoutScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguage, markWordKnown, incrementShowCount } = useStore();
-  const [queue, setQueue] = useState<Word[]>([]);
+  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, addWorkoutSnapshot } = useStore();
+  const [queue, setQueue] = useState<QueueItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState({ known: 0, unknown: 0 });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingWord, setEditingWord] = useState<Word | null>(null);
 
   // Generate workout queue
   useEffect(() => {
-    if (words.length > 0) {
-      const pendingWords = words.filter(w => {
-        const hasTranslation = w[activeLanguage as keyof Word] || (w.translations && w.translations[activeLanguage]);
-        if (!hasTranslation) return false;
-        
-        const stats = w.knowledge_stats as Record<string, boolean>;
-        const isKnown = stats && stats[activeLanguage];
-        return !isKnown;
+    if (words.length > 0 && activeLanguages.length > 0) {
+      const pendingItems: QueueItem[] = [];
+      
+      words.forEach(w => {
+        activeLanguages.forEach(langCode => {
+          const hasTranslation = w[langCode as keyof Word] || (w.translations && w.translations[langCode]);
+          if (!hasTranslation) return;
+          
+          const stats = w.knowledge_stats as Record<string, boolean>;
+          const isKnown = stats && stats[langCode];
+          if (!isKnown) {
+            pendingItems.push({ word: w, langCode });
+          }
+        });
       });
 
-      // Sort by count (least shown first)
-      pendingWords.sort((a, b) => (a.count || 0) - (b.count || 0));
-      setQueue(pendingWords.slice(0, 25));
+      // Sort randomly but roughly by count (least shown first)
+      // Since it's a mix of languages, just shuffling is good, but we can also prefer less shown words.
+      // Let's sort by count first, then add a small random factor to mix languages
+      pendingItems.sort((a, b) => {
+        const countA = a.word.count || 0;
+        const countB = b.word.count || 0;
+        if (countA === countB) {
+          return Math.random() - 0.5; // Randomize same count
+        }
+        return countA - countB;
+      });
+
+      // Limit to user settings
+      const limitedItems = pendingItems.slice(0, workoutWordCount);
+
+      setQueue(limitedItems);
       setCurrentIndex(0);
       setShowAnswer(false);
+    } else {
+      setQueue([]);
     }
-  }, [words, activeLanguage]);
+  }, [words, activeLanguages]);
 
-  const currentWord = queue[currentIndex];
+  const currentItem = queue[currentIndex];
+  const currentWord = currentItem?.word;
+  const currentLang = currentItem?.langCode;
 
   const handleAnswer = (knew: boolean) => {
-    if (!currentWord) return;
+    if (!currentWord || !currentLang) return;
 
     const wordKey = currentWord.eng || currentWord.word || '';
-    markWordKnown(wordKey, knew);
-    incrementShowCount(wordKey);
+    markWordKnown(wordKey, currentLang, knew);
+    incrementShowCount(wordKey, currentLang);
 
     if (knew) {
       setScore(s => ({ ...s, known: s.known + 1 }));
@@ -53,27 +84,38 @@ export default function BrainWorkoutScreen() {
       setCurrentIndex(currentIndex + 1);
       setShowAnswer(false);
     } else {
-      alert(`Тренировка завершена!\nВы знали: ${score.known + (knew ? 1 : 0)}\nНужно повторить: ${score.unknown + (knew ? 0 : 1)}`);
+      const finalKnown = score.known + (knew ? 1 : 0);
+      const finalUnknown = score.unknown + (knew ? 0 : 1);
+      
+      addWorkoutSnapshot({
+        date: new Date().toISOString().split('T')[0],
+        total: finalKnown + finalUnknown,
+        correct: finalKnown
+      });
+
+      alert(`Тренировка завершена!\nВы вспомнили: ${finalKnown}\nНужно повторить: ${finalUnknown}`);
       setCurrentIndex(0);
       setScore({ known: 0, unknown: 0 });
       setShowAnswer(false);
+      // Let useEffect regenerate a new limited batch
+      setQueue([]);
     }
   };
 
-  if (queue.length === 0 || !currentWord) {
+  if (queue.length === 0 || !currentWord || !currentLang) {
     return (
       <View style={[styles.container, { paddingTop: topPadding }]}>
         <View style={styles.emptyCard}>
           <Text style={styles.emptyIcon}>🎉</Text>
           <Text style={styles.header}>Все слова выучены!</Text>
-          <Text style={styles.emptySub}>Нет доступных новых слов для языка {activeLanguage.toUpperCase()}. Выберите другой язык в Настройках или сбросьте статистику.</Text>
+          <Text style={styles.emptySub}>Нет доступных новых слов для выбранных языков. Выберите другие языки в Настройках или сбросьте статистику.</Text>
         </View>
       </View>
     );
   }
 
-  const targetTranslation = (currentWord[activeLanguage as keyof Word] || (currentWord.translations && currentWord.translations[activeLanguage])) as string;
-  const activeLangObj = LANGUAGES.find(l => l.code === activeLanguage);
+  const targetTranslation = (currentWord[currentLang as keyof Word] || (currentWord.translations && currentWord.translations[currentLang])) as string;
+  const activeLangObj = LANGUAGES.find(l => l.code === currentLang);
   const remainingCount = queue.length - currentIndex;
 
   return (
@@ -81,12 +123,10 @@ export default function BrainWorkoutScreen() {
       {/* Top Header & Progress */}
       <View style={styles.headerSection}>
         <View style={styles.langBadge}>
-          <Text style={styles.langBadgeText}>{activeLangObj?.flag} {activeLangObj?.label || activeLanguage.toUpperCase()}</Text>
+          <Text style={styles.langBadgeText}>{activeLangObj?.flag} {activeLangObj?.label || currentLang.toUpperCase()}</Text>
         </View>
         <View style={styles.progressPill}>
-          <Text style={styles.progressText}>
-            Осталось: <Text style={{fontWeight: 'bold', color: '#007BFF'}}>{remainingCount}</Text>
-          </Text>
+          <Text style={styles.progressText}>{currentIndex + 1} / {queue.length}</Text>
         </View>
       </View>
 
@@ -97,6 +137,18 @@ export default function BrainWorkoutScreen() {
           activeOpacity={0.85} 
           onPress={() => setShowAnswer(!showAnswer)}
         >
+          <TouchableOpacity 
+            style={styles.editCardBtn} 
+            onPress={(e) => {
+              e.stopPropagation();
+              setEditingWord(currentWord);
+              setIsModalVisible(true);
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.editCardBtnText}>✏️</Text>
+          </TouchableOpacity>
+
           <Text style={styles.targetForeignWord}>{targetTranslation}</Text>
 
           <View style={styles.divider} />
@@ -129,8 +181,8 @@ export default function BrainWorkoutScreen() {
       {/* Bottom Zone: Always Visible Action Buttons (Thumb Friendly) */}
       <View style={styles.bottomZone}>
         <View style={styles.scoreRow}>
-          <Text style={styles.scoreKnown}>✓ Знал: {score.known}</Text>
-          <Text style={styles.scoreUnknown}>✗ Не знал: {score.unknown}</Text>
+          <Text style={styles.scoreKnown}>✓ Видел: {score.known}</Text>
+          <Text style={styles.scoreUnknown}>✗ Не видел: {score.unknown}</Text>
         </View>
 
         <View style={styles.actionButtons}>
@@ -140,7 +192,7 @@ export default function BrainWorkoutScreen() {
             onPress={() => handleAnswer(false)}
           >
             <Text style={styles.btnIcon}>✕</Text>
-            <Text style={styles.btnText}>Не знал</Text>
+            <Text style={styles.btnText}>Не видел</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -149,10 +201,16 @@ export default function BrainWorkoutScreen() {
             onPress={() => handleAnswer(true)}
           >
             <Text style={styles.btnIcon}>✓</Text>
-            <Text style={styles.btnText}>Знал</Text>
+            <Text style={styles.btnText}>Видел</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <EditWordModal 
+        visible={isModalVisible} 
+        onClose={() => setIsModalVisible(false)} 
+        wordToEdit={editingWord} 
+      />
     </View>
   );
 }
@@ -216,6 +274,21 @@ const styles = StyleSheet.create({
     elevation: 6,
     borderWidth: 1,
     borderColor: '#ECEFF1',
+    position: 'relative',
+  },
+  editCardBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    padding: 4,
+    zIndex: 10,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  editCardBtnText: {
+    fontSize: 16,
   },
   targetForeignWord: {
     fontSize: 32,

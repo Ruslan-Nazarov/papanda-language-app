@@ -5,13 +5,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Word, Sentence } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
+import EditWordModal from '../components/EditWordModal';
 
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { words, sentences, activeLanguages, markTripleKnown, saveWordAssociation, setTargetSentenceInfo, setActiveLanguage } = useStore();
+  const { words, sentences, activeLanguages, markTripleKnown, saveWordAssociation, setTargetSentenceInfo } = useStore();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingWord, setEditingWord] = useState<Word | null>(null);
 
   const pickRandomWord = () => {
     const pending = words.filter(w => {
@@ -87,7 +90,6 @@ export default function WordTriplesScreen() {
       saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
     }
     
-    setActiveLanguage(langCode);
     setTargetSentenceInfo({
       langCode,
       sentenceId: matchedSentence.id,
@@ -128,6 +130,17 @@ export default function WordTriplesScreen() {
 
         {/* Main Card */}
         <View style={styles.card}>
+          <TouchableOpacity 
+            style={styles.editCardBtn} 
+            onPress={() => {
+              setEditingWord(currentWord);
+              setIsModalVisible(true);
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.editCardBtnText}>✏️</Text>
+          </TouchableOpacity>
+
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
 
           <View style={styles.divider} />
@@ -193,6 +206,12 @@ export default function WordTriplesScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <EditWordModal 
+        visible={isModalVisible} 
+        onClose={() => setIsModalVisible(false)} 
+        wordToEdit={editingWord} 
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -240,7 +259,22 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#ECEFF1'
+    borderColor: '#ECEFF1',
+    position: 'relative',
+  },
+  editCardBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    padding: 4,
+    zIndex: 10,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  editCardBtnText: {
+    fontSize: 16,
   },
   nativeWord: { 
     fontSize: 28, 

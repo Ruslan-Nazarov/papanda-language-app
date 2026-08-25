@@ -1,0 +1,53 @@
+/* Изменение цвета основного заголовка и боковой панели */
+:root {
+    --pst-color-primary: #2c3e50;         /* Темно-синий для акцентов */
+    --pst-color-info: #34495e;            /* Цвет для информационных блоков */
+}
+
+/* Настройка шрифтов для лучшей читаемости */
+body {
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Стилизация бокового меню */
+.bd-sidebar {
+    background-color: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+}
+
+/* Выделение активного пункта меню */
+.bd-toc-link.active {
+    color: #2c3e50 !important;
+    font-weight: 700;
+    border-left: 3px solid #2c3e50;
+}
+
+/* Оформление блоков примечаний (admonitions) */
+.admonition.note {
+    border-left-color: #2c3e50 !important;
+    background-color: #f0f4f8;
+}
+
+/* Принудительные границы для HTML-таблиц */
+table, th, td {
+    border: 1px solid #444444 !important; /* Темно-серый цвет границ */
+    border-collapse: collapse !important;
+}
+
+/* Внутренние отступы, чтобы текст не прилипал к линиям */
+th, td {
+    padding: 8px 12px !important;
+}
+
+/* Фон для заголовков таблиц (thead) */
+thead th {
+    background-color: #eeeeee !important;
+    font-weight: bold;
+}
+
+/* Растягиваем таблицу на всю ширину, если нужно */
+table {
+    width: 100%;
+    margin: 1.5em 0;
+}

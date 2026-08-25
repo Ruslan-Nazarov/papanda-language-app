@@ -4,10 +4,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
 
+const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
+
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, activeLanguage, setActiveLanguage, resetStatistics } = useStore();
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount } = useStore();
 
   const toggleLanguage = (code: string) => {
     let newLangs = [...activeLanguages];
@@ -18,10 +20,6 @@ export default function SettingsScreen() {
       }
       newLangs = newLangs.filter(l => l !== code);
     } else {
-      if (newLangs.length >= 3) {
-        Alert.alert("Лимит языков", "Можно выбрать до 3 активных языков для троек слов.");
-        return;
-      }
       newLangs.push(code);
     }
     setLanguages(newLangs);
@@ -61,25 +59,29 @@ export default function SettingsScreen() {
       <Text style={styles.header}>Настройки</Text>
       
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Main Language Section */}
+        {/* Active Languages for Triples */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Основной язык для тренировок (Test)</Text>
-          <Text style={styles.sectionSub}>Язык, по которому запускается тест в разделе Brain Workout</Text>
-          {LANGUAGES.map(lang => (
-            <TouchableOpacity 
-              key={`main-${lang.code}`} 
-              style={[styles.row, activeLanguage === lang.code && styles.rowActive]}
-              onPress={() => setActiveLanguage(lang.code)}
-            >
-              <Text style={styles.rowText}>{lang.flag} {lang.label}</Text>
-              {activeLanguage === lang.code && <Text style={styles.check}>✓</Text>}
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.sectionTitle}>Изучаемые языки</Text>
+          <Text style={styles.sectionSub}>Выберите языки, которые будут использоваться во всех заданиях (слова, тесты, предложения).</Text>
+          {LANGUAGES.map(lang => {
+            const isActive = activeLanguages.includes(lang.code);
+            return (
+              <TouchableOpacity 
+                key={`triple-${lang.code}`} 
+                style={[styles.row, isActive && styles.rowActive]}
+                onPress={() => toggleLanguage(lang.code)}
+              >
+                <Text style={styles.rowText}>{lang.flag} {lang.label}</Text>
+                {isActive && <Text style={styles.check}>✓</Text>}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Selected Triples Order */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Порядок языков в режиме «Полиглот»</Text>
+          <Text style={styles.sectionTitle}>Порядок языков для заданий</Text>
+          <Text style={styles.sectionSub}>Влияет на порядок отображения во множественных заданиях</Text>
           {activeLanguages.map((code, index) => {
             return (
               <View key={`order-${code}`} style={styles.row}>
@@ -105,22 +107,23 @@ export default function SettingsScreen() {
           })}
         </View>
 
-        {/* Active Languages for Triples */}
+        {/* Brain Workout Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Активные языки в «Полиглоте» (до 3-х)</Text>
-          {LANGUAGES.map(lang => {
-            const isActive = activeLanguages.includes(lang.code);
-            return (
-              <TouchableOpacity 
-                key={`triple-${lang.code}`} 
-                style={[styles.row, isActive && styles.rowActive]}
-                onPress={() => toggleLanguage(lang.code)}
+          <Text style={styles.sectionTitle}>Настройки Brain Workout</Text>
+          <Text style={styles.sectionSub}>Количество слов за одну тренировку</Text>
+          <View style={styles.optionsRow}>
+            {WORKOUT_COUNT_OPTIONS.map(count => (
+              <TouchableOpacity
+                key={`count-${count}`}
+                style={[styles.optionChip, workoutWordCount === count && styles.optionChipActive]}
+                onPress={() => setWorkoutWordCount(count)}
               >
-                <Text style={styles.rowText}>{lang.flag} {lang.label}</Text>
-                {isActive && <Text style={styles.check}>✓</Text>}
+                <Text style={[styles.optionChipText, workoutWordCount === count && styles.optionChipTextActive]}>
+                  {count}
+                </Text>
               </TouchableOpacity>
-            );
-          })}
+            ))}
+          </View>
         </View>
 
         {/* Reset Data Section */}
@@ -178,5 +181,32 @@ const styles = StyleSheet.create({
     color: '#E53E3E',
     fontWeight: 'bold',
     fontSize: 15,
+  },
+  optionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  optionChip: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  optionChipActive: {
+    backgroundColor: '#007BFF',
+    borderColor: '#007BFF',
+  },
+  optionChipText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#4A5568',
+  },
+  optionChipTextActive: {
+    color: '#FFF',
   }
 });

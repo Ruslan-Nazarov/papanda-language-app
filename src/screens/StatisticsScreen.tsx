@@ -2,8 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
-import { LANGUAGES, getLanguageLabel } from '../constants/languages';
+import { LANGUAGES } from '../constants/languages';
 import { Word } from '../models/types';
+import {
+  calculateTotalVolume,
+  calculateCoverage,
+  calculateIMWIndex,
+  calculateKnownByLanguage,
+  calculateKnowledgeDistribution,
+  calculateFamiliarWordsEfficiency,
+  calculateShownToday
+} from '../utils/statistics';
 
 type ChartTab = 'distribution' | 'byLanguage' | 'efficiency' | 'shownDay';
 
@@ -12,55 +21,35 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 export default function StatisticsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, activeLanguage } = useStore();
+  const { words, activeLanguages, dailyShows, workoutSnapshots } = useStore();
   const [activeTab, setActiveTab] = useState<ChartTab>('distribution');
   const [efficiencyMode, setEfficiencyMode] = useState<'absolute' | 'percentage'>('absolute');
 
-  const totalWords = words.length;
+  const totalWords = calculateTotalVolume(words);
 
   // 1. Distribution by knowledge level
   const distributionData = useMemo(() => {
-    const counts = {
-      new: 0,         // 0 shows
-      beginner: 0,    // 1-5 shows
-      intermediate: 0,// 6-15 shows
-      advanced: 0,    // 16-40 shows
-      expert: 0,      // 41-80 shows
-      master: 0       // 80+ shows
-    };
-
-    words.forEach(w => {
-      const c = w.count || 0;
-      if (c === 0) counts.new++;
-      else if (c <= 5) counts.beginner++;
-      else if (c <= 15) counts.intermediate++;
-      else if (c <= 40) counts.advanced++;
-      else if (c <= 80) counts.expert++;
-      else counts.master++;
-    });
-
+    const dist = calculateKnowledgeDistribution(words, activeLanguages);
     return [
-      { label: 'New (0)', count: counts.new, color: '#E5E7EB' },
-      { label: 'Beginner (1-5)', count: counts.beginner, color: '#FDE68A' },
-      { label: 'Intermediate (6-15)', count: counts.intermediate, color: '#FED7AA' },
-      { label: 'Advanced (16-40)', count: counts.advanced, color: '#FDBA74' },
-      { label: 'Expert (41-80)', count: counts.expert, color: '#FB923C' },
-      { label: 'Master (80+)', count: counts.master, color: '#4ADE80' }
+      { label: 'Beginner (1-5)', count: dist.beginner, color: '#FDE68A' },
+      { label: 'Intermediate (6-15)', count: dist.intermediate, color: '#FED7AA' },
+      { label: 'Advanced (16-40)', count: dist.advanced, color: '#FDBA74' },
+      { label: 'Expert (41-80)', count: dist.expert, color: '#FB923C' },
+      { label: 'Master (80+)', count: dist.master, color: '#4ADE80' }
     ];
-  }, [words]);
+  }, [words, activeLanguages]);
 
   // 2. Knowledge by Language
   const languageStats = useMemo(() => {
-    return LANGUAGES.map(lang => {
-      let knownCount = 0;
+    const knownStats = calculateKnownByLanguage(words, activeLanguages);
+    
+    return LANGUAGES.filter(l => activeLanguages.includes(l.code)).map(lang => {
+      const knownCount = knownStats[lang.code]?.count || 0;
+      
       let showCount = 0;
-
       words.forEach(w => {
-        const knowStats = (w.knowledge_stats || {}) as Record<string, boolean>;
-        if (knowStats[lang.code] === true) knownCount++;
-
-        const showStats = (w.show_stats || {}) as Record<string, number>;
-        if (showStats[lang.code]) showCount += showStats[lang.code];
+        const showStats = typeof w.show_stats === 'string' ? JSON.parse(w.show_stats) : w.show_stats;
+        if (showStats && showStats[lang.code]) showCount += showStats[lang.code];
       });
 
       // Colors matching screenshot
@@ -78,83 +67,73 @@ export default function StatisticsScreen() {
         color
       };
     });
-  }, [words]);
+  }, [words, activeLanguages]);
 
   // 3. iMW Index (Intelligent Memory Weight)
   const imwStats = useMemo(() => {
-    // Calculate memory weight for active languages
+    const imw = calculateIMWIndex(words, activeLanguages);
+    
     const langsIMW = activeLanguages.map(code => {
       const langObj = LANGUAGES.find(l => l.code === code);
-      let learnedCount = 0;
-      let practicedCount = 0;
-
-      words.forEach(w => {
-        const knowStats = (w.knowledge_stats || {}) as Record<string, boolean>;
-        const showStats = (w.show_stats || {}) as Record<string, number>;
-        if (knowStats[code]) learnedCount++;
-        if (showStats[code] && showStats[code] > 0) practicedCount++;
-      });
-
-      // iMW formula: % of target memory retention
-      const ratio = totalWords > 0 ? ((learnedCount + (practicedCount * 0.3)) / Math.max(1, totalWords)) * 100 : 0;
-      const percentage = Math.min(100, Math.round(ratio * 10) / 10);
-
       return {
         code,
         label: langObj?.label || code.toUpperCase(),
         flag: langObj?.flag || '',
-        percentage
+        percentage: imw.byLanguage[code] || 0
       };
     });
 
-    const overall = langsIMW.length > 0 
-      ? Math.round((langsIMW.reduce((sum, item) => sum + item.percentage, 0) / langsIMW.length) * 10) / 10 
-      : 0;
-
     return {
       langs: langsIMW,
-      overall
+      overall: imw.overall
     };
-  }, [words, activeLanguages, totalWords]);
+  }, [words, activeLanguages]);
 
   // 4. Most Encountered Words
   const mostEncounteredWords = useMemo(() => {
-    const sorted = [...words].sort((a, b) => (b.count || 0) - (a.count || 0));
+    const filtered = words.filter(w => (w.count || 0) > 0);
+    const sorted = filtered.sort((a, b) => (b.count || 0) - (a.count || 0));
     return sorted.slice(0, 15);
   }, [words]);
 
-  // 5. Daily Shows Data (Mock / Last 30 days distribution)
-  const dailyShows = useMemo(() => {
+  // 5. Daily Shows Data (Real data from dailyShows)
+  const dailyShowsData = useMemo(() => {
     const days: { date: string; shows: number }[] = [];
     const now = new Date();
 
-    // Group actual last_shown dates or distribute
-    const dateCounts: Record<string, number> = {};
-    words.forEach(w => {
-      if (w.last_shown) {
-        try {
-          const d = new Date(w.last_shown);
-          const key = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-          dateCounts[key] = (dateCounts[key] || 0) + (w.count || 1);
-        } catch (e) {}
-      }
-    });
-
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const key = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+      const isoDate = d.toISOString().split('T')[0];
+      const displayKey = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
       days.push({
-        date: key,
-        shows: dateCounts[key] || 0
+        date: displayKey,
+        shows: dailyShows?.[isoDate] || 0
       });
     }
-
     return days;
-  }, [words]);
+  }, [dailyShows]);
+  
+  // 6. Efficiency Snapshots
+  const efficiencyData = useMemo(() => {
+    if (!workoutSnapshots || workoutSnapshots.length === 0) {
+      // Mock data if no snapshots yet for demonstration
+      return [
+        { date: '01.10', absolute: 10, percentage: 80, total: 12 },
+        { date: '02.10', absolute: 15, percentage: 85, total: 18 },
+        { date: '03.10', absolute: 12, percentage: 90, total: 14 },
+      ];
+    }
+    return calculateFamiliarWordsEfficiency(workoutSnapshots).map(item => ({
+      ...item,
+      // Shorten date for chart display
+      date: item.date.split('-').slice(1).reverse().join('.')
+    }));
+  }, [workoutSnapshots]);
 
   // Max value calculation for charts
   const maxDistributionCount = Math.max(...distributionData.map(d => d.count), 10);
-  const maxShowsPerDay = Math.max(...dailyShows.map(d => d.shows), 10);
+  const maxShowsPerDay = Math.max(...dailyShowsData.map(d => d.shows), 10);
+  const maxEfficiencyAbs = Math.max(...efficiencyData.map(d => d.absolute), 10);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
@@ -227,7 +206,8 @@ export default function StatisticsScreen() {
           <View style={styles.chartContainer}>
             <Text style={styles.subChartTitle}>Knowledge by Language</Text>
             {languageStats.map(lang => {
-              const fillPercent = totalWords > 0 ? (lang.knownCount / totalWords) * 100 : 0;
+              const maxKnown = Math.max(...languageStats.map(l => l.knownCount), 5); // Use max among languages, min 5
+              const fillPercent = maxKnown > 0 ? (lang.knownCount / maxKnown) * 100 : 0;
               return (
                 <View key={lang.code} style={styles.hBarRow}>
                   <Text style={styles.hBarLabel}>{lang.flag} {lang.label}</Text>
@@ -240,8 +220,8 @@ export default function StatisticsScreen() {
             })}
             <View style={styles.axisRow}>
               <Text style={styles.axisLabel}>0</Text>
-              <Text style={styles.axisLabel}>{Math.round(totalWords / 2)}</Text>
-              <Text style={styles.axisLabel}>{totalWords}</Text>
+              <Text style={styles.axisLabel}>{Math.round(Math.max(...languageStats.map(l => l.knownCount), 5) / 2)}</Text>
+              <Text style={styles.axisLabel}>{Math.max(...languageStats.map(l => l.knownCount), 5)}</Text>
             </View>
           </View>
         )}
@@ -268,20 +248,24 @@ export default function StatisticsScreen() {
             </View>
 
             <View style={styles.efficiencyContent}>
-              {languageStats.map(lang => {
-                const effPercent = lang.showCount > 0 ? Math.round((lang.knownCount / lang.showCount) * 100) : 0;
-                const valueText = efficiencyMode === 'absolute' ? `${lang.knownCount} из ${lang.showCount}` : `${effPercent}%`;
-                
-                return (
-                  <View key={lang.code} style={styles.effRow}>
-                    <Text style={styles.effLabel}>{lang.flag} {lang.label}</Text>
-                    <View style={styles.effTrack}>
-                      <View style={[styles.effFill, { width: `${Math.min(100, effPercent)}%`, backgroundColor: lang.color }]} />
+              {efficiencyData.length === 0 ? (
+                <Text style={styles.emptyStatsText}>Нет данных о тренировках. Пройдите тесты, чтобы увидеть статистику!</Text>
+              ) : (
+                efficiencyData.map((item, idx) => {
+                  const effPercent = item.percentage;
+                  const valueText = efficiencyMode === 'absolute' ? `${item.absolute}` : `${Math.round(effPercent)}%`;
+                  
+                  return (
+                    <View key={idx} style={styles.effRow}>
+                      <Text style={styles.effLabel}>{item.date}</Text>
+                      <View style={styles.effTrack}>
+                        <View style={[styles.effFill, { width: `${Math.min(100, effPercent)}%`, backgroundColor: '#3B82F6' }]} />
+                      </View>
+                      <Text style={styles.effVal}>{valueText}</Text>
                     </View>
-                    <Text style={styles.effVal}>{valueText}</Text>
-                  </View>
-                );
-              })}
+                  );
+                })
+              )}
             </View>
           </View>
         )}
@@ -292,7 +276,7 @@ export default function StatisticsScreen() {
             <Text style={styles.subChartTitle}>Words Shown Per Day (Last 30 days)</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.dailyBarsContainer}>
-                {dailyShows.map((d, i) => {
+                {dailyShowsData.map((d, i) => {
                   const hPercent = maxShowsPerDay > 0 ? (d.shows / maxShowsPerDay) * 100 : 0;
                   return (
                     <View key={i} style={styles.dailyBarCol}>
@@ -360,33 +344,37 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.wordListContainer}>
-          {mostEncounteredWords.map((word, index) => {
-            return (
-              <View key={word.eng || word.word || index} style={styles.wordCard}>
-                <View style={styles.wordCardHeader}>
-                  <Text style={styles.wordRussian}>{word.ru || word.eng || word.word}</Text>
-                  <View style={styles.wordShowBadge}>
-                    <Text style={styles.wordShowText}>{(word.count || 0)} пок.</Text>
+          {mostEncounteredWords.length === 0 ? (
+            <Text style={styles.emptyStatsText}>Вы еще не изучили ни одного слова. Начните тренировку, чтобы слова появились здесь!</Text>
+          ) : (
+            mostEncounteredWords.map((word, index) => {
+              return (
+                <View key={word.eng || word.word || index} style={styles.wordCard}>
+                  <View style={styles.wordCardHeader}>
+                    <Text style={styles.wordRussian}>{word.ru || word.eng || word.word}</Text>
+                    <View style={styles.wordShowBadge}>
+                      <Text style={styles.wordShowText}>{(word.count || 0)} пок.</Text>
+                    </View>
+                  </View>
+
+                  {/* Sub row with flags and translations for current active triples languages */}
+                  <View style={styles.wordTranslationsRow}>
+                    {activeLanguages.map(lang => {
+                      const trans = (word[lang as keyof Word] || (word.translations && word.translations[lang])) as string;
+                      const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
+                      if (!trans) return null;
+
+                      return (
+                        <Text key={lang} style={styles.wordTransItem}>
+                          {langFlag} <Text style={styles.wordTransText}>{trans}</Text>
+                        </Text>
+                      );
+                    })}
                   </View>
                 </View>
-
-                {/* Sub row with flags and translations for current active triples languages */}
-                <View style={styles.wordTranslationsRow}>
-                  {activeLanguages.map(lang => {
-                    const trans = (word[lang as keyof Word] || (word.translations && word.translations[lang])) as string;
-                    const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
-                    if (!trans) return null;
-
-                    return (
-                      <Text key={lang} style={styles.wordTransItem}>
-                        {langFlag} <Text style={styles.wordTransText}>{trans}</Text>
-                      </Text>
-                    );
-                  })}
-                </View>
-              </View>
-            );
-          })}
+              );
+            })
+          )}
         </View>
       </View>
     </ScrollView>
@@ -772,4 +760,11 @@ const styles = StyleSheet.create({
     color: '#475569',
     fontWeight: '500',
   },
+  emptyStatsText: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    paddingVertical: 10,
+  }
 });
