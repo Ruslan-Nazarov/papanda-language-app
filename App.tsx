@@ -91,7 +91,7 @@ function MainTabs() {
       <Tab.Screen 
         name="Brain Workout" 
         component={BrainWorkoutScreen} 
-        options={{ tabBarLabel: 'Test' }}
+        options={{ tabBarLabel: 'Тренировка' }}
       />
       <Tab.Screen 
         name="Statistics" 

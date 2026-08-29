@@ -14,63 +14,107 @@ interface QueueItem {
 export default function BrainWorkoutScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, addWorkoutSnapshot } = useStore();
+  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, restoreWordProgress, userWordProgress } = useStore();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState({ known: 0, unknown: 0 });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
+  const [history, setHistory] = useState<{index: number, knew: boolean, previousProgress: any}[]>([]);
 
   // Generate workout queue
   useEffect(() => {
     if (words.length > 0 && activeLanguages.length > 0) {
-      const pendingItems: QueueItem[] = [];
+      const unlearnedItems: (QueueItem & {isFailed: boolean})[] = [];
+      const learnedItems: QueueItem[] = [];
       
       words.forEach(w => {
         activeLanguages.forEach(langCode => {
           const hasTranslation = w[langCode as keyof Word] || (w.translations && w.translations[langCode]);
           if (!hasTranslation) return;
           
+          if (workoutFavoritesOnly && !w.is_favorite) return;
+
           const stats = w.knowledge_stats as Record<string, boolean>;
-          const isKnown = stats && stats[langCode];
-          if (!isKnown) {
-            pendingItems.push({ word: w, langCode });
+          const isKnown = stats && stats[langCode] === true;
+          const isFailed = stats && stats[langCode] === false;
+          
+          if (isKnown) {
+            learnedItems.push({ word: w, langCode });
+          } else {
+            unlearnedItems.push({ word: w, langCode, isFailed });
           }
         });
       });
 
-      // Sort randomly but roughly by count (least shown first)
-      // Since it's a mix of languages, just shuffling is good, but we can also prefer less shown words.
-      // Let's sort by count first, then add a small random factor to mix languages
-      pendingItems.sort((a, b) => {
+      // Sort unlearned: failed first, then by count, then random
+      unlearnedItems.sort((a, b) => {
+        if (a.isFailed && !b.isFailed) return -1;
+        if (!a.isFailed && b.isFailed) return 1;
+        
         const countA = a.word.count || 0;
         const countB = b.word.count || 0;
-        if (countA === countB) {
-          return Math.random() - 0.5; // Randomize same count
-        }
-        return countA - countB;
+        if (countA !== countB) return countA - countB;
+        
+        return Math.random() - 0.5;
       });
 
-      // Limit to user settings
-      const limitedItems = pendingItems.slice(0, workoutWordCount);
+      // Sort learned: least recently shown first
+      learnedItems.sort((a, b) => {
+        const timeA = a.word.last_shown ? new Date(a.word.last_shown).getTime() : 0;
+        const timeB = b.word.last_shown ? new Date(b.word.last_shown).getTime() : 0;
+        return timeA - timeB;
+      });
 
-      setQueue(limitedItems);
+      const numLearnedToTake = Math.min(workoutLearnedWordCount, learnedItems.length);
+      const numUnlearnedToTake = workoutWordCount - numLearnedToTake;
+
+      let finalQueue = [
+        ...unlearnedItems.slice(0, numUnlearnedToTake),
+        ...learnedItems.slice(0, numLearnedToTake)
+      ];
+
+      // If we don't have enough unlearned, fill with more learned
+      if (finalQueue.length < workoutWordCount && learnedItems.length > numLearnedToTake) {
+        const extraLearned = workoutWordCount - finalQueue.length;
+        finalQueue = [
+          ...finalQueue,
+          ...learnedItems.slice(numLearnedToTake, numLearnedToTake + extraLearned)
+        ];
+      }
+
+      finalQueue.sort(() => Math.random() - 0.5);
+
+      setQueue(finalQueue);
       setCurrentIndex(0);
       setShowAnswer(false);
+      setHistory([]);
     } else {
       setQueue([]);
     }
-  }, [words, activeLanguages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [words.length, activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount]);
 
   const currentItem = queue[currentIndex];
   const currentWord = currentItem?.word;
   const currentLang = currentItem?.langCode;
+  
+  // Always read the latest favorite status directly from the store
+  const isFavorite = currentWord ? (userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) : false;
 
   const handleAnswer = (knew: boolean) => {
     if (!currentWord || !currentLang) return;
 
     const wordKey = currentWord.eng || currentWord.word || '';
+    const previousProgress = useStore.getState().userWordProgress[wordKey];
+    
+    setHistory(prev => [...prev, {
+      index: currentIndex,
+      knew,
+      previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+    }]);
+
     markWordKnown(wordKey, currentLang, knew);
     incrementShowCount(wordKey, currentLang);
 
@@ -97,14 +141,44 @@ export default function BrainWorkoutScreen() {
       setCurrentIndex(0);
       setScore({ known: 0, unknown: 0 });
       setShowAnswer(false);
+      setHistory([]);
       // Let useEffect regenerate a new limited batch
       setQueue([]);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (history.length > 0) {
+      const lastAction = history[history.length - 1];
+      const wordKey = queue[lastAction.index].word.eng || queue[lastAction.index].word.word || '';
+      
+      restoreWordProgress(wordKey, lastAction.previousProgress);
+      
+      if (lastAction.knew) {
+        setScore(s => ({ ...s, known: Math.max(0, s.known - 1) }));
+      } else {
+        setScore(s => ({ ...s, unknown: Math.max(0, s.unknown - 1) }));
+      }
+      
+      setHistory(prev => prev.slice(0, -1));
+      setCurrentIndex(lastAction.index);
+      setShowAnswer(false);
     }
   };
 
   if (queue.length === 0 || !currentWord || !currentLang) {
     return (
       <View style={[styles.container, { paddingTop: topPadding }]}>
+        <View style={styles.headerSection}>
+          <TouchableOpacity 
+            style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]} 
+            onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
+          >
+            <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
+              {workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.emptyCard}>
           <Text style={styles.emptyIcon}>🎉</Text>
           <Text style={styles.header}>Все слова выучены!</Text>
@@ -125,6 +199,16 @@ export default function BrainWorkoutScreen() {
         <View style={styles.langBadge}>
           <Text style={styles.langBadgeText}>{activeLangObj?.flag} {activeLangObj?.label || currentLang.toUpperCase()}</Text>
         </View>
+        
+        <TouchableOpacity 
+          style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]} 
+          onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
+        >
+          <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
+            {workoutFavoritesOnly ? '★ Избранные' : '☆ Все'}
+          </Text>
+        </TouchableOpacity>
+
         <View style={styles.progressPill}>
           <Text style={styles.progressText}>{currentIndex + 1} / {queue.length}</Text>
         </View>
@@ -147,6 +231,20 @@ export default function BrainWorkoutScreen() {
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Text style={styles.editCardBtnText}>✏️</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.favCardBtn} 
+            onPress={(e) => {
+              e.stopPropagation();
+              const wordKey = currentWord.eng || currentWord.word || '';
+              toggleWordFavorite(wordKey);
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={[styles.favCardBtnText, isFavorite ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
+              {isFavorite ? '★' : '☆'}
+            </Text>
           </TouchableOpacity>
 
           <Text style={styles.targetForeignWord}>{targetTranslation}</Text>
@@ -181,8 +279,18 @@ export default function BrainWorkoutScreen() {
       {/* Bottom Zone: Always Visible Action Buttons (Thumb Friendly) */}
       <View style={styles.bottomZone}>
         <View style={styles.scoreRow}>
-          <Text style={styles.scoreKnown}>✓ Видел: {score.known}</Text>
-          <Text style={styles.scoreUnknown}>✗ Не видел: {score.unknown}</Text>
+          <TouchableOpacity 
+            onPress={handlePrevStep}
+            disabled={history.length === 0}
+            style={[styles.backBtn, { opacity: history.length === 0 ? 0.3 : 1 }]}
+          >
+            <Text style={styles.backBtnIcon}>⬅</Text>
+            <Text style={styles.backBtnText}>Назад</Text>
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <Text style={styles.scoreKnown}>✓ Видел: {score.known}</Text>
+            <Text style={styles.scoreUnknown}>✗ Не видел: {score.unknown}</Text>
+          </View>
         </View>
 
         <View style={styles.actionButtons}>
@@ -290,6 +398,20 @@ const styles = StyleSheet.create({
   editCardBtnText: {
     fontSize: 16,
   },
+  favCardBtn: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    padding: 4,
+    zIndex: 10,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  favCardBtnText: {
+    fontSize: 18,
+  },
   targetForeignWord: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -364,8 +486,23 @@ const styles = StyleSheet.create({
   scoreRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 10,
     marginBottom: 12,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtnIcon: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginRight: 4,
+  },
+  backBtnText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#007BFF',
   },
   scoreKnown: {
     fontSize: 14,
@@ -438,5 +575,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1A202C',
     textAlign: 'center',
+  },
+  favoriteToggleBtn: {
+    backgroundColor: '#FFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  favoriteToggleBtnActive: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+  },
+  favoriteToggleText: {
+    fontSize: 13,
+    color: '#718096',
+    fontWeight: '600',
+  },
+  favoriteToggleTextActive: {
+    color: '#D97706',
   },
 });

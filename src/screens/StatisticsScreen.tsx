@@ -24,6 +24,9 @@ export default function StatisticsScreen() {
   const { words, activeLanguages, dailyShows, workoutSnapshots } = useStore();
   const [activeTab, setActiveTab] = useState<ChartTab>('distribution');
   const [efficiencyMode, setEfficiencyMode] = useState<'absolute' | 'percentage'>('absolute');
+  const [isChartsExpanded, setIsChartsExpanded] = useState(true);
+  const [isImwExpanded, setIsImwExpanded] = useState(true);
+  const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
   const totalWords = calculateTotalVolume(words);
 
@@ -142,16 +145,22 @@ export default function StatisticsScreen() {
 
       {/* CARD 1: Progress Charts */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
+        <TouchableOpacity 
+          style={styles.cardHeader} 
+          activeOpacity={0.7} 
+          onPress={() => setIsChartsExpanded(!isChartsExpanded)}
+        >
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardHeaderIcon}>📈</Text>
             <Text style={styles.cardHeaderTitle}>Progress Charts</Text>
           </View>
-          <Text style={styles.cardToolsIcon}>🎨</Text>
-        </View>
+          <Text style={styles.cardToolsIcon}>{isChartsExpanded ? '▼' : '▶'}</Text>
+        </TouchableOpacity>
 
-        {/* Tab Pills */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabScroll} contentContainerStyle={styles.tabScrollContent}>
+        {isChartsExpanded && (
+          <View>
+            {/* Tab Pills */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabScroll} contentContainerStyle={styles.tabScrollContent}>
           <TouchableOpacity 
             style={[styles.tabBtn, activeTab === 'distribution' && styles.tabBtnActive]} 
             onPress={() => setActiveTab('distribution')}
@@ -292,19 +301,27 @@ export default function StatisticsScreen() {
             </ScrollView>
           </View>
         )}
+          </View>
+        )}
       </View>
 
       {/* CARD 2: iMW Index */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
+        <TouchableOpacity 
+          style={styles.cardHeader} 
+          activeOpacity={0.7} 
+          onPress={() => setIsImwExpanded(!isImwExpanded)}
+        >
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardHeaderIcon}>🧠</Text>
             <Text style={styles.cardHeaderTitle}>iMW Index</Text>
           </View>
-          <Text style={styles.cardToolsIcon}>▼</Text>
-        </View>
+          <Text style={styles.cardToolsIcon}>{isImwExpanded ? '▼' : '▶'}</Text>
+        </TouchableOpacity>
 
-        <Text style={styles.imwDescription}>
+        {isImwExpanded && (
+          <View>
+            <Text style={styles.imwDescription}>
           Intelligent Memory Weight shows how close you are to the target repetition frequency.
         </Text>
 
@@ -331,19 +348,26 @@ export default function StatisticsScreen() {
         <View style={styles.imwProgressBarTrack}>
           <View style={[styles.imwProgressBarFill, { width: `${Math.max(2, imwStats.overall)}%`, backgroundColor: '#007BFF' }]} />
         </View>
+          </View>
+        )}
       </View>
 
       {/* CARD 3: Most Encountered Words */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
+        <TouchableOpacity 
+          style={styles.cardHeader} 
+          activeOpacity={0.7} 
+          onPress={() => setIsWordsExpanded(!isWordsExpanded)}
+        >
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardHeaderIcon}>🔥</Text>
             <Text style={styles.cardHeaderTitle}>Most Encountered Words</Text>
           </View>
-          <Text style={styles.cardToolsIcon}>▼</Text>
-        </View>
+          <Text style={styles.cardToolsIcon}>{isWordsExpanded ? '▼' : '▶'}</Text>
+        </TouchableOpacity>
 
-        <View style={styles.wordListContainer}>
+        {isWordsExpanded && (
+          <View style={styles.wordListContainer}>
           {mostEncounteredWords.length === 0 ? (
             <Text style={styles.emptyStatsText}>Вы еще не изучили ни одного слова. Начните тренировку, чтобы слова появились здесь!</Text>
           ) : (
@@ -375,7 +399,8 @@ export default function StatisticsScreen() {
               );
             })
           )}
-        </View>
+          </View>
+        )}
       </View>
     </ScrollView>
   );

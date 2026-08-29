@@ -22,6 +22,7 @@ export interface Word {
   knowledge_stats?: string | Record<string, boolean>; // JSON string from DB, parsed to object
   show_stats?: string | Record<string, number>; // JSON string from DB, parsed to object
   personal_association?: string; // user's personal context/meaning
+  is_favorite?: boolean;
 }
 
 export type SyntaxRole =

@@ -49,11 +49,14 @@ const getRoleColor = (role: SyntaxRole) => {
 export default function SentenceTrainerScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { sentences, addSentence, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo } = useStore();
+  const { sentences, addSentence, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
   const [revealedRoles, setRevealedRoles] = useState<SyntaxRole[]>([]);
+  const [isFullyVisible, setIsFullyVisible] = useState(true);
   const [showTranslations, setShowTranslations] = useState(false);
   const [isTableMode, setIsTableMode] = useState(false);
+  const [isIntroMode, setIsIntroMode] = useState(true);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   // Modal state
   const [isModalVisible, setModalVisible] = useState(false);
@@ -92,7 +95,8 @@ export default function SentenceTrainerScreen() {
         const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
         if (foundIdx !== -1) {
           setCurrentFilteredIndex(foundIdx);
-          setRevealedRoles(STRICT_ORDER); // Reveal to show the sentence structure
+          setIsFullyVisible(true);
+          setRevealedRoles([]);
           setShowTranslations(true);
         }
       }
@@ -104,29 +108,112 @@ export default function SentenceTrainerScreen() {
   
   const currentSentence = filteredSentences[currentFilteredIndex];
 
-  // Clear AI explanation when switching to a different sentence
+  // Clear state when switching to a different sentence
   useEffect(() => {
     setAiExplanation(null);
+    setIsFullyVisible(true);
+    setRevealedRoles([]);
+    setIsIntroMode(true);
   }, [currentSentence?.id]);
+
+  const moveToNextSentence = () => {
+    if (filteredSentences.length <= 1) {
+      setIsFullyVisible(true);
+      setRevealedRoles([]);
+      setShowTranslations(false);
+      setAiExplanation(null);
+      return;
+    }
+    
+    const learned: number[] = [];
+    const unlearned: number[] = [];
+    filteredSentences.forEach((s, idx) => {
+      if (idx !== currentFilteredIndex) {
+        if (learnedSentences.includes(s.id)) learned.push(idx);
+        else unlearned.push(idx);
+      }
+    });
+
+    let nextIdx = 0;
+    if (unlearned.length > 0 && learned.length > 0) {
+      if (Math.random() < 0.8) {
+        nextIdx = unlearned[Math.floor(Math.random() * unlearned.length)];
+      } else {
+        nextIdx = learned[Math.floor(Math.random() * learned.length)];
+      }
+    } else if (unlearned.length > 0) {
+      nextIdx = unlearned[Math.floor(Math.random() * unlearned.length)];
+    } else if (learned.length > 0) {
+      nextIdx = learned[Math.floor(Math.random() * learned.length)];
+    }
+    
+    setCurrentFilteredIndex(nextIdx);
+    setIsFullyVisible(true);
+    setRevealedRoles([]);
+    setShowTranslations(false);
+    setAiExplanation(null);
+    setIsIntroMode(true);
+  };
 
   const handleNextStep = () => {
     if (!currentSentence) return;
     
+    if (isIntroMode) {
+      setIsIntroMode(false);
+      setIsFullyVisible(false);
+      setRevealedRoles([]);
+      return;
+    }
+
+    if (isFullyVisible) {
+      setIsFullyVisible(false);
+      setRevealedRoles([]);
+      return;
+    }
+
     const rolesInSentence = new Set(currentSentence.words.map((t: Token) => t.role));
     const nextRole = STRICT_ORDER.find(role => rolesInSentence.has(role) && !revealedRoles.includes(role));
     
     if (nextRole) {
       setRevealedRoles(prev => [...prev, nextRole]);
     } else {
-      if (currentFilteredIndex < filteredSentences.length - 1) {
-        setCurrentFilteredIndex(prev => prev + 1);
-      } else {
-        setCurrentFilteredIndex(0);
-      }
-      setRevealedRoles([]);
-      setShowTranslations(false);
-      setAiExplanation(null);
+      moveToNextSentence();
     }
+  };
+
+  const handlePrevStep = () => {
+    if (!currentSentence) return;
+
+    if (isIntroMode) {
+      return;
+    }
+
+    if (revealedRoles.length === 0 && !isFullyVisible) {
+      setIsIntroMode(true);
+      setIsFullyVisible(true);
+      return;
+    }
+
+    if (isFullyVisible) {
+      // If fully visible, just hide everything to start breaking down
+      setIsFullyVisible(false);
+      setRevealedRoles([...STRICT_ORDER.filter(role => new Set(currentSentence.words.map((t: Token) => t.role)).has(role))]);
+      return;
+    }
+
+    if (revealedRoles.length > 0) {
+      // Hide the last revealed role
+      setRevealedRoles(prev => prev.slice(0, -1));
+    } else {
+      // If nothing is revealed, show everything
+      setIsFullyVisible(true);
+    }
+  };
+
+  const handleMarkLearned = () => {
+    if (!currentSentence) return;
+    markSentenceLearned(currentSentence.id, true);
+    moveToNextSentence();
   };
 
   const handleExplainAI = async () => {
@@ -155,7 +242,15 @@ export default function SentenceTrainerScreen() {
     }
   };
 
-  const handleFlash = () => setRevealedRoles(STRICT_ORDER);
+  const handleFlash = () => {
+    if (isFullyVisible) {
+      setIsFullyVisible(false);
+      setRevealedRoles([]);
+    } else {
+      setIsFullyVisible(true);
+      setRevealedRoles([]);
+    }
+  };
 
   const openAddModal = () => {
     setEditingSentenceId(null);
@@ -239,7 +334,7 @@ export default function SentenceTrainerScreen() {
   };
 
   const renderToken = (token: Token, index: number) => {
-    const isRevealed = revealedRoles.includes(token.role);
+    const isRevealed = isFullyVisible || revealedRoles.includes(token.role);
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
@@ -287,7 +382,7 @@ export default function SentenceTrainerScreen() {
   };
 
   const renderTokenTableMode = (token: Token, index: number) => {
-    const isRevealed = revealedRoles.includes(token.role);
+    const isRevealed = isFullyVisible || revealedRoles.includes(token.role);
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
@@ -365,6 +460,7 @@ export default function SentenceTrainerScreen() {
               onPress={() => {
                 setSelectedLanguageCode(lang.code);
                 setCurrentFilteredIndex(0);
+                setIsFullyVisible(true);
                 setRevealedRoles([]);
                 setShowTranslations(false);
               }}
@@ -381,14 +477,32 @@ export default function SentenceTrainerScreen() {
       </View>
       
       {filteredSentences.length > 0 ? (
-        <TouchableOpacity activeOpacity={0.9} onPress={handleFlash} style={{flex: 1}}>
-          <ScrollView contentContainerStyle={isTableMode ? styles.tableContainer : styles.sentenceWrapper}>
-            {isTableMode 
-              ? currentSentence?.words?.map(renderTokenTableMode)
-              : currentSentence?.words?.map(renderToken)
-            }
-          </ScrollView>
-        </TouchableOpacity>
+        <ScrollView style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+          {isIntroMode ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+              <Text style={{ fontSize: 28, fontWeight: '500', color: '#111827', textAlign: 'center', lineHeight: 40 }}>
+                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
+              </Text>
+            </View>
+          ) : (
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 15 }}>
+                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
+              </Text>
+              
+              <TouchableOpacity 
+                activeOpacity={0.9} 
+                onPress={handleFlash} 
+                style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}
+              >
+                {isTableMode 
+                  ? currentSentence?.words?.map(renderTokenTableMode)
+                  : currentSentence?.words?.map(renderToken)
+                }
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
       ) : (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text style={{color: '#999'}}>No sentences found for {activeLangObj?.label}</Text>
@@ -396,7 +510,7 @@ export default function SentenceTrainerScreen() {
       )}
 
       {filteredSentences.length > 0 && (
-        <View style={{alignItems: 'center', marginVertical: 10}}>
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
           <TouchableOpacity 
             onPress={handleExplainAI} 
             disabled={isAiLoading}
@@ -411,38 +525,67 @@ export default function SentenceTrainerScreen() {
               </>
             )}
           </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={{marginLeft: 15, padding: 8, backgroundColor: '#F1F5F9', borderRadius: 20}} 
+            onPress={() => setIsMenuVisible(true)}
+          >
+            <Ionicons name="ellipsis-vertical" size={20} color="#475569" />
+          </TouchableOpacity>
         </View>
       )}
 
-      <View style={styles.controls}>
-        <TouchableOpacity style={styles.button} onPress={handleNextStep}>
-          <Text style={styles.buttonText}>Шаг (Роль)</Text>
+      {/* Primary Action */}
+      <View style={[styles.controls, { marginBottom: 5 }]}>
+        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handlePrevStep} disabled={isIntroMode}>
+          <Text style={styles.buttonText}>Назад</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, showTranslations ? styles.buttonActive : styles.buttonSecondary]} 
-          onPress={() => setShowTranslations(!showTranslations)}
-        >
-          <Text style={styles.buttonText}>Перевод</Text>
+        <TouchableOpacity style={[styles.button, styles.btnKnown]} onPress={handleMarkLearned}>
+          <Text style={styles.buttonText}>✓ Разобрался</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.buttonSecondary]} 
-          onPress={() => setIsTableMode(!isTableMode)}
-        >
-          <Text style={styles.buttonText}>{isTableMode ? 'Карточки' : 'Таблица'}</Text>
+        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={handleNextStep}>
+          <Text style={styles.primaryButtonText}>Далее</Text>
         </TouchableOpacity>
       </View>
-      
-      <View style={[styles.controls, {marginTop: 10}]}>
-        <TouchableOpacity style={[styles.button, {backgroundColor: '#17A2B8'}]} onPress={openEditModal}>
-          <Text style={styles.buttonText}>Edit Current</Text>
+
+      {/* Options Menu Modal */}
+      <Modal visible={isMenuVisible} transparent={true} animationType="fade">
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsMenuVisible(false)}>
+          <View style={[styles.menuCard, {position: 'absolute', bottom: insets.bottom + 120, right: 20}]}>
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => { setShowTranslations(!showTranslations); setIsMenuVisible(false); }}
+            >
+              <Ionicons name="language" size={20} color="#475569" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>{showTranslations ? 'Скрыть перевод' : 'Показать перевод'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => { setIsTableMode(!isTableMode); setIsMenuVisible(false); }}
+            >
+              <Ionicons name="list" size={20} color="#475569" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>Режим: {isTableMode ? 'Карточки' : 'Таблица'}</Text>
+            </TouchableOpacity>
+            
+            <View style={{height: 1, backgroundColor: '#E2E8F0', marginVertical: 5}} />
+            
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => { setIsMenuVisible(false); openEditModal(); }}
+            >
+              <Ionicons name="pencil" size={20} color="#475569" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>Изменить</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => { setIsMenuVisible(false); openAddModal(); }}
+            >
+              <Ionicons name="add" size={20} color="#475569" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>Добавить</Text>
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, {backgroundColor: '#20C997'}]} onPress={openAddModal}>
-          <Text style={styles.buttonText}>+ Add New</Text>
-        </TouchableOpacity>
-      </View>
+      </Modal>
 
       {/* Add/Edit Sentence Modal */}
       <Modal visible={isModalVisible} animationType="slide" presentationStyle="pageSheet">
@@ -560,6 +703,10 @@ export default function SentenceTrainerScreen() {
                 </Markdown>
               )}
             </ScrollView>
+            
+            <View style={{marginTop: 15, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#E2E8F0'}}>
+              <Text style={{fontSize: 12, color: '#94A3B8', textAlign: 'center'}}>Сгенерировано нейросетью. Возможны неточности.</Text>
+            </View>
           </View>
         </View>
       </Modal>
@@ -582,6 +729,8 @@ const styles = StyleSheet.create({
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
   button: { flex: 1, backgroundColor: '#007BFF', padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  primaryButton: { padding: 16, borderRadius: 12, shadowColor: '#007BFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 },
+  primaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18, textAlign: 'center' },
   buttonSecondary: { backgroundColor: '#6C757D' },
   buttonActive: { backgroundColor: '#28A745' },
   btnKnown: { backgroundColor: '#28A745' },
@@ -597,6 +746,10 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1, padding: 20, backgroundColor: '#F8FAFC', alignItems: 'center' },
   modalHeader: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#1E293B' },
   mainInput: { width: '100%', borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFF', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
+  
+  menuCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6, minWidth: 200 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 15 },
+  menuItemText: { fontSize: 16, color: '#1E293B', fontWeight: '500' },
   
   tokenEditorCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
   tokenEditorHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },

@@ -10,11 +10,13 @@ import EditWordModal from '../components/EditWordModal';
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { words, sentences, activeLanguages, markTripleKnown, saveWordAssociation, setTargetSentenceInfo } = useStore();
+  const { words, sentences, activeLanguages, markTripleKnown, saveWordAssociation, setTargetSentenceInfo, restoreWordProgress, toggleWordFavorite, userWordProgress } = useStore();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: any}[]>([]);
 
   const pickRandomWord = () => {
     const pending = words.filter(w => {
@@ -50,6 +52,18 @@ export default function WordTriplesScreen() {
     if (currentWord && associationText !== currentWord.personal_association) {
       saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
     }
+    
+    if (currentWord) {
+      const wordKey = currentWord.eng || currentWord.word || '';
+      const previousProgress = useStore.getState().userWordProgress[wordKey];
+      setHistory(prev => [...prev, {
+        word: currentWord,
+        markedLearned: false,
+        previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+      }]);
+    }
+
+    setSessionCount(prev => prev + 1);
     pickRandomWord();
   };
 
@@ -58,8 +72,33 @@ export default function WordTriplesScreen() {
       if (associationText !== currentWord.personal_association) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
       }
-      markTripleKnown(currentWord.eng || currentWord.word || '');
+      
+      const wordKey = currentWord.eng || currentWord.word || '';
+      const previousProgress = useStore.getState().userWordProgress[wordKey];
+      setHistory(prev => [...prev, {
+        word: currentWord,
+        markedLearned: true,
+        previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+      }]);
+
+      markTripleKnown(wordKey);
+      setSessionCount(prev => prev + 1);
       pickRandomWord();
+    }
+  };
+
+  const handlePrev = () => {
+    if (history.length > 0) {
+      const lastAction = history[history.length - 1];
+      const wordKey = lastAction.word.eng || lastAction.word.word || '';
+      
+      restoreWordProgress(wordKey, lastAction.previousProgress);
+      
+      setSessionCount(prev => Math.max(0, prev - 1));
+      setHistory(prev => prev.slice(0, -1));
+      
+      setCurrentWord(lastAction.word);
+      setAssociationText(lastAction.word.personal_association || '');
     }
   };
 
@@ -126,10 +165,26 @@ export default function WordTriplesScreen() {
         {/* Header with comfortable breathing space */}
         <View style={styles.topHeader}>
           <Text style={styles.headerTitle}>Слова</Text>
+          {sessionCount > 0 && (
+            <Text style={styles.sessionCountText}>Пройдено за заход: {sessionCount}</Text>
+          )}
         </View>
 
         {/* Main Card */}
         <View style={styles.card}>
+          <TouchableOpacity 
+            style={styles.favCardBtn} 
+            onPress={() => {
+              const wordKey = currentWord.eng || currentWord.word || '';
+              toggleWordFavorite(wordKey);
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={[styles.editCardBtnText, (userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
+              {(userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? '★' : '☆'}
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity 
             style={styles.editCardBtn} 
             onPress={() => {
@@ -198,6 +253,14 @@ export default function WordTriplesScreen() {
 
         {/* Bottom Actions */}
         <View style={styles.controls}>
+          <TouchableOpacity 
+            style={[styles.button, styles.btnPrev, history.length === 0 && { opacity: 0.5 }]} 
+            activeOpacity={0.8} 
+            onPress={handlePrev}
+            disabled={history.length === 0}
+          >
+            <Text style={styles.buttonText}>Назад</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.btnNext]} activeOpacity={0.8} onPress={handleNext}>
             <Text style={styles.buttonText}>Дальше</Text>
           </TouchableOpacity>
@@ -244,6 +307,12 @@ const styles = StyleSheet.create({
     color: '#1A202C',
     letterSpacing: 0.3,
   },
+  sessionCountText: {
+    fontSize: 13,
+    color: '#64748B',
+    marginTop: 2,
+    fontWeight: '600'
+  },
   info: { 
     fontSize: 16, 
     color: '#718096', 
@@ -266,6 +335,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
+    padding: 4,
+    zIndex: 10,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  favCardBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 56,
     padding: 4,
     zIndex: 10,
     backgroundColor: '#F8F9FA',
@@ -397,6 +477,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
+  },
+  btnPrev: {
+    backgroundColor: '#94A3B8'
   },
   btnNext: { 
     backgroundColor: '#64748B' 

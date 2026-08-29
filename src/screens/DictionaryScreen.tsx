@@ -9,7 +9,7 @@ import EditWordModal from '../components/EditWordModal';
 export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, sentences } = useStore();
+  const { words, activeLanguages, sentences, toggleWordFavorite } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   
   const wordsInSentences = useMemo(() => {
@@ -68,6 +68,11 @@ export default function DictionaryScreen() {
           </View>
 
           <View style={styles.badges}>
+            <TouchableOpacity style={styles.editBtn} onPress={() => toggleWordFavorite(wordKey)}>
+              <Text style={[styles.editBtnText, item.is_favorite ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
+                {item.is_favorite ? '★' : '☆'}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.editBtn} onPress={() => openEditor(item)}>
               <Text style={styles.editBtnText}>✏️</Text>
             </TouchableOpacity>

@@ -23,6 +23,7 @@ interface UserWordProgress {
   custom_word?: string;
   custom_ru?: string;
   custom_translations?: Record<string, string>;
+  is_favorite?: boolean;
 }
 
 interface AppState {
@@ -36,6 +37,9 @@ interface AppState {
   dailyShows: DailyShows;
   workoutSnapshots: WorkoutSnapshot[];
   workoutWordCount: number;
+  workoutLearnedWordCount: number;
+  workoutFavoritesOnly: boolean;
+  learnedSentences: string[];
   
   // Actions
   initializeStore: () => void;
@@ -47,11 +51,16 @@ interface AppState {
   saveWordAssociation: (wordEng: string, assoc: string) => void;
   addSentence: (sentence: Sentence) => void;
   updateSentence: (id: string, sentence: Sentence) => void;
+  markSentenceLearned: (id: string, isLearned: boolean) => void;
   updateWordDetails: (wordKey: string, details: { word?: string; ru?: string; translations?: Record<string, string> }) => void;
   addCustomWord: (word: Word) => void;
   resetStatistics: () => void;
   addWorkoutSnapshot: (snapshot: WorkoutSnapshot) => void;
   setWorkoutWordCount: (count: number) => void;
+  setWorkoutLearnedWordCount: (count: number) => void;
+  setWorkoutFavoritesOnly: (onlyFavorites: boolean) => void;
+  toggleWordFavorite: (wordEng: string) => void;
+  restoreWordProgress: (wordEng: string, previousProgress: UserWordProgress | null) => void;
 }
 
 // Helper to parse JSON fields safely
@@ -79,7 +88,8 @@ const baseStaticWords: Word[] = (wordsData as any[]).map((w, idx) => ({
   show_stats: {},
   last_shown: undefined,
   translations: parseJSONField(w.translations),
-  personal_association: ''
+  personal_association: '',
+  is_favorite: false
 }));
 
 const baseStaticSentences: Sentence[] = (sentencesData as Sentence[]).map((s, idx) => ({
@@ -102,6 +112,9 @@ export const useStore = create<AppState>()(
       dailyShows: {},
       workoutSnapshots: [],
       workoutWordCount: 10,
+      workoutLearnedWordCount: 2,
+      workoutFavoritesOnly: false,
+      learnedSentences: [],
 
       initializeStore: () => {
         const { userWordProgress, customSentences, customWords } = get();
@@ -122,7 +135,8 @@ export const useStore = create<AppState>()(
               knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
               show_stats: prog.show_stats || w.show_stats,
               last_shown: prog.last_shown || w.last_shown,
-              personal_association: prog.personal_association || w.personal_association
+              personal_association: prog.personal_association || w.personal_association,
+              is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : w.is_favorite
             };
           }
           return w;
@@ -143,7 +157,8 @@ export const useStore = create<AppState>()(
               knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
               show_stats: prog.show_stats || w.show_stats,
               last_shown: prog.last_shown || w.last_shown,
-              personal_association: prog.personal_association || w.personal_association
+              personal_association: prog.personal_association || w.personal_association,
+              is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : w.is_favorite
             };
           }
           return w;
@@ -354,6 +369,18 @@ export const useStore = create<AppState>()(
         });
       },
 
+      markSentenceLearned: (id, isLearned) => {
+        set((state) => {
+          let updated = [...state.learnedSentences];
+          if (isLearned && !updated.includes(id)) {
+            updated.push(id);
+          } else if (!isLearned && updated.includes(id)) {
+            updated = updated.filter(sId => sId !== id);
+          }
+          return { learnedSentences: updated };
+        });
+      },
+
       updateWordDetails: (wordKey, details) => {
         set((state) => {
           const key = wordKey;
@@ -420,7 +447,83 @@ export const useStore = create<AppState>()(
         }));
       },
       
-      setWorkoutWordCount: (count) => set({ workoutWordCount: count })
+      setWorkoutWordCount: (count) => set({ workoutWordCount: count }),
+      setWorkoutLearnedWordCount: (count) => set({ workoutLearnedWordCount: count }),
+
+      setWorkoutFavoritesOnly: (onlyFavorites) => set({ workoutFavoritesOnly: onlyFavorites }),
+
+      toggleWordFavorite: (wordEng) => {
+        set((state) => {
+          const key = wordEng;
+          const currentProg = state.userWordProgress[key] || {};
+          const currentFav = currentProg.is_favorite;
+          
+          const updatedProg: UserWordProgress = {
+            ...currentProg,
+            is_favorite: !currentFav
+          };
+
+          const newProgress = {
+            ...state.userWordProgress,
+            [key]: updatedProg
+          };
+
+          const newWords = state.words.map(w => {
+            if (w.eng === wordEng || w.word === wordEng) {
+              return { ...w, is_favorite: !currentFav };
+            }
+            return w;
+          });
+
+          return { 
+            userWordProgress: newProgress,
+            words: newWords 
+          };
+        });
+      },
+
+      restoreWordProgress: (wordEng, previousProgress) => {
+        set((state) => {
+          const key = wordEng;
+          
+          const newProgress = { ...state.userWordProgress };
+          if (previousProgress) {
+            newProgress[key] = previousProgress;
+          } else {
+            delete newProgress[key];
+          }
+
+          const baseWord = baseStaticWords.find(w => w.eng === wordEng || w.word === wordEng);
+          const newWords = state.words.map(w => {
+            if (w.eng === wordEng || w.word === wordEng) {
+              if (previousProgress) {
+                return {
+                  ...w,
+                  word: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.word || w.word),
+                  eng: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.eng || w.eng),
+                  ru: previousProgress.custom_ru !== undefined ? previousProgress.custom_ru : (baseWord?.ru || w.ru),
+                  translations: { ...(baseWord?.translations || {}), ...(previousProgress.custom_translations || {}) },
+                  count: previousProgress.count !== undefined ? previousProgress.count : (baseWord?.count || 0),
+                  is_learned: previousProgress.is_learned !== undefined ? previousProgress.is_learned : (baseWord?.is_learned || 0),
+                  knowledge_stats: previousProgress.knowledge_stats || (baseWord?.knowledge_stats || {}),
+                  show_stats: previousProgress.show_stats || (baseWord?.show_stats || {}),
+                  last_shown: previousProgress.last_shown || baseWord?.last_shown,
+                  personal_association: previousProgress.personal_association || baseWord?.personal_association,
+                  is_favorite: previousProgress.is_favorite !== undefined ? previousProgress.is_favorite : (baseWord?.is_favorite || false)
+                };
+              } else if (baseWord) {
+                return { ...baseWord }; // restore to base
+              }
+            }
+            return w;
+          });
+
+          return { 
+            userWordProgress: newProgress,
+            words: newWords 
+          };
+        });
+      }
     }),
     {
       name: 'papanda-storage',
@@ -434,6 +537,9 @@ export const useStore = create<AppState>()(
         dailyShows: state.dailyShows,
         workoutSnapshots: state.workoutSnapshots,
         workoutWordCount: state.workoutWordCount,
+        workoutLearnedWordCount: state.workoutLearnedWordCount,
+        workoutFavoritesOnly: state.workoutFavoritesOnly,
+        learnedSentences: state.learnedSentences,
       }),
     }
   )

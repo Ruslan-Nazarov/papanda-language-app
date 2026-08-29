@@ -9,7 +9,7 @@ const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount } = useStore();
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount } = useStore();
 
   const toggleLanguage = (code: string) => {
     let newLangs = [...activeLanguages];
@@ -109,9 +109,10 @@ export default function SettingsScreen() {
 
         {/* Brain Workout Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Настройки Brain Workout</Text>
-          <Text style={styles.sectionSub}>Количество слов за одну тренировку</Text>
-          <View style={styles.optionsRow}>
+          <Text style={styles.sectionTitle}>Настройки тренировки (Brain Workout)</Text>
+          
+          <Text style={styles.sectionSub}>Количество слов за одну сессию</Text>
+          <View style={[styles.optionsRow, {marginBottom: 20}]}>
             {WORKOUT_COUNT_OPTIONS.map(count => (
               <TouchableOpacity
                 key={`count-${count}`}
@@ -119,6 +120,21 @@ export default function SettingsScreen() {
                 onPress={() => setWorkoutWordCount(count)}
               >
                 <Text style={[styles.optionChipText, workoutWordCount === count && styles.optionChipTextActive]}>
+                  {count}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.sectionSub}>Сколько из них — уже выученные слова (для повторения)</Text>
+          <View style={styles.optionsRow}>
+            {[0, 1, 2, 3, 5].map(count => (
+              <TouchableOpacity
+                key={`learned-${count}`}
+                style={[styles.optionChip, workoutLearnedWordCount === count && styles.optionChipActive]}
+                onPress={() => setWorkoutLearnedWordCount(count)}
+              >
+                <Text style={[styles.optionChipText, workoutLearnedWordCount === count && styles.optionChipTextActive]}>
                   {count}
                 </Text>
               </TouchableOpacity>
