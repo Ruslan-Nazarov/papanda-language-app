@@ -51,7 +51,7 @@ export default function SentenceTrainerScreen() {
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { sentences, addSentence, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
-  const [revealedRoles, setRevealedRoles] = useState<SyntaxRole[]>([]);
+  const [revealedSteps, setRevealedSteps] = useState(0);
   const [isFullyVisible, setIsFullyVisible] = useState(true);
   const [showTranslations, setShowTranslations] = useState(false);
   const [isTableMode, setIsTableMode] = useState(false);
@@ -96,7 +96,7 @@ export default function SentenceTrainerScreen() {
         if (foundIdx !== -1) {
           setCurrentFilteredIndex(foundIdx);
           setIsFullyVisible(true);
-          setRevealedRoles([]);
+          setRevealedSteps(0);
           setShowTranslations(true);
         }
       }
@@ -112,14 +112,14 @@ export default function SentenceTrainerScreen() {
   useEffect(() => {
     setAiExplanation(null);
     setIsFullyVisible(true);
-    setRevealedRoles([]);
+    setRevealedSteps(0);
     setIsIntroMode(true);
   }, [currentSentence?.id]);
 
   const moveToNextSentence = () => {
     if (filteredSentences.length <= 1) {
       setIsFullyVisible(true);
-      setRevealedRoles([]);
+      setRevealedSteps(0);
       setShowTranslations(false);
       setAiExplanation(null);
       return;
@@ -149,11 +149,63 @@ export default function SentenceTrainerScreen() {
     
     setCurrentFilteredIndex(nextIdx);
     setIsFullyVisible(true);
-    setRevealedRoles([]);
+    setRevealedSteps(0);
     setShowTranslations(false);
     setAiExplanation(null);
     setIsIntroMode(true);
   };
+
+  const orderedGroups = React.useMemo(() => {
+    if (!currentSentence || !currentSentence.words) return [];
+    
+    let currentClause = 0;
+    let seenPredicate = false;
+    let seenSubject = false;
+    
+    const wordsWithClause = currentSentence.words.map((word, originalIndex) => {
+      if (word.role === 'Conjunction' && (seenPredicate || seenSubject)) {
+        currentClause++;
+        seenPredicate = false;
+        seenSubject = false;
+      } else if (
+        (word.role === 'Predicate' && seenPredicate) || 
+        (word.role === 'Subject' && seenPredicate && seenSubject)
+      ) {
+        currentClause++;
+        seenPredicate = false;
+        seenSubject = false;
+      }
+      
+      if (word.role === 'Predicate') seenPredicate = true;
+      if (word.role === 'Subject') seenSubject = true;
+      
+      return { role: word.role, clauseIndex: currentClause, originalIndex };
+    });
+
+    const groupsMap = new Map<string, { clauseIndex: number, role: SyntaxRole, tokenIndices: number[] }>();
+    wordsWithClause.forEach(w => {
+      const key = `${w.clauseIndex}-${w.role}`;
+      if (!groupsMap.has(key)) {
+        groupsMap.set(key, { clauseIndex: w.clauseIndex, role: w.role, tokenIndices: [] });
+      }
+      groupsMap.get(key)!.tokenIndices.push(w.originalIndex);
+    });
+
+    const groups = Array.from(groupsMap.values());
+    
+    groups.sort((a, b) => {
+      if (a.clauseIndex !== b.clauseIndex) {
+        return a.clauseIndex - b.clauseIndex;
+      }
+      const idxA = STRICT_ORDER.indexOf(a.role);
+      const idxB = STRICT_ORDER.indexOf(b.role);
+      const aVal = idxA === -1 ? 99 : idxA;
+      const bVal = idxB === -1 ? 99 : idxB;
+      return aVal - bVal;
+    });
+
+    return groups;
+  }, [currentSentence]);
 
   const handleNextStep = () => {
     if (!currentSentence) return;
@@ -161,21 +213,18 @@ export default function SentenceTrainerScreen() {
     if (isIntroMode) {
       setIsIntroMode(false);
       setIsFullyVisible(false);
-      setRevealedRoles([]);
+      setRevealedSteps(0);
       return;
     }
 
     if (isFullyVisible) {
       setIsFullyVisible(false);
-      setRevealedRoles([]);
+      setRevealedSteps(0);
       return;
     }
 
-    const rolesInSentence = new Set(currentSentence.words.map((t: Token) => t.role));
-    const nextRole = STRICT_ORDER.find(role => rolesInSentence.has(role) && !revealedRoles.includes(role));
-    
-    if (nextRole) {
-      setRevealedRoles(prev => [...prev, nextRole]);
+    if (revealedSteps < orderedGroups.length) {
+      setRevealedSteps(prev => prev + 1);
     } else {
       moveToNextSentence();
     }
@@ -188,24 +237,21 @@ export default function SentenceTrainerScreen() {
       return;
     }
 
-    if (revealedRoles.length === 0 && !isFullyVisible) {
+    if (revealedSteps === 0 && !isFullyVisible) {
       setIsIntroMode(true);
       setIsFullyVisible(true);
       return;
     }
 
     if (isFullyVisible) {
-      // If fully visible, just hide everything to start breaking down
       setIsFullyVisible(false);
-      setRevealedRoles([...STRICT_ORDER.filter(role => new Set(currentSentence.words.map((t: Token) => t.role)).has(role))]);
+      setRevealedSteps(orderedGroups.length);
       return;
     }
 
-    if (revealedRoles.length > 0) {
-      // Hide the last revealed role
-      setRevealedRoles(prev => prev.slice(0, -1));
+    if (revealedSteps > 0) {
+      setRevealedSteps(prev => prev - 1);
     } else {
-      // If nothing is revealed, show everything
       setIsFullyVisible(true);
     }
   };
@@ -245,10 +291,9 @@ export default function SentenceTrainerScreen() {
   const handleFlash = () => {
     if (isFullyVisible) {
       setIsFullyVisible(false);
-      setRevealedRoles([]);
+      setRevealedSteps(0);
     } else {
       setIsFullyVisible(true);
-      setRevealedRoles([]);
     }
   };
 
@@ -334,7 +379,8 @@ export default function SentenceTrainerScreen() {
   };
 
   const renderToken = (token: Token, index: number) => {
-    const isRevealed = isFullyVisible || revealedRoles.includes(token.role);
+    const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
+    const isRevealed = isFullyVisible || groupIndex < revealedSteps;
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
@@ -344,6 +390,9 @@ export default function SentenceTrainerScreen() {
             { borderColor: getRoleColor(token.role) },
             token.is_in_my_dict && { backgroundColor: '#FFFDF0' } // Gentle yellow background for dict words
           ]}>
+            <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
+              <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
+            </View>
             {token.parts && token.parts.length > 0 ? (
               <Text style={styles.wordText}>
                 {token.parts.map((part, i) => {
@@ -382,7 +431,8 @@ export default function SentenceTrainerScreen() {
   };
 
   const renderTokenTableMode = (token: Token, index: number) => {
-    const isRevealed = isFullyVisible || revealedRoles.includes(token.role);
+    const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
+    const isRevealed = isFullyVisible || groupIndex < revealedSteps;
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
@@ -393,6 +443,9 @@ export default function SentenceTrainerScreen() {
               { borderColor: getRoleColor(token.role), minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
               token.is_in_my_dict && { backgroundColor: '#FFFDF0' }
             ]}>
+              <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
+                <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
+              </View>
               {token.parts && token.parts.length > 0 ? (
                 <Text style={styles.wordText}>
                   {token.parts.map((part, i) => {
@@ -461,7 +514,7 @@ export default function SentenceTrainerScreen() {
                 setSelectedLanguageCode(lang.code);
                 setCurrentFilteredIndex(0);
                 setIsFullyVisible(true);
-                setRevealedRoles([]);
+                setRevealedSteps(0);
                 setShowTranslations(false);
               }}
             >
@@ -720,6 +773,8 @@ const styles = StyleSheet.create({
   sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 },
   tokenContainer: { margin: 4 },
   wordCard: { backgroundColor: '#FFFFFF', padding: 10, borderRadius: 8, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, alignItems: 'center', minWidth: 80 },
+  orderBadge: { position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
+  orderBadgeText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
   hiddenCard: { backgroundColor: '#E0E0E0', padding: 10, borderRadius: 8, borderWidth: 2, borderColor: '#CBD5E1', alignItems: 'center', minWidth: 80 },
   wordText: { fontSize: 18, fontWeight: '600' },
   wordRoot: { fontWeight: '600', color: '#111827' },

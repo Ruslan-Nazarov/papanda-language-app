@@ -56,23 +56,41 @@ export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
 
   const byLanguage: Record<string, number> = {};
   let totalShows = 0;
+  let overallTarget = 0;
 
   activeLangs.forEach(lang => {
     let langShows = 0;
+    let activeWords = 0;
+    
     words.forEach(w => {
-      const showStats = typeof w.show_stats === 'string' ? JSON.parse(w.show_stats) : w.show_stats;
-      if (showStats && showStats[lang]) {
-        langShows += showStats[lang];
+      let showStats = w.show_stats;
+      let statsObj: Record<string, number> = {};
+      if (typeof showStats === 'string') {
+        try {
+          statsObj = JSON.parse(showStats);
+        } catch (e) {
+          statsObj = {};
+        }
+      } else if (showStats) {
+        statsObj = showStats as Record<string, number>;
+      }
+      
+      if (statsObj && statsObj[lang]) {
+        langShows += statsObj[lang];
+        activeWords++;
       }
     });
 
-    const targetShows = words.length * 80;
-    byLanguage[lang] = targetShows > 0 ? (langShows / targetShows) * 100 : 0;
+    const targetShows = activeWords * 80;
+    const percentage = targetShows > 0 ? (langShows / targetShows) * 100 : 0;
+    byLanguage[lang] = Math.min(100, Math.max(0, percentage)) || 0;
+    
     totalShows += langShows;
+    overallTarget += targetShows;
   });
 
-  const overallTarget = words.length * 80 * activeLangs.length;
-  const overall = overallTarget > 0 ? (totalShows / overallTarget) * 100 : 0;
+  const overallPercentage = overallTarget > 0 ? (totalShows / overallTarget) * 100 : 0;
+  const overall = Math.min(100, Math.max(0, overallPercentage)) || 0;
 
   return {
     overall,

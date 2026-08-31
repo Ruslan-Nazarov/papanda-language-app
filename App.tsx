@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Text, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -14,6 +15,7 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import { useStore } from './src/store/useStore';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
@@ -84,11 +86,6 @@ function MainTabs() {
         options={{ tabBarLabel: 'Предложения' }}
       />
       <Tab.Screen 
-        name="Dictionary" 
-        component={DictionaryScreen} 
-        options={{ tabBarLabel: 'Словарь' }}
-      />
-      <Tab.Screen 
         name="Brain Workout" 
         component={BrainWorkoutScreen} 
         options={{ tabBarLabel: 'Тренировка' }}
@@ -118,7 +115,10 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <NavigationContainer>
-        <MainTabs />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Dictionary" component={DictionaryScreen} />
+        </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );

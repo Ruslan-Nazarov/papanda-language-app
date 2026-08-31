@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
@@ -17,6 +17,25 @@ export default function WordTriplesScreen() {
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: any}[]>([]);
+
+  // Avoid stale closures in PanResponder
+  const callbacks = React.useRef({ handleNext: () => {}, handlePrev: () => {} });
+  
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx < -50) {
+          callbacks.current.handleNext();
+        } else if (gestureState.dx > 50) {
+          callbacks.current.handlePrev();
+        }
+      },
+    })
+  ).current;
 
   const pickRandomWord = () => {
     const pending = words.filter(w => {
@@ -47,6 +66,17 @@ export default function WordTriplesScreen() {
       pickRandomWord();
     }
   }, [words, activeLanguages]);
+
+  // Sync currentWord with any edits made in the modal/store
+  useEffect(() => {
+    if (currentWord) {
+      const wordKey = currentWord.eng || currentWord.word;
+      const latestWord = words.find(w => (w.eng || w.word) === wordKey);
+      if (latestWord && JSON.stringify(latestWord) !== JSON.stringify(currentWord)) {
+        setCurrentWord(latestWord);
+      }
+    }
+  }, [words]);
 
   const handleNext = () => {
     if (currentWord && associationText !== currentWord.personal_association) {
@@ -110,6 +140,12 @@ export default function WordTriplesScreen() {
     const targetWord = translation.trim().toLowerCase();
     if (!targetWord) return null;
 
+    const escapeRegExp = (string: string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+
+    const regex = new RegExp(`(^|[^\\p{L}\\p{N}])` + escapeRegExp(targetWord) + `([^\\p{L}\\p{N}]|$)`, 'iu');
+
     const matched = sentences.find(s => {
       if (langObj && s.language && !s.language.toLowerCase().includes(langObj.label.toLowerCase())) {
         return false;
@@ -118,7 +154,7 @@ export default function WordTriplesScreen() {
         t.dictionary_word?.toLowerCase() === targetWord ||
         t.text?.toLowerCase() === targetWord ||
         t.translation?.toLowerCase() === targetWord
-      ) || s.sentence?.toLowerCase().includes(targetWord);
+      ) || (s.sentence && regex.test(s.sentence));
     });
 
     return matched || null;
@@ -140,6 +176,9 @@ export default function WordTriplesScreen() {
 
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
 
+  callbacks.current.handleNext = handleNext;
+  callbacks.current.handlePrev = handlePrev;
+
   if (activeLanguages.length === 0) {
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
@@ -160,14 +199,23 @@ export default function WordTriplesScreen() {
     <KeyboardAvoidingView 
       style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      {...panResponder.panHandlers}
     >
       <View style={[styles.innerWrapper, { paddingTop: topPadding }]}>
         {/* Header with comfortable breathing space */}
-        <View style={styles.topHeader}>
-          <Text style={styles.headerTitle}>Слова</Text>
-          {sessionCount > 0 && (
-            <Text style={styles.sessionCountText}>Пройдено за заход: {sessionCount}</Text>
-          )}
+        <View style={[styles.topHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+          <View>
+            <Text style={styles.headerTitle}>Слова</Text>
+            {sessionCount > 0 && (
+              <Text style={styles.sessionCountText}>Пройдено за заход: {sessionCount}</Text>
+            )}
+          </View>
+          <TouchableOpacity 
+            style={styles.dictionaryBtn} 
+            onPress={() => navigation.navigate('Dictionary')}
+          >
+            <Text style={{fontSize: 24}}>📖</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Main Card */}
@@ -474,9 +522,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  dictionaryBtn: {
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 2
   },
   btnPrev: {
     backgroundColor: '#94A3B8'

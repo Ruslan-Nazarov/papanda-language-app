@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, PanResponder } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
@@ -22,6 +22,26 @@ export default function BrainWorkoutScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [history, setHistory] = useState<{index: number, knew: boolean, previousProgress: any}[]>([]);
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [workoutResult, setWorkoutResult] = useState({ known: 0, unknown: 0 });
+
+  const callbacks = React.useRef({ handleAnswer: (knew: boolean) => {}, handlePrevStep: () => {} });
+
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx < -50) {
+          callbacks.current.handleAnswer(false);
+        } else if (gestureState.dx > 50) {
+          callbacks.current.handlePrevStep();
+        }
+      },
+    })
+  ).current;
 
   // Generate workout queue
   useEffect(() => {
@@ -97,7 +117,8 @@ export default function BrainWorkoutScreen() {
   }, [words.length, activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount]);
 
   const currentItem = queue[currentIndex];
-  const currentWord = currentItem?.word;
+  // Always use the freshest word data from the store in case it was edited
+  const currentWord = currentItem ? (words.find(w => (w.eng || w.word) === (currentItem.word.eng || currentItem.word.word)) || currentItem.word) : undefined;
   const currentLang = currentItem?.langCode;
   
   // Always read the latest favorite status directly from the store
@@ -137,7 +158,9 @@ export default function BrainWorkoutScreen() {
         correct: finalKnown
       });
 
-      alert(`Тренировка завершена!\nВы вспомнили: ${finalKnown}\nНужно повторить: ${finalUnknown}`);
+      setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
+      setResultModalVisible(true);
+      
       setCurrentIndex(0);
       setScore({ known: 0, unknown: 0 });
       setShowAnswer(false);
@@ -192,8 +215,11 @@ export default function BrainWorkoutScreen() {
   const activeLangObj = LANGUAGES.find(l => l.code === currentLang);
   const remainingCount = queue.length - currentIndex;
 
+  callbacks.current.handleAnswer = handleAnswer;
+  callbacks.current.handlePrevStep = handlePrevStep;
+
   return (
-    <View style={[styles.container, { paddingTop: topPadding }]}>
+    <View style={[styles.container, { paddingTop: topPadding }]} {...panResponder.panHandlers}>
       {/* Top Header & Progress */}
       <View style={styles.headerSection}>
         <View style={styles.langBadge}>
@@ -319,6 +345,35 @@ export default function BrainWorkoutScreen() {
         onClose={() => setIsModalVisible(false)} 
         wordToEdit={editingWord} 
       />
+
+      {/* Workout Result Modal */}
+      <Modal visible={resultModalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.resultModalCard}>
+            <Text style={styles.resultIcon}>🎉</Text>
+            <Text style={styles.resultTitle}>Тренировка завершена!</Text>
+            
+            <View style={styles.resultStatsRow}>
+              <View style={styles.resultStatBox}>
+                <Text style={styles.resultStatValueKnown}>{workoutResult.known}</Text>
+                <Text style={styles.resultStatLabel}>Вспомнили</Text>
+              </View>
+              <View style={styles.resultStatDivider} />
+              <View style={styles.resultStatBox}>
+                <Text style={styles.resultStatValueUnknown}>{workoutResult.unknown}</Text>
+                <Text style={styles.resultStatLabel}>Повторить</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.resultOkBtn}
+              onPress={() => setResultModalVisible(false)}
+            >
+              <Text style={styles.resultOkBtnText}>Отлично!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -595,5 +650,84 @@ const styles = StyleSheet.create({
   },
   favoriteToggleTextActive: {
     color: '#D97706',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  resultModalCard: {
+    width: '100%',
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  resultIcon: {
+    fontSize: 54,
+    marginBottom: 16,
+  },
+  resultTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1A202C',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  resultStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 24,
+    width: '100%',
+  },
+  resultStatBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  resultStatDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#E2E8F0',
+  },
+  resultStatValueKnown: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#10B981', // Green
+    marginBottom: 4,
+  },
+  resultStatValueUnknown: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#F59E0B', // Amber/Orange
+    marginBottom: 4,
+  },
+  resultStatLabel: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  resultOkBtn: {
+    backgroundColor: '#007BFF',
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+  resultOkBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

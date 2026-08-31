@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
@@ -8,6 +9,7 @@ import EditWordModal from '../components/EditWordModal';
 
 export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<any>();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, activeLanguages, sentences, toggleWordFavorite } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,7 +116,12 @@ export default function DictionaryScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
       <View style={styles.headerTitleRow}>
-        <Text style={styles.header}>Словарь ({filteredWords.length})</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{marginRight: 10, padding: 5}}>
+            <Text style={{fontSize: 24, color: '#333'}}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.header}>Словарь ({filteredWords.length})</Text>
+        </View>
         <TouchableOpacity style={styles.addBtn} onPress={() => openEditor()}>
           <Text style={styles.addBtnText}>+ Добавить</Text>
         </TouchableOpacity>
