@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder, Modal, Animated, Easing } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Word, Sentence } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
+
+type WordStats = Record<string, boolean | number>;
+
+const SWIPE_THRESHOLD = 72;
+const SWIPE_EXIT_DISTANCE = 520;
+const SWIPE_ENTRY_OFFSET = 56;
+
+const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | undefined): WordStats => {
+  if (!value) return {};
+  if (typeof value === 'object') return value;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
 
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
@@ -14,26 +32,40 @@ export default function WordTriplesScreen() {
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: any}[]>([]);
 
   // Avoid stale closures in PanResponder
-  const callbacks = React.useRef({ handleNext: () => {}, handlePrev: () => {} });
-  
+  const callbacks = React.useRef({
+    handleSwipe: (_direction: 'left' | 'right') => {},
+    resetCardPosition: () => {},
+  });
+  const cardTranslateX = React.useRef(new Animated.Value(0)).current;
+  const isSwipeAnimating = React.useRef(false);
+
   const panResponder = React.useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 8 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.4;
       },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dx < -50) {
-          callbacks.current.handleNext();
-        } else if (gestureState.dx > 50) {
-          callbacks.current.handlePrev();
+      onPanResponderMove: (_evt, gestureState) => {
+        if (!isSwipeAnimating.current) {
+          cardTranslateX.setValue(gestureState.dx);
         }
       },
+      onPanResponderRelease: (_evt, gestureState) => {
+        if (gestureState.dx < -SWIPE_THRESHOLD) {
+          callbacks.current.handleSwipe('left');
+        } else if (gestureState.dx > SWIPE_THRESHOLD) {
+          callbacks.current.handleSwipe('right');
+        } else {
+          callbacks.current.resetCardPosition();
+        }
+      },
+      onPanResponderTerminate: () => callbacks.current.resetCardPosition(),
     })
   ).current;
 
@@ -44,9 +76,7 @@ export default function WordTriplesScreen() {
       );
       if (!hasAllTranslations) return false;
 
-      const stats = w.knowledge_stats as Record<string, boolean>;
-      if (!stats) return true;
-      
+      const stats = readWordStats(w.knowledge_stats);
       const isKnownInAll = activeLanguages.every(lang => stats[lang] === true);
       return !isKnownInAll;
     });
@@ -67,16 +97,16 @@ export default function WordTriplesScreen() {
     }
   }, [words, activeLanguages]);
 
-  // Sync currentWord with any edits made in the modal/store
+  // Sync currentWord with any edits made in the modal/store. The store replaces
+  // word objects on every change, so a reference check is enough — no deep compare.
   useEffect(() => {
-    if (currentWord) {
-      const wordKey = currentWord.eng || currentWord.word;
-      const latestWord = words.find(w => (w.eng || w.word) === wordKey);
-      if (latestWord && JSON.stringify(latestWord) !== JSON.stringify(currentWord)) {
-        setCurrentWord(latestWord);
-      }
+    if (!currentWord) return;
+    const wordKey = currentWord.eng || currentWord.word;
+    const latestWord = words.find(w => (w.eng || w.word) === wordKey);
+    if (latestWord && latestWord !== currentWord) {
+      setCurrentWord(latestWord);
     }
-  }, [words]);
+  }, [words, currentWord]);
 
   const handleNext = () => {
     if (currentWord && associationText !== currentWord.personal_association) {
@@ -132,6 +162,56 @@ export default function WordTriplesScreen() {
     }
   };
 
+  const resetCardPosition = () => {
+    if (isSwipeAnimating.current) return;
+    Animated.spring(cardTranslateX, {
+      toValue: 0,
+      useNativeDriver: true,
+      speed: 18,
+      bounciness: 5,
+    }).start();
+  };
+
+  const handleSwipe = (direction: 'left' | 'right') => {
+    // Right swipe undoes the previous card; keep it in place if nothing to undo.
+    if (direction === 'right' && history.length === 0) {
+      resetCardPosition();
+      return;
+    }
+    if (isSwipeAnimating.current) return;
+    isSwipeAnimating.current = true;
+
+    const exitDirection = direction === 'left' ? -1 : 1;
+    Animated.timing(cardTranslateX, {
+      toValue: exitDirection * SWIPE_EXIT_DISTANCE,
+      duration: 210,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (!finished) {
+        isSwipeAnimating.current = false;
+        return;
+      }
+      // Drop the next card just beyond the opposite edge, then spring it home.
+      cardTranslateX.setValue(-exitDirection * SWIPE_ENTRY_OFFSET);
+      if (direction === 'left') {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+      requestAnimationFrame(() => {
+        Animated.spring(cardTranslateX, {
+          toValue: 0,
+          useNativeDriver: true,
+          speed: 18,
+          bounciness: 4,
+        }).start(() => {
+          isSwipeAnimating.current = false;
+        });
+      });
+    });
+  };
+
   // Find matching sentence for a given translation and language
   const findSentenceForWord = (langCode: string, translation: string | undefined): Sentence | null => {
     if (!translation || !sentences || sentences.length === 0) return null;
@@ -176,8 +256,32 @@ export default function WordTriplesScreen() {
 
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
 
-  callbacks.current.handleNext = handleNext;
-  callbacks.current.handlePrev = handlePrev;
+  const currentWordKey = currentWord?.eng || currentWord?.word || '';
+  const currentProgress = currentWordKey ? userWordProgress[currentWordKey] : undefined;
+  const knowledgeStats = {
+    ...readWordStats(currentWord?.knowledge_stats),
+    ...(currentProgress?.knowledge_stats || {}),
+  } as Record<string, boolean>;
+  const showStats = {
+    ...readWordStats(currentWord?.show_stats),
+    ...(currentProgress?.show_stats || {}),
+  } as Record<string, number>;
+  const totalShows = activeLanguages.reduce((total, lang) => total + (showStats[lang] || 0), 0);
+  const lastShown = currentProgress?.last_shown ?? currentWord?.last_shown;
+
+  callbacks.current.handleSwipe = handleSwipe;
+  callbacks.current.resetCardPosition = resetCardPosition;
+
+  const cardRotation = cardTranslateX.interpolate({
+    inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
+    outputRange: ['-7deg', '0deg', '7deg'],
+    extrapolate: 'clamp',
+  });
+  const cardOpacity = cardTranslateX.interpolate({
+    inputRange: [-SWIPE_EXIT_DISTANCE, -SWIPE_EXIT_DISTANCE / 2, 0, SWIPE_EXIT_DISTANCE / 2, SWIPE_EXIT_DISTANCE],
+    outputRange: [0.15, 0.85, 1, 0.85, 0.15],
+    extrapolate: 'clamp',
+  });
 
   if (activeLanguages.length === 0) {
     return (
@@ -219,30 +323,45 @@ export default function WordTriplesScreen() {
         </View>
 
         {/* Main Card */}
-        <View style={styles.card}>
-          <TouchableOpacity 
-            style={styles.favCardBtn} 
-            onPress={() => {
-              const wordKey = currentWord.eng || currentWord.word || '';
-              toggleWordFavorite(wordKey);
-            }}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={[styles.editCardBtnText, (userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
-              {(userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? '★' : '☆'}
-            </Text>
-          </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.card,
+            { transform: [{ translateX: cardTranslateX }, { rotate: cardRotation }], opacity: cardOpacity },
+          ]}
+        >
+          <View style={styles.cardActions}>
+            <TouchableOpacity
+              style={styles.favCardBtn}
+              onPress={() => {
+                const wordKey = currentWord.eng || currentWord.word || '';
+                toggleWordFavorite(wordKey);
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={[styles.editCardBtnText, (userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
+                {(userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? '★' : '☆'}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.editCardBtn} 
-            onPress={() => {
-              setEditingWord(currentWord);
-              setIsModalVisible(true);
-            }}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.editCardBtnText}>✏️</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.statsCardBtn}
+              onPress={() => setIsStatsVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.statsCardBtnText}>📊 Статистика</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.editCardBtn}
+              onPress={() => {
+                setEditingWord(currentWord);
+                setIsModalVisible(true);
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.editCardBtnText}>✏️</Text>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
 
@@ -297,7 +416,7 @@ export default function WordTriplesScreen() {
             value={associationText}
             onChangeText={setAssociationText}
           />
-        </View>
+        </Animated.View>
 
         {/* Bottom Actions */}
         <View style={styles.controls}>
@@ -323,6 +442,53 @@ export default function WordTriplesScreen() {
         onClose={() => setIsModalVisible(false)} 
         wordToEdit={editingWord} 
       />
+
+      <Modal
+        visible={isStatsVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsStatsVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.statsModalCard}>
+            <Text style={styles.statsModalTitle}>Статистика слова</Text>
+            <Text style={styles.statsModalWord}>{currentWord.ru}</Text>
+
+            <View style={styles.statsSummaryRow}>
+              <View style={styles.statsSummaryItem}>
+                <Text style={styles.statsSummaryValue}>{totalShows}</Text>
+                <Text style={styles.statsSummaryLabel}>показов</Text>
+              </View>
+              <View style={styles.statsSummaryDivider} />
+              <View style={styles.statsSummaryItem}>
+                <Text style={styles.statsSummaryValue}>{lastShown ? new Date(lastShown).toLocaleDateString('ru-RU') : '—'}</Text>
+                <Text style={styles.statsSummaryLabel}>последний показ</Text>
+              </View>
+            </View>
+
+            <Text style={styles.statsLanguagesTitle}>Активные языки</Text>
+            <View style={styles.statsLanguagesList}>
+              {activeLanguages.map(lang => {
+                const language = LANGUAGES.find(item => item.code === lang);
+                const learned = knowledgeStats[lang] === true;
+
+                return (
+                  <View key={lang} style={styles.statsLanguageRow}>
+                    <Text style={styles.statsLanguageName}>{language?.flag} {language?.label || lang.toUpperCase()}</Text>
+                    <Text style={[styles.statsLanguageStatus, learned ? styles.statsLanguageStatusLearned : styles.statsLanguageStatusPending]}>
+                      {learned ? '✓ Выучено' : '○ В процессе'} · {showStats[lang] || 0} пок.
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity style={styles.statsCloseBtn} onPress={() => setIsStatsVisible(false)}>
+              <Text style={styles.statsCloseBtnText}>Закрыть</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -379,23 +545,21 @@ const styles = StyleSheet.create({
     borderColor: '#ECEFF1',
     position: 'relative',
   },
+  cardActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginBottom: 2,
+  },
   editCardBtn: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
     padding: 4,
-    zIndex: 10,
     backgroundColor: '#F8F9FA',
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
   favCardBtn: {
-    position: 'absolute',
-    top: 16,
-    right: 56,
     padding: 4,
-    zIndex: 10,
     backgroundColor: '#F8F9FA',
     borderRadius: 20,
     borderWidth: 1,
@@ -403,6 +567,19 @@ const styles = StyleSheet.create({
   },
   editCardBtnText: {
     fontSize: 16,
+  },
+  statsCardBtn: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 14,
+  },
+  statsCardBtnText: {
+    color: '#2563EB',
+    fontSize: 12,
+    fontWeight: '700',
   },
   nativeWord: { 
     fontSize: 28, 
@@ -549,5 +726,113 @@ const styles = StyleSheet.create({
     color: '#FFF', 
     fontSize: 16, 
     fontWeight: 'bold' 
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  statsModalCard: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  statsModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1A202C',
+    textAlign: 'center',
+  },
+  statsModalWord: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007BFF',
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 18,
+  },
+  statsSummaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    paddingVertical: 12,
+    marginBottom: 20,
+  },
+  statsSummaryItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  statsSummaryValue: {
+    color: '#1E293B',
+    fontSize: 17,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  statsSummaryLabel: {
+    color: '#64748B',
+    fontSize: 11,
+    marginTop: 3,
+    textAlign: 'center',
+  },
+  statsSummaryDivider: {
+    width: 1,
+    height: 38,
+    backgroundColor: '#E2E8F0',
+  },
+  statsLanguagesTitle: {
+    color: '#475569',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  statsLanguagesList: {
+    gap: 8,
+  },
+  statsLanguageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  statsLanguageName: {
+    color: '#334155',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  statsLanguageStatus: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  statsLanguageStatusLearned: {
+    color: '#16A34A',
+  },
+  statsLanguageStatusPending: {
+    color: '#64748B',
+  },
+  statsCloseBtn: {
+    backgroundColor: '#007BFF',
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  statsCloseBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   }
 });

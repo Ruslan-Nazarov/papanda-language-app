@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
 import { Word } from '../models/types';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
@@ -25,7 +25,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
         });
 
         setTempWord({
-          eng: wordToEdit.eng || wordToEdit.word || '',
+          eng: wordToEdit.source_language ? (wordToEdit.word || '') : (wordToEdit.eng || wordToEdit.word || ''),
           ru: wordToEdit.ru || '',
           personal_association: wordToEdit.personal_association || '',
           translations: trans
@@ -41,7 +41,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
   const handleSave = () => {
     if (isAddingNew) {
       if (!tempWord.eng.trim()) {
-        alert("Поле 'Оригинал' не может быть пустым");
+        Alert.alert('Заполните поле', "Поле «Оригинал» не может быть пустым.");
         return;
       }
       const newWord: Word = {
@@ -59,12 +59,29 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
       addCustomWord(newWord);
     } else if (wordToEdit) {
       const editingWordKey = wordToEdit.eng || wordToEdit.word || '';
-      updateWordDetails(editingWordKey, {
-        word: tempWord.eng.trim(),
-        ru: tempWord.ru.trim(),
-        translations: tempWord.translations
+
+      // Only push fields the user actually changed, so userWordProgress doesn't
+      // accumulate redundant custom_* overrides.
+      const details: { ru?: string; translations?: Record<string, string> } = {};
+      if (tempWord.ru.trim() !== (wordToEdit.ru || '')) {
+        details.ru = tempWord.ru.trim();
+      }
+      const changedTranslations: Record<string, string> = {};
+      activeLanguages.forEach(lang => {
+        const before = (wordToEdit[lang as keyof Word] || wordToEdit.translations?.[lang] || '') as string;
+        const after = (tempWord.translations[lang] || '').trim();
+        if (after !== before.trim()) changedTranslations[lang] = after;
       });
-      saveWordAssociation(editingWordKey, tempWord.personal_association.trim());
+      if (Object.keys(changedTranslations).length > 0) {
+        details.translations = changedTranslations;
+      }
+      if (Object.keys(details).length > 0) {
+        updateWordDetails(editingWordKey, details);
+      }
+
+      if (tempWord.personal_association.trim() !== (wordToEdit.personal_association || '')) {
+        saveWordAssociation(editingWordKey, tempWord.personal_association.trim());
+      }
     }
     onClose();
   };

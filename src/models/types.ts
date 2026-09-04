@@ -23,6 +23,8 @@ export interface Word {
   show_stats?: string | Record<string, number>; // JSON string from DB, parsed to object
   personal_association?: string; // user's personal context/meaning
   is_favorite?: boolean;
+  /** Language of a word added from a sentence; the internal `eng` field remains its stable key. */
+  source_language?: string;
 }
 
 export type SyntaxRole =
@@ -47,7 +49,10 @@ export interface Token {
   parts?: string[]; // In new data parts is just an array of strings
   translation: string;
   is_in_my_dict: boolean;
-  dictionary_word?: string;
+  /** Existing dictionary reference; null means that this token is not yet in the user's dictionary. */
+  dictionary_word?: string | null;
+  /** Canonical lemma for adding the token to the dictionary, even when it is not there yet. */
+  dictionary_form?: string;
 }
 
 export interface Sentence {
@@ -55,4 +60,5 @@ export interface Sentence {
   language: string;
   sentence: string; // The original text is now in 'sentence' property
   words: Token[];   // Tokens are now in 'words' property
+  source?: 'seed' | 'manual' | 'generated';
 }

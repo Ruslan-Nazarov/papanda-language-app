@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator, Alert, PanResponder } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { SyntaxRole, Token } from '../models/types';
@@ -7,6 +7,7 @@ import { LANGUAGES } from '../constants/languages';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { explainSentenceWithAI } from '../services/aiService';
+import { generateSentenceBatch, isSentenceGenerationConfigured } from '../services/sentenceGeneration';
 
 const STRICT_ORDER: SyntaxRole[] = [
   'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
@@ -15,6 +16,8 @@ const STRICT_ORDER: SyntaxRole[] = [
 ];
 
 const AFFIX_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']; // Palette for multiple suffixes
+const GENERATION_RESERVE = 3; // top up when this few unlearned generated sentences remain
+const GENERATION_BATCH = 8;
 
 const ROLE_TRANSLATIONS: Record<SyntaxRole, string> = {
   Subject: 'Подлежащее',
@@ -49,12 +52,14 @@ const getRoleColor = (role: SyntaxRole) => {
 export default function SentenceTrainerScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { sentences, addSentence, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
+  const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
   const [revealedSteps, setRevealedSteps] = useState(0);
   const [isFullyVisible, setIsFullyVisible] = useState(true);
   const [showTranslations, setShowTranslations] = useState(false);
   const [isTableMode, setIsTableMode] = useState(false);
+  // Every sentence opens as a big, centered, readable line; the learner taps
+  // "Далее" to move into the card-by-card breakdown.
   const [isIntroMode, setIsIntroMode] = useState(true);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
@@ -68,15 +73,93 @@ export default function SentenceTrainerScreen() {
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationErrors, setGenerationErrors] = useState<Record<string, string>>({});
+  const [addedTokenKeys, setAddedTokenKeys] = useState<Set<string>>(new Set());
+  const generatingLanguages = useRef(new Set<string>());
+  // Set when a deep link (from another screen) wants the breakdown, not the intro.
+  const skipIntroOnce = useRef(false);
+  const swipeCallbacks = useRef({ next: () => {} });
+  const sentencePanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_event, gestureState) => (
+        Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+      ),
+      onPanResponderRelease: (_event, gestureState) => {
+        if (gestureState.dx < -50) swipeCallbacks.current.next();
+      }
+    })
+  ).current;
 
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(activeLanguages[0] || 'it');
 
-  // Filter sentences by selectedLanguageCode
+  // AI sentences are the normal training queue. Manually prepared sentences are
+  // kept untouched and shown only when Gemini cannot provide a sentence.
   const activeLangObj = LANGUAGES.find(l => l.code === selectedLanguageCode);
-  const filteredSentences = sentences.filter(s => {
+  const allSentencesForLanguage = sentences.filter(s => {
     if (!s.language || !activeLangObj) return false;
     return s.language.toLowerCase().includes(activeLangObj.label.toLowerCase());
   });
+  const generatedSentences = allSentencesForLanguage.filter(sentence => sentence.source === 'generated');
+  const fallbackSentences = allSentencesForLanguage.filter(sentence => sentence.source !== 'generated');
+  const generationError = generationErrors[selectedLanguageCode];
+  const filteredSentences = generatedSentences.length > 0
+    ? generatedSentences
+    : fallbackSentences;
+  const generatedCacheCount = generatedSentences.length;
+
+  const generateSentences = async (languageCode = selectedLanguageCode, count = GENERATION_BATCH) => {
+    const language = LANGUAGES.find(item => item.code === languageCode);
+    if (!language || generatingLanguages.current.has(languageCode)) return;
+
+    generatingLanguages.current.add(languageCode);
+    setIsGenerating(true);
+    setGenerationErrors(previous => {
+      if (!previous[languageCode]) return previous;
+      const updated = { ...previous };
+      delete updated[languageCode];
+      return updated;
+    });
+
+    try {
+      const generated = await generateSentenceBatch(languageCode, words, count);
+      addGeneratedSentences(generated);
+      if (languageCode === selectedLanguageCode && generatedSentences.length === 0) {
+        setCurrentFilteredIndex(0);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Не удалось сгенерировать предложения.';
+      setGenerationErrors(previous => ({ ...previous, [languageCode]: message }));
+    } finally {
+      generatingLanguages.current.delete(languageCode);
+      setIsGenerating(false);
+    }
+  };
+
+  // Open a language -> generate first batch only if there are NO generated sentences yet
+  useEffect(() => {
+    if (!isSentenceGenerationConfigured()) {
+      setGenerationErrors(previous => ({
+        ...previous,
+        [selectedLanguageCode]: 'Gemini не подключён: не задан ключ EXPO_PUBLIC_GEMINI_API_KEY. Добавьте его в .env (или в переменные окружения EAS) и пересоберите приложение.'
+      }));
+      return;
+    }
+    if (generatedCacheCount === 0 && !generationErrors[selectedLanguageCode]) {
+      void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+    }
+  }, [selectedLanguageCode, generatedCacheCount === 0]);
+
+  // Keep an endless queue: quietly top up while the learner still has cards left.
+  useEffect(() => {
+    if (!isSentenceGenerationConfigured()) return;
+    if (generatedCacheCount === 0 || generationErrors[selectedLanguageCode]) return;
+    const unlearnedGenerated = generatedSentences.filter(s => !learnedSentences.includes(s.id)).length;
+    if (unlearnedGenerated <= GENERATION_RESERVE) {
+      void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+    }
+  }, [selectedLanguageCode, currentFilteredIndex, generatedCacheCount, learnedSentences.length]);
 
   // Handle incoming target sentence from WordTriples or other screens
   useEffect(() => {
@@ -94,7 +177,9 @@ export default function SentenceTrainerScreen() {
       if (sentenceId) {
         const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
         if (foundIdx !== -1) {
+          skipIntroOnce.current = true;
           setCurrentFilteredIndex(foundIdx);
+          setIsIntroMode(false);
           setIsFullyVisible(true);
           setRevealedSteps(0);
           setShowTranslations(true);
@@ -108,12 +193,18 @@ export default function SentenceTrainerScreen() {
   
   const currentSentence = filteredSentences[currentFilteredIndex];
 
-  // Clear state when switching to a different sentence
+  // Clear state when switching to a different sentence — start from the intro view,
+  // unless a deep link asked to jump straight to the breakdown.
   useEffect(() => {
     setAiExplanation(null);
     setIsFullyVisible(true);
     setRevealedSteps(0);
-    setIsIntroMode(true);
+    if (skipIntroOnce.current) {
+      skipIntroOnce.current = false;
+      setIsIntroMode(false);
+    } else {
+      setIsIntroMode(true);
+    }
   }, [currentSentence?.id]);
 
   const moveToNextSentence = () => {
@@ -122,6 +213,7 @@ export default function SentenceTrainerScreen() {
       setRevealedSteps(0);
       setShowTranslations(false);
       setAiExplanation(null);
+      setIsIntroMode(true);
       return;
     }
     
@@ -154,6 +246,8 @@ export default function SentenceTrainerScreen() {
     setAiExplanation(null);
     setIsIntroMode(true);
   };
+
+  swipeCallbacks.current.next = moveToNextSentence;
 
   const orderedGroups = React.useMemo(() => {
     if (!currentSentence || !currentSentence.words) return [];
@@ -210,9 +304,10 @@ export default function SentenceTrainerScreen() {
   const handleNextStep = () => {
     if (!currentSentence) return;
     
+    // intro -> full breakdown -> hide, then reveal group by group -> next sentence
     if (isIntroMode) {
       setIsIntroMode(false);
-      setIsFullyVisible(false);
+      setIsFullyVisible(true);
       setRevealedSteps(0);
       return;
     }
@@ -233,27 +328,19 @@ export default function SentenceTrainerScreen() {
   const handlePrevStep = () => {
     if (!currentSentence) return;
 
-    if (isIntroMode) {
-      return;
-    }
-
-    if (revealedSteps === 0 && !isFullyVisible) {
-      setIsIntroMode(true);
-      setIsFullyVisible(true);
-      return;
-    }
+    if (isIntroMode) return;
 
     if (isFullyVisible) {
-      setIsFullyVisible(false);
-      setRevealedSteps(orderedGroups.length);
+      setIsIntroMode(true);
       return;
     }
 
-    if (revealedSteps > 0) {
-      setRevealedSteps(prev => prev - 1);
-    } else {
+    if (revealedSteps === 0) {
       setIsFullyVisible(true);
+      return;
     }
+
+    setRevealedSteps(prev => prev - 1);
   };
 
   const handleMarkLearned = () => {
@@ -281,11 +368,45 @@ export default function SentenceTrainerScreen() {
       const result = await explainSentenceWithAI(sentenceText, activeLangObj?.label || 'Unknown', nativeTranslation);
       setAiExplanation(result);
     } catch (error: any) {
-      alert(error.message);
+      Alert.alert('Не удалось объяснить', error?.message || 'Попробуйте ещё раз.');
       setShowAiModal(false);
     } finally {
       setIsAiLoading(false);
     }
+  };
+
+  const tokenKey = (token: Token) => `${selectedLanguageCode}:${(token.dictionary_form || token.dictionary_word || token.text).toLocaleLowerCase()}`;
+
+  const handleAddTokenToDictionary = (token: Token) => {
+    const key = tokenKey(token);
+    if (token.is_in_my_dict || addedTokenKeys.has(key)) return;
+
+    const added = addWordFromSentenceToken(token, selectedLanguageCode);
+    setAddedTokenKeys(previous => new Set([...previous, key]));
+    Alert.alert(
+      added ? 'Добавлено в словарь' : 'Уже в словаре',
+      added
+        ? `Слово «${token.dictionary_form || token.text}» добавлено. Его перевод можно отредактировать в словаре.`
+        : `Слово «${token.dictionary_form || token.text}» уже есть в словаре.`
+    );
+  };
+
+  const renderDictionaryAction = (token: Token) => {
+    const added = token.is_in_my_dict || addedTokenKeys.has(tokenKey(token));
+    return (
+      <TouchableOpacity
+        style={[styles.addToDictionaryBtn, added && styles.addToDictionaryBtnAdded]}
+        disabled={added}
+        onPress={(event) => {
+          event.stopPropagation();
+          handleAddTokenToDictionary(token);
+        }}
+      >
+        <Text style={[styles.addToDictionaryText, added && styles.addToDictionaryTextAdded]}>
+          {added ? '✓ В словаре' : '+ В словарь'}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   const handleFlash = () => {
@@ -355,7 +476,7 @@ export default function SentenceTrainerScreen() {
 
   const saveSentence = () => {
     if (!newSentenceText || parsedTokens.length === 0) {
-      alert('Пожалуйста, введите предложение и разберите его.');
+      Alert.alert('Не хватает данных', 'Введите предложение и разберите его на слова.');
       return;
     }
     
@@ -420,6 +541,7 @@ export default function SentenceTrainerScreen() {
             )}
             {showTranslations && <Text style={styles.translationText}>{token.translation}</Text>}
             <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
+            {renderDictionaryAction(token)}
           </View>
         ) : (
           <View style={styles.hiddenCard}>
@@ -487,9 +609,12 @@ export default function SentenceTrainerScreen() {
 
         <View style={styles.tableColRole}>
           {isRevealed && (
-            <Text style={[styles.roleText, { color: getRoleColor(token.role), marginTop: 0 }]}>
-              {ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}
-            </Text>
+            <View style={styles.tableRoleActions}>
+              <Text style={[styles.roleText, { color: getRoleColor(token.role), marginTop: 0 }]}>
+                {ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}
+              </Text>
+              {renderDictionaryAction(token)}
+            </View>
           )}
         </View>
       </View>
@@ -516,6 +641,13 @@ export default function SentenceTrainerScreen() {
                 setIsFullyVisible(true);
                 setRevealedSteps(0);
                 setShowTranslations(false);
+                setIsIntroMode(false);
+                setGenerationErrors(previous => {
+                  if (!previous[lang.code]) return previous;
+                  const updated = { ...previous };
+                  delete updated[lang.code];
+                  return updated;
+                });
               }}
             >
               <Text style={[
@@ -530,13 +662,24 @@ export default function SentenceTrainerScreen() {
       </View>
       
       {filteredSentences.length > 0 ? (
-        <ScrollView style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView
+          {...sentencePanResponder.panHandlers}
+          style={{flex: 1}}
+          contentContainerStyle={{flexGrow: 1}}
+        >
           {isIntroMode ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={handleNextStep}
+              style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}
+            >
               <Text style={{ fontSize: 28, fontWeight: '500', color: '#111827', textAlign: 'center', lineHeight: 40 }}>
                 {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
               </Text>
-            </View>
+              <Text style={{ fontSize: 13, color: '#94A3B8', marginTop: 24 }}>
+                Нажмите, чтобы разобрать
+              </Text>
+            </TouchableOpacity>
           ) : (
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 15 }}>
@@ -557,8 +700,27 @@ export default function SentenceTrainerScreen() {
           )}
         </ScrollView>
       ) : (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={{color: '#999'}}>No sentences found for {activeLangObj?.label}</Text>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24}}>
+          {isGenerating ? (
+            <>
+              <ActivityIndicator size="large" color="#2563EB" />
+              <Text style={styles.generationStatus}>Готовим предложение с разбором…</Text>
+            </>
+          ) : (
+            <>
+              <Ionicons name="alert-circle-outline" size={44} color="#94A3B8" style={{ marginBottom: 12 }} />
+              <Text style={styles.generationStatus}>
+                {generationError || `Для языка «${activeLangObj?.label}» пока нет предложений.`}
+              </Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={() => void generateSentences(selectedLanguageCode, GENERATION_BATCH)}
+              >
+                <Ionicons name="sparkles" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                <Text style={styles.retryButtonText}>Сгенерировать предложения</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       )}
 
@@ -578,12 +740,28 @@ export default function SentenceTrainerScreen() {
               </>
             )}
           </TouchableOpacity>
-          
+
           <TouchableOpacity 
             style={{marginLeft: 15, padding: 8, backgroundColor: '#F1F5F9', borderRadius: 20}} 
             onPress={() => setIsMenuVisible(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color="#475569" />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {filteredSentences.length > 0 && isGenerating && (
+        <View style={styles.generationProgress}>
+          <ActivityIndicator size="small" color="#2563EB" />
+          <Text style={styles.generationProgressText}>Подготавливаем новые предложения…</Text>
+        </View>
+      )}
+
+      {filteredSentences.length > 0 && Boolean(generationError) && !isGenerating && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText} numberOfLines={2}>{generationError}</Text>
+          <TouchableOpacity onPress={() => void generateSentences(selectedLanguageCode, GENERATION_BATCH)} style={styles.errorRetryBtn}>
+            <Text style={styles.errorRetryText}>Повторить</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -624,6 +802,43 @@ export default function SentenceTrainerScreen() {
             
             <TouchableOpacity 
               style={styles.menuItem} 
+              onPress={() => {
+                setIsMenuVisible(false);
+                void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+              }}
+            >
+              <Ionicons name="sparkles" size={20} color="#2563EB" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>Сгенерировать ещё (ИИ)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setIsMenuVisible(false);
+                Alert.alert(
+                  'Очистить сгенерированные?',
+                  `Удалить все предложения от ИИ для языка «${activeLangObj?.label}» и сгенерировать новую подборку.`,
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Очистить',
+                      style: 'destructive',
+                      onPress: () => {
+                        clearGeneratedSentences(activeLangObj?.label);
+                        setCurrentFilteredIndex(0);
+                        void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <Ionicons name="refresh" size={20} color="#DC2626" style={{marginRight: 10}} />
+              <Text style={styles.menuItemText}>Очистить и сгенерировать заново</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
               onPress={() => { setIsMenuVisible(false); openEditModal(); }}
             >
               <Ionicons name="pencil" size={20} color="#475569" style={{marginRight: 10}} />
@@ -781,6 +996,10 @@ const styles = StyleSheet.create({
   wordAffix: { fontWeight: '800' },
   translationText: { fontSize: 14, color: '#666', marginTop: 4 },
   roleText: { fontSize: 10, fontWeight: '600', marginTop: 4, opacity: 0.8 },
+  addToDictionaryBtn: { marginTop: 7, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
+  addToDictionaryBtnAdded: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
+  addToDictionaryText: { fontSize: 10, color: '#2563EB', fontWeight: '700' },
+  addToDictionaryTextAdded: { color: '#15803D' },
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
   button: { flex: 1, backgroundColor: '#007BFF', padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
@@ -797,6 +1016,7 @@ const styles = StyleSheet.create({
   tableColWord: { flex: 2, alignItems: 'flex-start' },
   tableColTrans: { flex: 2, paddingHorizontal: 10 },
   tableColRole: { flex: 1.5, alignItems: 'flex-end' },
+  tableRoleActions: { alignItems: 'flex-end' },
   
   modalContainer: { flex: 1, padding: 20, backgroundColor: '#F8FAFC', alignItems: 'center' },
   modalHeader: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#1E293B' },
@@ -828,7 +1048,59 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6 },
   aiButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: '#FDE047', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
-  aiButtonText: { color: '#B45309', fontWeight: '600', fontSize: 14 }
+  aiButtonText: { color: '#B45309', fontWeight: '600', fontSize: 14 },
+  generationStatus: { color: '#64748B', textAlign: 'center', marginTop: 14, paddingHorizontal: 28, fontSize: 16, lineHeight: 23 },
+  generationProgress: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  generationProgressText: { color: '#64748B', marginLeft: 8, fontSize: 12 },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 20,
+    shadowColor: '#007BFF',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 3
+  },
+  retryButtonText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: 'bold'
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginVertical: 6,
+    marginHorizontal: 10
+  },
+  errorBannerText: {
+    color: '#DC2626',
+    fontSize: 12,
+    flex: 1,
+    marginRight: 8
+  },
+  errorRetryBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: '#DC2626',
+    borderRadius: 6
+  },
+  errorRetryText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: 'bold'
+  }
 });
 
 const markdownStyles = {

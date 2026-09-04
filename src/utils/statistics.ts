@@ -10,6 +10,24 @@ export interface WorkoutSnapshot {
   correct: number;
 }
 
+export type WordStats = Record<string, unknown>;
+
+/**
+ * Progress is persisted on-device, so tolerate legacy or malformed values
+ * instead of letting the entire statistics screen crash.
+ */
+export const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | undefined): WordStats => {
+  if (!value) return {};
+  if (typeof value !== 'string') return value;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
 /**
  * 1. Total Volume (Общий объем)
  * Общее количество уникальных слов в словаре пользователя.
@@ -32,8 +50,8 @@ export const calculateCoverage = (words: Word[], activeLangs: string[]) => {
 
   activeLangs.forEach(lang => {
     const coveredWords = words.filter(w => {
-      const showStats = typeof w.show_stats === 'string' ? JSON.parse(w.show_stats) : w.show_stats;
-      return showStats && showStats[lang] > 0;
+      const showStats = readWordStats(w.show_stats);
+      return typeof showStats[lang] === 'number' && showStats[lang] > 0;
     }).length;
 
     const langCoverage = (coveredWords / words.length) * 100;
@@ -63,19 +81,9 @@ export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
     let activeWords = 0;
     
     words.forEach(w => {
-      let showStats = w.show_stats;
-      let statsObj: Record<string, number> = {};
-      if (typeof showStats === 'string') {
-        try {
-          statsObj = JSON.parse(showStats);
-        } catch (e) {
-          statsObj = {};
-        }
-      } else if (showStats) {
-        statsObj = showStats as Record<string, number>;
-      }
+      const statsObj = readWordStats(w.show_stats);
       
-      if (statsObj && statsObj[lang]) {
+      if (typeof statsObj[lang] === 'number' && statsObj[lang] > 0) {
         langShows += statsObj[lang];
         activeWords++;
       }
@@ -106,7 +114,7 @@ export const calculateFullyLearned = (words: Word[], activeLangs: string[]): num
   if (activeLangs.length === 0) return 0;
   
   return words.filter(w => {
-    const knowledgeStats = typeof w.knowledge_stats === 'string' ? JSON.parse(w.knowledge_stats) : w.knowledge_stats;
+    const knowledgeStats = readWordStats(w.knowledge_stats);
     if (!knowledgeStats) return false;
     
     // Check if it's learned (true or 1) in ALL active languages
@@ -125,7 +133,7 @@ export const calculateKnownByLanguage = (words: Word[], activeLangs: string[]) =
 
   activeLangs.forEach(lang => {
     const knownWords = words.filter(w => {
-      const knowledgeStats = typeof w.knowledge_stats === 'string' ? JSON.parse(w.knowledge_stats) : w.knowledge_stats;
+      const knowledgeStats = readWordStats(w.knowledge_stats);
       return knowledgeStats && (knowledgeStats[lang] === true || knowledgeStats[lang] === 1);
     }).length;
 
@@ -164,18 +172,21 @@ export const calculateKnowledgeDistribution = (words: Word[], activeLangs: strin
   if (activeLangs.length === 0) return distribution;
 
   words.forEach(w => {
+    const showStats = readWordStats(w.show_stats);
     let totalWordShows = 0;
-    const showStats = typeof w.show_stats === 'string' ? JSON.parse(w.show_stats) : w.show_stats;
-    
-    if (showStats) {
-      activeLangs.forEach(lang => {
-        if (showStats[lang]) {
-          totalWordShows += showStats[lang];
-        }
-      });
-    }
+    let practisedLangs = 0;
 
-    const avgShows = totalWordShows / activeLangs.length;
+    activeLangs.forEach(lang => {
+      const n = showStats[lang];
+      if (typeof n === 'number' && n > 0) {
+        totalWordShows += n;
+        practisedLangs += 1;
+      }
+    });
+
+    // Average over the languages actually practised, not every active language —
+    // otherwise a word drilled hard in one language reads as barely started.
+    const avgShows = practisedLangs > 0 ? totalWordShows / practisedLangs : 0;
 
     if (avgShows === 0) {
       distribution.new++;
@@ -197,15 +208,37 @@ export const calculateKnowledgeDistribution = (words: Word[], activeLangs: strin
 
 /**
  * 8. Familiar Words Efficiency (Эффективность тренировок)
- * Исторический график успешности прохождения тестов.
+ * Исторический график успешности тестов. Несколько тренировок за один день
+ * объединяются в одну точку, чтобы график не «слипался».
  */
 export const calculateFamiliarWordsEfficiency = (snapshots: WorkoutSnapshot[]) => {
-  return snapshots.map(snapshot => {
-    const successRate = snapshot.total > 0 ? (snapshot.correct / snapshot.total) * 100 : 0;
-    return {
-      date: snapshot.date,
-      absolute: snapshot.correct,
-      percentage: successRate
-    };
+  const byDay = new Map<string, { total: number; correct: number }>();
+
+  snapshots.forEach(snapshot => {
+    const day = byDay.get(snapshot.date) || { total: 0, correct: 0 };
+    day.total += snapshot.total || 0;
+    day.correct += snapshot.correct || 0;
+    byDay.set(snapshot.date, day);
   });
+
+  return Array.from(byDay.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, day]) => ({
+      date,
+      absolute: day.correct,
+      total: day.total,
+      percentage: day.total > 0 ? (day.correct / day.total) * 100 : 0
+    }));
+};
+
+/**
+ * 9. Seen Words (Просмотрено)
+ * Сколько слов пользователь встретил хотя бы раз хотя бы в одном активном языке.
+ */
+export const calculateSeenWords = (words: Word[], activeLangs: string[]): number => {
+  if (activeLangs.length === 0) return 0;
+  return words.filter(w => {
+    const showStats = readWordStats(w.show_stats);
+    return activeLangs.some(lang => typeof showStats[lang] === 'number' && (showStats[lang] as number) > 0);
+  }).length;
 };

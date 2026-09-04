@@ -14,18 +14,24 @@ export default function DictionaryScreen() {
   const { words, activeLanguages, sentences, toggleWordFavorite } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   
-  const wordsInSentences = useMemo(() => {
+  // Every word form (lemma, base, surface) that appears anywhere in the sentence set.
+  const sentenceWordForms = useMemo(() => {
     const set = new Set<string>();
     sentences.forEach(s => {
-      s.words.forEach(w => {
-        if (w.is_in_my_dict) {
-          if (w.dictionary_word) set.add(w.dictionary_word.toLowerCase());
-          else if (w.text) set.add(w.text.toLowerCase());
-        }
+      s.words?.forEach(t => {
+        [t.dictionary_word, t.dictionary_form, t.text].forEach(v => {
+          const norm = typeof v === 'string' ? v.trim().toLowerCase() : '';
+          if (norm) set.add(norm);
+        });
       });
     });
     return set;
   }, [sentences]);
+
+  const isWordInSentences = (item: Word) => {
+    const candidates = [item.eng, item.word, ...Object.values(item.translations || {})];
+    return candidates.some(v => typeof v === 'string' && sentenceWordForms.has(v.trim().toLowerCase()));
+  };
   
   // State for editing/adding
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -57,15 +63,17 @@ export default function DictionaryScreen() {
 
   const renderItem = ({ item }: { item: Word }) => {
     const wordKey = item.eng || item.word || '';
-    const isInTrainer = wordsInSentences.has(wordKey.toLowerCase());
+    const isInTrainer = isWordInSentences(item);
+    const sourceLanguage = item.source_language ? LANGUAGES.find(lang => lang.code === item.source_language) : undefined;
+    const displayOriginal = sourceLanguage ? `${sourceLanguage.flag} ${item.word || ''}` : item.eng;
 
     return (
       <View style={styles.card}>
         <View style={styles.headerRow}>
           <View style={{flex: 1}}>
             <Text style={styles.baseWord}>{item.ru || wordKey}</Text>
-            {!!item.eng && item.ru && (
-              <Text style={styles.subEng}>{item.eng}</Text>
+            {!!displayOriginal && item.ru && (
+              <Text style={styles.subEng}>{displayOriginal}</Text>
             )}
           </View>
 

@@ -1,795 +1,356 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
 import { Word } from '../models/types';
 import {
   calculateTotalVolume,
-  calculateCoverage,
+  calculateSeenWords,
+  calculateFullyLearned,
+  calculateShownToday,
   calculateIMWIndex,
   calculateKnownByLanguage,
   calculateKnowledgeDistribution,
-  calculateFamiliarWordsEfficiency,
-  calculateShownToday
+  calculateFamiliarWordsEfficiency
 } from '../utils/statistics';
 
-type ChartTab = 'distribution' | 'byLanguage' | 'efficiency' | 'shownDay';
+const LANG_COLORS: Record<string, string> = {
+  en: '#6366F1', it: '#10B981', de: '#EAB308', es: '#EC4899', fr: '#F97316', kz: '#0EA5E9', la: '#8B5CF6'
+};
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+const ACTIVITY_DAYS = 14;
+
+const formatDay = (d: Date) => `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+
+interface SectionProps {
+  icon: string;
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}
+
+function Section({ icon, title, children, defaultOpen = true }: SectionProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <View style={styles.card}>
+      <TouchableOpacity style={styles.cardHeader} activeOpacity={0.7} onPress={() => setOpen(o => !o)}>
+        <View style={styles.cardTitleRow}>
+          <Text style={styles.cardHeaderIcon}>{icon}</Text>
+          <Text style={styles.cardHeaderTitle}>{title}</Text>
+        </View>
+        <Text style={styles.cardChevron}>{open ? '▾' : '▸'}</Text>
+      </TouchableOpacity>
+      {open && <View style={styles.cardBody}>{children}</View>}
+    </View>
+  );
+}
+
+// One labelled horizontal bar.
+function BarRow({ label, value, max, color, valueText }: { label: string; value: number; max: number; color: string; valueText?: string }) {
+  const pct = max > 0 ? Math.max(2, (value / max) * 100) : 2;
+  return (
+    <View style={styles.barRow}>
+      <Text style={styles.barLabel} numberOfLines={1}>{label}</Text>
+      <View style={styles.barTrack}>
+        <View style={[styles.barFill, { width: `${pct}%`, backgroundColor: color }]} />
+      </View>
+      <Text style={styles.barValue}>{valueText ?? value}</Text>
+    </View>
+  );
+}
 
 export default function StatisticsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, activeLanguages, dailyShows, workoutSnapshots } = useStore();
-  const [activeTab, setActiveTab] = useState<ChartTab>('distribution');
-  const [efficiencyMode, setEfficiencyMode] = useState<'absolute' | 'percentage'>('absolute');
-  const [isChartsExpanded, setIsChartsExpanded] = useState(true);
-  const [isImwExpanded, setIsImwExpanded] = useState(true);
-  const [isWordsExpanded, setIsWordsExpanded] = useState(true);
+  const [efficiencyMode, setEfficiencyMode] = useState<'percentage' | 'absolute'>('percentage');
 
-  const totalWords = calculateTotalVolume(words);
+  const activeLangObjs = LANGUAGES.filter(l => activeLanguages.includes(l.code));
 
-  // 1. Distribution by knowledge level
-  const distributionData = useMemo(() => {
-    const dist = calculateKnowledgeDistribution(words, activeLanguages);
-    return [
-      { label: 'Beginner (1-5)', count: dist.beginner, color: '#FDE68A' },
-      { label: 'Intermediate (6-15)', count: dist.intermediate, color: '#FED7AA' },
-      { label: 'Advanced (16-40)', count: dist.advanced, color: '#FDBA74' },
-      { label: 'Expert (41-80)', count: dist.expert, color: '#FB923C' },
-      { label: 'Master (80+)', count: dist.master, color: '#4ADE80' }
-    ];
-  }, [words, activeLanguages]);
+  const summary = useMemo(() => ({
+    total: calculateTotalVolume(words),
+    seen: calculateSeenWords(words, activeLanguages),
+    learned: calculateFullyLearned(words, activeLanguages),
+    today: calculateShownToday(dailyShows)
+  }), [words, activeLanguages, dailyShows]);
 
-  // 2. Knowledge by Language
-  const languageStats = useMemo(() => {
-    const knownStats = calculateKnownByLanguage(words, activeLanguages);
-    
-    return LANGUAGES.filter(l => activeLanguages.includes(l.code)).map(lang => {
-      const knownCount = knownStats[lang.code]?.count || 0;
-      
-      let showCount = 0;
-      words.forEach(w => {
-        const showStats = typeof w.show_stats === 'string' ? JSON.parse(w.show_stats) : w.show_stats;
-        if (showStats && showStats[lang.code]) showCount += showStats[lang.code];
-      });
-
-      // Colors matching screenshot
-      let color = '#3B82F6';
-      if (lang.code === 'it') color = '#10B981';
-      else if (lang.code === 'de') color = '#EAB308';
-      else if (lang.code === 'es') color = '#EC4899';
-      else if (lang.code === 'kz') color = '#0EA5E9';
-      else if (lang.code === 'en') color = '#6366F1';
-
-      return {
-        ...lang,
-        knownCount,
-        showCount,
-        color
-      };
-    });
-  }, [words, activeLanguages]);
-
-  // 3. iMW Index (Intelligent Memory Weight)
-  const imwStats = useMemo(() => {
-    const imw = calculateIMWIndex(words, activeLanguages);
-    
-    const langsIMW = activeLanguages.map(code => {
-      const langObj = LANGUAGES.find(l => l.code === code);
-      return {
-        code,
-        label: langObj?.label || code.toUpperCase(),
-        flag: langObj?.flag || '',
-        percentage: imw.byLanguage[code] || 0
-      };
-    });
-
-    return {
-      langs: langsIMW,
-      overall: imw.overall
-    };
-  }, [words, activeLanguages]);
-
-  // 4. Most Encountered Words
-  const mostEncounteredWords = useMemo(() => {
-    const filtered = words.filter(w => (w.count || 0) > 0);
-    const sorted = filtered.sort((a, b) => (b.count || 0) - (a.count || 0));
-    return sorted.slice(0, 15);
-  }, [words]);
-
-  // 5. Daily Shows Data (Real data from dailyShows)
-  const dailyShowsData = useMemo(() => {
-    const days: { date: string; shows: number }[] = [];
+  // Activity: last N days of word shows.
+  const activity = useMemo(() => {
     const now = new Date();
-
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const isoDate = d.toISOString().split('T')[0];
-      const displayKey = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-      days.push({
-        date: displayKey,
-        shows: dailyShows?.[isoDate] || 0
-      });
+    const days = [];
+    for (let i = ACTIVITY_DAYS - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const iso = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+      days.push({ label: formatDay(d), shows: dailyShows?.[iso] || 0 });
     }
     return days;
   }, [dailyShows]);
-  
-  // 6. Efficiency Snapshots
-  const efficiencyData = useMemo(() => {
-    if (!workoutSnapshots || workoutSnapshots.length === 0) {
-      // Mock data if no snapshots yet for demonstration
-      return [
-        { date: '01.10', absolute: 10, percentage: 80, total: 12 },
-        { date: '02.10', absolute: 15, percentage: 85, total: 18 },
-        { date: '03.10', absolute: 12, percentage: 90, total: 14 },
-      ];
-    }
-    return calculateFamiliarWordsEfficiency(workoutSnapshots).map(item => ({
-      ...item,
-      // Shorten date for chart display
-      date: item.date.split('-').slice(1).reverse().join('.')
-    }));
-  }, [workoutSnapshots]);
+  const activityTotal = activity.reduce((s, d) => s + d.shows, 0);
+  const activityMax = Math.max(...activity.map(d => d.shows), 1);
 
-  // Max value calculation for charts
-  const maxDistributionCount = Math.max(...distributionData.map(d => d.count), 10);
-  const maxShowsPerDay = Math.max(...dailyShowsData.map(d => d.shows), 10);
-  const maxEfficiencyAbs = Math.max(...efficiencyData.map(d => d.absolute), 10);
+  const byLanguage = useMemo(() => {
+    const known = calculateKnownByLanguage(words, activeLanguages);
+    return activeLangObjs.map(lang => ({
+      ...lang,
+      known: known[lang.code]?.count || 0,
+      color: LANG_COLORS[lang.code] || '#3B82F6'
+    }));
+  }, [words, activeLanguages]);
+  const byLanguageMax = Math.max(...byLanguage.map(l => l.known), 5);
+
+  // Repetition buckets — "new" (never shown) is shown as a note, not a bar,
+  // so it doesn't dwarf everything else.
+  const repetition = useMemo(() => {
+    const d = calculateKnowledgeDistribution(words, activeLanguages);
+    return {
+      new: d.new,
+      buckets: [
+        { label: '1–5 показов', count: d.beginner, color: '#FCD34D' },
+        { label: '6–15 показов', count: d.intermediate, color: '#FBBF24' },
+        { label: '16–40 показов', count: d.advanced, color: '#FB923C' },
+        { label: '41–80 показов', count: d.expert, color: '#F97316' },
+        { label: 'больше 80', count: d.master, color: '#22C55E' }
+      ]
+    };
+  }, [words, activeLanguages]);
+  const repetitionMax = Math.max(...repetition.buckets.map(b => b.count), 1);
+
+  const imw = useMemo(() => {
+    const res = calculateIMWIndex(words, activeLanguages);
+    return {
+      overall: res.overall,
+      langs: activeLangObjs.map(lang => ({ ...lang, pct: res.byLanguage[lang.code] || 0 }))
+    };
+  }, [words, activeLanguages]);
+
+  const efficiency = useMemo(() => {
+    if (!workoutSnapshots?.length) return [];
+    return calculateFamiliarWordsEfficiency(workoutSnapshots)
+      .slice(-10)
+      .map(item => ({ ...item, shortDate: item.date.slice(5).split('-').reverse().join('.') }));
+  }, [workoutSnapshots]);
+  const efficiencyAbsMax = Math.max(...efficiency.map(e => e.total), 1);
+
+  const frequentWords = useMemo(
+    () => words.filter(w => (w.count || 0) > 0).sort((a, b) => (b.count || 0) - (a.count || 0)).slice(0, 15),
+    [words]
+  );
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
-      {/* Title */}
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
-      {/* CARD 1: Progress Charts */}
-      <View style={styles.card}>
-        <TouchableOpacity 
-          style={styles.cardHeader} 
-          activeOpacity={0.7} 
-          onPress={() => setIsChartsExpanded(!isChartsExpanded)}
-        >
-          <View style={styles.cardTitleRow}>
-            <Text style={styles.cardHeaderIcon}>📈</Text>
-            <Text style={styles.cardHeaderTitle}>Progress Charts</Text>
-          </View>
-          <Text style={styles.cardToolsIcon}>{isChartsExpanded ? '▼' : '▶'}</Text>
-        </TouchableOpacity>
-
-        {isChartsExpanded && (
-          <View>
-            {/* Tab Pills */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabScroll} contentContainerStyle={styles.tabScrollContent}>
-          <TouchableOpacity 
-            style={[styles.tabBtn, activeTab === 'distribution' && styles.tabBtnActive]} 
-            onPress={() => setActiveTab('distribution')}
-          >
-            <Text style={[styles.tabBtnText, activeTab === 'distribution' && styles.tabBtnTextActive]}>Distribution</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.tabBtn, activeTab === 'byLanguage' && styles.tabBtnActive]} 
-            onPress={() => setActiveTab('byLanguage')}
-          >
-            <Text style={[styles.tabBtnText, activeTab === 'byLanguage' && styles.tabBtnTextActive]}>By Language</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.tabBtn, activeTab === 'efficiency' && styles.tabBtnActive]} 
-            onPress={() => setActiveTab('efficiency')}
-          >
-            <Text style={[styles.tabBtnText, activeTab === 'efficiency' && styles.tabBtnTextActive]}>Efficiency</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.tabBtn, activeTab === 'shownDay' && styles.tabBtnActive]} 
-            onPress={() => setActiveTab('shownDay')}
-          >
-            <Text style={[styles.tabBtnText, activeTab === 'shownDay' && styles.tabBtnTextActive]}>Shown/Day</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        {/* TAB CONTENT: Distribution */}
-        {activeTab === 'distribution' && (
-          <View style={styles.chartContainer}>
-            <View style={styles.verticalBarsContainer}>
-              {distributionData.map((item, idx) => {
-                const heightPercent = maxDistributionCount > 0 ? (item.count / maxDistributionCount) * 100 : 0;
-                return (
-                  <View key={idx} style={styles.vBarColumn}>
-                    <Text style={styles.vBarValue}>{item.count > 0 ? item.count : ''}</Text>
-                    <View style={styles.vBarTrack}>
-                      <View style={[styles.vBarFill, { height: `${Math.max(4, heightPercent)}%`, backgroundColor: item.color }]} />
-                    </View>
-                    <Text style={styles.vBarLabel} numberOfLines={2}>{item.label}</Text>
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-        )}
-
-        {/* TAB CONTENT: By Language */}
-        {activeTab === 'byLanguage' && (
-          <View style={styles.chartContainer}>
-            <Text style={styles.subChartTitle}>Knowledge by Language</Text>
-            {languageStats.map(lang => {
-              const maxKnown = Math.max(...languageStats.map(l => l.knownCount), 5); // Use max among languages, min 5
-              const fillPercent = maxKnown > 0 ? (lang.knownCount / maxKnown) * 100 : 0;
-              return (
-                <View key={lang.code} style={styles.hBarRow}>
-                  <Text style={styles.hBarLabel}>{lang.flag} {lang.label}</Text>
-                  <View style={styles.hBarTrack}>
-                    <View style={[styles.hBarFill, { width: `${Math.max(2, fillPercent)}%`, backgroundColor: lang.color }]} />
-                  </View>
-                  <Text style={styles.hBarValue}>{lang.knownCount}</Text>
-                </View>
-              );
-            })}
-            <View style={styles.axisRow}>
-              <Text style={styles.axisLabel}>0</Text>
-              <Text style={styles.axisLabel}>{Math.round(Math.max(...languageStats.map(l => l.knownCount), 5) / 2)}</Text>
-              <Text style={styles.axisLabel}>{Math.max(...languageStats.map(l => l.knownCount), 5)}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* TAB CONTENT: Efficiency */}
-        {activeTab === 'efficiency' && (
-          <View style={styles.chartContainer}>
-            <View style={styles.efficiencyHeader}>
-              <Text style={styles.subChartTitle}>Familiar Words Efficiency</Text>
-              <View style={styles.modeToggle}>
-                <TouchableOpacity 
-                  style={[styles.modeBtn, efficiencyMode === 'absolute' && styles.modeBtnActive]}
-                  onPress={() => setEfficiencyMode('absolute')}
-                >
-                  <Text style={[styles.modeBtnText, efficiencyMode === 'absolute' && styles.modeBtnTextActive]}>Absolute</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modeBtn, efficiencyMode === 'percentage' && styles.modeBtnActive]}
-                  onPress={() => setEfficiencyMode('percentage')}
-                >
-                  <Text style={[styles.modeBtnText, efficiencyMode === 'percentage' && styles.modeBtnTextActive]}>Percentage (%)</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.efficiencyContent}>
-              {efficiencyData.length === 0 ? (
-                <Text style={styles.emptyStatsText}>Нет данных о тренировках. Пройдите тесты, чтобы увидеть статистику!</Text>
-              ) : (
-                efficiencyData.map((item, idx) => {
-                  const effPercent = item.percentage;
-                  const valueText = efficiencyMode === 'absolute' ? `${item.absolute}` : `${Math.round(effPercent)}%`;
-                  
-                  return (
-                    <View key={idx} style={styles.effRow}>
-                      <Text style={styles.effLabel}>{item.date}</Text>
-                      <View style={styles.effTrack}>
-                        <View style={[styles.effFill, { width: `${Math.min(100, effPercent)}%`, backgroundColor: '#3B82F6' }]} />
-                      </View>
-                      <Text style={styles.effVal}>{valueText}</Text>
-                    </View>
-                  );
-                })
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* TAB CONTENT: Shown/Day */}
-        {activeTab === 'shownDay' && (
-          <View style={styles.chartContainer}>
-            <Text style={styles.subChartTitle}>Words Shown Per Day (Last 30 days)</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.dailyBarsContainer}>
-                {dailyShowsData.map((d, i) => {
-                  const hPercent = maxShowsPerDay > 0 ? (d.shows / maxShowsPerDay) * 100 : 0;
-                  return (
-                    <View key={i} style={styles.dailyBarCol}>
-                      <Text style={styles.dailyBarVal}>{d.shows > 0 ? d.shows : ''}</Text>
-                      <View style={styles.dailyBarTrack}>
-                        <View style={[styles.dailyBarFill, { height: `${Math.max(d.shows > 0 ? 8 : 2, hPercent)}%` }]} />
-                      </View>
-                      <Text style={styles.dailyBarDate}>{d.date}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
-        )}
-          </View>
-        )}
+      {/* Summary tiles */}
+      <View style={styles.tilesRow}>
+        <View style={styles.tile}>
+          <Text style={styles.tileValue}>{summary.total}</Text>
+          <Text style={styles.tileLabel}>слов в базе</Text>
+        </View>
+        <View style={styles.tile}>
+          <Text style={styles.tileValue}>{summary.seen}</Text>
+          <Text style={styles.tileLabel}>просмотрено</Text>
+        </View>
+      </View>
+      <View style={styles.tilesRow}>
+        <View style={styles.tile}>
+          <Text style={[styles.tileValue, { color: '#16A34A' }]}>{summary.learned}</Text>
+          <Text style={styles.tileLabel}>выучено полностью</Text>
+        </View>
+        <View style={styles.tile}>
+          <Text style={[styles.tileValue, { color: '#2563EB' }]}>{summary.today}</Text>
+          <Text style={styles.tileLabel}>показов сегодня</Text>
+        </View>
       </View>
 
-      {/* CARD 2: iMW Index */}
-      <View style={styles.card}>
-        <TouchableOpacity 
-          style={styles.cardHeader} 
-          activeOpacity={0.7} 
-          onPress={() => setIsImwExpanded(!isImwExpanded)}
-        >
-          <View style={styles.cardTitleRow}>
-            <Text style={styles.cardHeaderIcon}>🧠</Text>
-            <Text style={styles.cardHeaderTitle}>iMW Index</Text>
-          </View>
-          <Text style={styles.cardToolsIcon}>{isImwExpanded ? '▼' : '▶'}</Text>
-        </TouchableOpacity>
-
-        {isImwExpanded && (
-          <View>
-            <Text style={styles.imwDescription}>
-          Intelligent Memory Weight shows how close you are to the target repetition frequency.
-        </Text>
-
-        <View style={styles.imwLanguagesList}>
-          {imwStats.langs.map(item => (
-            <View key={item.code} style={styles.imwLangItem}>
-              <View style={styles.imwLangHeader}>
-                <Text style={styles.imwLangName}>{item.flag} {item.label}</Text>
-                <Text style={styles.imwLangPercent}>{item.percentage.toFixed(1)}%</Text>
+      {/* Activity */}
+      <Section icon="📅" title={`Активность за ${ACTIVITY_DAYS} дней`}>
+        <Text style={styles.sectionNote}>Всего показов за период: {activityTotal}</Text>
+        <View style={styles.activityChart}>
+          {activity.map((d, i) => (
+            <View key={i} style={styles.activityCol}>
+              <Text style={styles.activityValue}>{d.shows > 0 ? d.shows : ''}</Text>
+              <View style={styles.activityTrack}>
+                <View
+                  style={[
+                    styles.activityFill,
+                    { height: `${d.shows > 0 ? Math.max(6, (d.shows / activityMax) * 100) : 0}%` }
+                  ]}
+                />
               </View>
-              <View style={styles.imwProgressBarTrack}>
-                <View style={[styles.imwProgressBarFill, { width: `${Math.max(2, item.percentage)}%` }]} />
-              </View>
+              <Text style={styles.activityDay}>{d.label.slice(0, 2)}</Text>
             </View>
           ))}
         </View>
+      </Section>
 
+      {/* Knowledge by language */}
+      <Section icon="🌍" title="Знание по языкам">
+        {byLanguage.length === 0 ? (
+          <Text style={styles.emptyText}>Нет активных языков.</Text>
+        ) : (
+          byLanguage.map(lang => (
+            <BarRow
+              key={lang.code}
+              label={`${lang.flag} ${lang.label}`}
+              value={lang.known}
+              max={byLanguageMax}
+              color={lang.color}
+            />
+          ))
+        )}
+        <Text style={styles.sectionNote}>Слов, отмеченных как выученные, по каждому языку.</Text>
+      </Section>
+
+      {/* Repetition */}
+      <Section icon="🔁" title="По количеству повторений">
+        {repetition.buckets.map(b => (
+          <BarRow key={b.label} label={b.label} value={b.count} max={repetitionMax} color={b.color} />
+        ))}
+        <Text style={styles.sectionNote}>Ещё {repetition.new} слов ни разу не показывались.</Text>
+      </Section>
+
+      {/* Efficiency */}
+      <Section icon="🎯" title="Эффективность тренировок" defaultOpen={efficiency.length > 0}>
+        {efficiency.length === 0 ? (
+          <Text style={styles.emptyText}>Пройдите тренировку в разделе «Тренировка», чтобы увидеть график.</Text>
+        ) : (
+          <>
+            <View style={styles.modeToggle}>
+              <TouchableOpacity
+                style={[styles.modeBtn, efficiencyMode === 'percentage' && styles.modeBtnActive]}
+                onPress={() => setEfficiencyMode('percentage')}
+              >
+                <Text style={[styles.modeBtnText, efficiencyMode === 'percentage' && styles.modeBtnTextActive]}>Доля верных</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modeBtn, efficiencyMode === 'absolute' && styles.modeBtnActive]}
+                onPress={() => setEfficiencyMode('absolute')}
+              >
+                <Text style={[styles.modeBtnText, efficiencyMode === 'absolute' && styles.modeBtnTextActive]}>Верных ответов</Text>
+              </TouchableOpacity>
+            </View>
+            {efficiency.map((e, i) => (
+              <BarRow
+                key={i}
+                label={e.shortDate}
+                value={efficiencyMode === 'percentage' ? e.percentage : e.absolute}
+                max={efficiencyMode === 'percentage' ? 100 : efficiencyAbsMax}
+                color="#3B82F6"
+                valueText={efficiencyMode === 'percentage' ? `${Math.round(e.percentage)}%` : `${e.absolute}/${e.total}`}
+              />
+            ))}
+          </>
+        )}
+      </Section>
+
+      {/* iMW */}
+      <Section icon="🧠" title="Индекс закрепления (iMW)" defaultOpen={false}>
+        <Text style={styles.sectionNote}>
+          Показывает, насколько показы слов приблизились к целевым 80 повторениям.
+        </Text>
+        {imw.langs.map(lang => (
+          <BarRow
+            key={lang.code}
+            label={`${lang.flag} ${lang.label}`}
+            value={lang.pct}
+            max={100}
+            color="#38BDF8"
+            valueText={`${lang.pct.toFixed(0)}%`}
+          />
+        ))}
         <View style={styles.divider} />
+        <BarRow label="Итого" value={imw.overall} max={100} color="#2563EB" valueText={`${imw.overall.toFixed(0)}%`} />
+      </Section>
 
-        <View style={styles.imwOverallRow}>
-          <Text style={styles.imwOverallLabel}>Overall iMW Index</Text>
-          <Text style={styles.imwOverallValue}>{imwStats.overall.toFixed(1)}%</Text>
-        </View>
-        <View style={styles.imwProgressBarTrack}>
-          <View style={[styles.imwProgressBarFill, { width: `${Math.max(2, imwStats.overall)}%`, backgroundColor: '#007BFF' }]} />
-        </View>
-          </View>
+      {/* Frequent words */}
+      <Section icon="🔥" title="Частые слова" defaultOpen={false}>
+        {frequentWords.length === 0 ? (
+          <Text style={styles.emptyText}>Слова появятся здесь после тренировок.</Text>
+        ) : (
+          frequentWords.map((word, i) => (
+            <View key={word.eng || word.word || i} style={styles.wordCard}>
+              <View style={styles.wordCardHeader}>
+                <Text style={styles.wordRu} numberOfLines={1}>{word.ru || word.eng || word.word}</Text>
+                <Text style={styles.wordCount}>{word.count || 0}×</Text>
+              </View>
+              <View style={styles.wordTransRow}>
+                {activeLangObjs.map(lang => {
+                  const trans = (word[lang.code as keyof Word] || word.translations?.[lang.code]) as string | undefined;
+                  if (!trans) return null;
+                  return (
+                    <Text key={lang.code} style={styles.wordTrans}>
+                      {lang.flag} <Text style={styles.wordTransText}>{trans}</Text>
+                    </Text>
+                  );
+                })}
+              </View>
+            </View>
+          ))
         )}
-      </View>
-
-      {/* CARD 3: Most Encountered Words */}
-      <View style={styles.card}>
-        <TouchableOpacity 
-          style={styles.cardHeader} 
-          activeOpacity={0.7} 
-          onPress={() => setIsWordsExpanded(!isWordsExpanded)}
-        >
-          <View style={styles.cardTitleRow}>
-            <Text style={styles.cardHeaderIcon}>🔥</Text>
-            <Text style={styles.cardHeaderTitle}>Most Encountered Words</Text>
-          </View>
-          <Text style={styles.cardToolsIcon}>{isWordsExpanded ? '▼' : '▶'}</Text>
-        </TouchableOpacity>
-
-        {isWordsExpanded && (
-          <View style={styles.wordListContainer}>
-          {mostEncounteredWords.length === 0 ? (
-            <Text style={styles.emptyStatsText}>Вы еще не изучили ни одного слова. Начните тренировку, чтобы слова появились здесь!</Text>
-          ) : (
-            mostEncounteredWords.map((word, index) => {
-              return (
-                <View key={word.eng || word.word || index} style={styles.wordCard}>
-                  <View style={styles.wordCardHeader}>
-                    <Text style={styles.wordRussian}>{word.ru || word.eng || word.word}</Text>
-                    <View style={styles.wordShowBadge}>
-                      <Text style={styles.wordShowText}>{(word.count || 0)} пок.</Text>
-                    </View>
-                  </View>
-
-                  {/* Sub row with flags and translations for current active triples languages */}
-                  <View style={styles.wordTranslationsRow}>
-                    {activeLanguages.map(lang => {
-                      const trans = (word[lang as keyof Word] || (word.translations && word.translations[lang])) as string;
-                      const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
-                      if (!trans) return null;
-
-                      return (
-                        <Text key={lang} style={styles.wordTransItem}>
-                          {langFlag} <Text style={styles.wordTransText}>{trans}</Text>
-                        </Text>
-                      );
-                    })}
-                  </View>
-                </View>
-              );
-            })
-          )}
-          </View>
-        )}
-      </View>
+      </Section>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
+  container: { flex: 1, backgroundColor: '#F5F6F8' },
+  scroll: { padding: 16, paddingBottom: 48 },
+  screenTitle: { fontSize: 24, fontWeight: 'bold', color: '#1A202C', marginBottom: 16 },
+
+  tilesRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  tile: {
+    flex: 1, backgroundColor: '#FFF', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 14,
+    borderWidth: 1, borderColor: '#ECEFF1', alignItems: 'flex-start'
   },
-  scroll: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  screenTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1A202C',
-    marginBottom: 16,
-    marginTop: 4,
-  },
+  tileValue: { fontSize: 26, fontWeight: 'bold', color: '#1A202C' },
+  tileLabel: { fontSize: 12, color: '#64748B', marginTop: 2 },
+
   card: {
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#ECEFF1',
+    backgroundColor: '#FFF', borderRadius: 16, marginTop: 12,
+    borderWidth: 1, borderColor: '#ECEFF1', overflow: 'hidden'
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  cardHeaderIcon: {
-    fontSize: 22,
-  },
-  cardHeaderTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A202C',
-  },
-  cardToolsIcon: {
-    fontSize: 16,
-    color: '#A0AEC0',
-  },
-  tabScroll: {
-    marginBottom: 16,
-  },
-  tabScrollContent: {
-    gap: 8,
-  },
-  tabBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  tabBtnActive: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
-  },
-  tabBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#475569',
-  },
-  tabBtnTextActive: {
-    color: '#FFF',
-  },
-  chartContainer: {
-    paddingVertical: 10,
-  },
-  verticalBarsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    height: 180,
-    paddingTop: 20,
-    paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  vBarColumn: {
-    flex: 1,
-    alignItems: 'center',
-    height: '100%',
-    justifyContent: 'flex-end',
-  },
-  vBarValue: {
-    fontSize: 11,
-    color: '#64748B',
-    marginBottom: 4,
-    fontWeight: '600',
-  },
-  vBarTrack: {
-    width: 32,
-    height: '70%',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-  },
-  vBarFill: {
-    width: '100%',
-    borderRadius: 8,
-  },
-  vBarLabel: {
-    fontSize: 9,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 6,
-    position: 'absolute',
-    bottom: -22,
-  },
-  subChartTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#334155',
-    marginBottom: 12,
-  },
-  hBarRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 10,
-  },
-  hBarLabel: {
-    width: 90,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#475569',
-  },
-  hBarTrack: {
-    flex: 1,
-    height: 18,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 9,
-    overflow: 'hidden',
-  },
-  hBarFill: {
-    height: '100%',
-    borderRadius: 9,
-  },
-  hBarValue: {
-    width: 40,
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#334155',
-    textAlign: 'right',
-  },
-  axisRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 100,
-    paddingRight: 40,
-    marginTop: 6,
-  },
-  axisLabel: {
-    fontSize: 11,
-    color: '#94A3B8',
-  },
-  efficiencyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  modeToggle: {
-    flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
-    borderRadius: 8,
-    padding: 2,
-  },
-  modeBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  modeBtnActive: {
-    backgroundColor: '#FFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  modeBtnText: {
-    fontSize: 11,
-    color: '#64748B',
-  },
-  modeBtnTextActive: {
-    color: '#0F172A',
-    fontWeight: 'bold',
-  },
-  efficiencyContent: {
-    gap: 12,
-  },
-  effRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  effLabel: {
-    width: 90,
-    fontSize: 13,
-    color: '#475569',
-    fontWeight: '600',
-  },
-  effTrack: {
-    flex: 1,
-    height: 12,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  effFill: {
-    height: '100%',
-    borderRadius: 6,
-  },
-  effVal: {
-    width: 70,
-    fontSize: 12,
-    color: '#475569',
-    textAlign: 'right',
-    fontWeight: '600',
-  },
-  dailyBarsContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    height: 160,
-    gap: 8,
-    paddingTop: 20,
-    paddingBottom: 24,
-  },
-  dailyBarCol: {
-    width: 28,
-    alignItems: 'center',
-    height: '100%',
-    justifyContent: 'flex-end',
-  },
-  dailyBarVal: {
-    fontSize: 10,
-    color: '#EA580C',
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  dailyBarTrack: {
-    width: 20,
-    height: '70%',
-    backgroundColor: '#FFF7ED',
-    borderRadius: 6,
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-  },
-  dailyBarFill: {
-    width: '100%',
-    backgroundColor: '#F97316',
-    borderRadius: 6,
-  },
-  dailyBarDate: {
-    fontSize: 9,
-    color: '#94A3B8',
-    marginTop: 4,
-    transform: [{ rotate: '-45deg' }],
-  },
-  imwDescription: {
-    fontSize: 13,
-    color: '#64748B',
-    lineHeight: 18,
-    marginBottom: 16,
-  },
-  imwLanguagesList: {
-    gap: 14,
-  },
-  imwLangItem: {
-    gap: 6,
-  },
-  imwLangHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  imwLangName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  imwLangPercent: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#0F172A',
-  },
-  imwProgressBarTrack: {
-    height: 6,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  imwProgressBarFill: {
-    height: '100%',
-    backgroundColor: '#38BDF8',
-    borderRadius: 3,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginVertical: 16,
-  },
-  imwOverallRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  imwOverallLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0F172A',
-  },
-  imwOverallValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0F172A',
-  },
-  wordListContainer: {
-    gap: 10,
-  },
-  wordCard: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-  },
-  wordCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  wordRussian: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#1E293B',
-  },
-  wordShowBadge: {
-    backgroundColor: '#FFF7ED',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#FFEDD5',
-  },
-  wordShowText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#C2410C',
-  },
-  wordTranslationsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  wordTransItem: {
-    fontSize: 14,
-  },
-  wordTransText: {
-    color: '#475569',
-    fontWeight: '500',
-  },
-  emptyStatsText: {
-    fontSize: 14,
-    color: '#64748B',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    paddingVertical: 10,
-  }
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16
+  },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  cardHeaderIcon: { fontSize: 18 },
+  cardHeaderTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', flex: 1 },
+  cardChevron: { fontSize: 16, color: '#94A3B8' },
+  cardBody: { paddingHorizontal: 16, paddingBottom: 16 },
+
+  sectionNote: { fontSize: 12, color: '#94A3B8', marginTop: 10, lineHeight: 17 },
+  emptyText: { fontSize: 13, color: '#64748B', fontStyle: 'italic', textAlign: 'center', paddingVertical: 14 },
+
+  barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },
+  barLabel: { width: 96, fontSize: 12, color: '#475569', fontWeight: '600' },
+  barTrack: { flex: 1, height: 16, backgroundColor: '#F1F5F9', borderRadius: 8, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 8 },
+  barValue: { width: 48, fontSize: 12, fontWeight: 'bold', color: '#334155', textAlign: 'right' },
+
+  activityChart: {
+    flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between',
+    height: 150, marginTop: 12
+  },
+  activityCol: { flex: 1, alignItems: 'center', height: '100%', justifyContent: 'flex-end' },
+  activityValue: { fontSize: 9, color: '#64748B', fontWeight: '600', marginBottom: 3 },
+  activityTrack: { width: 12, flex: 1, backgroundColor: '#F1F5F9', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  activityFill: { width: '100%', backgroundColor: '#3B82F6', borderRadius: 4 },
+  activityDay: { fontSize: 9, color: '#94A3B8', marginTop: 5 },
+
+  modeToggle: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 10, padding: 3, marginBottom: 14, alignSelf: 'flex-start' },
+  modeBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 7 },
+  modeBtnActive: { backgroundColor: '#FFF', elevation: 1 },
+  modeBtnText: { fontSize: 12, color: '#64748B', fontWeight: '600' },
+  modeBtnTextActive: { color: '#0F172A' },
+
+  divider: { height: 1, backgroundColor: '#F1F5F9', marginVertical: 12 },
+
+  wordCard: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#F1F5F9' },
+  wordCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  wordRu: { fontSize: 15, fontWeight: 'bold', color: '#1E293B', flex: 1 },
+  wordCount: { fontSize: 12, fontWeight: '700', color: '#C2410C', marginLeft: 8 },
+  wordTransRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  wordTrans: { fontSize: 13 },
+  wordTransText: { color: '#475569', fontWeight: '500' }
 });

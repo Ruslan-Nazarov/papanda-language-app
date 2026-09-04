@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Word, Sentence } from '../models/types';
+import { Word, Sentence, Token } from '../models/types';
 import { DailyShows, WorkoutSnapshot } from '../utils/statistics';
 import wordsData from '../data/words.json';
 import sentencesData from '../data/sentences.json';
@@ -30,6 +30,7 @@ interface AppState {
   words: Word[];
   sentences: Sentence[];
   customSentences: Sentence[];
+  generatedSentences: Sentence[];
   customWords: Word[];
   userWordProgress: Record<string, UserWordProgress>;
   activeLanguages: string[];
@@ -50,10 +51,13 @@ interface AppState {
   markTripleKnown: (wordEng: string) => void;
   saveWordAssociation: (wordEng: string, assoc: string) => void;
   addSentence: (sentence: Sentence) => void;
+  addGeneratedSentences: (sentences: Sentence[]) => void;
+  clearGeneratedSentences: (languageLabel?: string) => void;
   updateSentence: (id: string, sentence: Sentence) => void;
   markSentenceLearned: (id: string, isLearned: boolean) => void;
   updateWordDetails: (wordKey: string, details: { word?: string; ru?: string; translations?: Record<string, string> }) => void;
   addCustomWord: (word: Word) => void;
+  addWordFromSentenceToken: (token: Token, languageCode: string) => boolean;
   resetStatistics: () => void;
   addWorkoutSnapshot: (snapshot: WorkoutSnapshot) => void;
   setWorkoutWordCount: (count: number) => void;
@@ -71,26 +75,39 @@ const parseJSONField = (field: string | Record<string, any> | null) => {
   return field || {};
 };
 
+const normalizeDictionaryValue = (value: string) => value.trim().toLocaleLowerCase();
+
+const getWordValueForLanguage = (word: Word, languageCode: string): string => {
+  if (languageCode === 'en') return word.translations?.en || word.eng || word.word || '';
+  const directValue = word[languageCode as keyof Word];
+  return (typeof directValue === 'string' && directValue.trim() ? directValue : word.translations?.[languageCode]) || '';
+};
+
 // Base static words dictionary
-const baseStaticWords: Word[] = (wordsData as any[]).map((w, idx) => ({
+const baseStaticWords: Word[] = (wordsData as any[]).map((w, idx) => {
+  // words.json only carries top-level it/de/ru; es/fr/la/kz live inside the
+  // `translations` JSON string. Fold them in so word.es / word.fr are populated.
+  const tr = parseJSONField(w.translations);
+  return {
   id: w.id || idx.toString(),
   word: w.word || w.eng || '',
   eng: w.eng || w.word || '',
-  ru: w.ru || '',
-  it: w.it || '',
-  es: w.es || '',
-  de: w.de || '',
-  fr: w.fr || '',
+  ru: w.ru || tr.ru || '',
+  it: w.it || tr.it || '',
+  es: w.es || tr.es || '',
+  de: w.de || tr.de || '',
+  fr: w.fr || tr.fr || '',
   meaning: w.meaning || '',
   count: 0,
   is_learned: 0,
   knowledge_stats: {},
   show_stats: {},
   last_shown: undefined,
-  translations: parseJSONField(w.translations),
+  translations: tr,
   personal_association: '',
   is_favorite: false
-}));
+  };
+});
 
 const baseStaticSentences: Sentence[] = (sentencesData as Sentence[]).map((s, idx) => ({
   id: s.id || `sent_${idx}`,
@@ -105,6 +122,7 @@ export const useStore = create<AppState>()(
       words: baseStaticWords,
       sentences: baseStaticSentences,
       customSentences: [],
+      generatedSentences: [],
       customWords: [],
       userWordProgress: {},
       activeLanguages: ['en', 'kz', 'it'],
@@ -117,7 +135,7 @@ export const useStore = create<AppState>()(
       learnedSentences: [],
 
       initializeStore: () => {
-        const { userWordProgress, customSentences, customWords } = get();
+        const { userWordProgress, customSentences, customWords, generatedSentences } = get();
         
         // Merge baseStaticWords with persisted userWordProgress
         const mergedWords = baseStaticWords.map(w => {
@@ -127,7 +145,7 @@ export const useStore = create<AppState>()(
             return {
               ...w,
               word: prog.custom_word !== undefined ? prog.custom_word : w.word,
-              eng: prog.custom_word !== undefined ? prog.custom_word : w.eng,
+              eng: prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng,
               ru: prog.custom_ru !== undefined ? prog.custom_ru : w.ru,
               translations: { ...w.translations, ...(prog.custom_translations || {}) },
               count: prog.count !== undefined ? prog.count : w.count,
@@ -149,7 +167,7 @@ export const useStore = create<AppState>()(
             return {
               ...w,
               word: prog.custom_word !== undefined ? prog.custom_word : w.word,
-              eng: prog.custom_word !== undefined ? prog.custom_word : w.eng,
+              eng: prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng,
               ru: prog.custom_ru !== undefined ? prog.custom_ru : w.ru,
               translations: { ...w.translations, ...(prog.custom_translations || {}) },
               count: prog.count !== undefined ? prog.count : w.count,
@@ -164,7 +182,7 @@ export const useStore = create<AppState>()(
           return w;
         });
 
-        const mergedSentences = [...baseStaticSentences, ...(customSentences || [])];
+        const mergedSentences = [...baseStaticSentences, ...(customSentences || []), ...(generatedSentences || [])];
 
         set({ 
           words: [...mergedWords, ...mergedCustomWords], 
@@ -349,6 +367,43 @@ export const useStore = create<AppState>()(
         });
       },
 
+      addGeneratedSentences: (newSentences) => {
+        set((state) => {
+          const knownTexts = new Set(state.sentences.map(sentence => `${sentence.language}:${sentence.sentence}`));
+          const uniqueSentences = newSentences.filter(sentence => !knownTexts.has(`${sentence.language}:${sentence.sentence}`));
+          if (uniqueSentences.length === 0) return {};
+
+          // Cap the stored pool so an old weak batch ages out instead of looping forever.
+          const MAX_GENERATED = 80;
+          const mergedGenerated = [...state.generatedSentences, ...uniqueSentences];
+          const trimmedGenerated = mergedGenerated.slice(-MAX_GENERATED);
+          const dropped = new Set(mergedGenerated.slice(0, -MAX_GENERATED).map(s => s.id));
+
+          return {
+            generatedSentences: trimmedGenerated,
+            sentences: [
+              ...state.sentences.filter(s => !dropped.has(s.id)),
+              ...uniqueSentences
+            ]
+          };
+        });
+      },
+
+      clearGeneratedSentences: (languageLabel) => {
+        set((state) => {
+          const matches = (s: Sentence) =>
+            s.source === 'generated' &&
+            (!languageLabel || (s.language || '').toLowerCase().includes(languageLabel.toLowerCase()));
+          const removedIds = new Set(state.generatedSentences.filter(matches).map(s => s.id));
+          if (removedIds.size === 0) return {};
+          return {
+            generatedSentences: state.generatedSentences.filter(s => !removedIds.has(s.id)),
+            sentences: state.sentences.filter(s => !removedIds.has(s.id)),
+            learnedSentences: state.learnedSentences.filter(id => !removedIds.has(id))
+          };
+        });
+      },
+
       updateSentence: (id, sentence) => {
         set((state) => {
           const newSentences = state.sentences.map(s => s.id === id ? sentence : s);
@@ -407,7 +462,7 @@ export const useStore = create<AppState>()(
             if (w.eng === wordKey || w.word === wordKey) {
               return { 
                 ...w, 
-                ...(details.word !== undefined && { word: details.word, eng: details.word }),
+                ...(details.word !== undefined && { word: details.word, ...(!w.source_language && { eng: details.word }) }),
                 ...(details.ru !== undefined && { ru: details.ru }),
                 translations: { ...w.translations, ...updatedTranslations }
               };
@@ -432,18 +487,56 @@ export const useStore = create<AppState>()(
         });
       },
 
+      addWordFromSentenceToken: (token, languageCode) => {
+        const dictionaryForm = (token.dictionary_form || token.dictionary_word || token.parts?.[0] || token.text).trim();
+        if (!dictionaryForm) return false;
+
+        const normalizedForm = normalizeDictionaryValue(dictionaryForm);
+        const alreadyExists = get().words.some(word =>
+          normalizeDictionaryValue(getWordValueForLanguage(word, languageCode)) === normalizedForm ||
+          (word.source_language === languageCode && normalizeDictionaryValue(word.word || '') === normalizedForm)
+        );
+        if (alreadyExists) return false;
+
+        const stableKey = `user:${languageCode}:${normalizedForm}`;
+        const newWord: Word = {
+          id: `custom_${Date.now().toString()}`,
+          // `eng` is a legacy internal key in this app, not the visible language value.
+          eng: stableKey,
+          word: dictionaryForm,
+          ru: token.translation?.trim() || '',
+          translations: { [languageCode]: dictionaryForm },
+          source_language: languageCode,
+          count: 0,
+          is_learned: 0,
+          knowledge_stats: {},
+          show_stats: {},
+          personal_association: '',
+          is_favorite: false
+        };
+
+        set((state) => ({
+          customWords: [newWord, ...state.customWords],
+          words: [newWord, ...state.words]
+        }));
+        return true;
+      },
+
       resetStatistics: () => {
+        // Clear only progress/stats — keep the user's own words and sentences.
         set(() => ({
           userWordProgress: {},
-          words: baseStaticWords,
           dailyShows: {},
-          workoutSnapshots: []
+          workoutSnapshots: [],
+          learnedSentences: []
         }));
+        get().initializeStore();
       },
-      
+
       addWorkoutSnapshot: (snapshot) => {
+        const MAX_SNAPSHOTS = 200;
         set((state) => ({
-          workoutSnapshots: [...state.workoutSnapshots, snapshot]
+          workoutSnapshots: [...state.workoutSnapshots, snapshot].slice(-MAX_SNAPSHOTS)
         }));
       },
       
@@ -500,7 +593,7 @@ export const useStore = create<AppState>()(
                 return {
                   ...w,
                   word: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.word || w.word),
-                  eng: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.eng || w.eng),
+                  eng: previousProgress.custom_word !== undefined && !w.source_language ? previousProgress.custom_word : (baseWord?.eng || w.eng),
                   ru: previousProgress.custom_ru !== undefined ? previousProgress.custom_ru : (baseWord?.ru || w.ru),
                   translations: { ...(baseWord?.translations || {}), ...(previousProgress.custom_translations || {}) },
                   count: previousProgress.count !== undefined ? previousProgress.count : (baseWord?.count || 0),
@@ -528,10 +621,16 @@ export const useStore = create<AppState>()(
     {
       name: 'papanda-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      // AsyncStorage rehydrates asynchronously — once the persisted slices are in,
+      // rebuild the derived `words` / `sentences` from them.
+      onRehydrateStorage: () => (state) => {
+        state?.initializeStore();
+      },
       // CRITICAL FOR ANDROID: Only persist user changes, NOT the entire 5MB static dataset!
       partialize: (state) => ({
         userWordProgress: state.userWordProgress,
         customSentences: state.customSentences,
+        generatedSentences: state.generatedSentences,
         customWords: state.customWords,
         activeLanguages: state.activeLanguages,
         dailyShows: state.dailyShows,
@@ -544,4 +643,3 @@ export const useStore = create<AppState>()(
     }
   )
 );
-
