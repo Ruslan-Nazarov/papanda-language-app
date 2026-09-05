@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
+import { exportProgressToFile, importProgressFromFile } from '../services/backupService';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 
@@ -10,6 +11,8 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount } = useStore();
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   const toggleLanguage = (code: string) => {
     let newLangs = [...activeLanguages];
@@ -34,6 +37,46 @@ export default function SettingsScreen() {
       newLangs[targetIndex] = temp;
       setLanguages(newLangs);
     }
+  };
+
+  const handleExport = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const result = await exportProgressToFile();
+      if (!result.ok && result.error) {
+        Alert.alert('Не удалось сохранить', result.error);
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const runImport = async () => {
+    if (isImporting) return;
+    setIsImporting(true);
+    try {
+      const result = await importProgressFromFile();
+      if (result.canceled) return;
+      if (result.ok) {
+        Alert.alert('Готово', 'Прогресс восстановлен из резервной копии.');
+      } else {
+        Alert.alert('Не удалось восстановить', result.error || 'Проверьте выбранный файл.');
+      }
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleImport = () => {
+    Alert.alert(
+      'Импортировать резервную копию?',
+      'Это заменит текущий прогресс, словарь и предложения данными из файла. Действие нельзя отменить.',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Импортировать', style: 'destructive', onPress: () => void runImport() }
+      ]
+    );
   };
 
   const handleReset = () => {
@@ -140,6 +183,23 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Backup Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Резервная копия</Text>
+          <Text style={styles.sectionSub}>
+            Прогресс хранится только на этом телефоне и стирается при удалении приложения.
+            Сохраните копию перед переустановкой.
+          </Text>
+          <TouchableOpacity style={styles.row} onPress={handleExport} disabled={isExporting}>
+            <Text style={styles.rowText}>📤 Экспортировать прогресс</Text>
+            {isExporting && <ActivityIndicator size="small" color="#007BFF" />}
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.row} onPress={handleImport} disabled={isImporting}>
+            <Text style={styles.rowText}>📥 Импортировать прогресс</Text>
+            {isImporting && <ActivityIndicator size="small" color="#007BFF" />}
+          </TouchableOpacity>
         </View>
 
         {/* Reset Data Section */}

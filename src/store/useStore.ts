@@ -81,6 +81,8 @@ interface AppState {
   setWorkoutFavoritesOnly: (onlyFavorites: boolean) => void;
   toggleWordFavorite: (wordEng: string) => void;
   restoreWordProgress: (wordEng: string, previousProgress: UserWordProgress | null) => void;
+  exportProgress: () => PersistedProgress;
+  importProgress: (data: unknown) => { ok: boolean; error?: string };
 }
 
 // Helper to parse JSON fields safely
@@ -92,6 +94,37 @@ const parseJSONField = (field: string | Record<string, any> | null) => {
 };
 
 const normalizeDictionaryValue = (value: string) => value.trim().toLocaleLowerCase();
+
+// The subset of state that is persisted to disk and what a backup file
+// contains. Shared by the persist middleware's `partialize` and by
+// exportProgress/importProgress, so the two can never drift apart.
+export interface PersistedProgress {
+  userWordProgress: Record<string, UserWordProgress>;
+  customSentences: Sentence[];
+  generatedSentences: Sentence[];
+  customWords: Word[];
+  activeLanguages: string[];
+  dailyShows: DailyShows;
+  workoutSnapshots: WorkoutSnapshot[];
+  workoutWordCount: number;
+  workoutLearnedWordCount: number;
+  workoutFavoritesOnly: boolean;
+  learnedSentences: string[];
+}
+
+const pickPersistedFields = (state: AppState): PersistedProgress => ({
+  userWordProgress: state.userWordProgress,
+  customSentences: state.customSentences,
+  generatedSentences: state.generatedSentences,
+  customWords: state.customWords,
+  activeLanguages: state.activeLanguages,
+  dailyShows: state.dailyShows,
+  workoutSnapshots: state.workoutSnapshots,
+  workoutWordCount: state.workoutWordCount,
+  workoutLearnedWordCount: state.workoutLearnedWordCount,
+  workoutFavoritesOnly: state.workoutFavoritesOnly,
+  learnedSentences: state.learnedSentences,
+});
 
 const getWordValueForLanguage = (word: Word, languageCode: string): string => {
   return getWordTranslation(word, languageCode);
@@ -697,12 +730,38 @@ export const useStore = create<AppState>()(
           const newWords = state.words.map(restoreWord);
           const newCustomWords = (state.customWords || []).map(restoreWord);
 
-          return { 
+          return {
             userWordProgress: newProgress,
             words: newWords,
             customWords: newCustomWords
           };
         });
+      },
+
+      exportProgress: () => pickPersistedFields(get()),
+
+      importProgress: (data) => {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          return { ok: false, error: 'Файл повреждён или имеет неверный формат.' };
+        }
+        const d = data as Partial<PersistedProgress>;
+        set({
+          userWordProgress: d.userWordProgress || {},
+          customSentences: Array.isArray(d.customSentences) ? d.customSentences : [],
+          generatedSentences: Array.isArray(d.generatedSentences) ? d.generatedSentences : [],
+          customWords: Array.isArray(d.customWords) ? d.customWords : [],
+          activeLanguages: Array.isArray(d.activeLanguages) && d.activeLanguages.length > 0
+            ? d.activeLanguages
+            : ['en', 'kz', 'it'],
+          dailyShows: d.dailyShows || {},
+          workoutSnapshots: Array.isArray(d.workoutSnapshots) ? d.workoutSnapshots : [],
+          workoutWordCount: typeof d.workoutWordCount === 'number' ? d.workoutWordCount : 10,
+          workoutLearnedWordCount: typeof d.workoutLearnedWordCount === 'number' ? d.workoutLearnedWordCount : 2,
+          workoutFavoritesOnly: Boolean(d.workoutFavoritesOnly),
+          learnedSentences: Array.isArray(d.learnedSentences) ? d.learnedSentences : [],
+        });
+        get().initializeStore();
+        return { ok: true };
       }
     }),
     {
@@ -714,19 +773,7 @@ export const useStore = create<AppState>()(
         state?.initializeStore();
       },
       // CRITICAL FOR ANDROID: Only persist user changes, NOT the entire 5MB static dataset!
-      partialize: (state) => ({
-        userWordProgress: state.userWordProgress,
-        customSentences: state.customSentences,
-        generatedSentences: state.generatedSentences,
-        customWords: state.customWords,
-        activeLanguages: state.activeLanguages,
-        dailyShows: state.dailyShows,
-        workoutSnapshots: state.workoutSnapshots,
-        workoutWordCount: state.workoutWordCount,
-        workoutLearnedWordCount: state.workoutLearnedWordCount,
-        workoutFavoritesOnly: state.workoutFavoritesOnly,
-        learnedSentences: state.learnedSentences,
-      }),
+      partialize: pickPersistedFields,
     }
   )
 );
