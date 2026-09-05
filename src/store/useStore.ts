@@ -6,6 +6,8 @@ import { DailyShows, WorkoutSnapshot } from '../utils/statistics';
 import wordsData from '../data/words.json';
 import sentencesData from '../data/sentences.json';
 
+import { getWordTranslation } from '../utils/words';
+
 interface TargetSentenceInfo {
   langCode: string;
   sentenceId?: string;
@@ -13,7 +15,19 @@ interface TargetSentenceInfo {
   highlightWord?: string;
 }
 
-interface UserWordProgress {
+export interface WordAiIssue {
+  lang: string;
+  issue: string;
+  suggestion?: string;
+}
+
+export interface WordAiVerification {
+  status: 'verified' | 'flagged';
+  issues?: WordAiIssue[];
+  checkedAt: string;
+}
+
+export interface UserWordProgress {
   count?: number;
   is_learned?: number;
   knowledge_stats?: Record<string, boolean>;
@@ -24,6 +38,7 @@ interface UserWordProgress {
   custom_ru?: string;
   custom_translations?: Record<string, string>;
   is_favorite?: boolean;
+  ai_verification?: WordAiVerification;
 }
 
 interface AppState {
@@ -50,12 +65,13 @@ interface AppState {
   incrementShowCount: (wordEng: string, lang: string) => void;
   markTripleKnown: (wordEng: string) => void;
   saveWordAssociation: (wordEng: string, assoc: string) => void;
+  setWordAiVerification: (wordKey: string, verification: WordAiVerification) => void;
   addSentence: (sentence: Sentence) => void;
   addGeneratedSentences: (sentences: Sentence[]) => void;
   clearGeneratedSentences: (languageLabel?: string) => void;
   updateSentence: (id: string, sentence: Sentence) => void;
   markSentenceLearned: (id: string, isLearned: boolean) => void;
-  updateWordDetails: (wordKey: string, details: { word?: string; ru?: string; translations?: Record<string, string> }) => void;
+  updateWordDetails: (wordKey: string, details: { word?: string; ru?: string; translations?: Record<string, string>; personal_association?: string }) => void;
   addCustomWord: (word: Word) => void;
   addWordFromSentenceToken: (token: Token, languageCode: string) => boolean;
   resetStatistics: () => void;
@@ -78,9 +94,7 @@ const parseJSONField = (field: string | Record<string, any> | null) => {
 const normalizeDictionaryValue = (value: string) => value.trim().toLocaleLowerCase();
 
 const getWordValueForLanguage = (word: Word, languageCode: string): string => {
-  if (languageCode === 'en') return word.translations?.en || word.eng || word.word || '';
-  const directValue = word[languageCode as keyof Word];
-  return (typeof directValue === 'string' && directValue.trim() ? directValue : word.translations?.[languageCode]) || '';
+  return getWordTranslation(word, languageCode);
 };
 
 // Base static words dictionary
@@ -137,50 +151,48 @@ export const useStore = create<AppState>()(
       initializeStore: () => {
         const { userWordProgress, customSentences, customWords, generatedSentences } = get();
         
-        // Merge baseStaticWords with persisted userWordProgress
-        const mergedWords = baseStaticWords.map(w => {
+        const applyUserProgress = (w: Word): Word => {
           const key = w.eng || w.word || '';
           const prog = userWordProgress[key];
-          if (prog) {
-            return {
-              ...w,
-              word: prog.custom_word !== undefined ? prog.custom_word : w.word,
-              eng: prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng,
-              ru: prog.custom_ru !== undefined ? prog.custom_ru : w.ru,
-              translations: { ...w.translations, ...(prog.custom_translations || {}) },
-              count: prog.count !== undefined ? prog.count : w.count,
-              is_learned: prog.is_learned !== undefined ? prog.is_learned : w.is_learned,
-              knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
-              show_stats: prog.show_stats || w.show_stats,
-              last_shown: prog.last_shown || w.last_shown,
-              personal_association: prog.personal_association || w.personal_association,
-              is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : w.is_favorite
-            };
-          }
-          return w;
-        });
+          if (!prog) return w;
 
-        const mergedCustomWords = (customWords || []).map(w => {
-          const key = w.eng || w.word || '';
-          const prog = userWordProgress[key];
-          if (prog) {
-            return {
-              ...w,
-              word: prog.custom_word !== undefined ? prog.custom_word : w.word,
-              eng: prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng,
-              ru: prog.custom_ru !== undefined ? prog.custom_ru : w.ru,
-              translations: { ...w.translations, ...(prog.custom_translations || {}) },
-              count: prog.count !== undefined ? prog.count : w.count,
-              is_learned: prog.is_learned !== undefined ? prog.is_learned : w.is_learned,
-              knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
-              show_stats: prog.show_stats || w.show_stats,
-              last_shown: prog.last_shown || w.last_shown,
-              personal_association: prog.personal_association || w.personal_association,
-              is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : w.is_favorite
-            };
+          const mergedTranslations = {
+            ...w.translations,
+            ...(prog.custom_translations || {})
+          };
+
+          const directLangUpdates: Partial<Word> = {};
+          if (prog.custom_translations) {
+            if ('it' in prog.custom_translations) directLangUpdates.it = prog.custom_translations.it;
+            if ('de' in prog.custom_translations) directLangUpdates.de = prog.custom_translations.de;
+            if ('es' in prog.custom_translations) directLangUpdates.es = prog.custom_translations.es;
+            if ('fr' in prog.custom_translations) directLangUpdates.fr = prog.custom_translations.fr;
+            if ('ru' in prog.custom_translations) directLangUpdates.ru = prog.custom_translations.ru;
           }
-          return w;
-        });
+
+          const newWord = prog.custom_word !== undefined ? prog.custom_word : w.word;
+          const newEng = prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng;
+          const newRu = prog.custom_ru !== undefined ? prog.custom_ru : (directLangUpdates.ru ?? w.ru);
+
+          return {
+            ...w,
+            ...directLangUpdates,
+            word: newWord,
+            eng: newEng,
+            ru: newRu,
+            translations: mergedTranslations,
+            count: prog.count !== undefined ? prog.count : w.count,
+            is_learned: prog.is_learned !== undefined ? prog.is_learned : w.is_learned,
+            knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
+            show_stats: prog.show_stats || w.show_stats,
+            last_shown: prog.last_shown || w.last_shown,
+            personal_association: prog.personal_association !== undefined ? prog.personal_association : (w.personal_association || ''),
+            is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : (w.is_favorite || false)
+          };
+        };
+
+        const mergedWords = baseStaticWords.map(applyUserProgress);
+        const mergedCustomWords = (customWords || []).map(applyUserProgress);
 
         const mergedSentences = [...baseStaticSentences, ...(customSentences || []), ...(generatedSentences || [])];
 
@@ -343,16 +355,20 @@ export const useStore = create<AppState>()(
             [key]: updatedProg
           };
 
-          const newWords = state.words.map(w => {
+          const updateAssoc = (w: Word) => {
             if (w.eng === wordEng || w.word === wordEng) {
               return { ...w, personal_association: assoc };
             }
             return w;
-          });
+          };
+
+          const newWords = state.words.map(updateAssoc);
+          const newCustomWords = (state.customWords || []).map(updateAssoc);
 
           return { 
             userWordProgress: newProgress,
-            words: newWords 
+            words: newWords,
+            customWords: newCustomWords
           };
         });
       },
@@ -441,15 +457,17 @@ export const useStore = create<AppState>()(
           const key = wordKey;
           const currentProg = state.userWordProgress[key] || {};
           
-          const updatedTranslations = { 
+          const updatedTranslations: Record<string, string> = { 
             ...(currentProg.custom_translations || {}), 
-            ...(details.translations || {}) 
+            ...(details.translations || {}),
+            ...(details.ru !== undefined ? { ru: details.ru } : {})
           };
 
           const updatedProg: UserWordProgress = {
             ...currentProg,
             ...(details.word !== undefined && { custom_word: details.word }),
             ...(details.ru !== undefined && { custom_ru: details.ru }),
+            ...(details.personal_association !== undefined && { personal_association: details.personal_association }),
             ...(Object.keys(updatedTranslations).length > 0 && { custom_translations: updatedTranslations })
           };
 
@@ -458,21 +476,44 @@ export const useStore = create<AppState>()(
             [key]: updatedProg
           };
 
-          const newWords = state.words.map(w => {
+          const updateWord = (w: Word): Word => {
             if (w.eng === wordKey || w.word === wordKey) {
+              const mergedTranslations = {
+                ...w.translations,
+                ...updatedTranslations
+              };
+
+              const directLangUpdates: Partial<Word> = {};
+              if (updatedTranslations.it !== undefined) directLangUpdates.it = updatedTranslations.it;
+              if (updatedTranslations.de !== undefined) directLangUpdates.de = updatedTranslations.de;
+              if (updatedTranslations.es !== undefined) directLangUpdates.es = updatedTranslations.es;
+              if (updatedTranslations.fr !== undefined) directLangUpdates.fr = updatedTranslations.fr;
+
+              const newRu = details.ru !== undefined ? details.ru : (updatedTranslations.ru ?? w.ru);
+              const newWord = details.word !== undefined ? details.word : w.word;
+              const newEng = details.word !== undefined && !w.source_language ? details.word : w.eng;
+              const newAssoc = details.personal_association !== undefined ? details.personal_association : (w.personal_association || '');
+
               return { 
                 ...w, 
-                ...(details.word !== undefined && { word: details.word, ...(!w.source_language && { eng: details.word }) }),
-                ...(details.ru !== undefined && { ru: details.ru }),
-                translations: { ...w.translations, ...updatedTranslations }
+                ...directLangUpdates,
+                word: newWord,
+                eng: newEng,
+                ru: newRu,
+                personal_association: newAssoc,
+                translations: mergedTranslations
               };
             }
             return w;
-          });
+          };
+
+          const newWords = state.words.map(updateWord);
+          const newCustomWords = (state.customWords || []).map(updateWord);
 
           return { 
             userWordProgress: newProgress,
-            words: newWords 
+            words: newWords,
+            customWords: newCustomWords
           };
         });
       },
@@ -487,8 +528,30 @@ export const useStore = create<AppState>()(
         });
       },
 
+      setWordAiVerification: (wordKey, verification) => {
+        set((state) => {
+          const key = wordKey;
+          const currentProg = state.userWordProgress[key] || {};
+          const updatedProg: UserWordProgress = {
+            ...currentProg,
+            ai_verification: verification,
+          };
+          return {
+            userWordProgress: {
+              ...state.userWordProgress,
+              [key]: updatedProg,
+            }
+          };
+        });
+      },
+
       addWordFromSentenceToken: (token, languageCode) => {
-        const dictionaryForm = (token.dictionary_form || token.dictionary_word || token.parts?.[0] || token.text).trim();
+        // Prioritize canonical dictionary form (lemma) or dictionary_word.
+        // If neither exists, clean up token.text (strip punctuation) - NEVER use parts[0].
+        const rawForm = token.dictionary_form || token.dictionary_word || token.text;
+        const dictionaryForm = (rawForm || '')
+          .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '')
+          .trim();
         if (!dictionaryForm) return false;
 
         const normalizedForm = normalizeDictionaryValue(dictionaryForm);
@@ -561,16 +624,20 @@ export const useStore = create<AppState>()(
             [key]: updatedProg
           };
 
-          const newWords = state.words.map(w => {
+          const updateFav = (w: Word) => {
             if (w.eng === wordEng || w.word === wordEng) {
               return { ...w, is_favorite: !currentFav };
             }
             return w;
-          });
+          };
+
+          const newWords = state.words.map(updateFav);
+          const newCustomWords = (state.customWords || []).map(updateFav);
 
           return { 
             userWordProgress: newProgress,
-            words: newWords 
+            words: newWords,
+            customWords: newCustomWords
           };
         });
       },
@@ -587,21 +654,37 @@ export const useStore = create<AppState>()(
           }
 
           const baseWord = baseStaticWords.find(w => w.eng === wordEng || w.word === wordEng);
-          const newWords = state.words.map(w => {
+
+          const restoreWord = (w: Word): Word => {
             if (w.eng === wordEng || w.word === wordEng) {
               if (previousProgress) {
+                const mergedTranslations = {
+                  ...(baseWord?.translations || {}),
+                  ...(previousProgress.custom_translations || {})
+                };
+
+                const directLangUpdates: Partial<Word> = {};
+                if (previousProgress.custom_translations) {
+                  if ('it' in previousProgress.custom_translations) directLangUpdates.it = previousProgress.custom_translations.it;
+                  if ('de' in previousProgress.custom_translations) directLangUpdates.de = previousProgress.custom_translations.de;
+                  if ('es' in previousProgress.custom_translations) directLangUpdates.es = previousProgress.custom_translations.es;
+                  if ('fr' in previousProgress.custom_translations) directLangUpdates.fr = previousProgress.custom_translations.fr;
+                  if ('ru' in previousProgress.custom_translations) directLangUpdates.ru = previousProgress.custom_translations.ru;
+                }
+
                 return {
                   ...w,
+                  ...directLangUpdates,
                   word: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.word || w.word),
                   eng: previousProgress.custom_word !== undefined && !w.source_language ? previousProgress.custom_word : (baseWord?.eng || w.eng),
-                  ru: previousProgress.custom_ru !== undefined ? previousProgress.custom_ru : (baseWord?.ru || w.ru),
-                  translations: { ...(baseWord?.translations || {}), ...(previousProgress.custom_translations || {}) },
+                  ru: previousProgress.custom_ru !== undefined ? previousProgress.custom_ru : (directLangUpdates.ru ?? baseWord?.ru ?? w.ru),
+                  translations: mergedTranslations,
                   count: previousProgress.count !== undefined ? previousProgress.count : (baseWord?.count || 0),
                   is_learned: previousProgress.is_learned !== undefined ? previousProgress.is_learned : (baseWord?.is_learned || 0),
                   knowledge_stats: previousProgress.knowledge_stats || (baseWord?.knowledge_stats || {}),
                   show_stats: previousProgress.show_stats || (baseWord?.show_stats || {}),
                   last_shown: previousProgress.last_shown || baseWord?.last_shown,
-                  personal_association: previousProgress.personal_association || baseWord?.personal_association,
+                  personal_association: previousProgress.personal_association || baseWord?.personal_association || '',
                   is_favorite: previousProgress.is_favorite !== undefined ? previousProgress.is_favorite : (baseWord?.is_favorite || false)
                 };
               } else if (baseWord) {
@@ -609,11 +692,15 @@ export const useStore = create<AppState>()(
               }
             }
             return w;
-          });
+          };
+
+          const newWords = state.words.map(restoreWord);
+          const newCustomWords = (state.customWords || []).map(restoreWord);
 
           return { 
             userWordProgress: newProgress,
-            words: newWords 
+            words: newWords,
+            customWords: newCustomWords
           };
         });
       }

@@ -12,6 +12,7 @@ import DictionaryScreen from './src/screens/DictionaryScreen';
 import BrainWorkoutScreen from './src/screens/BrainWorkoutScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import { prefetchSentencesInBackground } from './src/services/sentencePrefetch';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -42,10 +43,10 @@ class ErrorBoundary extends React.Component<
     if (!this.state.error) return this.props.children;
     return (
       <View style={boundaryStyles.container}>
-        <Text style={boundaryStyles.emoji}>😕</Text>
+        <Text style={boundaryStyles.emoji}>⚠️</Text>
         <Text style={boundaryStyles.title}>Что-то пошло не так</Text>
         <Text style={boundaryStyles.sub}>
-          Экран не удалось показать. Попробуйте вернуться назад или перезапустить приложение.
+          Экран не смог отобразиться из-за внутренней ошибки. Мы уже изолировали её, чтобы приложение не упало целиком.
         </Text>
         <TouchableOpacity style={boundaryStyles.button} onPress={() => this.setState({ error: null })}>
           <Text style={boundaryStyles.buttonText}>Попробовать снова</Text>
@@ -68,12 +69,20 @@ function MainTabs() {
   const insets = useSafeAreaInsets();
   const bottomInset = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 12 : 8);
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      void prefetchSentencesInBackground();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Tab.Navigator
       initialRouteName="Word Triples"
       screenOptions={({ route }) => ({
+        tabBarShowLabel: false,
         tabBarIcon: ({ focused }) => (
-          <Text style={{ fontSize: focused ? 20 : 17, opacity: focused ? 1 : 0.6, marginBottom: 2 }}>
+          <Text style={{ fontSize: focused ? 24 : 20, opacity: focused ? 1 : 0.5 }}>
             {TAB_EMOJI[route.name] ?? '📌'}
           </Text>
         ),
@@ -84,19 +93,14 @@ function MainTabs() {
           backgroundColor: '#FFFFFF',
           borderTopColor: '#E2E8F0',
           borderTopWidth: 1,
-          paddingTop: 8,
+          paddingTop: 6,
           paddingBottom: bottomInset,
-          height: 56 + bottomInset,
+          height: 50 + bottomInset,
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.06,
           shadowRadius: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginTop: 0,
         },
         tabBarItemStyle: {
           justifyContent: 'center',
@@ -104,11 +108,11 @@ function MainTabs() {
         }
       })}
     >
-      <Tab.Screen name="Word Triples" component={WordTriplesScreen} options={{ tabBarLabel: 'Слова' }} />
-      <Tab.Screen name="Sentence Trainer" component={SentenceTrainerScreen} options={{ tabBarLabel: 'Предложения' }} />
-      <Tab.Screen name="Brain Workout" component={BrainWorkoutScreen} options={{ tabBarLabel: 'Тренировка' }} />
-      <Tab.Screen name="Statistics" component={StatisticsScreen} options={{ tabBarLabel: 'Статистика' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Настройки' }} />
+      <Tab.Screen name="Word Triples" component={WordTriplesScreen} />
+      <Tab.Screen name="Sentence Trainer" component={SentenceTrainerScreen} />
+      <Tab.Screen name="Brain Workout" component={BrainWorkoutScreen} />
+      <Tab.Screen name="Statistics" component={StatisticsScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 }

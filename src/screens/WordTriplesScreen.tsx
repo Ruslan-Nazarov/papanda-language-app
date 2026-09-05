@@ -3,9 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingVi
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
-import { Word, Sentence } from '../models/types';
+import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
+import { getWordTranslation } from '../utils/words';
+import { auditNextWordInBackground } from '../services/wordAuditService';
+import { prefetchSentencesInBackground } from '../services/sentencePrefetch';
 
 type WordStats = Record<string, boolean | number>;
 
@@ -28,7 +31,7 @@ const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | und
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { words, sentences, activeLanguages, markTripleKnown, saveWordAssociation, setTargetSentenceInfo, restoreWordProgress, toggleWordFavorite, userWordProgress } = useStore();
+  const { words, activeLanguages, markTripleKnown, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress } = useStore();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -72,7 +75,7 @@ export default function WordTriplesScreen() {
   const pickRandomWord = () => {
     const pending = words.filter(w => {
       const hasAllTranslations = activeLanguages.every(lang => 
-        w[lang as keyof Word] || (w.translations && w.translations[lang])
+        Boolean(getWordTranslation(w, lang))
       );
       if (!hasAllTranslations) return false;
 
@@ -105,6 +108,7 @@ export default function WordTriplesScreen() {
     const latestWord = words.find(w => (w.eng || w.word) === wordKey);
     if (latestWord && latestWord !== currentWord) {
       setCurrentWord(latestWord);
+      setAssociationText(latestWord.personal_association || '');
     }
   }, [words, currentWord]);
 
@@ -212,47 +216,14 @@ export default function WordTriplesScreen() {
     });
   };
 
-  // Find matching sentence for a given translation and language
-  const findSentenceForWord = (langCode: string, translation: string | undefined): Sentence | null => {
-    if (!translation || !sentences || sentences.length === 0) return null;
-    
-    const langObj = LANGUAGES.find(l => l.code === langCode);
-    const targetWord = translation.trim().toLowerCase();
-    if (!targetWord) return null;
-
-    const escapeRegExp = (string: string) => {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
-
-    const regex = new RegExp(`(^|[^\\p{L}\\p{N}])` + escapeRegExp(targetWord) + `([^\\p{L}\\p{N}]|$)`, 'iu');
-
-    const matched = sentences.find(s => {
-      if (langObj && s.language && !s.language.toLowerCase().includes(langObj.label.toLowerCase())) {
-        return false;
-      }
-      return s.words?.some(t => 
-        t.dictionary_word?.toLowerCase() === targetWord ||
-        t.text?.toLowerCase() === targetWord ||
-        t.translation?.toLowerCase() === targetWord
-      ) || (s.sentence && regex.test(s.sentence));
-    });
-
-    return matched || null;
-  };
-
-  const handleWordSentencePress = (langCode: string, translation: string, matchedSentence: Sentence) => {
-    if (currentWord && associationText !== currentWord.personal_association) {
-      saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
-    }
-    
-    setTargetSentenceInfo({
-      langCode,
-      sentenceId: matchedSentence.id,
-      highlightWord: translation
-    });
-
-    navigation.navigate('Sentence Trainer');
-  };
+  // Background periodic AI check and sentence prefetching
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void auditNextWordInBackground();
+      void prefetchSentencesInBackground();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [currentWord?.eng, currentWord?.word, sessionCount, activeLanguages.length]);
 
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
 
@@ -365,36 +336,49 @@ export default function WordTriplesScreen() {
 
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
 
+          {currentProgress?.ai_verification?.status === 'flagged' && (
+            <TouchableOpacity 
+              style={styles.aiWarningBanner}
+              activeOpacity={0.8}
+              onPress={() => {
+                setEditingWord(currentWord);
+                setIsModalVisible(true);
+              }}
+            >
+              <Text style={styles.aiWarningIcon}>⚠️</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.aiWarningTitle}>Возможна неточность перевода (ИИ)</Text>
+                {currentProgress.ai_verification.issues?.map((iss, i) => (
+                  <Text key={i} style={styles.aiWarningIssue}>
+                    • {iss.lang.toUpperCase()}: {iss.issue} {iss.suggestion ? `(совет: ${iss.suggestion})` : ''}
+                  </Text>
+                ))}
+              </View>
+              <Text style={styles.aiWarningEdit}>✏️</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.divider} />
 
           {/* Large Centered Words with Subtle Side Badges */}
           <View style={styles.langsContainer}>
             {activeLanguages.map(lang => {
-              const translation = (currentWord[lang as keyof Word] || (currentWord.translations && currentWord.translations[lang])) as string;
+              const translation = getWordTranslation(currentWord, lang) || '—';
               const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
-              const matchedSentence = findSentenceForWord(lang, translation);
-              const hasSentence = !!matchedSentence;
 
               return (
-                <TouchableOpacity
-                  key={lang}
-                  activeOpacity={hasSentence ? 0.7 : 1}
-                  disabled={!hasSentence}
-                  onPress={() => hasSentence && handleWordSentencePress(lang, translation, matchedSentence)}
-                  style={[styles.langBlock, hasSentence && styles.langBlockClickable]}
-                >
+                <View key={lang} style={styles.langBlock}>
                   {/* Subtle Language Indicator on the Left Side */}
                   <View style={styles.sideBadge}>
                     <Text style={styles.sideFlag}>{langFlag}</Text>
                     <Text style={styles.sideLangCode}>{lang.toUpperCase()}</Text>
-                    {hasSentence && <View style={styles.yellowDot} />}
                   </View>
 
                   {/* Prominent Centered Translation */}
                   <View style={styles.wordCenterContainer}>
                     <Text style={styles.langTranslation}>{translation}</Text>
                   </View>
-                </TouchableOpacity>
+                </View>
               );
             })}
           </View>
@@ -608,9 +592,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  langBlockClickable: {
-    backgroundColor: '#FFFDF0',
-    borderColor: '#FDE047'
+  aiWarningBanner: {
+    backgroundColor: '#FEF3C7',
+    borderColor: '#F59E0B',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    width: '100%',
+  },
+  aiWarningIcon: {
+    fontSize: 18,
+  },
+  aiWarningTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#92400E',
+    marginBottom: 2,
+  },
+  aiWarningIssue: {
+    fontSize: 11,
+    color: '#78350F',
+    marginTop: 1,
+  },
+  aiWarningEdit: {
+    fontSize: 16,
+    paddingHorizontal: 4,
   },
   sideBadge: {
     position: 'absolute',
@@ -630,13 +640,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#64748B',
-  },
-  yellowDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#EAB308',
-    marginLeft: 2,
   },
   wordCenterContainer: {
     flex: 1,

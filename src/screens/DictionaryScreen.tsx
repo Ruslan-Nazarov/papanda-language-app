@@ -6,32 +6,14 @@ import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
+import { getWordTranslation } from '../utils/words';
 
 export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, sentences, toggleWordFavorite } = useStore();
+  const { words, activeLanguages, userWordProgress, toggleWordFavorite } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Every word form (lemma, base, surface) that appears anywhere in the sentence set.
-  const sentenceWordForms = useMemo(() => {
-    const set = new Set<string>();
-    sentences.forEach(s => {
-      s.words?.forEach(t => {
-        [t.dictionary_word, t.dictionary_form, t.text].forEach(v => {
-          const norm = typeof v === 'string' ? v.trim().toLowerCase() : '';
-          if (norm) set.add(norm);
-        });
-      });
-    });
-    return set;
-  }, [sentences]);
-
-  const isWordInSentences = (item: Word) => {
-    const candidates = [item.eng, item.word, ...Object.values(item.translations || {})];
-    return candidates.some(v => typeof v === 'string' && sentenceWordForms.has(v.trim().toLowerCase()));
-  };
   
   // State for editing/adding
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -48,8 +30,8 @@ export default function DictionaryScreen() {
       
       // Check active languages translations
       const transMatch = activeLanguages.some(lang => {
-        const trans = (w[lang as keyof Word] || (w.translations && w.translations[lang])) as string | undefined;
-        return trans?.toLowerCase().includes(query);
+        const trans = getWordTranslation(w, lang);
+        return trans.toLowerCase().includes(query);
       });
 
       return ruMatch || engMatch || assocMatch || transMatch;
@@ -63,9 +45,11 @@ export default function DictionaryScreen() {
 
   const renderItem = ({ item }: { item: Word }) => {
     const wordKey = item.eng || item.word || '';
-    const isInTrainer = isWordInSentences(item);
     const sourceLanguage = item.source_language ? LANGUAGES.find(lang => lang.code === item.source_language) : undefined;
     const displayOriginal = sourceLanguage ? `${sourceLanguage.flag} ${item.word || ''}` : item.eng;
+    const progress = userWordProgress[wordKey];
+    const aiVerification = progress?.ai_verification;
+    const isAiFlagged = aiVerification?.status === 'flagged';
 
     return (
       <View style={styles.card}>
@@ -87,7 +71,11 @@ export default function DictionaryScreen() {
               <Text style={styles.editBtnText}>✏️</Text>
             </TouchableOpacity>
             {!!item.is_learned && <Text style={styles.badgeLearned}>Выучено</Text>}
-            {isInTrainer && <Text style={styles.badgeTrainer}>В тренажере</Text>}
+            {isAiFlagged && (
+              <TouchableOpacity style={styles.badgeAiFlagged} onPress={() => openEditor(item)}>
+                <Text style={styles.badgeAiFlaggedText}>⚠️ Проверить перевод</Text>
+              </TouchableOpacity>
+            )}
             <Text style={styles.badgeCount}>{(item.count || 0)} пок.</Text>
           </View>
         </View>
@@ -95,7 +83,7 @@ export default function DictionaryScreen() {
         {/* Translations for activeLanguages only */}
         <View style={styles.translationsContainer}>
           {activeLanguages.map(lang => {
-            const trans = (item[lang as keyof Word] || (item.translations && item.translations[lang])) as string | undefined;
+            const trans = getWordTranslation(item, lang);
             const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
             const langLabel = lang.toUpperCase();
 
@@ -109,6 +97,17 @@ export default function DictionaryScreen() {
             );
           })}
         </View>
+
+        {/* AI verification issues */}
+        {isAiFlagged && aiVerification?.issues && aiVerification.issues.length > 0 && (
+          <View style={styles.aiIssueBox}>
+            {aiVerification.issues.map((iss, i) => (
+              <Text key={i} style={styles.aiIssueText}>
+                ⚠️ {iss.lang.toUpperCase()}: {iss.issue} {iss.suggestion ? `(рекомендуется: ${iss.suggestion})` : ''}
+              </Text>
+            ))}
+          </View>
+        )}
 
         {/* Personal Association */}
         {!!item.personal_association && (
@@ -358,17 +357,31 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     overflow: 'hidden',
   },
-  badgeTrainer: {
-    backgroundColor: '#FFFBEB',
-    color: '#D97706',
+  badgeAiFlagged: {
+    backgroundColor: '#FEF3C7',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
-    fontSize: 12,
-    fontWeight: 'bold',
-    overflow: 'hidden',
     borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  badgeAiFlaggedText: {
+    color: '#B45309',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  aiIssueBox: {
+    marginTop: 8,
+    backgroundColor: '#FFFBEB',
     borderColor: '#FDE68A',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    gap: 3,
+  },
+  aiIssueText: {
+    fontSize: 12,
+    color: '#92400E',
   },
   emptyContainer: {
     padding: 40,

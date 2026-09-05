@@ -5,6 +5,7 @@ import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
+import { getWordTranslation } from '../utils/words';
 
 interface QueueItem {
   word: Word;
@@ -85,7 +86,7 @@ export default function BrainWorkoutScreen() {
       
       words.forEach(w => {
         activeLanguages.forEach(langCode => {
-          const hasTranslation = w[langCode as keyof Word] || (w.translations && w.translations[langCode]);
+          const hasTranslation = Boolean(getWordTranslation(w, langCode));
           if (!hasTranslation) return;
           
           if (workoutFavoritesOnly && !w.is_favorite) return;
@@ -245,13 +246,6 @@ export default function BrainWorkoutScreen() {
   };
 
   const handleSwipe = (direction: 'left' | 'right') => {
-    // A right swipe is the existing "Back" action. Keep the card in place if
-    // there is no previous answer to undo.
-    if (direction === 'right' && history.length === 0) {
-      resetCardPosition();
-      return;
-    }
-
     if (isSwipeAnimating.current) return;
     isSwipeAnimating.current = true;
 
@@ -273,7 +267,7 @@ export default function BrainWorkoutScreen() {
       if (direction === 'left') {
         handleAnswer(false);
       } else {
-        handlePrevStep();
+        handleAnswer(true);
       }
 
       requestAnimationFrame(() => {
@@ -311,12 +305,8 @@ export default function BrainWorkoutScreen() {
     );
   }
 
-  const targetTranslation = (currentWord[currentLang as keyof Word] || (currentWord.translations && currentWord.translations[currentLang])) as string;
+  const targetTranslation = getWordTranslation(currentWord, currentLang);
   const activeLangObj = LANGUAGES.find(l => l.code === currentLang);
-
-  callbacks.current.handleSwipe = handleSwipe;
-  callbacks.current.resetCardPosition = resetCardPosition;
-
   const cardRotation = cardTranslateX.interpolate({
     inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
     outputRange: ['-8deg', '0deg', '8deg'],
@@ -327,6 +317,19 @@ export default function BrainWorkoutScreen() {
     outputRange: [0.15, 1, 0.15],
     extrapolate: 'clamp',
   });
+  const knownBadgeOpacity = cardTranslateX.interpolate({
+    inputRange: [20, 80],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+  const unknownBadgeOpacity = cardTranslateX.interpolate({
+    inputRange: [-80, -20],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  callbacks.current.handleSwipe = handleSwipe;
+  callbacks.current.resetCardPosition = resetCardPosition;
 
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
@@ -341,7 +344,7 @@ export default function BrainWorkoutScreen() {
           onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
         >
           <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
-            {workoutFavoritesOnly ? '★ Избранные' : '☆ Все'}
+            {workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
           </Text>
         </TouchableOpacity>
 
@@ -350,7 +353,7 @@ export default function BrainWorkoutScreen() {
         </View>
       </View>
 
-      {/* Main Flashcard */}
+      {/* Main Flashcard with Swipe Animation */}
       <View style={styles.cardArea}>
         <Animated.View
           {...panResponder.panHandlers}
@@ -362,6 +365,20 @@ export default function BrainWorkoutScreen() {
             },
           ]}
         >
+          {/* Visual stamps during swipe */}
+          <Animated.View 
+            style={[styles.swipeStamp, styles.swipeStampKnown, { opacity: knownBadgeOpacity }]} 
+            pointerEvents="none"
+          >
+            <Text style={styles.swipeStampKnownText}>✓ ЗНАЮ</Text>
+          </Animated.View>
+          <Animated.View 
+            style={[styles.swipeStamp, styles.swipeStampUnknown, { opacity: unknownBadgeOpacity }]} 
+            pointerEvents="none"
+          >
+            <Text style={styles.swipeStampUnknownText}>✕ НЕ ЗНАЮ</Text>
+          </Animated.View>
+
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
@@ -462,7 +479,7 @@ export default function BrainWorkoutScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, styles.btnUnknown]}
             activeOpacity={0.8}
-            onPress={() => handleAnswer(false)}
+            onPress={() => handleSwipe('left')}
           >
             <Text style={styles.btnIcon}>✕</Text>
             <Text style={styles.btnText}>Не знаю</Text>
@@ -471,7 +488,7 @@ export default function BrainWorkoutScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, styles.btnKnown]}
             activeOpacity={0.8}
-            onPress={() => handleAnswer(true)}
+            onPress={() => handleSwipe('right')}
           >
             <Text style={styles.btnIcon}>✓</Text>
             <Text style={styles.btnText}>Знаю</Text>
@@ -610,6 +627,45 @@ const styles = StyleSheet.create({
   },
   cardMotion: {
     width: '100%',
+    position: 'relative',
+  },
+  swipeStamp: {
+    position: 'absolute',
+    top: 28,
+    zIndex: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 2.5,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  swipeStampKnown: {
+    right: 24,
+    borderColor: '#16A34A',
+    backgroundColor: '#DCFCE7',
+    transform: [{ rotate: '12deg' }],
+  },
+  swipeStampKnownText: {
+    color: '#15803D',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  swipeStampUnknown: {
+    left: 24,
+    borderColor: '#DC2626',
+    backgroundColor: '#FEE2E2',
+    transform: [{ rotate: '-12deg' }],
+  },
+  swipeStampUnknownText: {
+    color: '#B91C1C',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   card: {
     backgroundColor: '#FFF',

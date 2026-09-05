@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView,
 import { Word } from '../models/types';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
+import { getWordTranslation } from '../utils/words';
 
 interface EditWordModalProps {
   visible: boolean;
@@ -11,22 +12,34 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
-  const { activeLanguages, updateWordDetails, addCustomWord, saveWordAssociation } = useStore();
+  const { activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore();
+  const [tempWord, setTempWord] = useState<{
+    eng: string;
+    ru: string;
+    personal_association: string;
+    translations: Record<string, string>;
+  }>({
+    eng: '',
+    ru: '',
+    personal_association: '',
+    translations: {}
+  });
 
-  const [tempWord, setTempWord] = useState({ eng: '', ru: '', personal_association: '', translations: {} as Record<string, string> });
   const isAddingNew = !wordToEdit;
+  const wordKey = wordToEdit?.eng || wordToEdit?.word || '';
+  const aiVerification = wordKey ? userWordProgress[wordKey]?.ai_verification : undefined;
 
   useEffect(() => {
     if (visible) {
       if (wordToEdit) {
         const trans: Record<string, string> = {};
         activeLanguages.forEach(l => {
-          trans[l] = (wordToEdit[l as keyof Word] || (wordToEdit.translations && wordToEdit.translations[l]) || '') as string;
+          trans[l] = getWordTranslation(wordToEdit, l);
         });
 
         setTempWord({
           eng: wordToEdit.source_language ? (wordToEdit.word || '') : (wordToEdit.eng || wordToEdit.word || ''),
-          ru: wordToEdit.ru || '',
+          ru: wordToEdit.ru || wordToEdit.translations?.ru || '',
           personal_association: wordToEdit.personal_association || '',
           translations: trans
         });
@@ -49,53 +62,79 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
         word: tempWord.eng.trim(),
         eng: tempWord.eng.trim(),
         ru: tempWord.ru.trim(),
-        translations: tempWord.translations,
         personal_association: tempWord.personal_association.trim(),
+        translations: { ...tempWord.translations },
         count: 0,
         is_learned: 0,
         knowledge_stats: {},
-        show_stats: {}
+        show_stats: {},
+        is_favorite: false
       };
       addCustomWord(newWord);
-    } else if (wordToEdit) {
-      const editingWordKey = wordToEdit.eng || wordToEdit.word || '';
+    } else {
+      const details: {
+        word?: string;
+        ru?: string;
+        translations?: Record<string, string>;
+        personal_association?: string;
+      } = {
+        personal_association: tempWord.personal_association.trim(),
+        translations: { ...tempWord.translations }
+      };
 
-      // Only push fields the user actually changed, so userWordProgress doesn't
-      // accumulate redundant custom_* overrides.
-      const details: { ru?: string; translations?: Record<string, string> } = {};
-      if (tempWord.ru.trim() !== (wordToEdit.ru || '')) {
-        details.ru = tempWord.ru.trim();
-      }
-      const changedTranslations: Record<string, string> = {};
-      activeLanguages.forEach(lang => {
-        const before = (wordToEdit[lang as keyof Word] || wordToEdit.translations?.[lang] || '') as string;
-        const after = (tempWord.translations[lang] || '').trim();
-        if (after !== before.trim()) changedTranslations[lang] = after;
-      });
-      if (Object.keys(changedTranslations).length > 0) {
-        details.translations = changedTranslations;
-      }
-      if (Object.keys(details).length > 0) {
-        updateWordDetails(editingWordKey, details);
+      if (wordToEdit.source_language) {
+        details.word = tempWord.eng.trim();
+      } else {
+        details.word = tempWord.eng.trim();
       }
 
-      if (tempWord.personal_association.trim() !== (wordToEdit.personal_association || '')) {
-        saveWordAssociation(editingWordKey, tempWord.personal_association.trim());
+      details.ru = tempWord.ru.trim();
+
+      updateWordDetails(wordKey, details);
+
+      if (aiVerification?.status === 'flagged') {
+        setWordAiVerification(wordKey, { status: 'verified', checkedAt: new Date().toISOString() });
       }
     }
     onClose();
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalCard}>
-          <Text style={styles.modalTitle}>{isAddingNew ? 'Новое слово' : 'Редактировать'}</Text>
+          <Text style={styles.modalTitle}>{isAddingNew ? 'Новое слово' : 'Редактировать слово'}</Text>
 
           <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+            {aiVerification?.status === 'flagged' && aiVerification.issues && aiVerification.issues.length > 0 && (
+              <View style={styles.aiSuggestionBox}>
+                <Text style={styles.aiSuggestionTitle}>💡 Замечания и подсказки ИИ:</Text>
+                {aiVerification.issues.map((iss, i) => (
+                  <View key={i} style={styles.aiIssueRow}>
+                    <Text style={styles.aiIssueText}>
+                      • {iss.lang.toUpperCase()}: {iss.issue}
+                    </Text>
+                    {!!iss.suggestion && (
+                      <TouchableOpacity
+                        style={styles.applySuggestionBtn}
+                        onPress={() => {
+                          setTempWord(prev => ({
+                            ...prev,
+                            translations: { ...prev.translations, [iss.lang]: iss.suggestion! }
+                          }));
+                        }}
+                      >
+                        <Text style={styles.applySuggestionText}>Вставить «{iss.suggestion}»</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+
             {isAddingNew && (
               <>
-                <Text style={styles.inputLabel}>Оригинал (Англ / Основной ключ)*</Text>
+                <Text style={styles.inputLabel}>Оригинал (Слово/Ключ)</Text>
                 <TextInput
                   style={styles.modalInput}
                   value={tempWord.eng}
@@ -213,7 +252,7 @@ const styles = StyleSheet.create({
   },
   modalCancelText: {
     color: '#4A5568',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   modalSave: {
     backgroundColor: '#007BFF',
@@ -221,5 +260,42 @@ const styles = StyleSheet.create({
   modalSaveText: {
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  aiSuggestionBox: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
+    gap: 6,
+  },
+  aiSuggestionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#92400E',
+    marginBottom: 2,
+  },
+  aiIssueRow: {
+    gap: 4,
+  },
+  aiIssueText: {
+    fontSize: 12,
+    color: '#78350F',
+  },
+  applySuggestionBtn: {
+    backgroundColor: '#FEF3C7',
+    borderColor: '#F59E0B',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginTop: 2,
+  },
+  applySuggestionText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#B45309',
   },
 });

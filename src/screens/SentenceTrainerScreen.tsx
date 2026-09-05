@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator, Alert, PanResponder } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
-import { SyntaxRole, Token } from '../models/types';
+import { SyntaxRole, Token, Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { explainSentenceWithAI } from '../services/aiService';
 import { generateSentenceBatch, isSentenceGenerationConfigured } from '../services/sentenceGeneration';
+import EditWordModal from '../components/EditWordModal';
+import { getWordTranslation } from '../utils/words';
 
 const STRICT_ORDER: SyntaxRole[] = [
   'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
@@ -69,6 +71,10 @@ export default function SentenceTrainerScreen() {
   const [newSentenceText, setNewSentenceText] = useState('');
   const [parsedTokens, setParsedTokens] = useState<Token[]>([]);
 
+  // Word modal state for tapping a token
+  const [editingWord, setEditingWord] = useState<Word | null>(null);
+  const [isWordModalVisible, setIsWordModalVisible] = useState(false);
+
   // AI state
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -79,7 +85,7 @@ export default function SentenceTrainerScreen() {
   const generatingLanguages = useRef(new Set<string>());
   // Set when a deep link (from another screen) wants the breakdown, not the intro.
   const skipIntroOnce = useRef(false);
-  const swipeCallbacks = useRef({ next: () => {} });
+  const swipeCallbacks = useRef({ next: () => {}, prev: () => {} });
   const sentencePanResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
@@ -87,7 +93,11 @@ export default function SentenceTrainerScreen() {
         Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
       ),
       onPanResponderRelease: (_event, gestureState) => {
-        if (gestureState.dx < -50) swipeCallbacks.current.next();
+        if (gestureState.dx < -50) {
+          swipeCallbacks.current.next();
+        } else if (gestureState.dx > 50) {
+          swipeCallbacks.current.prev();
+        }
       }
     })
   ).current;
@@ -247,7 +257,64 @@ export default function SentenceTrainerScreen() {
     setIsIntroMode(true);
   };
 
+  const moveToPrevSentence = () => {
+    if (filteredSentences.length <= 1) {
+      setIsFullyVisible(true);
+      setRevealedSteps(0);
+      setShowTranslations(false);
+      setAiExplanation(null);
+      setIsIntroMode(true);
+      return;
+    }
+
+    const prevIdx = (currentFilteredIndex - 1 + filteredSentences.length) % filteredSentences.length;
+    setCurrentFilteredIndex(prevIdx);
+    setIsFullyVisible(true);
+    setRevealedSteps(0);
+    setShowTranslations(false);
+    setAiExplanation(null);
+    setIsIntroMode(true);
+  };
+
   swipeCallbacks.current.next = moveToNextSentence;
+  swipeCallbacks.current.prev = moveToPrevSentence;
+
+  const handleTokenPress = (token: Token) => {
+    const rawForm = token.dictionary_form || token.dictionary_word || token.text;
+    const cleanForm = (rawForm || '').replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '').trim();
+    if (!cleanForm) return;
+
+    const existing = words.find(w => {
+      const tr = getWordTranslation(w, selectedLanguageCode);
+      return (
+        (tr && tr.toLowerCase() === cleanForm.toLowerCase()) ||
+        (w.word && w.word.toLowerCase() === cleanForm.toLowerCase()) ||
+        (w.eng && w.eng.toLowerCase() === cleanForm.toLowerCase())
+      );
+    });
+
+    if (existing) {
+      setEditingWord(existing);
+    } else {
+      const stableKey = `user:${selectedLanguageCode}:${cleanForm.toLowerCase()}`;
+      const draftWord: Word = {
+        id: `custom_${Date.now().toString()}`,
+        eng: stableKey,
+        word: cleanForm,
+        ru: token.translation?.trim() || '',
+        translations: { [selectedLanguageCode]: cleanForm },
+        source_language: selectedLanguageCode,
+        count: 0,
+        is_learned: 0,
+        knowledge_stats: {},
+        show_stats: {},
+        personal_association: '',
+        is_favorite: false
+      };
+      setEditingWord(draftWord);
+    }
+    setIsWordModalVisible(true);
+  };
 
   const orderedGroups = React.useMemo(() => {
     if (!currentSentence || !currentSentence.words) return [];
@@ -325,24 +392,6 @@ export default function SentenceTrainerScreen() {
     }
   };
 
-  const handlePrevStep = () => {
-    if (!currentSentence) return;
-
-    if (isIntroMode) return;
-
-    if (isFullyVisible) {
-      setIsIntroMode(true);
-      return;
-    }
-
-    if (revealedSteps === 0) {
-      setIsFullyVisible(true);
-      return;
-    }
-
-    setRevealedSteps(prev => prev - 1);
-  };
-
   const handleMarkLearned = () => {
     if (!currentSentence) return;
     markSentenceLearned(currentSentence.id, true);
@@ -407,15 +456,6 @@ export default function SentenceTrainerScreen() {
         </Text>
       </TouchableOpacity>
     );
-  };
-
-  const handleFlash = () => {
-    if (isFullyVisible) {
-      setIsFullyVisible(false);
-      setRevealedSteps(0);
-    } else {
-      setIsFullyVisible(true);
-    }
   };
 
   const openAddModal = () => {
@@ -506,11 +546,18 @@ export default function SentenceTrainerScreen() {
     return (
       <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
         {isRevealed ? (
-          <View style={[
-            styles.wordCard, 
-            { borderColor: getRoleColor(token.role) },
-            token.is_in_my_dict && { backgroundColor: '#FFFDF0' } // Gentle yellow background for dict words
-          ]}>
+          <TouchableOpacity 
+            activeOpacity={0.85}
+            onPress={(e) => {
+              e.stopPropagation();
+              handleTokenPress(token);
+            }}
+            style={[
+              styles.wordCard, 
+              { borderColor: getRoleColor(token.role) },
+              token.is_in_my_dict && { backgroundColor: '#FFFDF0' } // Gentle yellow background for dict words
+            ]}
+          >
             <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
               <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
             </View>
@@ -542,7 +589,7 @@ export default function SentenceTrainerScreen() {
             {showTranslations && <Text style={styles.translationText}>{token.translation}</Text>}
             <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
             {renderDictionaryAction(token)}
-          </View>
+          </TouchableOpacity>
         ) : (
           <View style={styles.hiddenCard}>
             <Text style={styles.hiddenText}>???</Text>
@@ -560,11 +607,18 @@ export default function SentenceTrainerScreen() {
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
         <View style={styles.tableColWord}>
           {isRevealed ? (
-            <View style={[
-              styles.wordCard, 
-              { borderColor: getRoleColor(token.role), minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
-              token.is_in_my_dict && { backgroundColor: '#FFFDF0' }
-            ]}>
+            <TouchableOpacity 
+              activeOpacity={0.85}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleTokenPress(token);
+              }}
+              style={[
+                styles.wordCard, 
+                { borderColor: getRoleColor(token.role), minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
+                token.is_in_my_dict && { backgroundColor: '#FFFDF0' }
+              ]}
+            >
               <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
                 <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
               </View>
@@ -593,7 +647,7 @@ export default function SentenceTrainerScreen() {
                   {(index === 0 && token.text) ? token.text.charAt(0).toUpperCase() + token.text.slice(1) : token.text}
                 </Text>
               )}
-            </View>
+            </TouchableOpacity>
           ) : (
             <View style={[styles.hiddenCard, { minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 }]}>
               <Text style={styles.hiddenText}>???</Text>
@@ -676,19 +730,34 @@ export default function SentenceTrainerScreen() {
               <Text style={{ fontSize: 28, fontWeight: '500', color: '#111827', textAlign: 'center', lineHeight: 40 }}>
                 {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
               </Text>
-              <Text style={{ fontSize: 13, color: '#94A3B8', marginTop: 24 }}>
+
+              <View style={[styles.swipeHintContainer, { marginTop: 20 }]}>
+                <Ionicons name="chevron-back" size={14} color="#94A3B8" />
+                <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
+                <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
+              </View>
+
+              <Text style={{ fontSize: 13, color: '#94A3B8', marginTop: 14 }}>
                 Нажмите, чтобы разобрать
               </Text>
             </TouchableOpacity>
           ) : (
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 15 }}>
-                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
-              </Text>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleNextStep}>
+                <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
+                  {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.swipeHintContainer}>
+                <Ionicons name="chevron-back" size={13} color="#94A3B8" />
+                <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
+                <Ionicons name="chevron-forward" size={13} color="#94A3B8" />
+              </View>
               
               <TouchableOpacity 
-                activeOpacity={0.9} 
-                onPress={handleFlash} 
+                activeOpacity={0.95} 
+                onPress={handleNextStep} 
                 style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}
               >
                 {isTableMode 
@@ -768,14 +837,23 @@ export default function SentenceTrainerScreen() {
 
       {/* Primary Action */}
       <View style={[styles.controls, { marginBottom: 5 }]}>
-        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handlePrevStep} disabled={isIntroMode}>
-          <Text style={styles.buttonText}>Назад</Text>
+        <TouchableOpacity 
+          style={[styles.button, styles.buttonTranslation, showTranslations && styles.buttonTranslationActive]} 
+          onPress={() => setShowTranslations(!showTranslations)}
+        >
+          <Ionicons 
+            name={showTranslations ? "eye-off-outline" : "eye-outline"} 
+            size={18} 
+            color={showTranslations ? "#1D4ED8" : "#475569"} 
+            style={{ marginRight: 6 }} 
+          />
+          <Text style={[styles.buttonTranslationText, showTranslations && styles.buttonTranslationTextActive]}>
+            {showTranslations ? 'Скрыть перевод' : 'Показать перевод'}
+          </Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={[styles.button, styles.btnKnown]} onPress={handleMarkLearned}>
           <Text style={styles.buttonText}>✓ Разобрался</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={handleNextStep}>
-          <Text style={styles.primaryButtonText}>Далее</Text>
         </TouchableOpacity>
       </View>
 
@@ -978,6 +1056,12 @@ export default function SentenceTrainerScreen() {
           </View>
         </View>
       </Modal>
+
+      <EditWordModal
+        visible={isWordModalVisible}
+        onClose={() => setIsWordModalVisible(false)}
+        wordToEdit={editingWord}
+      />
     </View>
   );
 }
@@ -1003,11 +1087,41 @@ const styles = StyleSheet.create({
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
   button: { flex: 1, backgroundColor: '#007BFF', padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  primaryButton: { padding: 16, borderRadius: 12, shadowColor: '#007BFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 },
-  primaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18, textAlign: 'center' },
-  buttonSecondary: { backgroundColor: '#6C757D' },
-  buttonActive: { backgroundColor: '#28A745' },
+  buttonTranslation: {
+    backgroundColor: '#F1F5F9',
+    borderColor: '#CBD5E1',
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonTranslationActive: {
+    backgroundColor: '#DBEAFE',
+    borderColor: '#93C5FD',
+  },
+  buttonTranslationText: {
+    color: '#334155',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  buttonTranslationTextActive: {
+    color: '#1D4ED8',
+  },
+  swipeHintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  swipeHintText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
   btnKnown: { backgroundColor: '#28A745' },
+  buttonSecondary: { backgroundColor: '#6C757D' },
   buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
   
   // Table Mode Styles

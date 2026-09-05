@@ -1,5 +1,6 @@
 import { Sentence, SyntaxRole, Token, Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
+import { getWordTranslation } from '../utils/words';
 
 export interface DictionaryCandidate {
   lemma: string;
@@ -188,18 +189,7 @@ export const getDictionaryCandidates = (words: Word[], languageCode: string, lim
 
   const scored = words
     .map(word => {
-      const direct = word[languageCode as keyof Word];
-      let trans = word.translations;
-      if (typeof trans === 'string') {
-        try {
-          trans = JSON.parse(trans);
-        } catch {
-          trans = undefined;
-        }
-      }
-      const lemma = (languageCode === 'en'
-        ? trans?.en || word.eng || word.word
-        : (typeof direct === 'string' && direct.trim() ? direct : trans?.[languageCode])) || '';
+      const lemma = getWordTranslation(word, languageCode);
       return {
         lemma: lemma.trim(),
         translation: (word.ru || '').trim(),
