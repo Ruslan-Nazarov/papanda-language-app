@@ -392,6 +392,22 @@ export default function SentenceTrainerScreen() {
     }
   };
 
+  const handlePrevStep = () => {
+    if (!currentSentence || isIntroMode) return;
+
+    if (isFullyVisible) {
+      setIsIntroMode(true);
+      return;
+    }
+
+    if (revealedSteps === 0) {
+      setIsFullyVisible(true);
+      return;
+    }
+
+    setRevealedSteps(prev => prev - 1);
+  };
+
   const handleMarkLearned = () => {
     if (!currentSentence) return;
     markSentenceLearned(currentSentence.id, true);
@@ -837,23 +853,20 @@ export default function SentenceTrainerScreen() {
 
       {/* Primary Action */}
       <View style={[styles.controls, { marginBottom: 5 }]}>
-        <TouchableOpacity 
-          style={[styles.button, styles.buttonTranslation, showTranslations && styles.buttonTranslationActive]} 
-          onPress={() => setShowTranslations(!showTranslations)}
+        <TouchableOpacity
+          style={[styles.button, styles.buttonSecondary]}
+          onPress={handlePrevStep}
+          disabled={isIntroMode}
         >
-          <Ionicons 
-            name={showTranslations ? "eye-off-outline" : "eye-outline"} 
-            size={18} 
-            color={showTranslations ? "#1D4ED8" : "#475569"} 
-            style={{ marginRight: 6 }} 
-          />
-          <Text style={[styles.buttonTranslationText, showTranslations && styles.buttonTranslationTextActive]}>
-            {showTranslations ? 'Скрыть перевод' : 'Показать перевод'}
-          </Text>
+          <Text style={styles.buttonText}>Назад</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.btnKnown]} onPress={handleMarkLearned}>
           <Text style={styles.buttonText}>✓ Разобрался</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleNextStep}>
+          <Text style={styles.buttonText}>Далее</Text>
         </TouchableOpacity>
       </View>
 
@@ -1087,26 +1100,6 @@ const styles = StyleSheet.create({
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
   button: { flex: 1, backgroundColor: '#007BFF', padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  buttonTranslation: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#CBD5E1',
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonTranslationActive: {
-    backgroundColor: '#DBEAFE',
-    borderColor: '#93C5FD',
-  },
-  buttonTranslationText: {
-    color: '#334155',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  buttonTranslationTextActive: {
-    color: '#1D4ED8',
-  },
   swipeHintContainer: {
     flexDirection: 'row',
     alignItems: 'center',
