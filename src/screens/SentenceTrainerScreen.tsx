@@ -20,6 +20,7 @@ const STRICT_ORDER: SyntaxRole[] = [
 const AFFIX_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']; // Palette for multiple suffixes
 const GENERATION_RESERVE = 3; // top up when this few unlearned generated sentences remain
 const GENERATION_BATCH = 8;
+const FULLY_REVEALED = 9999; // sentinel: more than any sentence has role-groups
 
 const ROLE_TRANSLATIONS: Record<SyntaxRole, string> = {
   Subject: 'Подлежащее',
@@ -56,13 +57,10 @@ export default function SentenceTrainerScreen() {
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
+  // How many role-groups are revealed; 0 = fully hidden, >= orderedGroups.length = fully revealed.
   const [revealedSteps, setRevealedSteps] = useState(0);
-  const [isFullyVisible, setIsFullyVisible] = useState(true);
   const [showTranslations, setShowTranslations] = useState(false);
   const [isTableMode, setIsTableMode] = useState(false);
-  // Every sentence opens as a big, centered, readable line; the learner taps
-  // "Далее" to move into the card-by-card breakdown.
-  const [isIntroMode, setIsIntroMode] = useState(true);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   // Modal state
@@ -83,8 +81,6 @@ export default function SentenceTrainerScreen() {
   const [generationErrors, setGenerationErrors] = useState<Record<string, string>>({});
   const [addedTokenKeys, setAddedTokenKeys] = useState<Set<string>>(new Set());
   const generatingLanguages = useRef(new Set<string>());
-  // Set when a deep link (from another screen) wants the breakdown, not the intro.
-  const skipIntroOnce = useRef(false);
   const swipeCallbacks = useRef({ next: () => {}, prev: () => {} });
   const sentencePanResponder = useRef(
     PanResponder.create({
@@ -187,11 +183,8 @@ export default function SentenceTrainerScreen() {
       if (sentenceId) {
         const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
         if (foundIdx !== -1) {
-          skipIntroOnce.current = true;
           setCurrentFilteredIndex(foundIdx);
-          setIsIntroMode(false);
-          setIsFullyVisible(true);
-          setRevealedSteps(0);
+          setRevealedSteps(FULLY_REVEALED);
           setShowTranslations(true);
         }
       }
@@ -203,30 +196,20 @@ export default function SentenceTrainerScreen() {
   
   const currentSentence = filteredSentences[currentFilteredIndex];
 
-  // Clear state when switching to a different sentence — start from the intro view,
-  // unless a deep link asked to jump straight to the breakdown.
+  // Clear state when switching to a different sentence — start fully hidden.
   useEffect(() => {
     setAiExplanation(null);
-    setIsFullyVisible(true);
     setRevealedSteps(0);
-    if (skipIntroOnce.current) {
-      skipIntroOnce.current = false;
-      setIsIntroMode(false);
-    } else {
-      setIsIntroMode(true);
-    }
   }, [currentSentence?.id]);
 
   const moveToNextSentence = () => {
     if (filteredSentences.length <= 1) {
-      setIsFullyVisible(true);
       setRevealedSteps(0);
       setShowTranslations(false);
       setAiExplanation(null);
-      setIsIntroMode(true);
       return;
     }
-    
+
     const learned: number[] = [];
     const unlearned: number[] = [];
     filteredSentences.forEach((s, idx) => {
@@ -248,32 +231,26 @@ export default function SentenceTrainerScreen() {
     } else if (learned.length > 0) {
       nextIdx = learned[Math.floor(Math.random() * learned.length)];
     }
-    
+
     setCurrentFilteredIndex(nextIdx);
-    setIsFullyVisible(true);
     setRevealedSteps(0);
     setShowTranslations(false);
     setAiExplanation(null);
-    setIsIntroMode(true);
   };
 
   const moveToPrevSentence = () => {
     if (filteredSentences.length <= 1) {
-      setIsFullyVisible(true);
       setRevealedSteps(0);
       setShowTranslations(false);
       setAiExplanation(null);
-      setIsIntroMode(true);
       return;
     }
 
     const prevIdx = (currentFilteredIndex - 1 + filteredSentences.length) % filteredSentences.length;
     setCurrentFilteredIndex(prevIdx);
-    setIsFullyVisible(true);
     setRevealedSteps(0);
     setShowTranslations(false);
     setAiExplanation(null);
-    setIsIntroMode(true);
   };
 
   swipeCallbacks.current.next = moveToNextSentence;
@@ -368,44 +345,16 @@ export default function SentenceTrainerScreen() {
     return groups;
   }, [currentSentence]);
 
-  const handleNextStep = () => {
+  // Reveals one more role-group per press; once everything is shown, the next
+  // press hides it all again so the sentence can be quizzed again. Moving to a
+  // different sentence is swipe-only (see swipeCallbacks).
+  const handleReveal = () => {
     if (!currentSentence) return;
-    
-    // intro -> full breakdown -> hide, then reveal group by group -> next sentence
-    if (isIntroMode) {
-      setIsIntroMode(false);
-      setIsFullyVisible(true);
-      setRevealedSteps(0);
-      return;
-    }
-
-    if (isFullyVisible) {
-      setIsFullyVisible(false);
-      setRevealedSteps(0);
-      return;
-    }
-
     if (revealedSteps < orderedGroups.length) {
       setRevealedSteps(prev => prev + 1);
     } else {
-      moveToNextSentence();
+      setRevealedSteps(0);
     }
-  };
-
-  const handlePrevStep = () => {
-    if (!currentSentence || isIntroMode) return;
-
-    if (isFullyVisible) {
-      setIsIntroMode(true);
-      return;
-    }
-
-    if (revealedSteps === 0) {
-      setIsFullyVisible(true);
-      return;
-    }
-
-    setRevealedSteps(prev => prev - 1);
   };
 
   const handleMarkLearned = () => {
@@ -557,7 +506,7 @@ export default function SentenceTrainerScreen() {
 
   const renderToken = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
-    const isRevealed = isFullyVisible || groupIndex < revealedSteps;
+    const isRevealed = groupIndex < revealedSteps;
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
@@ -617,7 +566,7 @@ export default function SentenceTrainerScreen() {
 
   const renderTokenTableMode = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
-    const isRevealed = isFullyVisible || groupIndex < revealedSteps;
+    const isRevealed = groupIndex < revealedSteps;
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
@@ -708,10 +657,8 @@ export default function SentenceTrainerScreen() {
               onPress={() => {
                 setSelectedLanguageCode(lang.code);
                 setCurrentFilteredIndex(0);
-                setIsFullyVisible(true);
                 setRevealedSteps(0);
                 setShowTranslations(false);
-                setIsIntroMode(true);
                 setGenerationErrors(previous => {
                   if (!previous[lang.code]) return previous;
                   const updated = { ...previous };
@@ -737,52 +684,24 @@ export default function SentenceTrainerScreen() {
           style={{flex: 1}}
           contentContainerStyle={{flexGrow: 1}}
         >
-          {isIntroMode ? (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={handleNextStep}
-              style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}
-            >
-              <Text style={{ fontSize: 28, fontWeight: '500', color: '#111827', textAlign: 'center', lineHeight: 40 }}>
-                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
-              </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
+              {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
+            </Text>
 
-              <View style={[styles.swipeHintContainer, { marginTop: 20 }]}>
-                <Ionicons name="chevron-back" size={14} color="#94A3B8" />
-                <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
-                <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
-              </View>
-
-              <Text style={{ fontSize: 13, color: '#94A3B8', marginTop: 14 }}>
-                Нажмите, чтобы разобрать
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={{ flex: 1 }}>
-              <TouchableOpacity activeOpacity={0.8} onPress={handleNextStep}>
-                <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
-                  {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
-                </Text>
-              </TouchableOpacity>
-
-              <View style={styles.swipeHintContainer}>
-                <Ionicons name="chevron-back" size={13} color="#94A3B8" />
-                <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
-                <Ionicons name="chevron-forward" size={13} color="#94A3B8" />
-              </View>
-              
-              <TouchableOpacity 
-                activeOpacity={0.95} 
-                onPress={handleNextStep} 
-                style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}
-              >
-                {isTableMode 
-                  ? currentSentence?.words?.map(renderTokenTableMode)
-                  : currentSentence?.words?.map(renderToken)
-                }
-              </TouchableOpacity>
+            <View style={styles.swipeHintContainer}>
+              <Ionicons name="chevron-back" size={13} color="#94A3B8" />
+              <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
+              <Ionicons name="chevron-forward" size={13} color="#94A3B8" />
             </View>
-          )}
+
+            <View style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}>
+              {isTableMode
+                ? currentSentence?.words?.map(renderTokenTableMode)
+                : currentSentence?.words?.map(renderToken)
+              }
+            </View>
+          </View>
         </ScrollView>
       ) : (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24}}>
@@ -853,20 +772,16 @@ export default function SentenceTrainerScreen() {
 
       {/* Primary Action */}
       <View style={[styles.controls, { marginBottom: 5 }]}>
-        <TouchableOpacity
-          style={[styles.button, styles.buttonSecondary]}
-          onPress={handlePrevStep}
-          disabled={isIntroMode}
-        >
-          <Text style={styles.buttonText}>Назад</Text>
+        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => setShowTranslations(!showTranslations)}>
+          <Text style={styles.buttonText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.btnKnown]} onPress={handleMarkLearned}>
           <Text style={styles.buttonText}>✓ Разобрался</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleNextStep}>
-          <Text style={styles.buttonText}>Далее</Text>
+        <TouchableOpacity style={styles.button} onPress={handleReveal}>
+          <Text style={styles.buttonText}>Разбор</Text>
         </TouchableOpacity>
       </View>
 
@@ -874,15 +789,8 @@ export default function SentenceTrainerScreen() {
       <Modal visible={isMenuVisible} transparent={true} animationType="fade">
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsMenuVisible(false)}>
           <View style={[styles.menuCard, {position: 'absolute', bottom: insets.bottom + 120, right: 20}]}>
-            <TouchableOpacity 
-              style={styles.menuItem} 
-              onPress={() => { setShowTranslations(!showTranslations); setIsMenuVisible(false); }}
-            >
-              <Ionicons name="language" size={20} color="#475569" style={{marginRight: 10}} />
-              <Text style={styles.menuItemText}>{showTranslations ? 'Скрыть перевод' : 'Показать перевод'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.menuItem} 
+            <TouchableOpacity
+              style={styles.menuItem}
               onPress={() => { setIsTableMode(!isTableMode); setIsMenuVisible(false); }}
             >
               <Ionicons name="list" size={20} color="#475569" style={{marginRight: 10}} />
