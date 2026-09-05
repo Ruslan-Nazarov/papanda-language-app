@@ -12,7 +12,7 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
-  const { activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore();
+  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore();
   const [tempWord, setTempWord] = useState<{
     eng: string;
     ru: string;
@@ -25,9 +25,13 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
     translations: {}
   });
 
-  const isAddingNew = !wordToEdit;
   const wordKey = wordToEdit?.eng || wordToEdit?.word || '';
-  const aiVerification = wordKey ? userWordProgress[wordKey]?.ai_verification : undefined;
+  // A token tap can hand us a draft Word for a form that isn't in the dictionary
+  // yet (see SentenceTrainerScreen.handleTokenPress) — treat that the same as
+  // "adding new", since updateWordDetails only touches words that already exist.
+  const existsInStore = Boolean(wordKey) && words.some(w => (w.eng || w.word) === wordKey);
+  const isAddingNew = !wordToEdit || !existsInStore;
+  const aiVerification = wordKey && existsInStore ? userWordProgress[wordKey]?.ai_verification : undefined;
 
   useEffect(() => {
     if (visible) {
@@ -51,46 +55,88 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
     }
   }, [visible, wordToEdit, activeLanguages]);
 
+  // Only the fields that actually changed vs. `original` — so saving (e.g. just to
+  // add a personal association) doesn't freeze every translation as a permanent
+  // per-word override and block future corrections to the shipped dictionary data.
+  const buildChangedDetails = (original: Word | null) => {
+    const details: {
+      word?: string;
+      ru?: string;
+      translations?: Record<string, string>;
+      personal_association?: string;
+    } = {};
+
+    const newRu = tempWord.ru.trim();
+    if (newRu !== (original?.ru || original?.translations?.ru || '').trim()) {
+      details.ru = newRu;
+    }
+
+    const changedTranslations: Record<string, string> = {};
+    activeLanguages.forEach(lang => {
+      const before = original ? getWordTranslation(original, lang) : '';
+      const after = (tempWord.translations[lang] || '').trim();
+      if (after !== before) changedTranslations[lang] = after;
+    });
+    if (Object.keys(changedTranslations).length > 0) {
+      details.translations = changedTranslations;
+    }
+
+    const newAssoc = tempWord.personal_association.trim();
+    if (newAssoc !== (original?.personal_association || '')) {
+      details.personal_association = newAssoc;
+    }
+
+    return details;
+  };
+
   const handleSave = () => {
+    const trimmedOriginal = tempWord.eng.trim();
+
     if (isAddingNew) {
-      if (!tempWord.eng.trim()) {
+      if (!trimmedOriginal) {
         Alert.alert('Заполните поле', "Поле «Оригинал» не может быть пустым.");
         return;
       }
-      const newWord: Word = {
-        id: 'custom_' + Date.now().toString(),
-        word: tempWord.eng.trim(),
-        eng: tempWord.eng.trim(),
-        ru: tempWord.ru.trim(),
-        personal_association: tempWord.personal_association.trim(),
-        translations: { ...tempWord.translations },
-        count: 0,
-        is_learned: 0,
-        knowledge_stats: {},
-        show_stats: {},
-        is_favorite: false
-      };
-      addCustomWord(newWord);
-    } else {
-      const details: {
-        word?: string;
-        ru?: string;
-        translations?: Record<string, string>;
-        personal_association?: string;
-      } = {
-        personal_association: tempWord.personal_association.trim(),
-        translations: { ...tempWord.translations }
-      };
 
-      if (wordToEdit.source_language) {
-        details.word = tempWord.eng.trim();
+      // A draft from tapping an unrecognized sentence token — check once more for
+      // an existing dictionary entry (e.g. the user retyped it to match one)
+      // before creating a duplicate.
+      const sourceLanguage = wordToEdit?.source_language;
+      const normalizedOriginal = trimmedOriginal.toLowerCase();
+      const existingMatch = sourceLanguage
+        ? words.find(w =>
+            (w.source_language === sourceLanguage && (w.word || '').toLowerCase() === normalizedOriginal) ||
+            getWordTranslation(w, sourceLanguage).toLowerCase() === normalizedOriginal
+          )
+        : undefined;
+
+      if (existingMatch) {
+        const existingKey = existingMatch.eng || existingMatch.word || '';
+        const details = buildChangedDetails(existingMatch);
+        if (Object.keys(details).length > 0) updateWordDetails(existingKey, details);
       } else {
-        details.word = tempWord.eng.trim();
+        const eng = sourceLanguage ? `user:${sourceLanguage}:${normalizedOriginal}` : trimmedOriginal;
+        const newWord: Word = {
+          id: wordToEdit?.id || ('custom_' + Date.now().toString()),
+          word: trimmedOriginal,
+          eng,
+          ru: tempWord.ru.trim(),
+          personal_association: tempWord.personal_association.trim(),
+          translations: { ...tempWord.translations, ...(sourceLanguage ? { [sourceLanguage]: trimmedOriginal } : {}) },
+          source_language: sourceLanguage,
+          count: 0,
+          is_learned: 0,
+          knowledge_stats: {},
+          show_stats: {},
+          is_favorite: false
+        };
+        addCustomWord(newWord);
       }
-
-      details.ru = tempWord.ru.trim();
-
-      updateWordDetails(wordKey, details);
+    } else {
+      const details = buildChangedDetails(wordToEdit);
+      if (Object.keys(details).length > 0) {
+        updateWordDetails(wordKey, details);
+      }
 
       if (aiVerification?.status === 'flagged') {
         setWordAiVerification(wordKey, { status: 'verified', checkedAt: new Date().toISOString() });

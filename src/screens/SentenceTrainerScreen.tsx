@@ -695,7 +695,7 @@ export default function SentenceTrainerScreen() {
                 setIsFullyVisible(true);
                 setRevealedSteps(0);
                 setShowTranslations(false);
-                setIsIntroMode(false);
+                setIsIntroMode(true);
                 setGenerationErrors(previous => {
                   if (!previous[lang.code]) return previous;
                   const updated = { ...previous };
