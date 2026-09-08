@@ -10,6 +10,7 @@ import { explainSentenceWithAI } from '../services/aiService';
 import { generateSentenceBatch, isSentenceGenerationConfigured } from '../services/sentenceGeneration';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
+import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 
 const STRICT_ORDER: SyntaxRole[] = [
   'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
@@ -100,8 +101,8 @@ export default function SentenceTrainerScreen() {
 
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(activeLanguages[0] || 'it');
 
-  // AI sentences are the normal training queue. Manually prepared sentences are
-  // kept untouched and shown only when Gemini cannot provide a sentence.
+  // AI sentences are the normal training queue. Manually prepared / seed
+  // sentences are kept untouched and shown only when Gemini can't provide any.
   const activeLangObj = LANGUAGES.find(l => l.code === selectedLanguageCode);
   const allSentencesForLanguage = sentences.filter(s => {
     if (!s.language || !activeLangObj) return false;
@@ -110,10 +111,14 @@ export default function SentenceTrainerScreen() {
   const generatedSentences = allSentencesForLanguage.filter(sentence => sentence.source === 'generated');
   const fallbackSentences = allSentencesForLanguage.filter(sentence => sentence.source !== 'generated');
   const generationError = generationErrors[selectedLanguageCode];
-  const filteredSentences = generatedSentences.length > 0
-    ? generatedSentences
-    : fallbackSentences;
   const generatedCacheCount = generatedSentences.length;
+
+  // Sentences generated during this app session (fresh each launch). Older
+  // generated ones stay in the store as a fallback for when generation fails.
+  const sessionGenerated = generatedSentences.filter(s => (s.createdAt ?? 0) >= SESSION_START);
+  const activeGenerated = sessionGenerated.length > 0 ? sessionGenerated : generatedSentences;
+  const filteredSentences = activeGenerated.length > 0 ? activeGenerated : fallbackSentences;
+  const showingGenerated = activeGenerated.length > 0;
 
   const generateSentences = async (languageCode = selectedLanguageCode, count = GENERATION_BATCH) => {
     const language = LANGUAGES.find(item => item.code === languageCode);
@@ -143,7 +148,8 @@ export default function SentenceTrainerScreen() {
     }
   };
 
-  // Open a language -> generate first batch only if there are NO generated sentences yet
+  // Once per language per app launch: pull a fresh batch so each visit shows new
+  // sentences. If it fails, the older cached batch keeps showing (fallback).
   useEffect(() => {
     if (!isSentenceGenerationConfigured()) {
       setGenerationErrors(previous => ({
@@ -152,20 +158,21 @@ export default function SentenceTrainerScreen() {
       }));
       return;
     }
-    if (generatedCacheCount === 0 && !generationErrors[selectedLanguageCode]) {
+    if (!sessionRefreshedLangs.has(selectedLanguageCode) && !generationErrors[selectedLanguageCode]) {
+      sessionRefreshedLangs.add(selectedLanguageCode);
       void generateSentences(selectedLanguageCode, GENERATION_BATCH);
     }
-  }, [selectedLanguageCode, generatedCacheCount === 0]);
+  }, [selectedLanguageCode]);
 
   // Keep an endless queue: quietly top up while the learner still has cards left.
   useEffect(() => {
     if (!isSentenceGenerationConfigured()) return;
-    if (generatedCacheCount === 0 || generationErrors[selectedLanguageCode]) return;
-    const unlearnedGenerated = generatedSentences.filter(s => !learnedSentences.includes(s.id)).length;
-    if (unlearnedGenerated <= GENERATION_RESERVE) {
+    if (!showingGenerated || generationErrors[selectedLanguageCode]) return;
+    const unlearnedInPlay = filteredSentences.filter(s => !learnedSentences.includes(s.id)).length;
+    if (unlearnedInPlay <= GENERATION_RESERVE) {
       void generateSentences(selectedLanguageCode, GENERATION_BATCH);
     }
-  }, [selectedLanguageCode, currentFilteredIndex, generatedCacheCount, learnedSentences.length]);
+  }, [selectedLanguageCode, currentFilteredIndex, generatedCacheCount, learnedSentences.length, showingGenerated]);
 
   // Handle incoming target sentence from WordTriples or other screens
   useEffect(() => {
@@ -194,6 +201,17 @@ export default function SentenceTrainerScreen() {
     }
   }, [targetSentenceInfo, sentences]);
   
+  // When a fresh session batch replaces the cached view (or on any set change
+  // that leaves the index out of range), jump back to the first sentence.
+  const showingSessionBatch = sessionGenerated.length > 0;
+  const prevShowingSessionBatch = useRef(showingSessionBatch);
+  useEffect(() => {
+    if ((showingSessionBatch && !prevShowingSessionBatch.current) || currentFilteredIndex >= filteredSentences.length) {
+      setCurrentFilteredIndex(0);
+    }
+    prevShowingSessionBatch.current = showingSessionBatch;
+  }, [showingSessionBatch, filteredSentences.length, currentFilteredIndex]);
+
   const currentSentence = filteredSentences[currentFilteredIndex];
 
   // Clear state when switching to a different sentence — start fully hidden.

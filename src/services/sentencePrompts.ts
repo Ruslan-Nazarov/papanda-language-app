@@ -280,7 +280,8 @@ export const makeGeneratedSentenceId = (languageCode: string, offset: number) =>
 export const makeGeneratedSentence = (sentence: Omit<Sentence, 'id' | 'source'>, languageCode: string, offset: number): Sentence => ({
   ...sentence,
   id: makeGeneratedSentenceId(languageCode, offset),
-  source: 'generated'
+  source: 'generated',
+  createdAt: Date.now()
 });
 
 export const TOKEN_SCHEMA = {

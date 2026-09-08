@@ -61,4 +61,6 @@ export interface Sentence {
   sentence: string; // The original text is now in 'sentence' property
   words: Token[];   // Tokens are now in 'words' property
   source?: 'seed' | 'manual' | 'generated';
+  /** Epoch ms when a generated sentence was created; used to surface fresh batches first. */
+  createdAt?: number;
 }
