@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
 import { exportProgressToFile, importProgressFromFile } from '../services/backupService';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
+const ONBOARDING_KEY = 'papanda-onboarded';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -77,6 +79,12 @@ export default function SettingsScreen() {
         { text: 'Импортировать', style: 'destructive', onPress: () => void runImport() }
       ]
     );
+  };
+
+  const handleReplayOnboarding = () => {
+    AsyncStorage.removeItem(ONBOARDING_KEY)
+      .then(() => Alert.alert('Готово', 'Вводный экран покажется при следующем запуске приложения.'))
+      .catch(() => Alert.alert('Не получилось', 'Попробуйте ещё раз.'));
   };
 
   const handleReset = () => {
@@ -199,6 +207,14 @@ export default function SettingsScreen() {
           <TouchableOpacity style={styles.row} onPress={handleImport} disabled={isImporting}>
             <Text style={styles.rowText}>📥 Импортировать прогресс</Text>
             {isImporting && <ActivityIndicator size="small" color="#007BFF" />}
+          </TouchableOpacity>
+        </View>
+
+        {/* About */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>О приложении</Text>
+          <TouchableOpacity style={styles.row} onPress={handleReplayOnboarding}>
+            <Text style={styles.rowText}>👋 Показать вводный экран снова</Text>
           </TouchableOpacity>
         </View>
 

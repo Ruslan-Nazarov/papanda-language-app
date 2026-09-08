@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,8 +13,11 @@ import DictionaryScreen from './src/screens/DictionaryScreen';
 import BrainWorkoutScreen from './src/screens/BrainWorkoutScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 import { prefetchSentencesInBackground } from './src/services/sentencePrefetch';
 import { useStore } from './src/store/useStore';
+
+const ONBOARDING_KEY = 'papanda-onboarded';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -123,16 +127,36 @@ function MainTabs() {
 export default function App() {
   // Store hydration (and the derived `words`/`sentences` rebuild) is handled by
   // the persist `onRehydrateStorage` hook in the store itself.
+  // `null` = still reading the flag, `false` = show onboarding, `true` = go to the app.
+  const [onboarded, setOnboarded] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    AsyncStorage.getItem(ONBOARDING_KEY)
+      .then((value) => setOnboarded(value === '1'))
+      .catch(() => setOnboarded(true)); // on a storage error, don't trap the user on onboarding
+  }, []);
+
+  const finishOnboarding = React.useCallback(() => {
+    setOnboarded(true);
+    AsyncStorage.setItem(ONBOARDING_KEY, '1').catch(() => {});
+  }, []);
+
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <ErrorBoundary>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="Dictionary" component={DictionaryScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        {onboarded === null ? (
+          <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
+        ) : onboarded === false ? (
+          <OnboardingScreen onDone={finishOnboarding} />
+        ) : (
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+              <Stack.Screen name="Dictionary" component={DictionaryScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        )}
       </ErrorBoundary>
     </SafeAreaProvider>
   );
