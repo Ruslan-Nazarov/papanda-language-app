@@ -14,6 +14,6 @@ GLOBAL_DAILY = "1500"
 # then paste the printed id below.
 [[kv_namespaces]]
 binding = "RL"
-id = "PASTE_KV_NAMESPACE_ID_HERE"
+id = "8e64fb14cc21484d92881dba047176f9"
 
 # GEMINI_API_KEY is a secret, not a var:  npx wrangler secret put GEMINI_API_KEY
