@@ -1,6 +1,6 @@
 {
   "name": "papanda-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.ts",
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
@@ -9,7 +9,6 @@
     "@react-navigation/native": "^7.3.16",
     "@react-navigation/native-stack": "^7.18.10",
     "expo": "~54.0.0",
-    "expo-dev-client": "~6.0.21",
     "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.24",
     "expo-sharing": "~14.0.8",
@@ -27,6 +26,7 @@
   "devDependencies": {
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~54.0.10",
+    "expo-dev-client": "~6.0.21",
     "puppeteer": "^25.8.0",
     "tsx": "^4.23.13",
     "typescript": "~5.9.2"

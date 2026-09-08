@@ -17,7 +17,6 @@
     },
     "android": {
       "package": "com.papanda.app",
-      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/android-icon-foreground.png",
