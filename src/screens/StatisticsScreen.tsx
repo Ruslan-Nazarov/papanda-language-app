@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
@@ -10,6 +10,7 @@ import {
   calculateFullyLearned,
   calculateShownToday,
   calculateIMWIndex,
+  calculateImwTrend,
   calculateKnownByLanguage,
   calculateKnowledgeDistribution,
   calculateFamiliarWordsEfficiency
@@ -63,8 +64,11 @@ function BarRow({ label, value, max, color, valueText }: { label: string; value:
 export default function StatisticsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, dailyShows, workoutSnapshots } = useStore();
+  const { words, activeLanguages, dailyShows, workoutSnapshots, imwSnapshots, recordImwSnapshot } = useStore();
   const [efficiencyMode, setEfficiencyMode] = useState<'percentage' | 'absolute'>('percentage');
+
+  // Refresh today's iMW point whenever the user opens this screen.
+  useEffect(() => { recordImwSnapshot(); }, [recordImwSnapshot]);
 
   const activeLangObjs = LANGUAGES.filter(l => activeLanguages.includes(l.code));
 
@@ -123,6 +127,9 @@ export default function StatisticsScreen() {
       langs: activeLangObjs.map(lang => ({ ...lang, pct: res.byLanguage[lang.code] || 0 }))
     };
   }, [words, activeLanguages]);
+
+  const imwTrend = useMemo(() => calculateImwTrend(imwSnapshots || []).slice(-16), [imwSnapshots]);
+  const imwTrendMax = Math.max(...imwTrend.map(p => p.imw), 10);
 
   const efficiency = useMemo(() => {
     if (!workoutSnapshots?.length) return [];
@@ -247,8 +254,29 @@ export default function StatisticsScreen() {
       {/* iMW */}
       <Section icon="🧠" title="Индекс закрепления (iMW)" defaultOpen={false}>
         <Text style={styles.sectionNote}>
-          Показывает, насколько показы слов приблизились к целевым 80 повторениям.
+          Средний «вес памяти» по начатым словам: прогресс к 80 повторениям × статус «выучено» × забывание со временем.
         </Text>
+
+        {imwTrend.length >= 2 && (
+          <>
+            <Text style={[styles.sectionNote, { marginTop: 14, color: '#475569', fontWeight: '600' }]}>
+              Динамика ({imwTrend.length} дн.)
+            </Text>
+            <View style={[styles.activityChart, { height: 110 }]}>
+              {imwTrend.map((p, i) => (
+                <View key={i} style={styles.activityCol}>
+                  <Text style={styles.activityValue}>{i === imwTrend.length - 1 ? `${p.imw.toFixed(0)}` : ''}</Text>
+                  <View style={styles.activityTrack}>
+                    <View style={[styles.activityFill, { height: `${Math.max(4, (p.imw / imwTrendMax) * 100)}%`, backgroundColor: '#38BDF8' }]} />
+                  </View>
+                  <Text style={styles.activityDay}>{p.date.slice(8)}</Text>
+                </View>
+              ))}
+            </View>
+            <View style={styles.divider} />
+          </>
+        )}
+
         {imw.langs.map(lang => (
           <BarRow
             key={lang.code}

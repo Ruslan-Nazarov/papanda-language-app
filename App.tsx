@@ -13,6 +13,7 @@ import BrainWorkoutScreen from './src/screens/BrainWorkoutScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import { prefetchSentencesInBackground } from './src/services/sentencePrefetch';
+import { useStore } from './src/store/useStore';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -72,6 +73,8 @@ function MainTabs() {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       void prefetchSentencesInBackground();
+      // One iMW data point per day the app is opened.
+      useStore.getState().recordImwSnapshot();
     }, 2000);
     return () => clearTimeout(timer);
   }, []);

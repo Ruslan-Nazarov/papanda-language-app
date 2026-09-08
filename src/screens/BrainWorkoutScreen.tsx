@@ -6,6 +6,7 @@ import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
+import { wordMemoryWeight } from '../utils/statistics';
 
 interface QueueItem {
   word: Word;
@@ -33,7 +34,7 @@ const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | und
 export default function BrainWorkoutScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, restoreWordProgress, userWordProgress } = useStore();
+  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, restoreWordProgress, userWordProgress } = useStore();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   // Bumped to force a fresh workout queue (finishing a session, closing the result modal).
   const [regenNonce, setRegenNonce] = useState(0);
@@ -103,24 +104,16 @@ export default function BrainWorkoutScreen() {
         });
       });
 
-      // Sort unlearned: failed first, then by count, then random
-      unlearnedItems.sort((a, b) => {
-        if (a.isFailed && !b.isFailed) return -1;
-        if (!a.isFailed && b.isFailed) return 1;
-        
-        const countA = a.word.count || 0;
-        const countB = b.word.count || 0;
-        if (countA !== countB) return countA - countB;
-        
-        return Math.random() - 0.5;
-      });
+      // Both queues: weakest memory weight first (least retained / most due for review),
+      // with a little jitter so the order isn't fully deterministic.
+      const now = Date.now();
+      const dueScore = (it: QueueItem) => wordMemoryWeight(it.word, it.langCode, now) + Math.random() * 0.08;
 
-      // Sort learned: least recently shown first
-      learnedItems.sort((a, b) => {
-        const timeA = a.word.last_shown ? new Date(a.word.last_shown).getTime() : 0;
-        const timeB = b.word.last_shown ? new Date(b.word.last_shown).getTime() : 0;
-        return timeA - timeB;
+      unlearnedItems.sort((a, b) => {
+        if (a.isFailed !== b.isFailed) return a.isFailed ? -1 : 1;
+        return dueScore(a) - dueScore(b);
       });
+      learnedItems.sort((a, b) => dueScore(a) - dueScore(b));
 
       const numLearnedToTake = Math.min(workoutLearnedWordCount, learnedItems.length);
       const numUnlearnedToTake = workoutWordCount - numLearnedToTake;
@@ -205,6 +198,8 @@ export default function BrainWorkoutScreen() {
         total: finalKnown + finalUnknown,
         correct: finalKnown
       });
+      // Capture how the workout moved the memory index.
+      recordImwSnapshot();
 
       setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
       setResultModalVisible(true);

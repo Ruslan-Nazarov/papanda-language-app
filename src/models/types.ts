@@ -18,7 +18,8 @@ export interface Word {
   fr?: string;
   count: number;
   is_learned: number;
-  last_shown?: string; // ISO date string
+  last_shown?: string; // ISO date string — most recent show in ANY language (legacy / fallback)
+  last_shown_by_lang?: Record<string, string>; // ISO date string per language code
   knowledge_stats?: string | Record<string, boolean>; // JSON string from DB, parsed to object
   show_stats?: string | Record<string, number>; // JSON string from DB, parsed to object
   personal_association?: string; // user's personal context/meaning

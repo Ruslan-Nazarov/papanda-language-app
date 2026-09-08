@@ -10,6 +10,53 @@ export interface WorkoutSnapshot {
   correct: number;
 }
 
+export interface ImwSnapshot {
+  date: string; // YYYY-MM-DD
+  imw: number; // overall iMW %
+  byLang: Record<string, number>;
+}
+
+// Tunables for the memory-weight model behind iMW.
+export const WORD_MEMORY = {
+  TARGET_SHOWS: 80,        // shows per (word, language) that count as "fully exposed"
+  UNKNOWN_FACTOR: 0.5,     // multiplier while the word isn't marked "known"
+  BASE_STABILITY_DAYS: 3,  // memory half-life-ish base, before growth from reps/knowledge
+  RETENTION_FLOOR: 0.35,   // fraction of earned weight that survives a long pause
+};
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Most recent show of a word for a specific language (falls back to the word-level date). */
+export const getWordLastShown = (word: Word, lang: string): string | undefined =>
+  word.last_shown_by_lang?.[lang] || word.last_shown;
+
+/**
+ * Memory weight of one (word, language) pair in [0..1]:
+ *   w = exposureProgress · knownFactor · retention
+ * exposureProgress ramps linearly to TARGET_SHOWS; knownFactor halves it until
+ * the word is marked known; retention is an exponential forgetting curve whose
+ * stability grows with reps and knowledge. Returns 0 if the word was never shown.
+ */
+export const wordMemoryWeight = (word: Word, lang: string, nowMs: number = Date.now()): number => {
+  const shows = readWordStats(word.show_stats)[lang];
+  if (typeof shows !== 'number' || shows <= 0) return 0;
+
+  const known = readWordStats(word.knowledge_stats)[lang] === true;
+  const exposureProgress = Math.min(1, shows / WORD_MEMORY.TARGET_SHOWS);
+  const knownFactor = known ? 1 : WORD_MEMORY.UNKNOWN_FACTOR;
+
+  const lastShown = getWordLastShown(word, lang);
+  let retention = 1;
+  if (lastShown) {
+    const deltaDays = Math.max(0, (nowMs - new Date(lastShown).getTime()) / MS_PER_DAY);
+    const stabilityDays = WORD_MEMORY.BASE_STABILITY_DAYS * (1 + shows / 10) * (known ? 3 : 1);
+    const r = Math.exp(-deltaDays / stabilityDays);
+    retention = WORD_MEMORY.RETENTION_FLOOR + (1 - WORD_MEMORY.RETENTION_FLOOR) * r;
+  }
+
+  return exposureProgress * knownFactor * retention;
+};
+
 export type WordStats = Record<string, unknown>;
 
 /**
@@ -67,43 +114,48 @@ export const calculateCoverage = (words: Word[], activeLangs: string[]) => {
 
 /**
  * 3. iMW Index (Intelligent Memory Weight)
- * Индекс интеллектуального веса памяти. 80 показов - цель.
+ * Средний вес памяти по словам, которые пользователь начал учить.
+ * Учитывает прогресс к 80 показам, статус "выучено" и забывание со временем.
  */
 export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
   if (words.length === 0 || activeLangs.length === 0) return { overall: 0, byLanguage: {} as Record<string, number> };
 
+  const now = Date.now();
   const byLanguage: Record<string, number> = {};
-  let totalShows = 0;
-  let overallTarget = 0;
+  let overallWeightSum = 0;
+  let overallStudiedCount = 0;
 
   activeLangs.forEach(lang => {
-    let langShows = 0;
-    let activeWords = 0;
-    
+    let weightSum = 0;
+    let studiedCount = 0;
+
     words.forEach(w => {
-      const statsObj = readWordStats(w.show_stats);
-      
-      if (typeof statsObj[lang] === 'number' && statsObj[lang] > 0) {
-        langShows += statsObj[lang];
-        activeWords++;
+      const shows = readWordStats(w.show_stats)[lang];
+      if (typeof shows === 'number' && shows > 0) {
+        weightSum += wordMemoryWeight(w, lang, now);
+        studiedCount += 1;
       }
     });
 
-    const targetShows = activeWords * 80;
-    const percentage = targetShows > 0 ? (langShows / targetShows) * 100 : 0;
-    byLanguage[lang] = Math.min(100, Math.max(0, percentage)) || 0;
-    
-    totalShows += langShows;
-    overallTarget += targetShows;
+    byLanguage[lang] = studiedCount > 0 ? Math.min(100, (weightSum / studiedCount) * 100) : 0;
+    overallWeightSum += weightSum;
+    overallStudiedCount += studiedCount;
   });
 
-  const overallPercentage = overallTarget > 0 ? (totalShows / overallTarget) * 100 : 0;
-  const overall = Math.min(100, Math.max(0, overallPercentage)) || 0;
+  const overall = overallStudiedCount > 0
+    ? Math.min(100, (overallWeightSum / overallStudiedCount) * 100)
+    : 0;
 
-  return {
-    overall,
-    byLanguage
-  };
+  return { overall, byLanguage };
+};
+
+/**
+ * iMW history for the trend chart — one point per day, latest snapshot wins.
+ */
+export const calculateImwTrend = (snapshots: ImwSnapshot[]) => {
+  const byDay = new Map<string, ImwSnapshot>();
+  snapshots.forEach(s => byDay.set(s.date, s));
+  return Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date));
 };
 
 /**

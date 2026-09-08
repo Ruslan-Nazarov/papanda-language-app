@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Word, Sentence, Token } from '../models/types';
-import { DailyShows, WorkoutSnapshot } from '../utils/statistics';
+import { DailyShows, WorkoutSnapshot, ImwSnapshot, calculateIMWIndex } from '../utils/statistics';
 import wordsData from '../data/words.json';
 import sentencesData from '../data/sentences.json';
 
@@ -33,6 +33,7 @@ export interface UserWordProgress {
   knowledge_stats?: Record<string, boolean>;
   show_stats?: Record<string, number>;
   last_shown?: string;
+  last_shown_by_lang?: Record<string, string>;
   personal_association?: string;
   custom_word?: string;
   custom_ru?: string;
@@ -52,13 +53,15 @@ interface AppState {
   targetSentenceInfo: TargetSentenceInfo | null;
   dailyShows: DailyShows;
   workoutSnapshots: WorkoutSnapshot[];
+  imwSnapshots: ImwSnapshot[];
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
   learnedSentences: string[];
-  
+
   // Actions
   initializeStore: () => void;
+  recordImwSnapshot: () => void;
   setLanguages: (langs: string[]) => void;
   setTargetSentenceInfo: (info: TargetSentenceInfo | null) => void;
   markWordKnown: (wordEng: string, lang: string, isKnown: boolean) => void;
@@ -106,6 +109,7 @@ export interface PersistedProgress {
   activeLanguages: string[];
   dailyShows: DailyShows;
   workoutSnapshots: WorkoutSnapshot[];
+  imwSnapshots: ImwSnapshot[];
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
@@ -120,6 +124,7 @@ const pickPersistedFields = (state: AppState): PersistedProgress => ({
   activeLanguages: state.activeLanguages,
   dailyShows: state.dailyShows,
   workoutSnapshots: state.workoutSnapshots,
+  imwSnapshots: state.imwSnapshots,
   workoutWordCount: state.workoutWordCount,
   workoutLearnedWordCount: state.workoutLearnedWordCount,
   workoutFavoritesOnly: state.workoutFavoritesOnly,
@@ -176,10 +181,22 @@ export const useStore = create<AppState>()(
       targetSentenceInfo: null,
       dailyShows: {},
       workoutSnapshots: [],
+      imwSnapshots: [],
       workoutWordCount: 10,
       workoutLearnedWordCount: 2,
       workoutFavoritesOnly: false,
       learnedSentences: [],
+
+      recordImwSnapshot: () => {
+        set((state) => {
+          if (state.words.length === 0 || state.activeLanguages.length === 0) return {};
+          const { overall, byLanguage } = calculateIMWIndex(state.words, state.activeLanguages);
+          const today = new Date().toISOString().split('T')[0];
+          const rest = state.imwSnapshots.filter(s => s.date !== today);
+          const next: ImwSnapshot[] = [...rest, { date: today, imw: overall, byLang: byLanguage }];
+          return { imwSnapshots: next.slice(-180) };
+        });
+      },
 
       initializeStore: () => {
         const { userWordProgress, customSentences, customWords, generatedSentences } = get();
@@ -219,6 +236,7 @@ export const useStore = create<AppState>()(
             knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
             show_stats: prog.show_stats || w.show_stats,
             last_shown: prog.last_shown || w.last_shown,
+            last_shown_by_lang: prog.last_shown_by_lang || w.last_shown_by_lang,
             personal_association: prog.personal_association !== undefined ? prog.personal_association : (w.personal_association || ''),
             is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : (w.is_favorite || false)
           };
@@ -284,11 +302,13 @@ export const useStore = create<AppState>()(
           const newCount = (currentProg.count || 0) + 1;
           const nowIso = new Date().toISOString();
           const today = nowIso.split('T')[0];
+          const lastShownByLang = { ...(currentProg.last_shown_by_lang || {}), [lang]: nowIso };
 
           const updatedProg: UserWordProgress = {
             ...currentProg,
             count: newCount,
             last_shown: nowIso,
+            last_shown_by_lang: lastShownByLang,
             show_stats: currentShowStats
           };
 
@@ -299,11 +319,12 @@ export const useStore = create<AppState>()(
 
           const newWords = state.words.map(w => {
             if (w.eng === wordEng || w.word === wordEng) {
-              return { 
-                ...w, 
+              return {
+                ...w,
                 count: newCount,
                 last_shown: nowIso,
-                show_stats: currentShowStats 
+                last_shown_by_lang: lastShownByLang,
+                show_stats: currentShowStats
               };
             }
             return w;
@@ -326,17 +347,20 @@ export const useStore = create<AppState>()(
           const currentProg = state.userWordProgress[key] || {};
           const currentStats = { ...(currentProg.knowledge_stats || {}) };
           const currentShowStats = { ...(currentProg.show_stats || {}) };
+          const lastShownByLang = { ...(currentProg.last_shown_by_lang || {}) };
           const nowIso = new Date().toISOString();
 
           state.activeLanguages.forEach(lang => {
             currentStats[lang] = true;
             currentShowStats[lang] = (currentShowStats[lang] || 0) + 1;
+            lastShownByLang[lang] = nowIso;
           });
 
           const updatedProg: UserWordProgress = {
             ...currentProg,
             knowledge_stats: currentStats,
             show_stats: currentShowStats,
+            last_shown_by_lang: lastShownByLang,
             count: (currentProg.count || 0) + 1,
             last_shown: nowIso,
             is_learned: 1
@@ -349,10 +373,11 @@ export const useStore = create<AppState>()(
 
           const newWords = state.words.map(w => {
             if (w.eng === wordEng || w.word === wordEng) {
-              return { 
-                ...w, 
+              return {
+                ...w,
                 knowledge_stats: currentStats,
                 show_stats: currentShowStats,
+                last_shown_by_lang: lastShownByLang,
                 count: (w.count || 0) + 1,
                 last_shown: nowIso,
                 is_learned: 1
@@ -624,6 +649,7 @@ export const useStore = create<AppState>()(
           userWordProgress: {},
           dailyShows: {},
           workoutSnapshots: [],
+          imwSnapshots: [],
           learnedSentences: []
         }));
         get().initializeStore();
@@ -717,6 +743,7 @@ export const useStore = create<AppState>()(
                   knowledge_stats: previousProgress.knowledge_stats || (baseWord?.knowledge_stats || {}),
                   show_stats: previousProgress.show_stats || (baseWord?.show_stats || {}),
                   last_shown: previousProgress.last_shown || baseWord?.last_shown,
+                  last_shown_by_lang: previousProgress.last_shown_by_lang || baseWord?.last_shown_by_lang,
                   personal_association: previousProgress.personal_association || baseWord?.personal_association || '',
                   is_favorite: previousProgress.is_favorite !== undefined ? previousProgress.is_favorite : (baseWord?.is_favorite || false)
                 };
@@ -755,6 +782,7 @@ export const useStore = create<AppState>()(
             : ['en', 'kz', 'it'],
           dailyShows: d.dailyShows || {},
           workoutSnapshots: Array.isArray(d.workoutSnapshots) ? d.workoutSnapshots : [],
+          imwSnapshots: Array.isArray(d.imwSnapshots) ? d.imwSnapshots : [],
           workoutWordCount: typeof d.workoutWordCount === 'number' ? d.workoutWordCount : 10,
           workoutLearnedWordCount: typeof d.workoutLearnedWordCount === 'number' ? d.workoutLearnedWordCount : 2,
           workoutFavoritesOnly: Boolean(d.workoutFavoritesOnly),

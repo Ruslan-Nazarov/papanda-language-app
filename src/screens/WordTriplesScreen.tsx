@@ -7,6 +7,7 @@ import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
+import { wordMemoryWeight } from '../utils/statistics';
 import { auditNextWordInBackground } from '../services/wordAuditService';
 import { prefetchSentencesInBackground } from '../services/sentencePrefetch';
 
@@ -74,7 +75,7 @@ export default function WordTriplesScreen() {
 
   const pickRandomWord = () => {
     const pending = words.filter(w => {
-      const hasAllTranslations = activeLanguages.every(lang => 
+      const hasAllTranslations = activeLanguages.every(lang =>
         Boolean(getWordTranslation(w, lang))
       );
       if (!hasAllTranslations) return false;
@@ -84,14 +85,28 @@ export default function WordTriplesScreen() {
       return !isKnownInAll;
     });
 
-    if (pending.length > 0) {
-      const randomIndex = Math.floor(Math.random() * pending.length);
-      const word = pending[randomIndex];
-      setCurrentWord(word);
-      setAssociationText(word.personal_association || '');
-    } else {
+    if (pending.length === 0) {
       setCurrentWord(null);
+      return;
     }
+
+    // Weighted pick: the weaker a word's memory weight (new or decayed), the more
+    // likely it comes up. The 0.15 floor keeps solid words in rotation too.
+    const now = Date.now();
+    const weights = pending.map(w => {
+      const avgW = activeLanguages.reduce((s, lang) => s + wordMemoryWeight(w, lang, now), 0) / activeLanguages.length;
+      return 0.15 + (1 - avgW);
+    });
+    const total = weights.reduce((s, x) => s + x, 0);
+    let r = Math.random() * total;
+    let chosen = pending[pending.length - 1];
+    for (let i = 0; i < pending.length; i++) {
+      r -= weights[i];
+      if (r <= 0) { chosen = pending[i]; break; }
+    }
+
+    setCurrentWord(chosen);
+    setAssociationText(chosen.personal_association || '');
   };
 
   useEffect(() => {

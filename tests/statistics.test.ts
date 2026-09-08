@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   readWordStats,
+  wordMemoryWeight,
   calculateTotalVolume,
   calculateCoverage,
   calculateIMWIndex,
@@ -96,13 +97,41 @@ describe('Statistics Utilities', () => {
     assert.strictEqual(Math.round(coverage.overall), 50);
   });
 
-  it('calculates iMW index targeting 80 shows per word', () => {
+  it('calculates iMW as the mean memory weight of started words', () => {
+    // mockWords have no last_shown -> retention = 1, both kz words known.
+    // Word 1 kz: min(1, 80/80) * 1 * 1 = 1.0
+    // Word 2 kz: min(1, 20/80) * 1 * 1 = 0.25
+    // mean = 0.625 -> 62.5%. Word 3 (0 shows) is excluded.
     const imw = calculateIMWIndex(mockWords, ['kz']);
-    // kz shows: Word 1 = 80, Word 2 = 20 -> total shows = 100
-    // Active words with shows > 0 = 2 -> target = 2 * 80 = 160
-    // Percentage = (100 / 160) * 100 = 62.5%
     assert.strictEqual(imw.byLanguage.kz, 62.5);
     assert.strictEqual(imw.overall, 62.5);
+  });
+
+  it('wordMemoryWeight: 0 for never-shown, halved for not-known, decays over time', () => {
+    const now = new Date('2026-01-31T00:00:00Z').getTime();
+    const base: Word = {
+      id: 'x', eng: 'x', word: 'x', ru: 'x', translations: { kz: 'x' },
+      count: 0, is_learned: 0, knowledge_stats: {}, show_stats: {}, is_favorite: false,
+    };
+
+    assert.strictEqual(wordMemoryWeight(base, 'kz', now), 0);
+
+    // 80 shows, known, shown "now" -> full weight
+    const mastered: Word = { ...base, show_stats: { kz: 80 }, knowledge_stats: { kz: true }, last_shown: new Date(now).toISOString() };
+    assert.ok(wordMemoryWeight(mastered, 'kz', now) > 0.99);
+
+    // same but NOT known -> about half
+    const notKnown: Word = { ...mastered, knowledge_stats: { kz: false } };
+    const w = wordMemoryWeight(notKnown, 'kz', now);
+    assert.ok(w > 0.48 && w < 0.52, `expected ~0.5, got ${w}`);
+
+    // known & drilled but last seen 200 days ago -> decayed well below fresh
+    const stale: Word = { ...mastered, last_shown: new Date(now - 200 * 86400000).toISOString() };
+    assert.ok(wordMemoryWeight(stale, 'kz', now) < 0.6);
+
+    // shows above 80 do not push exposure past 1
+    const over: Word = { ...mastered, show_stats: { kz: 500 } };
+    assert.ok(Math.abs(wordMemoryWeight(over, 'kz', now) - wordMemoryWeight(mastered, 'kz', now)) < 0.01);
   });
 
   it('calculates fully learned words across all active languages', () => {
