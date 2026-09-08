@@ -114,8 +114,13 @@ export default function OnboardingScreen({ onDone }: Props) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.heroCard}>
-            <Image source={require('../../assets/logo.png')} style={styles.hero} resizeMode="contain" />
+            <Image
+              source={require('../../assets/panda-mascot.png')}
+              style={styles.hero}
+              resizeMode="contain"
+            />
           </View>
+          <Text style={styles.title}>papanda</Text>
           <Text style={styles.lead}>
             Язык — это не список слов. Это то, как из слов собирается мысль.
           </Text>
@@ -264,13 +269,14 @@ const styles = StyleSheet.create({
 
   heroCard: {
     backgroundColor: '#FBE7D5',
-    borderRadius: 20,
-    paddingVertical: 10,
+    borderRadius: 24,
+    paddingVertical: 18,
     marginBottom: 18,
+    alignItems: 'center',
     overflow: 'hidden',
   },
-  hero: { width: '100%', height: 190 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#0F172A', textAlign: 'center', marginBottom: 16 },
+  hero: { width: 200, height: 200 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#0F172A', textAlign: 'center', marginBottom: 12 },
   lead: { fontSize: 19, fontWeight: '600', color: '#1E293B', textAlign: 'center', lineHeight: 27, marginBottom: 16 },
   body: { fontSize: 15, color: '#475569', textAlign: 'center', lineHeight: 23 },
 
