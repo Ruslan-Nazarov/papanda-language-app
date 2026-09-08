@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Политика конфиденциальности — papanda</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    max-width: 720px; margin: 0 auto; padding: 2rem 1.2rem 4rem;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a; background: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e8e8e8; background: #16171a; }
+    a { color: #7db3ff; }
+  }
+  h1 { font-size: 1.6rem; margin-top: 2.4rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; }
+  hr { border: none; border-top: 1px solid #ccc4; margin: 3rem 0; }
+  .updated { color: #8a8a8a; font-style: italic; }
+  code { background: #8881; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>Политика конфиденциальности — papanda</h1>
+<p class="updated">Последнее обновление: 8 сентября 2026 г.</p>
+
+<p>Приложение <strong>papanda</strong> (пакет <code>com.papanda.app</code>, далее — «Приложение») —
+это инструмент для изучения языков. Настоящая политика описывает, какие данные Приложение
+обрабатывает. Разработчик — частное лицо, контакт: <strong>runaz2007@gmail.com</strong>.</p>
+
+<h2>Коротко</h2>
+<ul>
+  <li>Приложение <strong>не собирает</strong> персональные данные: ни имя, ни email, ни номер
+      телефона, ни точную геолокацию.</li>
+  <li>В Приложении <strong>нет</strong> рекламы, аналитики, трекеров и SDK третьих сторон для
+      отслеживания.</li>
+  <li>Ваш словарь, прогресс обучения и статистика хранятся <strong>только на вашем
+      устройстве</strong>.</li>
+  <li>Для генерации и разбора учебных предложений короткие тексты (слова и предложения)
+      отправляются через наш прокси-сервер в облачный сервис Google Gemini.</li>
+</ul>
+
+<h2>Какие данные хранятся на устройстве</h2>
+<p>Приложение сохраняет локально (в хранилище приложения на телефоне):</p>
+<ul>
+  <li>добавленные вами слова и переводы;</li>
+  <li>отметки «знаю / не знаю», счётчики показов, даты последнего повторения;</li>
+  <li>рассчитанную статистику и ежедневные снимки индекса запоминания;</li>
+  <li>пользовательские настройки.</li>
+</ul>
+<p>Эти данные <strong>не передаются</strong> нам и никуда не загружаются автоматически. Они
+удаляются при удалении Приложения. Вы можете вручную экспортировать их в файл и импортировать
+обратно (функция «Экспорт / импорт прогресса» в настройках) — этот файл создаётся и хранится
+там, куда вы его сохраните; мы к нему доступа не имеем.</p>
+
+<h2>Какие данные покидают устройство</h2>
+<p>Для функций генерации учебных предложений и объяснения их структуры Приложение отправляет
+запрос на наш промежуточный сервер (Cloudflare Worker), который пересылает его в
+<strong>Google Gemini API</strong>. В запросе передаются:</p>
+<ul>
+  <li>текст задания для модели: изучаемый язык, несколько слов из вашего активного словаря
+      и/или предложение, которое нужно разобрать;</li>
+  <li>случайный идентификатор установки (UUID, генерируется на устройстве) — используется
+      только для ограничения частоты запросов и защиты от злоупотреблений. Он не привязан к
+      вашей личности, аккаунту или устройству и не используется для рекламы или аналитики.</li>
+</ul>
+<p>Промежуточный сервер не ведёт журналов содержимого запросов на постоянной основе и хранит
+только счётчики количества запросов по идентификатору установки (сбрасываются по времени).
+Обработка данных на стороне Google регулируется условиями
+<a href="https://developers.google.com/terms">Google APIs Terms of Service</a> и
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+<p>Приложению требуется разрешение «Интернет» исключительно для этих запросов.</p>
+
+<h2>AI-генерируемый контент</h2>
+<p>Учебные предложения и объяснения создаются языковой моделью и могут содержать неточности.
+Они предназначены только для учебных целей.</p>
+
+<h2>Дети</h2>
+<p>Приложение не предназначено для детей младше 13 лет и не собирает намеренно данные детей.</p>
+
+<h2>Изменения политики</h2>
+<p>При изменении политики обновляется дата в начале документа. Существенные изменения будут
+отражены в описании обновления Приложения.</p>
+
+<h2>Контакты</h2>
+<p>По вопросам о данных: <strong>runaz2007@gmail.com</strong></p>
+
+<hr>
+
+<h1>Privacy Policy — papanda</h1>
+<p class="updated">Last updated: 8 September 2026</p>
+
+<p><strong>papanda</strong> (package <code>com.papanda.app</code>, the "App") is a
+language-learning tool. This policy explains what data the App processes. The developer is an
+individual; contact: <strong>runaz2007@gmail.com</strong>.</p>
+
+<h2>Summary</h2>
+<ul>
+  <li>The App does <strong>not</strong> collect personal data — no name, email, phone number,
+      or precise location.</li>
+  <li>The App contains <strong>no</strong> ads, analytics, tracking, or third-party tracking
+      SDKs.</li>
+  <li>Your vocabulary, learning progress, and statistics are stored <strong>only on your
+      device</strong>.</li>
+  <li>To generate and analyse practice sentences, short texts (words and sentences) are sent
+      through our proxy server to the Google Gemini cloud service.</li>
+</ul>
+
+<h2>Data stored on your device</h2>
+<p>The App stores locally (in the app's storage on your phone):</p>
+<ul>
+  <li>words and translations you add;</li>
+  <li>"known / unknown" marks, view counters, last-review dates;</li>
+  <li>computed statistics and daily memory-index snapshots;</li>
+  <li>app settings.</li>
+</ul>
+<p>This data is <strong>never</strong> sent to us or uploaded automatically. It is removed
+when you uninstall the App. You can manually export it to a file and import it back ("Export
+/ import progress" in settings) — that file is stored wherever you choose to save it and we
+have no access to it.</p>
+
+<h2>Data that leaves your device</h2>
+<p>For sentence generation and structure-explanation features, the App sends a request to our
+intermediary server (a Cloudflare Worker), which forwards it to the <strong>Google Gemini
+API</strong>. The request contains:</p>
+<ul>
+  <li>the task text for the model: the language being studied, a few words from your active
+      vocabulary, and/or a sentence to analyse;</li>
+  <li>a random installation identifier (a UUID generated on the device) — used only for rate
+      limiting and abuse prevention. It is not linked to your identity, account, or device and
+      is not used for advertising or analytics.</li>
+</ul>
+<p>The intermediary server does not persistently log request contents; it stores only
+per-installation request counters that reset over time. Google's processing is governed by the
+<a href="https://developers.google.com/terms">Google APIs Terms of Service</a> and the
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+<p>The App requests the "Internet" permission solely for these requests.</p>
+
+<h2>AI-generated content</h2>
+<p>Practice sentences and explanations are produced by a language model and may contain
+inaccuracies. They are for learning purposes only.</p>
+
+<h2>Children</h2>
+<p>The App is not directed to children under 13 and does not knowingly collect children's
+data.</p>
+
+<h2>Changes</h2>
+<p>If this policy changes, the date at the top is updated. Material changes will be noted in
+the App's update description.</p>
+
+<h2>Contact</h2>
+<p>Data questions: <strong>runaz2007@gmail.com</strong></p>
+
+</body>
+</html>
