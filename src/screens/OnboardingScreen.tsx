@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -112,8 +113,9 @@ export default function OnboardingScreen({ onDone }: Props) {
           contentContainerStyle={styles.pageContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.hero}>🐼</Text>
-          <Text style={styles.title}>papanda</Text>
+          <View style={styles.heroCard}>
+            <Image source={require('../../assets/logo.png')} style={styles.hero} resizeMode="contain" />
+          </View>
           <Text style={styles.lead}>
             Язык — это не список слов. Это то, как из слов собирается мысль.
           </Text>
@@ -260,7 +262,14 @@ const styles = StyleSheet.create({
   skipText: { color: '#94A3B8', fontSize: 15, fontWeight: '600' },
   pageContent: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 12, paddingBottom: 24, justifyContent: 'center' },
 
-  hero: { fontSize: 64, textAlign: 'center', marginBottom: 8 },
+  heroCard: {
+    backgroundColor: '#FBE7D5',
+    borderRadius: 20,
+    paddingVertical: 10,
+    marginBottom: 18,
+    overflow: 'hidden',
+  },
+  hero: { width: '100%', height: 190 },
   title: { fontSize: 26, fontWeight: 'bold', color: '#0F172A', textAlign: 'center', marginBottom: 16 },
   lead: { fontSize: 19, fontWeight: '600', color: '#1E293B', textAlign: 'center', lineHeight: 27, marginBottom: 16 },
   body: { fontSize: 15, color: '#475569', textAlign: 'center', lineHeight: 23 },

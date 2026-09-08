@@ -23,12 +23,16 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const TAB_EMOJI: Record<string, string> = {
+  Statistics: '📊',
   'Word Triples': '📚',
   'Sentence Trainer': '💬',
   'Brain Workout': '⚡',
-  Statistics: '📊',
   Settings: '⚙️',
 };
+
+// The dialectical sentence breakdown is the core of papanda, so it sits in the
+// centre of the tab bar as a larger, raised button and is the first screen.
+const CENTER_TAB = 'Sentence Trainer';
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -85,40 +89,53 @@ function MainTabs() {
 
   return (
     <Tab.Navigator
-      initialRouteName="Word Triples"
-      screenOptions={({ route }) => ({
-        tabBarShowLabel: false,
-        tabBarIcon: ({ focused }) => (
-          <Text style={{ fontSize: focused ? 24 : 20, opacity: focused ? 1 : 0.5 }}>
-            {TAB_EMOJI[route.name] ?? '📌'}
-          </Text>
-        ),
-        tabBarActiveTintColor: '#007BFF',
-        tabBarInactiveTintColor: '#8E8E93',
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E2E8F0',
-          borderTopWidth: 1,
-          paddingTop: 6,
-          paddingBottom: bottomInset,
-          height: 50 + bottomInset,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 4,
-        },
-        tabBarItemStyle: {
-          justifyContent: 'center',
-          alignItems: 'center',
-        }
-      })}
+      initialRouteName={CENTER_TAB}
+      screenOptions={({ route }) => {
+        const isCenter = route.name === CENTER_TAB;
+        return {
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused }) =>
+            isCenter ? (
+              <View
+                style={[
+                  tabStyles.centerButton,
+                  { backgroundColor: focused ? '#007BFF' : '#334155' },
+                ]}
+              >
+                <Text style={tabStyles.centerEmoji}>{TAB_EMOJI[route.name]}</Text>
+              </View>
+            ) : (
+              <Text style={{ fontSize: focused ? 24 : 20, opacity: focused ? 1 : 0.5 }}>
+                {TAB_EMOJI[route.name] ?? '📌'}
+              </Text>
+            ),
+          tabBarActiveTintColor: '#007BFF',
+          tabBarInactiveTintColor: '#8E8E93',
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: '#FFFFFF',
+            borderTopColor: '#E2E8F0',
+            borderTopWidth: 1,
+            paddingTop: 6,
+            paddingBottom: bottomInset,
+            height: 58 + bottomInset,
+            elevation: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 4,
+          },
+          tabBarItemStyle: {
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+        };
+      }}
     >
+      <Tab.Screen name="Statistics" component={StatisticsScreen} />
       <Tab.Screen name="Word Triples" component={WordTriplesScreen} />
       <Tab.Screen name="Sentence Trainer" component={SentenceTrainerScreen} />
       <Tab.Screen name="Brain Workout" component={BrainWorkoutScreen} />
-      <Tab.Screen name="Statistics" component={StatisticsScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
@@ -161,6 +178,25 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+
+const tabStyles = StyleSheet.create({
+  centerButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Platform.OS === 'android' ? 10 : 14,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  centerEmoji: { fontSize: 26 },
+});
 
 const boundaryStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA', alignItems: 'center', justifyContent: 'center', padding: 28 },
