@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
@@ -29,20 +29,45 @@ interface SectionProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  help?: string;
 }
 
-function Section({ icon, title, children, defaultOpen = true }: SectionProps) {
+function Section({ icon, title, children, defaultOpen = true, help }: SectionProps) {
   const [open, setOpen] = useState(defaultOpen);
+  const [showHelp, setShowHelp] = useState(false);
   return (
     <View style={styles.card}>
       <TouchableOpacity style={styles.cardHeader} activeOpacity={0.7} onPress={() => setOpen(o => !o)}>
         <View style={styles.cardTitleRow}>
           <Text style={styles.cardHeaderIcon}>{icon}</Text>
-          <Text style={styles.cardHeaderTitle}>{title}</Text>
+          <Text style={styles.cardHeaderTitle} numberOfLines={1}>{title}</Text>
         </View>
+        {help && (
+          <TouchableOpacity
+            onPress={() => setShowHelp(true)}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            style={styles.helpBtn}
+          >
+            <Text style={styles.helpBtnText}>?</Text>
+          </TouchableOpacity>
+        )}
         <Text style={styles.cardChevron}>{open ? '▾' : '▸'}</Text>
       </TouchableOpacity>
       {open && <View style={styles.cardBody}>{children}</View>}
+
+      {help && (
+        <Modal visible={showHelp} transparent animationType="fade" onRequestClose={() => setShowHelp(false)}>
+          <TouchableOpacity style={styles.helpOverlay} activeOpacity={1} onPress={() => setShowHelp(false)}>
+            <View style={styles.helpCard}>
+              <Text style={styles.helpTitle}>{icon}  {title}</Text>
+              <Text style={styles.helpText}>{help}</Text>
+              <TouchableOpacity style={styles.helpClose} onPress={() => setShowHelp(false)}>
+                <Text style={styles.helpCloseText}>Понятно</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -171,7 +196,11 @@ export default function StatisticsScreen() {
       </View>
 
       {/* Activity */}
-      <Section icon="📅" title={`Активность за ${ACTIVITY_DAYS} дней`}>
+      <Section
+        icon="📅"
+        title={`Активность за ${ACTIVITY_DAYS} дней`}
+        help="Сколько раз в день приложение показывало тебе слова — в тренировке, в тройках слов и в разборе предложений. Помогает следить за регулярностью занятий: важнее заниматься понемногу каждый день, чем помногу раз в неделю."
+      >
         <Text style={styles.sectionNote}>Всего показов за период: {activityTotal}</Text>
         <View style={styles.activityChart}>
           {activity.map((d, i) => (
@@ -192,7 +221,11 @@ export default function StatisticsScreen() {
       </Section>
 
       {/* Knowledge by language */}
-      <Section icon="🌍" title="Знание по языкам">
+      <Section
+        icon="🌍"
+        title="Знание по языкам"
+        help="Сколько слов ты отметил как «выучено» отдельно по каждому языку. Отметка ставится в тренировке кнопкой «Знаю» или когда проходишь тройку слов целиком. Одно и то же слово может быть выучено на одном языке и не выучено на другом."
+      >
         {byLanguage.length === 0 ? (
           <Text style={styles.emptyText}>Нет активных языков.</Text>
         ) : (
@@ -210,7 +243,11 @@ export default function StatisticsScreen() {
       </Section>
 
       {/* Repetition */}
-      <Section icon="🔁" title="По количеству повторений">
+      <Section
+        icon="🔁"
+        title="По количеству повторений"
+        help="Распределение начатых слов по тому, сколько раз ты их видел (в среднем по языкам, которые учишь). Цель — около 80 показов на слово: примерно столько повторений нужно, чтобы слово надёжно осело в долговременной памяти. Слова, которые ни разу не показывались, вынесены отдельной строкой."
+      >
         {repetition.buckets.map(b => (
           <BarRow key={b.label} label={b.label} value={b.count} max={repetitionMax} color={b.color} />
         ))}
@@ -218,7 +255,12 @@ export default function StatisticsScreen() {
       </Section>
 
       {/* Efficiency */}
-      <Section icon="🎯" title="Эффективность тренировок" defaultOpen={efficiency.length > 0}>
+      <Section
+        icon="🎯"
+        title="Эффективность тренировок"
+        defaultOpen={efficiency.length > 0}
+        help="Доля верных ответов («Знаю») в тренировках по дням. Несколько тренировок за один день объединяются в одну точку. Переключатель «Верных ответов» показывает то же самое в штуках (верно / всего). Растущая линия — материал закрепляется; проседания — набрал слишком много новых слов сразу."
+      >
         {efficiency.length === 0 ? (
           <Text style={styles.emptyText}>Пройдите тренировку в разделе «Тренировка», чтобы увидеть график.</Text>
         ) : (
@@ -252,7 +294,18 @@ export default function StatisticsScreen() {
       </Section>
 
       {/* iMW */}
-      <Section icon="🧠" title="Индекс закрепления (iMW)" defaultOpen={false}>
+      <Section
+        icon="🧠"
+        title="Индекс закрепления (iMW)"
+        defaultOpen={false}
+        help={
+          'Средний «вес памяти» по словам, которые ты начал учить. Для каждого слова считается:\n\n' +
+          '• прогресс к 80 повторениям (сколько раз показывалось / 80);\n' +
+          '• отмечено ли как «выучено» (если нет — вес вдвое меньше);\n' +
+          '• забывание: чем дольше не повторял слово, тем ниже его вклад.\n\n' +
+          '100% — весь начатый словарь надёжно закреплён. Новое слово временно тянет индекс вниз, пока не закрепишь его. График показывает динамику по дням.'
+        }
+      >
         <Text style={styles.sectionNote}>
           Средний «вес памяти» по начатым словам: прогресс к 80 повторениям × статус «выучено» × забывание со временем.
         </Text>
@@ -292,7 +345,12 @@ export default function StatisticsScreen() {
       </Section>
 
       {/* Frequent words */}
-      <Section icon="🔥" title="Частые слова" defaultOpen={false}>
+      <Section
+        icon="🔥"
+        title="Частые слова"
+        defaultOpen={false}
+        help="Слова, которые встречались тебе чаще всего — по суммарному числу показов во всех разделах. Обычно это самая частотная лексика, которую ты уже почти не путаешь."
+      >
         {frequentWords.length === 0 ? (
           <Text style={styles.emptyText}>Слова появятся здесь после тренировок.</Text>
         ) : (
@@ -346,6 +404,19 @@ const styles = StyleSheet.create({
   cardHeaderTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', flex: 1 },
   cardChevron: { fontSize: 16, color: '#94A3B8' },
   cardBody: { paddingHorizontal: 16, paddingBottom: 16 },
+
+  helpBtn: {
+    width: 22, height: 22, borderRadius: 11, marginRight: 10,
+    backgroundColor: '#EEF2F7', borderWidth: 1, borderColor: '#D9E1EC',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  helpBtnText: { fontSize: 13, fontWeight: '800', color: '#64748B', lineHeight: 15 },
+  helpOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', alignItems: 'center', justifyContent: 'center', padding: 28 },
+  helpCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, maxWidth: 420, width: '100%' },
+  helpTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', marginBottom: 10 },
+  helpText: { fontSize: 14, color: '#475569', lineHeight: 21 },
+  helpClose: { marginTop: 18, alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 10, backgroundColor: '#2563EB' },
+  helpCloseText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
 
   sectionNote: { fontSize: 12, color: '#94A3B8', marginTop: 10, lineHeight: 17 },
   emptyText: { fontSize: 13, color: '#64748B', fontStyle: 'italic', textAlign: 'center', paddingVertical: 14 },
