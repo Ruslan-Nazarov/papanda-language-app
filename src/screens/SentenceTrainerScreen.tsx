@@ -525,18 +525,20 @@ export default function SentenceTrainerScreen() {
   const renderToken = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
     const isRevealed = groupIndex < revealedSteps;
+    // In a complex (multi-clause) sentence, wrap words of the 2nd+ clause in a
+    // second colored frame so the clause boundary reads at a glance.
+    const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
+    const secondaryClause = clauseIndex >= 1;
 
-    return (
-      <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
-        {isRevealed ? (
-          <TouchableOpacity 
+    const card = isRevealed ? (
+          <TouchableOpacity
             activeOpacity={0.85}
             onPress={(e) => {
               e.stopPropagation();
               handleTokenPress(token);
             }}
             style={[
-              styles.wordCard, 
+              styles.wordCard,
               { borderColor: getRoleColor(token.role) },
               token.is_in_my_dict && { backgroundColor: '#FFFDF0' } // Gentle yellow background for dict words
             ]}
@@ -573,11 +575,19 @@ export default function SentenceTrainerScreen() {
             <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
             {renderDictionaryAction(token)}
           </TouchableOpacity>
-        ) : (
+    ) : (
           <View style={styles.hiddenCard}>
             <Text style={styles.hiddenText}>???</Text>
           </View>
-        )}
+    );
+
+    return (
+      <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
+        {secondaryClause ? (
+          <View style={[styles.clauseFrame, { borderColor: isRevealed ? getRoleColor(token.role) : '#94A3B8' }]}>
+            {card}
+          </View>
+        ) : card}
       </View>
     );
   };
@@ -585,19 +595,18 @@ export default function SentenceTrainerScreen() {
   const renderTokenTableMode = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
     const isRevealed = groupIndex < revealedSteps;
+    const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
+    const secondaryClause = clauseIndex >= 1;
 
-    return (
-      <View key={`${index}-${token.text}`} style={styles.tableRow}>
-        <View style={styles.tableColWord}>
-          {isRevealed ? (
-            <TouchableOpacity 
+    const card = isRevealed ? (
+            <TouchableOpacity
               activeOpacity={0.85}
               onPress={(e) => {
                 e.stopPropagation();
                 handleTokenPress(token);
               }}
               style={[
-                styles.wordCard, 
+                styles.wordCard,
                 { borderColor: getRoleColor(token.role), minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
                 token.is_in_my_dict && { backgroundColor: '#FFFDF0' }
               ]}
@@ -631,11 +640,20 @@ export default function SentenceTrainerScreen() {
                 </Text>
               )}
             </TouchableOpacity>
-          ) : (
+    ) : (
             <View style={[styles.hiddenCard, { minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 }]}>
               <Text style={styles.hiddenText}>???</Text>
             </View>
-          )}
+    );
+
+    return (
+      <View key={`${index}-${token.text}`} style={styles.tableRow}>
+        <View style={styles.tableColWord}>
+          {secondaryClause ? (
+            <View style={[styles.clauseFrame, { borderColor: isRevealed ? getRoleColor(token.role) : '#94A3B8' }]}>
+              {card}
+            </View>
+          ) : card}
         </View>
 
         <View style={styles.tableColTrans}>
@@ -1011,6 +1029,8 @@ const styles = StyleSheet.create({
   sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 },
   tokenContainer: { margin: 4 },
   wordCard: { backgroundColor: '#FFFFFF', padding: 10, borderRadius: 8, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, alignItems: 'center', minWidth: 80 },
+  // Outer ring for words of a 2nd+ clause in a complex sentence — reads as a double frame.
+  clauseFrame: { borderWidth: 2, borderRadius: 13, padding: 3, alignSelf: 'flex-start' },
   orderBadge: { position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
   orderBadgeText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
   hiddenCard: { backgroundColor: '#E0E0E0', padding: 10, borderRadius: 8, borderWidth: 2, borderColor: '#CBD5E1', alignItems: 'center', minWidth: 80 },
