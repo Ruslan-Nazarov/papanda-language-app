@@ -12,6 +12,8 @@ interface LanguagePrompt {
   idPrefix: string;
   grammar: string;
   morphology: string;
+  /** Extra language-specific line appended to the pre-answer self-check. */
+  verify?: string;
 }
 
 const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
@@ -24,8 +26,11 @@ const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
   kz: {
     label: 'Қазақша',
     idPrefix: 'kz',
-    grammar: 'Use natural Kazakh with pedagogical SOV order (Subject … Object … Predicate) unless a question or emphasis needs another order. Respect vowel harmony, accusative -ны/-ні/-ды/-ді on definite objects, dative -ға/-ге for direction, negation -ма/-ме/-ба/-бе/-па/-пе, past -ды/-ді. Put the yes/no particle ма/ме/ба/бе/па/пе as its own final token. Vary the batch: affirmative past, negative, a question with the particle, and a complex sentence with және / бірақ / өйткені.',
-    morphology: 'Kazakh is agglutinative: split root + ordered affixes — оқыды -> ["оқы","ды"], жазбады -> ["жаз","ба","ды"], дүкенге -> ["дүкен","ге"], машинаны -> ["машина","ны"]. dictionary_form is the verbal noun / base: оқыды -> "оқу", салды -> "салу", көрді -> "көру"; for nouns the bare stem: дүкенге -> "дүкен".'
+    grammar: `Use natural Kazakh with pedagogical SOV order (Subject … Object … Predicate) unless a question needs another order. Respect vowel harmony everywhere.
+DIRECT-OBJECT CASE — the most common mistake: a direct object that is modified by an adjective, is specific/definite, or stands in a NEGATED sentence MUST take the accusative -ны/-ні/-ды/-ді/-ты/-ті. Examples: «үлкен апатты ұмытпады», «жаңа кітапты оқыды», «жаман хатты жазбады», «итті көрді». Only a bare, fully generic mass/indefinite object may stay unmarked («нан жеді», «су ішті»). When unsure, mark it.
+Direction takes the dative -ға/-ге/-қа/-ке. Negation -ма/-ме/-ба/-бе/-па/-пе goes before the tense suffix. Past is -ды/-ді/-ты/-ті. Put the yes/no particle ма/ме/ба/бе/па/пе as its own final token. Vary the batch: affirmative past, negative, a question with the particle, and a complex sentence with және / бірақ / өйткені.`,
+    morphology: 'Kazakh is agglutinative: split root + ordered affixes — оқыды -> ["оқы","ды"], жазбады -> ["жаз","ба","ды"], дүкенге -> ["дүкен","ге"], кітапты -> ["кітап","ты"], апатты -> ["апат","ты"]. dictionary_form is the verbal noun / base: оқыды -> "оқу", салды -> "салу", көрді -> "көру"; for nouns the bare stem: дүкенге -> "дүкен", кітапты -> "кітап".',
+    verify: 'Kazakh: for EVERY direct object, if it is modified by an adjective, is specific, or the sentence is negated, it must carry the accusative -ны/-ні/-ды/-ді/-ты/-ті — fix any bare-nominative object that should be accusative.'
   },
   de: {
     label: 'Deutsch',
@@ -94,20 +99,21 @@ const LANGUAGE_EXAMPLES: Record<string, string> = {
   ]}
 ]`,
   kz: `[
-  {"language":"Қазақша","sentence":"Жақсы дос жаман хат жазбады.","words":[
+  {"language":"Қазақша","sentence":"Жақсы дос жаман хатты жазбады.","words":[
     {"text":"Жақсы","label":"Adjective","role":"Attribute_Subject","parts":["жақсы"],"translation":"хороший","is_in_my_dict":true,"dictionary_word":"жақсы","dictionary_form":"жақсы"},
     {"text":"дос","label":"Noun","role":"Subject","parts":["дос"],"translation":"друг","is_in_my_dict":true,"dictionary_word":"дос","dictionary_form":"дос"},
     {"text":"жаман","label":"Adjective","role":"Attribute_Object","parts":["жаман"],"translation":"плохое","is_in_my_dict":true,"dictionary_word":"жаман","dictionary_form":"жаман"},
-    {"text":"хат","label":"Noun","role":"Object","parts":["хат"],"translation":"письмо","is_in_my_dict":true,"dictionary_word":"хат","dictionary_form":"хат"},
+    {"text":"хатты","label":"Noun","role":"Object","parts":["хат","ты"],"translation":"письмо","is_in_my_dict":true,"dictionary_word":"хат","dictionary_form":"хат"},
     {"text":"жазбады","label":"Verb (Neg)","role":"Predicate","parts":["жаз","ба","ды"],"translation":"не написал","is_in_my_dict":true,"dictionary_word":"жазу","dictionary_form":"жазу"}
   ]},
-  {"language":"Қазақша","sentence":"Қыз ит көрді және ұл кітап оқыды.","words":[
+  {"language":"Қазақша","sentence":"Қыз итті көрді және ұл жаңа кітапты оқыды.","words":[
     {"text":"Қыз","label":"Noun","role":"Subject","parts":["қыз"],"translation":"девочка","is_in_my_dict":true,"dictionary_word":"қыз","dictionary_form":"қыз"},
-    {"text":"ит","label":"Noun","role":"Object","parts":["ит"],"translation":"собаку","is_in_my_dict":true,"dictionary_word":"ит","dictionary_form":"ит"},
+    {"text":"итті","label":"Noun","role":"Object","parts":["ит","ті"],"translation":"собаку","is_in_my_dict":true,"dictionary_word":"ит","dictionary_form":"ит"},
     {"text":"көрді","label":"Verb (Past)","role":"Predicate","parts":["көр","ді"],"translation":"увидела","is_in_my_dict":true,"dictionary_word":"көру","dictionary_form":"көру"},
     {"text":"және","label":"Conjunction","role":"Conjunction","parts":["және"],"translation":"и","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"және"},
     {"text":"ұл","label":"Noun","role":"Subject","parts":["ұл"],"translation":"сын","is_in_my_dict":true,"dictionary_word":"ұл","dictionary_form":"ұл"},
-    {"text":"кітап","label":"Noun","role":"Object","parts":["кітап"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"кітап","dictionary_form":"кітап"},
+    {"text":"жаңа","label":"Adjective","role":"Attribute_Object","parts":["жаңа"],"translation":"новую","is_in_my_dict":true,"dictionary_word":"жаңа","dictionary_form":"жаңа"},
+    {"text":"кітапты","label":"Noun","role":"Object","parts":["кітап","ты"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"кітап","dictionary_form":"кітап"},
     {"text":"оқыды","label":"Verb (Past)","role":"Predicate","parts":["оқы","ды"],"translation":"прочитал","is_in_my_dict":true,"dictionary_word":"оқу","dictionary_form":"оқу"}
   ]}
 ]`,
@@ -269,7 +275,7 @@ TOKEN CONTRACT (one token per whitespace-separated word, in reading order):
 FOLLOW THIS SHAPE EXACTLY (structure and depth, not vocabulary):
 ${example}
 
-BEFORE YOU ANSWER, silently verify: grammar is correct; every sentence has a predicate and ≥4 words; token.text values rebuild the sentence; ≥2 dictionary content words per sentence; the negative / question / complex quota is met; no two sentences are near-duplicates.`;
+BEFORE YOU ANSWER, silently verify: grammar and every case ending are correct; every sentence has a predicate and ≥4 words; token.text values rebuild the sentence; ≥2 dictionary content words per sentence; the negative / question / complex quota is met; no two sentences are near-duplicates.${language.verify ? `\n${language.verify}` : ''}`;
 };
 
 export const makeGeneratedSentenceId = (languageCode: string, offset: number) => {
