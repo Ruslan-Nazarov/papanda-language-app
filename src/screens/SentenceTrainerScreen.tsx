@@ -11,6 +11,7 @@ import { generateSentenceBatch, isSentenceGenerationConfigured } from '../servic
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
+import { computeSentenceGroups } from '../utils/sentenceGroups';
 
 const STRICT_ORDER: SyntaxRole[] = [
   'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
@@ -311,57 +312,10 @@ export default function SentenceTrainerScreen() {
     setIsWordModalVisible(true);
   };
 
-  const orderedGroups = React.useMemo(() => {
-    if (!currentSentence || !currentSentence.words) return [];
-    
-    let currentClause = 0;
-    let seenPredicate = false;
-    let seenSubject = false;
-    
-    const wordsWithClause = currentSentence.words.map((word, originalIndex) => {
-      if (word.role === 'Conjunction' && (seenPredicate || seenSubject)) {
-        currentClause++;
-        seenPredicate = false;
-        seenSubject = false;
-      } else if (
-        (word.role === 'Predicate' && seenPredicate) || 
-        (word.role === 'Subject' && seenPredicate && seenSubject)
-      ) {
-        currentClause++;
-        seenPredicate = false;
-        seenSubject = false;
-      }
-      
-      if (word.role === 'Predicate') seenPredicate = true;
-      if (word.role === 'Subject') seenSubject = true;
-      
-      return { role: word.role, clauseIndex: currentClause, originalIndex };
-    });
-
-    const groupsMap = new Map<string, { clauseIndex: number, role: SyntaxRole, tokenIndices: number[] }>();
-    wordsWithClause.forEach(w => {
-      const key = `${w.clauseIndex}-${w.role}`;
-      if (!groupsMap.has(key)) {
-        groupsMap.set(key, { clauseIndex: w.clauseIndex, role: w.role, tokenIndices: [] });
-      }
-      groupsMap.get(key)!.tokenIndices.push(w.originalIndex);
-    });
-
-    const groups = Array.from(groupsMap.values());
-    
-    groups.sort((a, b) => {
-      if (a.clauseIndex !== b.clauseIndex) {
-        return a.clauseIndex - b.clauseIndex;
-      }
-      const idxA = STRICT_ORDER.indexOf(a.role);
-      const idxB = STRICT_ORDER.indexOf(b.role);
-      const aVal = idxA === -1 ? 99 : idxA;
-      const bVal = idxB === -1 ? 99 : idxB;
-      return aVal - bVal;
-    });
-
-    return groups;
-  }, [currentSentence]);
+  const orderedGroups = React.useMemo(
+    () => computeSentenceGroups(currentSentence?.words),
+    [currentSentence]
+  );
 
   // Reveals one more role-group per press; once everything is shown, the next
   // press hides it all again so the sentence can be quizzed again. Moving to a
