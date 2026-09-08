@@ -153,10 +153,7 @@ export default function SentenceTrainerScreen() {
   // sentences. If it fails, the older cached batch keeps showing (fallback).
   useEffect(() => {
     if (!isSentenceGenerationConfigured()) {
-      setGenerationErrors(previous => ({
-        ...previous,
-        [selectedLanguageCode]: 'Gemini не подключён: не задан ключ EXPO_PUBLIC_GEMINI_API_KEY. Добавьте его в .env (или в переменные окружения EAS) и пересоберите приложение.'
-      }));
+      // No AI in this build — the seed sentences below are the whole experience.
       return;
     }
     if (!sessionRefreshedLangs.has(selectedLanguageCode) && !generationErrors[selectedLanguageCode]) {
@@ -720,23 +717,25 @@ export default function SentenceTrainerScreen() {
 
       {filteredSentences.length > 0 && (
         <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
-          <TouchableOpacity 
-            onPress={handleExplainAI} 
-            disabled={isAiLoading}
-            style={styles.aiButton}
-          >
-            {isAiLoading ? (
-              <ActivityIndicator size="small" color="#EAB308" />
-            ) : (
-              <>
-                <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
-                <Text style={styles.aiButtonText}>Объяснить структуру</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          {isSentenceGenerationConfigured() && (
+            <TouchableOpacity
+              onPress={handleExplainAI}
+              disabled={isAiLoading}
+              style={styles.aiButton}
+            >
+              {isAiLoading ? (
+                <ActivityIndicator size="small" color="#EAB308" />
+              ) : (
+                <>
+                  <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
+                  <Text style={styles.aiButtonText}>Объяснить структуру</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity 
-            style={{marginLeft: 15, padding: 8, backgroundColor: '#F1F5F9', borderRadius: 20}} 
+          <TouchableOpacity
+            style={{marginLeft: 15, padding: 8, backgroundColor: '#F1F5F9', borderRadius: 20}}
             onPress={() => setIsMenuVisible(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color="#475569" />
@@ -787,44 +786,48 @@ export default function SentenceTrainerScreen() {
               <Text style={styles.menuItemText}>Режим: {isTableMode ? 'Карточки' : 'Таблица'}</Text>
             </TouchableOpacity>
             
-            <View style={{height: 1, backgroundColor: '#E2E8F0', marginVertical: 5}} />
-            
-            <TouchableOpacity 
-              style={styles.menuItem} 
-              onPress={() => {
-                setIsMenuVisible(false);
-                void generateSentences(selectedLanguageCode, GENERATION_BATCH);
-              }}
-            >
-              <Ionicons name="sparkles" size={20} color="#2563EB" style={{marginRight: 10}} />
-              <Text style={styles.menuItemText}>Сгенерировать ещё (ИИ)</Text>
-            </TouchableOpacity>
+            {isSentenceGenerationConfigured() && (
+              <>
+                <View style={{height: 1, backgroundColor: '#E2E8F0', marginVertical: 5}} />
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setIsMenuVisible(false);
-                Alert.alert(
-                  'Очистить сгенерированные?',
-                  `Удалить все предложения от ИИ для языка «${activeLangObj?.label}» и сгенерировать новую подборку.`,
-                  [
-                    { text: 'Отмена', style: 'cancel' },
-                    {
-                      text: 'Очистить',
-                      style: 'destructive',
-                      onPress: () => {
-                        clearGeneratedSentences(activeLangObj?.label);
-                        setCurrentFilteredIndex(0);
-                        void generateSentences(selectedLanguageCode, GENERATION_BATCH);
-                      }
-                    }
-                  ]
-                );
-              }}
-            >
-              <Ionicons name="refresh" size={20} color="#DC2626" style={{marginRight: 10}} />
-              <Text style={styles.menuItemText}>Очистить и сгенерировать заново</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setIsMenuVisible(false);
+                    void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+                  }}
+                >
+                  <Ionicons name="sparkles" size={20} color="#2563EB" style={{marginRight: 10}} />
+                  <Text style={styles.menuItemText}>Сгенерировать ещё (ИИ)</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setIsMenuVisible(false);
+                    Alert.alert(
+                      'Очистить сгенерированные?',
+                      `Удалить все предложения от ИИ для языка «${activeLangObj?.label}» и сгенерировать новую подборку.`,
+                      [
+                        { text: 'Отмена', style: 'cancel' },
+                        {
+                          text: 'Очистить',
+                          style: 'destructive',
+                          onPress: () => {
+                            clearGeneratedSentences(activeLangObj?.label);
+                            setCurrentFilteredIndex(0);
+                            void generateSentences(selectedLanguageCode, GENERATION_BATCH);
+                          }
+                        }
+                      ]
+                    );
+                  }}
+                >
+                  <Ionicons name="refresh" size={20} color="#DC2626" style={{marginRight: 10}} />
+                  <Text style={styles.menuItemText}>Очистить и сгенерировать заново</Text>
+                </TouchableOpacity>
+              </>
+            )}
 
             <TouchableOpacity
               style={styles.menuItem}
