@@ -27,6 +27,7 @@ const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
     label: 'Қазақша',
     idPrefix: 'kz',
     grammar: `Use natural Kazakh with pedagogical SOV order (Subject … Object … Predicate) unless a question needs another order. Respect vowel harmony everywhere.
+An adjective ALWAYS stands immediately before the noun it describes: «бағалы машинаны» (never «машинаны бағалы»), «үлкен үй».
 DIRECT-OBJECT CASE — the most common mistake: a direct object that is modified by an adjective, is specific/definite, or stands in a NEGATED sentence MUST take the accusative -ны/-ні/-ды/-ді/-ты/-ті. Examples: «үлкен апатты ұмытпады», «жаңа кітапты оқыды», «жаман хатты жазбады», «итті көрді». Only a bare, fully generic mass/indefinite object may stay unmarked («нан жеді», «су ішті»). When unsure, mark it.
 Direction takes the dative -ға/-ге/-қа/-ке. Negation -ма/-ме/-ба/-бе/-па/-пе goes before the tense suffix. Past is -ды/-ді/-ты/-ті. Put the yes/no particle ма/ме/ба/бе/па/пе as its own final token. Vary the batch: affirmative past, negative, a question with the particle, and a complex sentence with және / бірақ / өйткені.`,
     morphology: 'Kazakh is agglutinative: split root + ordered affixes — оқыды -> ["оқы","ды"], жазбады -> ["жаз","ба","ды"], дүкенге -> ["дүкен","ге"], кітапты -> ["кітап","ты"], апатты -> ["апат","ты"]. dictionary_form is the verbal noun / base: оқыды -> "оқу", салды -> "салу", көрді -> "көру"; for nouns the bare stem: дүкенге -> "дүкен", кітапты -> "кітап".',
