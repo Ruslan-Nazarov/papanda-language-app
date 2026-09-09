@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -50,14 +50,14 @@ const roleColor = (role: SyntaxRole) => {
   }
 };
 
-const EXAMPLE_TEXT = 'La bambina legge un libro nuovo';
+const EXAMPLE_TEXT = 'The girl reads a book';
+const EXAMPLE_META = 'английский · «Девочка читает книгу»';
 const EXAMPLE_TOKENS: Token[] = [
-  { text: 'La', label: 'La', role: 'Article', translation: 'артикль', is_in_my_dict: false },
-  { text: 'bambina', label: 'bambina', role: 'Subject', translation: 'девочка', is_in_my_dict: false },
-  { text: 'legge', label: 'legge', role: 'Predicate', translation: 'читает', is_in_my_dict: false },
-  { text: 'un', label: 'un', role: 'Article', translation: 'артикль', is_in_my_dict: false },
-  { text: 'libro', label: 'libro', role: 'Object', translation: 'книгу', is_in_my_dict: false },
-  { text: 'nuovo', label: 'nuovo', role: 'Attribute_Object', translation: 'новую', is_in_my_dict: false },
+  { text: 'The', label: 'Article', role: 'Article', translation: 'определённый артикль', is_in_my_dict: false },
+  { text: 'girl', label: 'Noun', role: 'Subject', translation: 'девочка', is_in_my_dict: false },
+  { text: 'reads', label: 'Verb', role: 'Predicate', translation: 'читает', is_in_my_dict: false },
+  { text: 'a', label: 'Article', role: 'Article', translation: 'неопределённый артикль', is_in_my_dict: false },
+  { text: 'book', label: 'Noun', role: 'Object', translation: 'книгу', is_in_my_dict: false },
 ];
 
 interface Props {
@@ -70,11 +70,39 @@ export default function OnboardingScreen({ onDone }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const [page, setPage] = useState(0);
 
+  const PAGE_COUNT = 3;
+
   const groups = useMemo(() => computeSentenceGroups(EXAMPLE_TOKENS), []);
   const [revealed, setRevealed] = useState(0);
   const exampleDone = revealed >= groups.length;
+  const playTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoPlayed = useRef(false);
 
-  const PAGE_COUNT = 3;
+  const playExample = () => {
+    if (playTimer.current) clearInterval(playTimer.current);
+    setRevealed(0);
+    let n = 0;
+    playTimer.current = setInterval(() => {
+      n += 1;
+      setRevealed(n);
+      if (n >= groups.length && playTimer.current) {
+        clearInterval(playTimer.current);
+        playTimer.current = null;
+      }
+    }, 850);
+  };
+
+  // Auto-play the breakdown the first time the learner lands on the last page.
+  useEffect(() => {
+    if (page === PAGE_COUNT - 1 && !autoPlayed.current) {
+      autoPlayed.current = true;
+      playExample();
+    }
+  }, [page]);
+
+  useEffect(() => () => {
+    if (playTimer.current) clearInterval(playTimer.current);
+  }, []);
 
   const goTo = (next: number) => {
     const clamped = Math.max(0, Math.min(PAGE_COUNT - 1, next));
@@ -142,7 +170,7 @@ export default function OnboardingScreen({ onDone }: Props) {
             <View style={styles.featureTextWrap}>
               <Text style={styles.featureName}>Слова</Text>
               <Text style={styles.featureDesc}>
-                Карточка слова сразу на нескольких языках. Отмечаешь «знаю» или «не знаю».
+                Одно слово на всех твоих языках сразу, рядом. Отмечаешь те, что уже знаешь.
               </Text>
             </View>
           </View>
@@ -151,18 +179,18 @@ export default function OnboardingScreen({ onDone }: Props) {
             <View style={styles.featureTextWrap}>
               <Text style={styles.featureName}>Разбор предложений</Text>
               <Text style={styles.featureDesc}>
-                Сердце papanda. Предложение → карточки по членам (сказуемое, подлежащее,
-                дополнение…), с выделением морфем, которые несут смысл.
+                Главное в papanda. Берём предложение и разбираем по членам — сказуемое,
+                подлежащее, дополнение — а внутри слов показываем части, которые несут смысл.
               </Text>
             </View>
           </View>
           <View style={styles.featureRow}>
             <Text style={styles.featureEmoji}>⚡</Text>
             <View style={styles.featureTextWrap}>
-              <Text style={styles.featureName}>Тренировка</Text>
+              <Text style={styles.featureName}>Узнавание слов</Text>
               <Text style={styles.featureDesc}>
-                Быстрый прогон «знаю / не знаю». Приложение само поднимает то, что пора
-                повторить.
+                Быстрая проверка: помнишь перевод или нет. Приложение само подбирает слова,
+                которые пора повторить.
               </Text>
             </View>
           </View>
@@ -171,7 +199,7 @@ export default function OnboardingScreen({ onDone }: Props) {
             <View style={styles.featureTextWrap}>
               <Text style={styles.featureName}>Статистика</Text>
               <Text style={styles.featureDesc}>
-                Индекс запоминания (iMW) и динамика по дням.
+                Индекс запоминания и график по дням: видно, что закрепляется, а что забывается.
               </Text>
             </View>
           </View>
@@ -185,7 +213,7 @@ export default function OnboardingScreen({ onDone }: Props) {
         >
           <Text style={styles.title}>Как это выглядит</Text>
           <Text style={styles.exampleSentence}>{EXAMPLE_TEXT}</Text>
-          <Text style={styles.exampleMeta}>итальянский · «Девочка читает новую книгу»</Text>
+          <Text style={styles.exampleMeta}>{EXAMPLE_META}</Text>
 
           <View style={styles.cardsWrap}>
             {groups.map((group, gi) => {
@@ -218,18 +246,12 @@ export default function OnboardingScreen({ onDone }: Props) {
             })}
           </View>
 
-          {exampleDone ? (
-            <Text style={styles.exampleHint}>
-              papanda показывает каждое предложение так — от действия к деталям.
-            </Text>
-          ) : (
-            <TouchableOpacity
-              style={styles.revealButton}
-              onPress={() => setRevealed((n) => Math.min(groups.length, n + 1))}
-            >
-              <Text style={styles.revealButtonText}>
-                {revealed === 0 ? 'Собрать разбор' : 'Следующий член →'}
-              </Text>
+          <Text style={styles.exampleHint}>
+            papanda раскрывает каждое предложение так — от действия к деталям.
+          </Text>
+          {exampleDone && (
+            <TouchableOpacity style={styles.revealButton} onPress={playExample}>
+              <Text style={styles.revealButtonText}>↻ Ещё раз</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -247,13 +269,8 @@ export default function OnboardingScreen({ onDone }: Props) {
             <Text style={styles.primaryButtonText}>Далее</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity
-            style={[styles.primaryButton, !exampleDone && styles.primaryButtonMuted]}
-            onPress={onDone}
-          >
-            <Text style={styles.primaryButtonText}>
-              {exampleDone ? 'Начать' : 'Начать без примера'}
-            </Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={onDone}>
+            <Text style={styles.primaryButtonText}>Начать</Text>
           </TouchableOpacity>
         )}
       </View>

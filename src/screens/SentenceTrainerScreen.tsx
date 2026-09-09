@@ -102,6 +102,18 @@ export default function SentenceTrainerScreen() {
 
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(activeLanguages[0] || 'it');
 
+  // If the learner drops the currently-selected language in Settings, the old
+  // language's sentences would keep showing (with no button to switch away).
+  // Snap back to the first active language.
+  useEffect(() => {
+    if (activeLanguages.length > 0 && !activeLanguages.includes(selectedLanguageCode)) {
+      setSelectedLanguageCode(activeLanguages[0]);
+      setCurrentFilteredIndex(0);
+      setRevealedSteps(0);
+      setShowTranslations(false);
+    }
+  }, [activeLanguages, selectedLanguageCode]);
+
   // AI sentences are the normal training queue. Manually prepared / seed
   // sentences are kept untouched and shown only when Gemini can't provide any.
   const activeLangObj = LANGUAGES.find(l => l.code === selectedLanguageCode);
@@ -272,19 +284,29 @@ export default function SentenceTrainerScreen() {
   swipeCallbacks.current.next = moveToNextSentence;
   swipeCallbacks.current.prev = moveToPrevSentence;
 
+  // Does a word matching this token already live in the user's dictionary?
+  // Generated tokens only mark is_in_my_dict for the ~40 lemmas offered to the
+  // model that batch, so a real dictionary word can still arrive flagged false.
+  const findWordInStore = (token: Token): Word | undefined => {
+    const rawForm = token.dictionary_form || token.dictionary_word || token.text;
+    const cleanForm = (rawForm || '').replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '').trim().toLowerCase();
+    if (!cleanForm) return undefined;
+    return words.find(w => {
+      const tr = getWordTranslation(w, selectedLanguageCode);
+      return (
+        (tr && tr.toLowerCase() === cleanForm) ||
+        (w.word && w.word.toLowerCase() === cleanForm) ||
+        (w.eng && w.eng.toLowerCase() === cleanForm)
+      );
+    });
+  };
+
   const handleTokenPress = (token: Token) => {
     const rawForm = token.dictionary_form || token.dictionary_word || token.text;
     const cleanForm = (rawForm || '').replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '').trim();
     if (!cleanForm) return;
 
-    const existing = words.find(w => {
-      const tr = getWordTranslation(w, selectedLanguageCode);
-      return (
-        (tr && tr.toLowerCase() === cleanForm.toLowerCase()) ||
-        (w.word && w.word.toLowerCase() === cleanForm.toLowerCase()) ||
-        (w.eng && w.eng.toLowerCase() === cleanForm.toLowerCase())
-      );
-    });
+    const existing = findWordInStore(token);
 
     if (existing) {
       setEditingWord(existing);
@@ -375,7 +397,7 @@ export default function SentenceTrainerScreen() {
   };
 
   const renderDictionaryAction = (token: Token) => {
-    const added = token.is_in_my_dict || addedTokenKeys.has(tokenKey(token));
+    const added = token.is_in_my_dict || addedTokenKeys.has(tokenKey(token)) || Boolean(findWordInStore(token));
     return (
       <TouchableOpacity
         style={[styles.addToDictionaryBtn, added && styles.addToDictionaryBtnAdded]}
@@ -473,6 +495,14 @@ export default function SentenceTrainerScreen() {
     setModalVisible(false);
   };
 
+  // The reveal badge counts groups WITHIN their own clause — a complex sentence's
+  // second clause restarts at 1.
+  const clauseLocalNumber = (groupIndex: number): number => {
+    const group = groupIndex >= 0 ? orderedGroups[groupIndex] : undefined;
+    if (!group) return groupIndex + 1;
+    return orderedGroups.filter(g => g.clauseIndex === group.clauseIndex).indexOf(group) + 1;
+  };
+
   const renderToken = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
     const isRevealed = groupIndex < revealedSteps;
@@ -480,6 +510,7 @@ export default function SentenceTrainerScreen() {
     // second colored frame so the clause boundary reads at a glance.
     const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
     const secondaryClause = clauseIndex >= 1;
+    const badgeNumber = clauseLocalNumber(groupIndex);
 
     const card = isRevealed ? (
           <TouchableOpacity
@@ -495,7 +526,7 @@ export default function SentenceTrainerScreen() {
             ]}
           >
             <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
-              <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
+              <Text style={styles.orderBadgeText}>{badgeNumber}</Text>
             </View>
             {token.parts && token.parts.length > 0 ? (
               <Text style={styles.wordText}>
@@ -504,11 +535,11 @@ export default function SentenceTrainerScreen() {
                     ? part.charAt(0).toUpperCase() + part.slice(1)
                     : part;
                   return (
-                    <Text 
-                      key={i} 
+                    <Text
+                      key={i}
                       style={
-                        i === 0 
-                          ? styles.wordRoot 
+                        i === 0
+                          ? styles.wordRoot
                           : [styles.wordAffix, { color: AFFIX_COLORS[(i - 1) % AFFIX_COLORS.length] }]
                       }
                     >
@@ -548,6 +579,7 @@ export default function SentenceTrainerScreen() {
     const isRevealed = groupIndex < revealedSteps;
     const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
     const secondaryClause = clauseIndex >= 1;
+    const badgeNumber = clauseLocalNumber(groupIndex);
 
     const card = isRevealed ? (
             <TouchableOpacity
@@ -563,7 +595,7 @@ export default function SentenceTrainerScreen() {
               ]}
             >
               <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
-                <Text style={styles.orderBadgeText}>{groupIndex + 1}</Text>
+                <Text style={styles.orderBadgeText}>{badgeNumber}</Text>
               </View>
               {token.parts && token.parts.length > 0 ? (
                 <Text style={styles.wordText}>

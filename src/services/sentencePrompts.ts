@@ -248,6 +248,8 @@ TASK: Write exactly ${count} DIFFERENT sentences that a beginner would study.
 
 SENTENCE QUALITY — every sentence must:
 - be fully natural and grammatically correct in ${languageLabel};
+- describe a PLAUSIBLE everyday situation that actually makes sense in the real world. A beginner should picture it instantly. NO absurd, contradictory or surreal combinations — e.g. reject "the weak winner", "he did not insult the precious car", "the sad table runs". If the dictionary words don't combine into something sensible, choose different dictionary words rather than forcing a strange sentence;
+- adjective + noun pairs must be things that genuinely go together (a "big house", not a "big minister"); the verb must be something the subject can plausibly do to that object;
 - be a COMPLETE thought with an explicit subject and predicate; most sentences also have a direct object;
 - use 4–9 words (before punctuation) — never a bare "subject + verb" with nothing else;
 - add at least one attribute (adjective/article-carrying noun phrase) or one adverbial (place / time / manner) so there is real structure to analyse;
@@ -275,7 +277,7 @@ TOKEN CONTRACT (one token per whitespace-separated word, in reading order):
 FOLLOW THIS SHAPE EXACTLY (structure and depth, not vocabulary):
 ${example}
 
-BEFORE YOU ANSWER, silently verify: grammar and every case ending are correct; every sentence has a predicate and ≥4 words; token.text values rebuild the sentence; ≥2 dictionary content words per sentence; the negative / question / complex quota is met; no two sentences are near-duplicates.${language.verify ? `\n${language.verify}` : ''}`;
+BEFORE YOU ANSWER, silently verify EACH sentence: it describes a realistic everyday situation a beginner can picture (discard anything absurd or contradictory and rewrite it); grammar and every case ending are correct; every sentence has a predicate and ≥4 words; token.text values rebuild the sentence; ≥2 dictionary content words per sentence; the negative / question / complex quota is met; no two sentences are near-duplicates.${language.verify ? `\n${language.verify}` : ''}`;
 };
 
 export const makeGeneratedSentenceId = (languageCode: string, offset: number) => {

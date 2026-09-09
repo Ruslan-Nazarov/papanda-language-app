@@ -391,7 +391,7 @@ export default function WordTriplesScreen() {
 
                   {/* Prominent Centered Translation */}
                   <View style={styles.wordCenterContainer}>
-                    <Text style={styles.langTranslation}>{translation}</Text>
+                    <Text style={styles.langTranslation} numberOfLines={2}>{translation}</Text>
                   </View>
                 </View>
               );
@@ -660,6 +660,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    // Reserve room for the absolutely-positioned language badge on the left so a
+    // long word (e.g. Kazakh) never slides under the flag. Symmetric so the word
+    // stays visually centred, it just wraps sooner.
+    paddingHorizontal: 58,
   },
   langTranslation: { 
     fontSize: 24, 

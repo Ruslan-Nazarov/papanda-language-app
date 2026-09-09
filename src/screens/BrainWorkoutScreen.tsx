@@ -118,17 +118,34 @@ export default function BrainWorkoutScreen() {
       const numLearnedToTake = Math.min(workoutLearnedWordCount, learnedItems.length);
       const numUnlearnedToTake = workoutWordCount - numLearnedToTake;
 
-      let finalQueue = [
-        ...unlearnedItems.slice(0, numUnlearnedToTake),
-        ...learnedItems.slice(0, numLearnedToTake)
+      // Pick from a window ~3x the size of what we need, then randomise inside it,
+      // so consecutive workouts rotate through the "most due" region instead of
+      // replaying the exact same front-of-queue words every time.
+      const pickFromWindow = <T,>(sorted: T[], take: number): T[] => {
+        if (take <= 0) return [];
+        const windowSize = Math.min(sorted.length, Math.max(take + 4, take * 3));
+        const windowed = sorted.slice(0, windowSize);
+        for (let i = windowed.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [windowed[i], windowed[j]] = [windowed[j], windowed[i]];
+        }
+        return windowed.slice(0, take);
+      };
+
+      let finalQueue: QueueItem[] = [
+        ...pickFromWindow(unlearnedItems, numUnlearnedToTake),
+        ...pickFromWindow(learnedItems, numLearnedToTake),
       ];
 
       // If we don't have enough unlearned, fill with more learned
       if (finalQueue.length < workoutWordCount && learnedItems.length > numLearnedToTake) {
         const extraLearned = workoutWordCount - finalQueue.length;
+        const usedKeys = new Set(finalQueue.map(it => `${it.word.eng || it.word.word}:${it.langCode}`));
         finalQueue = [
           ...finalQueue,
-          ...learnedItems.slice(numLearnedToTake, numLearnedToTake + extraLearned)
+          ...learnedItems
+            .filter(it => !usedKeys.has(`${it.word.eng || it.word.word}:${it.langCode}`))
+            .slice(0, extraLearned),
         ];
       }
 
@@ -312,16 +329,6 @@ export default function BrainWorkoutScreen() {
     outputRange: [0.15, 1, 0.15],
     extrapolate: 'clamp',
   });
-  const knownBadgeOpacity = cardTranslateX.interpolate({
-    inputRange: [20, 80],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-  const unknownBadgeOpacity = cardTranslateX.interpolate({
-    inputRange: [-80, -20],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
 
   callbacks.current.handleSwipe = handleSwipe;
   callbacks.current.resetCardPosition = resetCardPosition;
@@ -360,20 +367,6 @@ export default function BrainWorkoutScreen() {
             },
           ]}
         >
-          {/* Visual stamps during swipe */}
-          <Animated.View 
-            style={[styles.swipeStamp, styles.swipeStampKnown, { opacity: knownBadgeOpacity }]} 
-            pointerEvents="none"
-          >
-            <Text style={styles.swipeStampKnownText}>✓ ЗНАЮ</Text>
-          </Animated.View>
-          <Animated.View 
-            style={[styles.swipeStamp, styles.swipeStampUnknown, { opacity: unknownBadgeOpacity }]} 
-            pointerEvents="none"
-          >
-            <Text style={styles.swipeStampUnknownText}>✕ НЕ ЗНАЮ</Text>
-          </Animated.View>
-
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
@@ -623,44 +616,6 @@ const styles = StyleSheet.create({
   cardMotion: {
     width: '100%',
     position: 'relative',
-  },
-  swipeStamp: {
-    position: 'absolute',
-    top: 28,
-    zIndex: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 2.5,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  swipeStampKnown: {
-    right: 24,
-    borderColor: '#16A34A',
-    backgroundColor: '#DCFCE7',
-    transform: [{ rotate: '12deg' }],
-  },
-  swipeStampKnownText: {
-    color: '#15803D',
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  swipeStampUnknown: {
-    left: 24,
-    borderColor: '#DC2626',
-    backgroundColor: '#FEE2E2',
-    transform: [{ rotate: '-12deg' }],
-  },
-  swipeStampUnknownText: {
-    color: '#B91C1C',
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
   },
   card: {
     backgroundColor: '#FFF',

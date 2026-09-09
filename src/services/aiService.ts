@@ -10,9 +10,9 @@ export async function explainSentenceWithAI(sentence: string, targetLanguage: st
     // 2048 was routinely truncating the visible answer. Cap the thinking and give
     // the response room.
     return await generateGeminiText(`${AI_SYSTEM_PROMPT}\n\n${userPrompt}`, {
-      temperature: 0.4,
+      temperature: 0.5,
       maxOutputTokens: 8192,
-      thinkingConfig: { thinkingBudget: 512 }
+      thinkingConfig: { thinkingBudget: 1024 }
     });
   } catch (error: unknown) {
     throw new Error(error instanceof Error ? error.message : 'Не удалось получить объяснение');
