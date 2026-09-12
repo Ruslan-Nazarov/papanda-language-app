@@ -3,9 +3,15 @@ main = "src/worker.ts"
 compatibility_date = "2024-11-01"
 workers_dev = true
 
-# Model can be changed here without touching the app.
+# Provider + model can be changed here without touching the app.
+# DEFAULT_PROVIDER selects which upstream is used when the app doesn't ask for a
+# specific one: "gemini" | "cerebras" | "groq". Only the matching *_API_KEY secret
+# needs to be set for whichever provider(s) you actually use.
 [vars]
+DEFAULT_PROVIDER = "gemini"
 GEMINI_MODEL = "gemini-3.5-flash-lite"
+CEREBRAS_MODEL = "gpt-oss-120b"
+GROQ_MODEL = "openai/gpt-oss-120b"
 PER_INSTALL_HOURLY = "40"
 PER_INSTALL_DAILY = "200"
 GLOBAL_DAILY = "1500"
@@ -16,4 +22,7 @@ GLOBAL_DAILY = "1500"
 binding = "RL"
 id = "8e64fb14cc21484d92881dba047176f9"
 
-# GEMINI_API_KEY is a secret, not a var:  npx wrangler secret put GEMINI_API_KEY
+# API keys are secrets, not vars — set only the ones you use:
+#   npx wrangler secret put GEMINI_API_KEY
+#   npx wrangler secret put CEREBRAS_API_KEY
+#   npx wrangler secret put GROQ_API_KEY

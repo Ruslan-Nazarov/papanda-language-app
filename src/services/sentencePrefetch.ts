@@ -5,8 +5,8 @@ import { LANGUAGES } from '../constants/languages';
 let isPrefetching = false;
 let lastPrefetchTime = 0;
 const MIN_PREFETCH_INTERVAL_MS = 25000; // at least 25 seconds between background prefetch checks
-const PREFETCH_THRESHOLD = 4; // top up if fewer than this many unlearned generated sentences
-const PREFETCH_BATCH_SIZE = 6;
+const PREFETCH_THRESHOLD = 6; // top up if fewer than this many unlearned generated sentences
+const PREFETCH_BATCH_SIZE = 10;
 
 export async function prefetchSentencesInBackground(): Promise<void> {
   if (isPrefetching) return;

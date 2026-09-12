@@ -20,8 +20,8 @@ const STRICT_ORDER: SyntaxRole[] = [
 ];
 
 const AFFIX_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']; // Palette for multiple suffixes
-const GENERATION_RESERVE = 3; // top up when this few unlearned generated sentences remain
-const GENERATION_BATCH = 8;
+const GENERATION_RESERVE = 5; // top up when this few unlearned generated sentences remain
+const GENERATION_BATCH = 10;
 const FULLY_REVEALED = 9999; // sentinel: more than any sentence has role-groups
 
 const ROLE_TRANSLATIONS: Record<SyntaxRole, string> = {
@@ -370,7 +370,7 @@ export default function SentenceTrainerScreen() {
     setIsAiLoading(true);
     setShowAiModal(true);
     try {
-      const result = await explainSentenceWithAI(sentenceText, activeLangObj?.label || 'Unknown', nativeTranslation);
+      const result = await explainSentenceWithAI(sentenceText, activeLangObj?.label || 'Unknown', nativeTranslation, currentSentence.words);
       setAiExplanation(result);
     } catch (error: any) {
       Alert.alert('Не удалось объяснить', error?.message || 'Попробуйте ещё раз.');

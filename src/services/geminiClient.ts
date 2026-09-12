@@ -36,9 +36,15 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 /** Thrown when retrying won't help (quota gone, bad request, proxy misconfigured). */
 class GeminiFatalError extends Error {}
 
+/** Optional per-call override of which upstream the proxy uses. Leave unset to
+ * use the Worker's own DEFAULT_PROVIDER (gemini-proxy/wrangler.toml) — that
+ * lets provider/model be swapped without an app release. */
+export type AiProvider = 'gemini' | 'cerebras' | 'groq';
+
 export const generateGeminiText = async (
   prompt: string,
-  generationConfig: GeminiGenerationConfig = {}
+  generationConfig: GeminiGenerationConfig = {},
+  provider?: AiProvider
 ): Promise<string> => {
   const proxyUrl = getProxyUrl();
   if (!proxyUrl) {
@@ -61,7 +67,7 @@ export const generateGeminiText = async (
           'Content-Type': 'application/json',
           'X-Install-Id': installId,
         },
-        body: JSON.stringify({ prompt, generationConfig }),
+        body: JSON.stringify({ prompt, generationConfig, provider }),
         signal: controller.signal,
       });
       clearTimeout(timer);

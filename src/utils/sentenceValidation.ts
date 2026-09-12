@@ -18,6 +18,12 @@ const ROLE_ALIASES: Record<string, SyntaxRole> = {
 
 const normalize = (value: string) => value.trim().toLocaleLowerCase();
 
+// Structural fingerprint used to dedupe near-identical sentences that differ by
+// one token (e.g. swapped adjective) but are otherwise the same template. Case,
+// punctuation and spacing differences alone must NOT count as "different".
+export const sentenceFingerprint = (languageLabel: string, sentenceText: string): string =>
+  `${normalize(languageLabel)}:${normalize(sentenceText).replace(/[.,;:!?"«»„“”()]/gu, '').replace(/\s+/g, ' ').trim()}`;
+
 export interface ValidationResult {
   sentences: Sentence[];
   errors: string[];

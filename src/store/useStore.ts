@@ -7,6 +7,7 @@ import wordsData from '../data/words.json';
 import sentencesData from '../data/sentences.json';
 
 import { getWordTranslation } from '../utils/words';
+import { sentenceFingerprint } from '../utils/sentenceValidation';
 
 interface TargetSentenceInfo {
   langCode: string;
@@ -443,8 +444,17 @@ export const useStore = create<AppState>()(
 
       addGeneratedSentences: (newSentences) => {
         set((state) => {
-          const knownTexts = new Set(state.sentences.map(sentence => `${sentence.language}:${sentence.sentence}`));
-          const uniqueSentences = newSentences.filter(sentence => !knownTexts.has(`${sentence.language}:${sentence.sentence}`));
+          // Normalized fingerprint (case/punctuation/spacing-insensitive) so a
+          // "lite" model regenerating near-identical templates doesn't silently
+          // pad the pool with sentences that only look distinct to a string diff.
+          const knownFingerprints = new Set(state.sentences.map(sentence => sentenceFingerprint(sentence.language, sentence.sentence)));
+          const uniqueSentences: typeof newSentences = [];
+          for (const sentence of newSentences) {
+            const fp = sentenceFingerprint(sentence.language, sentence.sentence);
+            if (knownFingerprints.has(fp)) continue;
+            knownFingerprints.add(fp);
+            uniqueSentences.push(sentence);
+          }
           if (uniqueSentences.length === 0) return {};
 
           // Cap the stored pool so an old weak batch ages out instead of looping forever.

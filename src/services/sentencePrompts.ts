@@ -235,12 +235,16 @@ const varietyLine = (count: number): string => {
 export const buildSentenceGenerationPrompt = (
   languageCode: string,
   candidates: DictionaryCandidate[],
-  count: number
+  count: number,
+  avoidSentences: string[] = []
 ) => {
   const language = getLanguagePrompt(languageCode);
   const languageLabel = LANGUAGES.find(item => item.code === languageCode)?.label || language.label;
   const dictionary = candidates.map(item => `- ${item.lemma} — ${item.translation || 'перевод уточнить'}`).join('\n');
   const example = LANGUAGE_EXAMPLES[languageCode] || LANGUAGE_EXAMPLES.en;
+  const avoidBlock = avoidSentences.length > 0
+    ? `\nDO NOT repeat these sentences or their templates (same structure with one word swapped) — invent genuinely different situations, subjects and verbs:\n${avoidSentences.map(s => `- ${s}`).join('\n')}\n`
+    : '';
 
   return `You generate learning data for the Papanda Sentence Trainer, which teaches sentence structure top-down: first find the members of the sentence (predicate, subject, attributes, object, adverbials), then the meaningful parts inside each word. Return ONLY the JSON array required by the response schema — no prose, no Markdown.
 
@@ -262,6 +266,7 @@ ${language.grammar}
 
 DICTIONARY — only these lemmas may get is_in_my_dict: true. Keep their spelling exactly:
 ${dictionary}
+${avoidBlock}
 
 TOKEN CONTRACT (one token per whitespace-separated word, in reading order):
 - "language" of every sentence object is exactly "${languageLabel}".
