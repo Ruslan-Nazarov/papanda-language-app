@@ -7,8 +7,12 @@ workers_dev = true
 # DEFAULT_PROVIDER selects which upstream is used when the app doesn't ask for a
 # specific one: "gemini" | "cerebras" | "groq". Only the matching *_API_KEY secret
 # needs to be set for whichever provider(s) you actually use.
+# FALLBACK_PROVIDER is tried automatically (same request) if the primary call
+# fails or comes back empty — a Gemini outage/quota hit no longer fails the
+# request outright, it silently retries on Cerebras.
 [vars]
 DEFAULT_PROVIDER = "gemini"
+FALLBACK_PROVIDER = "cerebras"
 GEMINI_MODEL = "gemini-3.5-flash-lite"
 CEREBRAS_MODEL = "gpt-oss-120b"
 GROQ_MODEL = "openai/gpt-oss-120b"

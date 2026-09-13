@@ -15,6 +15,7 @@ export interface Env {
 
   // Vars — change provider/model without an app release.
   DEFAULT_PROVIDER?: string; // 'gemini' | 'cerebras' | 'groq', default 'gemini'
+  FALLBACK_PROVIDER?: string; // tried automatically if DEFAULT_PROVIDER's call fails, default 'cerebras'
   GEMINI_MODEL?: string;
   CEREBRAS_MODEL?: string;
   GROQ_MODEL?: string;
@@ -208,6 +209,32 @@ async function callOpenAiCompatible(
   return { ok: true, text, finishReason: normalizedFinish };
 }
 
+/** One attempt against a single provider, with its own timeout. */
+async function callProvider(
+  provider: Provider,
+  apiKey: string,
+  model: string,
+  prompt: string,
+  cfg: GenerationConfig
+): Promise<UpstreamResult | UpstreamError> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 40_000);
+  try {
+    return provider === 'gemini'
+      ? await callGemini(apiKey, model, prompt, cfg, controller.signal)
+      : await callOpenAiCompatible(
+          provider === 'cerebras' ? CEREBRAS_URL : GROQ_URL,
+          apiKey,
+          model,
+          prompt,
+          cfg,
+          controller.signal
+        );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -275,30 +302,33 @@ export default {
       return json({ error: 'Дневной лимит генерации для этого устройства исчерпан.', code: 'INSTALL_DAILY', retryable: false, daily: true }, 429);
     }
 
-    // ---- forward to the chosen provider ----
-    const model = modelFor(provider, env);
-    let result: UpstreamResult | UpstreamError;
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 40_000);
+    // ---- forward to the chosen provider, falling back to a backup provider on
+    // a transient failure (network error, quota, overload, or empty output) so
+    // a single provider's outage/rate-limit doesn't fail every request. ----
+    const fallbackProvider = (env.FALLBACK_PROVIDER as Provider) || 'cerebras';
+    const fallbackApiKey = PROVIDERS.includes(fallbackProvider) ? apiKeyFor(fallbackProvider, env) : undefined;
+    const attempts: Provider[] =
+      fallbackProvider !== provider && fallbackApiKey ? [provider, fallbackProvider] : [provider];
+
+    let result: UpstreamResult | UpstreamError = { ok: false, status: 502, message: 'Не удалось связаться с сервисом генерации.' };
+    let usedProvider: Provider = provider;
+
+    for (const attemptProvider of attempts) {
+      const attemptKey = attemptProvider === provider ? apiKey : (fallbackApiKey as string);
+      const attemptModel = modelFor(attemptProvider, env);
       try {
-        result =
-          provider === 'gemini'
-            ? await callGemini(apiKey, model, prompt, generationConfig, controller.signal)
-            : await callOpenAiCompatible(
-                provider === 'cerebras' ? CEREBRAS_URL : GROQ_URL,
-                apiKey,
-                model,
-                prompt,
-                generationConfig,
-                controller.signal,
-              );
-      } finally {
-        clearTimeout(timer);
+        result = await callProvider(attemptProvider, attemptKey, attemptModel, prompt, generationConfig);
+      } catch {
+        result = { ok: false, status: 502, message: 'Не удалось связаться с сервисом генерации.' };
       }
-    } catch {
-      return json({ error: 'Не удалось связаться с сервисом генерации.', retryable: true }, 502);
+      usedProvider = attemptProvider;
+
+      const succeeded = result.ok && Boolean(result.text);
+      const isLastAttempt = attemptProvider === attempts[attempts.length - 1];
+      if (succeeded || isLastAttempt) break;
+      // Otherwise: this attempt failed or came back empty — fall through to the next provider.
     }
+    void usedProvider; // kept for future logging/telemetry
 
     if (!result.ok) {
       const isQuota = result.status === 429;
