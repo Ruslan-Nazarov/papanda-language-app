@@ -7,6 +7,7 @@ import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { wordMemoryWeight } from '../utils/statistics';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 interface QueueItem {
   word: Word;
@@ -82,45 +83,68 @@ export default function BrainWorkoutScreen() {
   // Generate workout queue
   useEffect(() => {
     if (words.length > 0 && activeLanguages.length > 0) {
-      const unlearnedItems: (QueueItem & {isFailed: boolean})[] = [];
+      const failedItems: QueueItem[] = [];
+      const newItems: QueueItem[] = [];
       const learnedItems: QueueItem[] = [];
-      
+
       words.forEach(w => {
         activeLanguages.forEach(langCode => {
           const hasTranslation = Boolean(getWordTranslation(w, langCode));
           if (!hasTranslation) return;
-          
+
           if (workoutFavoritesOnly && !w.is_favorite) return;
 
           const stats = w.knowledge_stats as Record<string, boolean>;
           const isKnown = stats && stats[langCode] === true;
           const isFailed = stats && stats[langCode] === false;
-          
+
           if (isKnown) {
             learnedItems.push({ word: w, langCode });
+          } else if (isFailed) {
+            failedItems.push({ word: w, langCode });
           } else {
-            unlearnedItems.push({ word: w, langCode, isFailed });
+            newItems.push({ word: w, langCode });
           }
         });
       });
 
-      // Both queues: weakest memory weight first (least retained / most due for review),
+      // All queues: weakest memory weight first (least retained / most due for review),
       // with a little jitter so the order isn't fully deterministic.
       const now = Date.now();
       const dueScore = (it: QueueItem) => wordMemoryWeight(it.word, it.langCode, now) + Math.random() * 0.08;
 
-      unlearnedItems.sort((a, b) => {
-        if (a.isFailed !== b.isFailed) return a.isFailed ? -1 : 1;
-        return dueScore(a) - dueScore(b);
-      });
+      failedItems.sort((a, b) => dueScore(a) - dueScore(b));
       learnedItems.sort((a, b) => dueScore(a) - dueScore(b));
+      // Never-shown words all score 0 (see wordMemoryWeight) — shuffle instead of
+      // sorting so the same front-of-array words don't win every rebuild.
+      for (let i = newItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newItems[i], newItems[j]] = [newItems[j], newItems[i]];
+      }
 
       const numLearnedToTake = Math.min(workoutLearnedWordCount, learnedItems.length);
       const numUnlearnedToTake = workoutWordCount - numLearnedToTake;
 
+      // Split unlearned slots between "review" (previously failed, due for another
+      // shot) and "new" (never shown). Reserving a minimum share for new words
+      // stops a large failed backlog from crowding them out of every single
+      // session — before this, isFailed items always sorted ahead of new ones,
+      // so once you had more due failures than fit the window, new words never
+      // appeared again and the same hard words kept looping forever.
+      const numFailedToTake = Math.min(failedItems.length, Math.ceil(numUnlearnedToTake * 0.6));
+      let numNewToTake = numUnlearnedToTake - numFailedToTake;
+      let finalNumFailedToTake = numFailedToTake;
+      if (numNewToTake > newItems.length) {
+        finalNumFailedToTake = Math.min(failedItems.length, finalNumFailedToTake + (numNewToTake - newItems.length));
+        numNewToTake = newItems.length;
+      }
+
       // Pick from a window ~3x the size of what we need, then randomise inside it,
       // so consecutive workouts rotate through the "most due" region instead of
-      // replaying the exact same front-of-queue words every time.
+      // replaying the exact same front-of-queue words every time. The same word
+      // CAN legitimately appear twice in a batch (once per active language) —
+      // that's fine, each (word, language) pair has its own due score / known
+      // status driving how often it comes up.
       const pickFromWindow = <T,>(sorted: T[], take: number): T[] => {
         if (take <= 0) return [];
         const windowSize = Math.min(sorted.length, Math.max(take + 4, take * 3));
@@ -133,7 +157,8 @@ export default function BrainWorkoutScreen() {
       };
 
       let finalQueue: QueueItem[] = [
-        ...pickFromWindow(unlearnedItems, numUnlearnedToTake),
+        ...pickFromWindow(failedItems, finalNumFailedToTake),
+        ...newItems.slice(0, numNewToTake),
         ...pickFromWindow(learnedItems, numLearnedToTake),
       ];
 
@@ -584,17 +609,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   langBadge: {
-    backgroundColor: '#EBF5FF',
+    backgroundColor: ACCENT_LIGHT,
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#BEE3F8',
+    borderColor: ACCENT_BORDER,
   },
   langBadgeText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2B6CB0',
+    color: ACCENT_DARK,
   },
   progressPill: {
     backgroundColor: '#FFF',
@@ -679,22 +704,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statsCardBtn: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
+    backgroundColor: ACCENT_LIGHT,
+    borderColor: ACCENT_BORDER,
     borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 14,
   },
   statsCardBtnText: {
-    color: '#2563EB',
+    color: ACCENT_DARK,
     fontSize: 12,
     fontWeight: '700',
   },
   targetForeignWord: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: ACCENT,
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -775,13 +800,13 @@ const styles = StyleSheet.create({
   },
   backBtnIcon: {
     fontSize: 16,
-    color: '#007BFF',
+    color: ACCENT,
     marginRight: 4,
   },
   backBtnText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: ACCENT,
   },
   scoreKnown: {
     fontSize: 14,
@@ -943,7 +968,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   resultOkBtn: {
-    backgroundColor: '#007BFF',
+    backgroundColor: ACCENT,
     width: '100%',
     paddingVertical: 16,
     borderRadius: 14,
@@ -975,7 +1000,7 @@ const styles = StyleSheet.create({
   statsModalWord: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: ACCENT,
     textAlign: 'center',
     marginTop: 6,
     marginBottom: 18,
@@ -1044,7 +1069,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   statsCloseBtn: {
-    backgroundColor: '#007BFF',
+    backgroundColor: ACCENT,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',

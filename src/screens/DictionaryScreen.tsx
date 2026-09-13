@@ -7,6 +7,7 @@ import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
@@ -194,15 +195,15 @@ const styles = StyleSheet.create({
     color: '#212529',
   },
   addBtn: {
-    backgroundColor: '#EBF5FF',
+    backgroundColor: ACCENT_LIGHT,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#BEE3F8',
+    borderColor: ACCENT_BORDER,
   },
   addBtnText: {
-    color: '#2B6CB0',
+    color: ACCENT_DARK,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: ACCENT,
   },
   assocBox: {
     marginTop: 10,
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
   },
   assocEditLink: {
     fontSize: 12,
-    color: '#007BFF',
+    color: ACCENT,
     fontWeight: '600',
   },
   assocContent: {

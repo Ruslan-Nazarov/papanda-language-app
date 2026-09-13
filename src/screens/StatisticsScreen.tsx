@@ -15,6 +15,7 @@ import {
   calculateKnowledgeDistribution,
   calculateFamiliarWordsEfficiency
 } from '../utils/statistics';
+import { ACCENT, ACCENT_DARK } from '../constants/theme';
 
 const LANG_COLORS: Record<string, string> = {
   en: '#6366F1', it: '#10B981', de: '#EAB308', es: '#EC4899', fr: '#F97316', kz: '#0EA5E9', la: '#8B5CF6'
@@ -190,7 +191,7 @@ export default function StatisticsScreen() {
           <Text style={styles.tileLabel}>выучено полностью</Text>
         </View>
         <View style={styles.tile}>
-          <Text style={[styles.tileValue, { color: '#2563EB' }]}>{summary.today}</Text>
+          <Text style={[styles.tileValue, { color: ACCENT_DARK }]}>{summary.today}</Text>
           <Text style={styles.tileLabel}>показов сегодня</Text>
         </View>
       </View>
@@ -259,7 +260,7 @@ export default function StatisticsScreen() {
         icon="🎯"
         title="Эффективность тренировок"
         defaultOpen={efficiency.length > 0}
-        help="Доля верных ответов («Знаю») в тренировках по дням. Несколько тренировок за один день объединяются в одну точку. Переключатель «Верных ответов» показывает то же самое в штуках (верно / всего). Растущая линия — материал закрепляется; проседания — набрал слишком много новых слов сразу."
+        help="Доля верных ответов («Знаю») в тренировках по дням. Несколько тренировок за один день объединяются в одну точку. Режим «Ответы (шт.)» показывает то же самое в штуках (верно / всего). Растущая линия — материал закрепляется; проседания — набрал слишком много новых слов сразу."
       >
         {efficiency.length === 0 ? (
           <Text style={styles.emptyText}>Пройдите тренировку в разделе «Тренировка», чтобы увидеть график.</Text>
@@ -270,13 +271,13 @@ export default function StatisticsScreen() {
                 style={[styles.modeBtn, efficiencyMode === 'percentage' && styles.modeBtnActive]}
                 onPress={() => setEfficiencyMode('percentage')}
               >
-                <Text style={[styles.modeBtnText, efficiencyMode === 'percentage' && styles.modeBtnTextActive]}>Доля верных</Text>
+                <Text style={[styles.modeBtnText, efficiencyMode === 'percentage' && styles.modeBtnTextActive]}>Точность (%)</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modeBtn, efficiencyMode === 'absolute' && styles.modeBtnActive]}
                 onPress={() => setEfficiencyMode('absolute')}
               >
-                <Text style={[styles.modeBtnText, efficiencyMode === 'absolute' && styles.modeBtnTextActive]}>Верных ответов</Text>
+                <Text style={[styles.modeBtnText, efficiencyMode === 'absolute' && styles.modeBtnTextActive]}>Ответы (шт.)</Text>
               </TouchableOpacity>
             </View>
             {efficiency.map((e, i) => (
@@ -285,7 +286,7 @@ export default function StatisticsScreen() {
                 label={e.shortDate}
                 value={efficiencyMode === 'percentage' ? e.percentage : e.absolute}
                 max={efficiencyMode === 'percentage' ? 100 : efficiencyAbsMax}
-                color="#3B82F6"
+                color={ACCENT}
                 valueText={efficiencyMode === 'percentage' ? `${Math.round(e.percentage)}%` : `${e.absolute}/${e.total}`}
               />
             ))}
@@ -341,7 +342,7 @@ export default function StatisticsScreen() {
           />
         ))}
         <View style={styles.divider} />
-        <BarRow label="Итого" value={imw.overall} max={100} color="#2563EB" valueText={`${imw.overall.toFixed(0)}%`} />
+        <BarRow label="Итого" value={imw.overall} max={100} color={ACCENT_DARK} valueText={`${imw.overall.toFixed(0)}%`} />
       </Section>
 
       {/* Frequent words */}
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
   helpCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, maxWidth: 420, width: '100%' },
   helpTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', marginBottom: 10 },
   helpText: { fontSize: 14, color: '#475569', lineHeight: 21 },
-  helpClose: { marginTop: 18, alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 10, backgroundColor: '#2563EB' },
+  helpClose: { marginTop: 18, alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 10, backgroundColor: ACCENT },
   helpCloseText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
 
   sectionNote: { fontSize: 12, color: '#94A3B8', marginTop: 10, lineHeight: 17 },
@@ -434,7 +435,7 @@ const styles = StyleSheet.create({
   activityCol: { flex: 1, alignItems: 'center', height: '100%', justifyContent: 'flex-end' },
   activityValue: { fontSize: 9, color: '#64748B', fontWeight: '600', marginBottom: 3 },
   activityTrack: { width: 12, flex: 1, backgroundColor: '#F1F5F9', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
-  activityFill: { width: '100%', backgroundColor: '#3B82F6', borderRadius: 4 },
+  activityFill: { width: '100%', backgroundColor: ACCENT, borderRadius: 4 },
   activityDay: { fontSize: 9, color: '#94A3B8', marginTop: 5 },
 
   modeToggle: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 10, padding: 3, marginBottom: 14, alignSelf: 'flex-start' },

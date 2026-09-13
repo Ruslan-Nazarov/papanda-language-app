@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { ACCENT } from './src/constants/theme';
 
 import WordTriplesScreen from './src/screens/WordTriplesScreen';
 import SentenceTrainerScreen from './src/screens/SentenceTrainerScreen';
@@ -99,7 +100,7 @@ function MainTabs() {
               <View
                 style={[
                   tabStyles.centerButton,
-                  { backgroundColor: focused ? '#007BFF' : '#334155' },
+                  { backgroundColor: focused ? ACCENT : '#334155' },
                 ]}
               >
                 <Text style={tabStyles.centerEmoji}>{TAB_EMOJI[route.name]}</Text>
@@ -109,7 +110,7 @@ function MainTabs() {
                 {TAB_EMOJI[route.name] ?? '📌'}
               </Text>
             ),
-          tabBarActiveTintColor: '#007BFF',
+          tabBarActiveTintColor: ACCENT,
           tabBarInactiveTintColor: '#8E8E93',
           headerShown: false,
           tabBarStyle: {
@@ -203,7 +204,7 @@ const boundaryStyles = StyleSheet.create({
   emoji: { fontSize: 44, marginBottom: 12 },
   title: { fontSize: 20, fontWeight: 'bold', color: '#1A202C', marginBottom: 8 },
   sub: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 20, marginBottom: 20 },
-  button: { backgroundColor: '#007BFF', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12 },
+  button: { backgroundColor: ACCENT, paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12 },
   buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 15 },
   details: { marginTop: 20, maxHeight: 220, alignSelf: 'stretch' },
   detailsText: { fontSize: 11, color: '#94A3B8', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },

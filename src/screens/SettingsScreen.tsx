@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
 import { exportProgressToFile, importProgressFromFile } from '../services/backupService';
+import { ACCENT, ACCENT_LIGHT } from '../constants/theme';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 const ONBOARDING_KEY = 'papanda-onboarded';
@@ -202,11 +203,11 @@ export default function SettingsScreen() {
           </Text>
           <TouchableOpacity style={styles.row} onPress={handleExport} disabled={isExporting}>
             <Text style={styles.rowText}>📤 Экспортировать прогресс</Text>
-            {isExporting && <ActivityIndicator size="small" color="#007BFF" />}
+            {isExporting && <ActivityIndicator size="small" color={ACCENT} />}
           </TouchableOpacity>
           <TouchableOpacity style={styles.row} onPress={handleImport} disabled={isImporting}>
             <Text style={styles.rowText}>📥 Импортировать прогресс</Text>
-            {isImporting && <ActivityIndicator size="small" color="#007BFF" />}
+            {isImporting && <ActivityIndicator size="small" color={ACCENT} />}
           </TouchableOpacity>
         </View>
 
@@ -256,9 +257,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
-  rowActive: { borderColor: '#007BFF', backgroundColor: '#EBF5FF' },
+  rowActive: { borderColor: ACCENT, backgroundColor: ACCENT_LIGHT },
   rowText: { fontSize: 15, fontWeight: '600', color: '#2D3748' },
-  check: { color: '#007BFF', fontWeight: 'bold', fontSize: 16 },
+  check: { color: ACCENT, fontWeight: 'bold', fontSize: 16 },
   orderControls: { flexDirection: 'row', gap: 8 },
   orderBtn: { padding: 6, backgroundColor: '#EDF2F7', borderRadius: 8, minWidth: 38, alignItems: 'center' },
   orderBtnText: { fontSize: 16 },
@@ -290,8 +291,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionChipActive: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
+    backgroundColor: ACCENT,
+    borderColor: ACCENT,
   },
   optionChipText: {
     fontSize: 15,

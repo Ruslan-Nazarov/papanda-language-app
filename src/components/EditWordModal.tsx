@@ -4,6 +4,7 @@ import { Word } from '../models/types';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
 import { getWordTranslation } from '../utils/words';
+import { ACCENT } from '../constants/theme';
 
 interface EditWordModalProps {
   visible: boolean;
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modalSave: {
-    backgroundColor: '#007BFF',
+    backgroundColor: ACCENT,
   },
   modalSaveText: {
     color: '#FFF',

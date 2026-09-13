@@ -10,6 +10,7 @@ import { getWordTranslation } from '../utils/words';
 import { wordMemoryWeight } from '../utils/statistics';
 import { auditNextWordInBackground } from '../services/wordAuditService';
 import { prefetchSentencesInBackground } from '../services/sentencePrefetch';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 type WordStats = Record<string, boolean | number>;
 
@@ -32,7 +33,7 @@ const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | und
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { words, activeLanguages, markTripleKnown, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress } = useStore();
+  const { words, activeLanguages, markTripleKnown, recordTripleCardShow, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -107,6 +108,7 @@ export default function WordTriplesScreen() {
 
     setCurrentWord(chosen);
     setAssociationText(chosen.personal_association || '');
+    recordTripleCardShow(chosen.eng || chosen.word || '');
   };
 
   useEffect(() => {
@@ -378,7 +380,7 @@ export default function WordTriplesScreen() {
           {/* Large Centered Words with Subtle Side Badges */}
           <View style={styles.langsContainer}>
             {activeLanguages.map(lang => {
-              const translation = getWordTranslation(currentWord, lang) || '—';
+              const translation = getWordTranslation(currentWord, lang);
               const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
 
               return (
@@ -389,10 +391,18 @@ export default function WordTriplesScreen() {
                     <Text style={styles.sideLangCode}>{lang.toUpperCase()}</Text>
                   </View>
 
-                  {/* Prominent Centered Translation */}
-                  <View style={styles.wordCenterContainer}>
-                    <Text style={styles.langTranslation} numberOfLines={2}>{translation}</Text>
-                  </View>
+                  {/* Prominent Centered Translation — tap to practise it in a generated sentence */}
+                  <TouchableOpacity
+                    style={styles.wordCenterContainer}
+                    activeOpacity={translation ? 0.6 : 1}
+                    disabled={!translation}
+                    onPress={() => {
+                      setTargetSentenceInfo({ langCode: lang, highlightWord: translation });
+                      navigation.navigate('Sentence Trainer');
+                    }}
+                  >
+                    <Text style={styles.langTranslation} numberOfLines={2}>{translation || '—'}</Text>
+                  </TouchableOpacity>
                 </View>
               );
             })}
@@ -568,15 +578,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   statsCardBtn: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
+    backgroundColor: ACCENT_LIGHT,
+    borderColor: ACCENT_BORDER,
     borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 14,
   },
   statsCardBtnText: {
-    color: '#2563EB',
+    color: ACCENT_DARK,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -667,7 +677,7 @@ const styles = StyleSheet.create({
   },
   langTranslation: { 
     fontSize: 24, 
-    color: '#007BFF', 
+    color: ACCENT, 
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -777,7 +787,7 @@ const styles = StyleSheet.create({
   statsModalWord: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: ACCENT,
     textAlign: 'center',
     marginTop: 6,
     marginBottom: 18,
@@ -846,7 +856,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   statsCloseBtn: {
-    backgroundColor: '#007BFF',
+    backgroundColor: ACCENT,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',

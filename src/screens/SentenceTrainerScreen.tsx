@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator, Alert, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator, Alert, PanResponder, Animated, Easing, LayoutAnimation, UIManager } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { SyntaxRole, Token, Word } from '../models/types';
@@ -7,11 +7,18 @@ import { LANGUAGES } from '../constants/languages';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { explainSentenceWithAI } from '../services/aiService';
-import { generateSentenceBatch, isSentenceGenerationConfigured } from '../services/sentenceGeneration';
+import { generateSentenceBatch, isSentenceGenerationConfigured, RequiredWord } from '../services/sentenceGeneration';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 import { computeSentenceGroups } from '../utils/sentenceGroups';
+import { ACCENT, ACCENT_DARK } from '../constants/theme';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const REVEAL_ANIMATION = LayoutAnimation.create(220, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity);
 
 const STRICT_ORDER: SyntaxRole[] = [
   'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
@@ -57,7 +64,7 @@ const getRoleColor = (role: SyntaxRole) => {
 export default function SentenceTrainerScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned } = useStore();
+  const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned, incrementShowCount } = useStore();
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
   // How many role-groups are revealed; 0 = fully hidden, >= orderedGroups.length = fully revealed.
   const [revealedSteps, setRevealedSteps] = useState(0);
@@ -82,21 +89,77 @@ export default function SentenceTrainerScreen() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationErrors, setGenerationErrors] = useState<Record<string, string>>({});
   const [addedTokenKeys, setAddedTokenKeys] = useState<Set<string>>(new Set());
+  // Set while chasing a word tapped elsewhere (e.g. Word Triples) into a freshly
+  // generated sentence — cleared once a matching sentence is found or generation
+  // gives up.
+  const [pendingHighlightWord, setPendingHighlightWord] = useState<string | null>(null);
   const generatingLanguages = useRef(new Set<string>());
   const swipeCallbacks = useRef({ next: () => {}, prev: () => {} });
+  const cardTranslateX = useRef(new Animated.Value(0)).current;
+  const isSwipeAnimating = useRef(false);
+  const SWIPE_THRESHOLD = 60;
+  const SWIPE_EXIT_DISTANCE = 420;
+  const SWIPE_ENTRY_OFFSET = 48;
+
+  const resetCardPosition = () => {
+    if (isSwipeAnimating.current) return;
+    Animated.spring(cardTranslateX, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 5 }).start();
+  };
+
+  const animateSwipe = (direction: 'left' | 'right') => {
+    if (isSwipeAnimating.current) return;
+    isSwipeAnimating.current = true;
+    const exitDirection = direction === 'left' ? -1 : 1;
+    Animated.timing(cardTranslateX, {
+      toValue: exitDirection * SWIPE_EXIT_DISTANCE,
+      duration: 200,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (!finished) {
+        isSwipeAnimating.current = false;
+        return;
+      }
+      cardTranslateX.setValue(-exitDirection * SWIPE_ENTRY_OFFSET);
+      if (direction === 'left') swipeCallbacks.current.next();
+      else swipeCallbacks.current.prev();
+      requestAnimationFrame(() => {
+        Animated.spring(cardTranslateX, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 4 }).start(() => {
+          isSwipeAnimating.current = false;
+        });
+      });
+    });
+  };
+
+  // A 1:1 dx>dy ratio effectively demanded a near-perfectly horizontal drag —
+  // any natural diagonal wobble (very common on a touchscreen) failed to
+  // register, especially inside a vertically-scrolling ScrollView that's also
+  // eligible to claim the gesture. Lower the distance needed and require only
+  // that horizontal clearly dominates (1.4x), same ratio used by the other
+  // swipeable screens (Word Triples, Brain Workout) where this feels natural.
+  // onMoveShouldSetPanResponderCapture claims the gesture in the capture phase,
+  // before the ScrollView's own scroll responder gets a chance to grab it.
+  const isHorizontalSwipe = (gestureState: { dx: number; dy: number }) =>
+    Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.4;
+
   const sentencePanResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_event, gestureState) => (
-        Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
-      ),
+      onMoveShouldSetPanResponder: (_event, gestureState) => isHorizontalSwipe(gestureState),
+      onMoveShouldSetPanResponderCapture: (_event, gestureState) => isHorizontalSwipe(gestureState),
+      onPanResponderMove: (_event, gestureState) => {
+        if (!isSwipeAnimating.current) cardTranslateX.setValue(gestureState.dx);
+      },
       onPanResponderRelease: (_event, gestureState) => {
-        if (gestureState.dx < -50) {
-          swipeCallbacks.current.next();
-        } else if (gestureState.dx > 50) {
-          swipeCallbacks.current.prev();
+        if (gestureState.dx < -SWIPE_THRESHOLD) {
+          animateSwipe('left');
+        } else if (gestureState.dx > SWIPE_THRESHOLD) {
+          animateSwipe('right');
+        } else {
+          resetCardPosition();
         }
-      }
+      },
+      onPanResponderTerminate: () => resetCardPosition(),
     })
   ).current;
 
@@ -133,7 +196,7 @@ export default function SentenceTrainerScreen() {
   const filteredSentences = activeGenerated.length > 0 ? activeGenerated : fallbackSentences;
   const showingGenerated = activeGenerated.length > 0;
 
-  const generateSentences = async (languageCode = selectedLanguageCode, count = GENERATION_BATCH) => {
+  const generateSentences = async (languageCode = selectedLanguageCode, count = GENERATION_BATCH, requiredWord?: RequiredWord) => {
     const language = LANGUAGES.find(item => item.code === languageCode);
     if (!language || generatingLanguages.current.has(languageCode)) return;
 
@@ -147,7 +210,7 @@ export default function SentenceTrainerScreen() {
     });
 
     try {
-      const generated = await generateSentenceBatch(languageCode, words, count);
+      const generated = await generateSentenceBatch(languageCode, words, count, requiredWord);
       addGeneratedSentences(generated);
       if (languageCode === selectedLanguageCode && generatedSentences.length === 0) {
         setCurrentFilteredIndex(0);
@@ -155,6 +218,10 @@ export default function SentenceTrainerScreen() {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Не удалось сгенерировать предложения.';
       setGenerationErrors(previous => ({ ...previous, [languageCode]: message }));
+      if (requiredWord) {
+        setPendingHighlightWord(null);
+        Alert.alert('Не удалось создать предложение', `Не получилось составить предложение со словом «${requiredWord.lemma}». Попробуйте ещё раз.`);
+      }
     } finally {
       generatingLanguages.current.delete(languageCode);
       setIsGenerating(false);
@@ -186,31 +253,73 @@ export default function SentenceTrainerScreen() {
 
   // Handle incoming target sentence from WordTriples or other screens
   useEffect(() => {
-    if (targetSentenceInfo) {
-      const { langCode, sentenceId } = targetSentenceInfo;
-      if (langCode && langCode !== selectedLanguageCode) {
-        setSelectedLanguageCode(langCode);
-      }
-      
+    if (!targetSentenceInfo) return;
+    const { langCode, sentenceId, highlightWord } = targetSentenceInfo;
+
+    // Wait for the language switch to actually take effect before doing
+    // anything language-dependent below (sentence lookup, generation).
+    if (langCode && langCode !== selectedLanguageCode) {
+      setSelectedLanguageCode(langCode);
+      return;
+    }
+
+    if (sentenceId) {
       const langObj = LANGUAGES.find(l => l.code === langCode);
-      const sentencesForLang = sentences.filter(s => 
+      const sentencesForLang = sentences.filter(s =>
         s.language && langObj && s.language.toLowerCase().includes(langObj.label.toLowerCase())
       );
-      
-      if (sentenceId) {
-        const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
-        if (foundIdx !== -1) {
-          setCurrentFilteredIndex(foundIdx);
-          setRevealedSteps(FULLY_REVEALED);
-          setShowTranslations(true);
-        }
+      const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
+      if (foundIdx !== -1) {
+        setCurrentFilteredIndex(foundIdx);
+        setRevealedSteps(FULLY_REVEALED);
+        setShowTranslations(true);
       }
-      
-      // Clear target so user can freely navigate afterward
       setTargetSentenceInfo(null);
+      return;
     }
-  }, [targetSentenceInfo, sentences]);
-  
+
+    if (highlightWord) {
+      // Tapped a word elsewhere: chase a sentence containing it. The matching
+      // effect below watches filteredSentences and jumps once one shows up;
+      // trigger a targeted generation to produce one.
+      setPendingHighlightWord(highlightWord);
+      setTargetSentenceInfo(null);
+      const wordEntry = words.find(w => getWordTranslation(w, langCode) === highlightWord);
+      void generateSentences(langCode, GENERATION_BATCH, { lemma: highlightWord, translation: wordEntry?.ru });
+      return;
+    }
+
+    setTargetSentenceInfo(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetSentenceInfo, sentences, selectedLanguageCode]);
+
+  // Once the required word shows up in a freshly generated sentence, jump to it.
+  useEffect(() => {
+    if (!pendingHighlightWord) return;
+    const normalized = pendingHighlightWord.trim().toLocaleLowerCase();
+    const idx = filteredSentences.findIndex(s => s.words.some(t => {
+      const forms = [t.dictionary_form, t.dictionary_word, t.text].filter(Boolean) as string[];
+      return forms.some(f => f.trim().toLocaleLowerCase() === normalized);
+    }));
+    if (idx !== -1) {
+      setCurrentFilteredIndex(idx);
+      setRevealedSteps(FULLY_REVEALED);
+      setShowTranslations(true);
+      setPendingHighlightWord(null);
+    }
+  }, [filteredSentences, pendingHighlightWord]);
+
+  // Generation finished (successfully) but the word still isn't in any sentence —
+  // give up chasing it rather than leaving the screen silently stuck.
+  useEffect(() => {
+    if (!isGenerating && pendingHighlightWord && !generationErrors[selectedLanguageCode]) {
+      const word = pendingHighlightWord;
+      setPendingHighlightWord(null);
+      Alert.alert('Не удалось создать предложение', `ИИ не включил слово «${word}» ни в одно из предложений. Попробуйте ещё раз позже.`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGenerating]);
+
   // When a fresh session batch replaces the cached view (or on any set change
   // that leaves the index out of range), jump back to the first sentence.
   const showingSessionBatch = sessionGenerated.length > 0;
@@ -301,6 +410,19 @@ export default function SentenceTrainerScreen() {
     });
   };
 
+  // Count a show for every dictionary word in the sentence being displayed —
+  // once per sentence view, same as a Triples card, not per interaction.
+  useEffect(() => {
+    if (!currentSentence) return;
+    currentSentence.words.forEach(token => {
+      const match = findWordInStore(token);
+      if (match) {
+        incrementShowCount(match.eng || match.word || '', selectedLanguageCode);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSentence?.id, selectedLanguageCode]);
+
   const handleTokenPress = (token: Token) => {
     const rawForm = token.dictionary_form || token.dictionary_word || token.text;
     const cleanForm = (rawForm || '').replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '').trim();
@@ -336,11 +458,29 @@ export default function SentenceTrainerScreen() {
     [currentSentence]
   );
 
+  // Per-token badge numbers, unique within each clause. A role-group can hold
+  // several tokens (e.g. two articles revealed together) — numbering them by
+  // group alone would print the same number on two different cards, which
+  // reads as a mistake. Count tokens instead, restarting at 1 per clause.
+  const tokenBadgeNumbers = React.useMemo(() => {
+    const map = new Map<number, number>();
+    const clauseCounters = new Map<number, number>();
+    orderedGroups.forEach(group => {
+      group.tokenIndices.forEach(ti => {
+        const next = (clauseCounters.get(group.clauseIndex) || 0) + 1;
+        clauseCounters.set(group.clauseIndex, next);
+        map.set(ti, next);
+      });
+    });
+    return map;
+  }, [orderedGroups]);
+
   // Reveals one more role-group per press; once everything is shown, the next
   // press hides it all again so the sentence can be quizzed again. Moving to a
   // different sentence is swipe-only (see swipeCallbacks).
   const handleReveal = () => {
     if (!currentSentence) return;
+    LayoutAnimation.configureNext(REVEAL_ANIMATION);
     if (revealedSteps < orderedGroups.length) {
       setRevealedSteps(prev => prev + 1);
     } else {
@@ -495,14 +635,6 @@ export default function SentenceTrainerScreen() {
     setModalVisible(false);
   };
 
-  // The reveal badge counts groups WITHIN their own clause — a complex sentence's
-  // second clause restarts at 1.
-  const clauseLocalNumber = (groupIndex: number): number => {
-    const group = groupIndex >= 0 ? orderedGroups[groupIndex] : undefined;
-    if (!group) return groupIndex + 1;
-    return orderedGroups.filter(g => g.clauseIndex === group.clauseIndex).indexOf(group) + 1;
-  };
-
   const renderToken = (token: Token, index: number) => {
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
     const isRevealed = groupIndex < revealedSteps;
@@ -510,7 +642,7 @@ export default function SentenceTrainerScreen() {
     // second colored frame so the clause boundary reads at a glance.
     const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
     const secondaryClause = clauseIndex >= 1;
-    const badgeNumber = clauseLocalNumber(groupIndex);
+    const badgeNumber = tokenBadgeNumbers.get(index) ?? groupIndex + 1;
 
     const card = isRevealed ? (
           <TouchableOpacity
@@ -579,7 +711,7 @@ export default function SentenceTrainerScreen() {
     const isRevealed = groupIndex < revealedSteps;
     const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
     const secondaryClause = clauseIndex >= 1;
-    const badgeNumber = clauseLocalNumber(groupIndex);
+    const badgeNumber = tokenBadgeNumbers.get(index) ?? groupIndex + 1;
 
     const card = isRevealed ? (
             <TouchableOpacity
@@ -698,35 +830,47 @@ export default function SentenceTrainerScreen() {
       </View>
       
       {filteredSentences.length > 0 ? (
-        <ScrollView
-          {...sentencePanResponder.panHandlers}
-          style={{flex: 1}}
-          contentContainerStyle={{flexGrow: 1}}
+        <Animated.View
+          style={{
+            flex: 1,
+            transform: [{ translateX: cardTranslateX }],
+            opacity: cardTranslateX.interpolate({
+              inputRange: [-SWIPE_EXIT_DISTANCE, -SWIPE_EXIT_DISTANCE / 2, 0, SWIPE_EXIT_DISTANCE / 2, SWIPE_EXIT_DISTANCE],
+              outputRange: [0.2, 0.85, 1, 0.85, 0.2],
+              extrapolate: 'clamp',
+            }),
+          }}
         >
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
-              {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
-            </Text>
+          <ScrollView
+            {...sentencePanResponder.panHandlers}
+            style={{flex: 1}}
+            contentContainerStyle={{flexGrow: 1}}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
+                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
+              </Text>
 
-            <View style={styles.swipeHintContainer}>
-              <Ionicons name="chevron-back" size={13} color="#94A3B8" />
-              <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
-              <Ionicons name="chevron-forward" size={13} color="#94A3B8" />
-            </View>
+              <View style={styles.swipeHintContainer}>
+                <Ionicons name="chevron-back" size={13} color="#94A3B8" />
+                <Text style={styles.swipeHintText}>свайп для смены предложения</Text>
+                <Ionicons name="chevron-forward" size={13} color="#94A3B8" />
+              </View>
 
-            <View style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}>
-              {isTableMode
-                ? currentSentence?.words?.map(renderTokenTableMode)
-                : currentSentence?.words?.map(renderToken)
-              }
+              <View style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}>
+                {isTableMode
+                  ? currentSentence?.words?.map(renderTokenTableMode)
+                  : currentSentence?.words?.map(renderToken)
+                }
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </Animated.View>
       ) : (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24}}>
           {isGenerating ? (
             <>
-              <ActivityIndicator size="large" color="#2563EB" />
+              <ActivityIndicator size="large" color={ACCENT_DARK} />
               <Text style={styles.generationStatus}>Готовим предложение с разбором…</Text>
             </>
           ) : (
@@ -777,7 +921,7 @@ export default function SentenceTrainerScreen() {
 
       {filteredSentences.length > 0 && isGenerating && (
         <View style={styles.generationProgress}>
-          <ActivityIndicator size="small" color="#2563EB" />
+          <ActivityIndicator size="small" color={ACCENT_DARK} />
           <Text style={styles.generationProgressText}>Подготавливаем новые предложения…</Text>
         </View>
       )}
@@ -829,7 +973,7 @@ export default function SentenceTrainerScreen() {
                     void generateSentences(selectedLanguageCode, GENERATION_BATCH);
                   }}
                 >
-                  <Ionicons name="sparkles" size={20} color="#2563EB" style={{marginRight: 10}} />
+                  <Ionicons name="sparkles" size={20} color={ACCENT_DARK} style={{marginRight: 10}} />
                   <Text style={styles.menuItemText}>Сгенерировать ещё (ИИ)</Text>
                 </TouchableOpacity>
 
@@ -986,7 +1130,7 @@ export default function SentenceTrainerScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
               {isAiLoading ? (
                 <View style={{padding: 40, alignItems: 'center'}}>
-                  <ActivityIndicator size="large" color="#007BFF" />
+                  <ActivityIndicator size="large" color={ACCENT} />
                   <Text style={{marginTop: 15, color: '#64748B'}}>Анализирую структуру...</Text>
                 </View>
               ) : (
@@ -1030,11 +1174,11 @@ const styles = StyleSheet.create({
   roleText: { fontSize: 10, fontWeight: '600', marginTop: 4, opacity: 0.8 },
   addToDictionaryBtn: { marginTop: 7, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
   addToDictionaryBtnAdded: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
-  addToDictionaryText: { fontSize: 10, color: '#2563EB', fontWeight: '700' },
+  addToDictionaryText: { fontSize: 10, color: ACCENT_DARK, fontWeight: '700' },
   addToDictionaryTextAdded: { color: '#15803D' },
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
-  button: { flex: 1, backgroundColor: '#007BFF', padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  button: { flex: 1, backgroundColor: ACCENT, padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   swipeHintContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1084,7 +1228,7 @@ const styles = StyleSheet.create({
   roleSelectBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', marginHorizontal: 4 },
   roleSelectText: { fontSize: 12, color: '#475569', fontWeight: '500' },
   langSelectBtn: { paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, backgroundColor: '#E0E0E0', marginHorizontal: 5 },
-  langSelectBtnActive: { backgroundColor: '#007BFF' },
+  langSelectBtnActive: { backgroundColor: ACCENT },
   langSelectText: { fontSize: 14, color: '#333' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
@@ -1097,12 +1241,12 @@ const styles = StyleSheet.create({
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#007BFF',
+    backgroundColor: ACCENT,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 12,
     marginTop: 20,
-    shadowColor: '#007BFF',
+    shadowColor: ACCENT,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 5,

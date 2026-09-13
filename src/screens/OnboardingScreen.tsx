@@ -9,10 +9,14 @@ import {
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SyntaxRole, Token } from '../models/types';
 import { computeSentenceGroups } from '../utils/sentenceGroups';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 const ROLE_RU: Record<SyntaxRole, string> = {
   Subject: 'Подлежащее',
@@ -50,6 +54,11 @@ const roleColor = (role: SyntaxRole) => {
   }
 };
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+const REVEAL_ANIMATION = LayoutAnimation.create(300, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity);
+
 const EXAMPLE_TEXT = 'The girl reads a book';
 const EXAMPLE_META = 'английский · «Девочка читает книгу»';
 const EXAMPLE_TOKENS: Token[] = [
@@ -73,6 +82,15 @@ export default function OnboardingScreen({ onDone }: Props) {
   const PAGE_COUNT = 3;
 
   const groups = useMemo(() => computeSentenceGroups(EXAMPLE_TOKENS), []);
+  // A role-group can span more than one token (here: "The" and "a" are both
+  // Article) — number cards by token position, not by group, so two different
+  // cards never show the same badge number.
+  const cardNumbers = useMemo(() => {
+    const map = new Map<number, number>();
+    let n = 0;
+    groups.forEach(group => group.tokenIndices.forEach(ti => map.set(ti, ++n)));
+    return map;
+  }, [groups]);
   const [revealed, setRevealed] = useState(0);
   const exampleDone = revealed >= groups.length;
   const playTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -80,10 +98,12 @@ export default function OnboardingScreen({ onDone }: Props) {
 
   const playExample = () => {
     if (playTimer.current) clearInterval(playTimer.current);
+    LayoutAnimation.configureNext(REVEAL_ANIMATION);
     setRevealed(0);
     let n = 0;
     playTimer.current = setInterval(() => {
       n += 1;
+      LayoutAnimation.configureNext(REVEAL_ANIMATION);
       setRevealed(n);
       if (n >= groups.length && playTimer.current) {
         clearInterval(playTimer.current);
@@ -233,7 +253,7 @@ export default function OnboardingScreen({ onDone }: Props) {
                     style={[styles.wordCard, { borderColor: roleColor(token.role) }]}
                   >
                     <View style={[styles.orderBadge, { backgroundColor: roleColor(token.role) }]}>
-                      <Text style={styles.orderBadgeText}>{gi + 1}</Text>
+                      <Text style={styles.orderBadgeText}>{cardNumbers.get(ti) ?? gi + 1}</Text>
                     </View>
                     <Text style={styles.wordText}>{token.text}</Text>
                     <Text style={styles.translationText}>{token.translation}</Text>
@@ -351,21 +371,21 @@ const styles = StyleSheet.create({
   revealButton: {
     alignSelf: 'center',
     marginTop: 24,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: ACCENT_LIGHT,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: ACCENT_BORDER,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 24,
   },
-  revealButtonText: { color: '#2563EB', fontWeight: '700', fontSize: 15 },
+  revealButtonText: { color: ACCENT_DARK, fontWeight: '700', fontSize: 15 },
 
   dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 12 },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#CBD5E1' },
-  dotActive: { backgroundColor: '#2563EB', width: 20 },
+  dotActive: { backgroundColor: ACCENT, width: 20 },
 
   footer: { paddingHorizontal: 28, paddingTop: 4 },
-  primaryButton: { backgroundColor: '#007BFF', paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
+  primaryButton: { backgroundColor: ACCENT, paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
   primaryButtonMuted: { backgroundColor: '#94A3B8' },
   primaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
 });

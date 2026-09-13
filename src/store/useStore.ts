@@ -67,6 +67,7 @@ interface AppState {
   setTargetSentenceInfo: (info: TargetSentenceInfo | null) => void;
   markWordKnown: (wordEng: string, lang: string, isKnown: boolean) => void;
   incrementShowCount: (wordEng: string, lang: string) => void;
+  recordTripleCardShow: (wordEng: string) => void;
   markTripleKnown: (wordEng: string) => void;
   saveWordAssociation: (wordEng: string, assoc: string) => void;
   setWordAiVerification: (wordKey: string, verification: WordAiVerification) => void;
@@ -342,27 +343,77 @@ export const useStore = create<AppState>()(
         });
       },
 
-      markTripleKnown: (wordEng) => {
+      // One triples card shown = one show, regardless of active language count.
+      // Call this whenever a new card is presented to the user, not just when
+      // they mark it known — browsing via "Дальше" is a real exposure too.
+      recordTripleCardShow: (wordEng) => {
         set((state) => {
           const key = wordEng;
           const currentProg = state.userWordProgress[key] || {};
-          const currentStats = { ...(currentProg.knowledge_stats || {}) };
           const currentShowStats = { ...(currentProg.show_stats || {}) };
           const lastShownByLang = { ...(currentProg.last_shown_by_lang || {}) };
           const nowIso = new Date().toISOString();
 
           state.activeLanguages.forEach(lang => {
-            currentStats[lang] = true;
             currentShowStats[lang] = (currentShowStats[lang] || 0) + 1;
             lastShownByLang[lang] = nowIso;
           });
 
           const updatedProg: UserWordProgress = {
             ...currentProg,
-            knowledge_stats: currentStats,
             show_stats: currentShowStats,
             last_shown_by_lang: lastShownByLang,
             count: (currentProg.count || 0) + 1,
+            last_shown: nowIso
+          };
+
+          const newProgress = {
+            ...state.userWordProgress,
+            [key]: updatedProg
+          };
+
+          const newWords = state.words.map(w => {
+            if (w.eng === wordEng || w.word === wordEng) {
+              return {
+                ...w,
+                show_stats: currentShowStats,
+                last_shown_by_lang: lastShownByLang,
+                count: (w.count || 0) + 1,
+                last_shown: nowIso
+              };
+            }
+            return w;
+          });
+
+          const today = nowIso.split('T')[0];
+
+          return {
+            userWordProgress: newProgress,
+            words: newWords,
+            dailyShows: {
+              ...state.dailyShows,
+              [today]: (state.dailyShows[today] || 0) + 1
+            }
+          };
+        });
+      },
+
+      // Just the "learned" verdict — the show itself was already recorded by
+      // recordTripleCardShow when this card was presented.
+      markTripleKnown: (wordEng) => {
+        set((state) => {
+          const key = wordEng;
+          const currentProg = state.userWordProgress[key] || {};
+          const currentStats = { ...(currentProg.knowledge_stats || {}) };
+          const nowIso = new Date().toISOString();
+
+          state.activeLanguages.forEach(lang => {
+            currentStats[lang] = true;
+          });
+
+          const updatedProg: UserWordProgress = {
+            ...currentProg,
+            knowledge_stats: currentStats,
             last_shown: nowIso,
             is_learned: 1
           };
@@ -377,25 +428,16 @@ export const useStore = create<AppState>()(
               return {
                 ...w,
                 knowledge_stats: currentStats,
-                show_stats: currentShowStats,
-                last_shown_by_lang: lastShownByLang,
-                count: (w.count || 0) + 1,
                 last_shown: nowIso,
                 is_learned: 1
               };
             }
             return w;
           });
-          
-          const today = nowIso.split('T')[0];
 
-          return { 
+          return {
             userWordProgress: newProgress,
-            words: newWords,
-            dailyShows: {
-              ...state.dailyShows,
-              [today]: (state.dailyShows[today] || 0) + state.activeLanguages.length
-            }
+            words: newWords
           };
         });
       },
@@ -630,13 +672,20 @@ export const useStore = create<AppState>()(
         if (alreadyExists) return false;
 
         const stableKey = `user:${languageCode}:${normalizedForm}`;
+        // Prefill every language the user has active in the app (not just the one
+        // being studied right now), matching how EditWordModal adds a word manually —
+        // otherwise the word is missing translations for other active languages.
+        const translations: Record<string, string> = {};
+        get().activeLanguages.forEach(lang => { translations[lang] = ''; });
+        translations[languageCode] = dictionaryForm;
+
         const newWord: Word = {
           id: `custom_${Date.now().toString()}`,
           // `eng` is a legacy internal key in this app, not the visible language value.
           eng: stableKey,
           word: dictionaryForm,
           ru: token.translation?.trim() || '',
-          translations: { [languageCode]: dictionaryForm },
+          translations,
           source_language: languageCode,
           count: 0,
           is_learned: 0,

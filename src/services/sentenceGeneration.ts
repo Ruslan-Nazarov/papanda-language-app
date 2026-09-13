@@ -15,9 +15,10 @@ const requestOneRound = async (
   dictionary: ReturnType<typeof getDictionaryCandidates>,
   languageLabel: string,
   count: number,
-  avoidSentences: string[]
+  avoidSentences: string[],
+  requiredWord?: string
 ): Promise<{ sentences: Sentence[]; errors: string[] }> => {
-  const text = await generateGeminiText(buildSentenceGenerationPrompt(languageCode, dictionary, count, avoidSentences), {
+  const text = await generateGeminiText(buildSentenceGenerationPrompt(languageCode, dictionary, count, avoidSentences, requiredWord), {
     // Higher temperature — the batch needs varied sentences, not the single most
     // probable "subject + verb" for the given words.
     temperature: 0.95,
@@ -38,13 +39,31 @@ const requestOneRound = async (
 
 export const isSentenceGenerationConfigured = isGeminiConfigured;
 
+export interface RequiredWord {
+  lemma: string;
+  translation?: string;
+}
+
 export const generateSentenceBatch = async (
   languageCode: string,
   words: Word[],
-  count = DEFAULT_BATCH_SIZE
+  count = DEFAULT_BATCH_SIZE,
+  requiredWord?: RequiredWord
 ): Promise<Sentence[]> => {
   const language = getLanguagePrompt(languageCode);
   const dictionary = getDictionaryCandidates(words, languageCode);
+
+  // The tapped word might not have made it into the random candidate sample
+  // (or might not even be in the dictionary yet) — force it in so the model
+  // is actually allowed to use it and satisfy the REQUIRED WORD instruction.
+  if (requiredWord?.lemma) {
+    const normalized = requiredWord.lemma.trim().toLocaleLowerCase();
+    const alreadyThere = dictionary.some(item => item.lemma.trim().toLocaleLowerCase() === normalized);
+    if (!alreadyThere && normalized) {
+      dictionary.unshift({ lemma: requiredWord.lemma.trim(), translation: requiredWord.translation || '' });
+    }
+  }
+
   if (dictionary.length < 2) throw new Error('Для генерации нужны хотя бы два слова с переводом в активном словаре.');
 
   const collected: Sentence[] = [];
@@ -59,7 +78,7 @@ export const generateSentenceBatch = async (
 
     let result: { sentences: Sentence[]; errors: string[] };
     try {
-      result = await requestOneRound(languageCode, dictionary, language.label, requestCount, avoidSentences);
+      result = await requestOneRound(languageCode, dictionary, language.label, requestCount, avoidSentences, requiredWord?.lemma);
     } catch (error) {
       if (collected.length > 0) break; // keep what we already have rather than failing the whole batch
       throw error;

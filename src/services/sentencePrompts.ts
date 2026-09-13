@@ -236,7 +236,8 @@ export const buildSentenceGenerationPrompt = (
   languageCode: string,
   candidates: DictionaryCandidate[],
   count: number,
-  avoidSentences: string[] = []
+  avoidSentences: string[] = [],
+  requiredWord?: string
 ) => {
   const language = getLanguagePrompt(languageCode);
   const languageLabel = LANGUAGES.find(item => item.code === languageCode)?.label || language.label;
@@ -244,6 +245,9 @@ export const buildSentenceGenerationPrompt = (
   const example = LANGUAGE_EXAMPLES[languageCode] || LANGUAGE_EXAMPLES.en;
   const avoidBlock = avoidSentences.length > 0
     ? `\nDO NOT repeat these sentences or their templates (same structure with one word swapped) — invent genuinely different situations, subjects and verbs:\n${avoidSentences.map(s => `- ${s}`).join('\n')}\n`
+    : '';
+  const requiredWordBlock = requiredWord
+    ? `\nREQUIRED WORD: sentence #1 MUST use the exact dictionary lemma "${requiredWord}" as one of its content words (inflected/conjugated as the sentence needs), with dictionary_word set to it. The other sentences are free to use any dictionary words.\n`
     : '';
 
   return `You generate learning data for the Papanda Sentence Trainer, which teaches sentence structure top-down: first find the members of the sentence (predicate, subject, attributes, object, adverbials), then the meaningful parts inside each word. Return ONLY the JSON array required by the response schema — no prose, no Markdown.
@@ -266,7 +270,7 @@ ${language.grammar}
 
 DICTIONARY — only these lemmas may get is_in_my_dict: true. Keep their spelling exactly:
 ${dictionary}
-${avoidBlock}
+${requiredWordBlock}${avoidBlock}
 
 TOKEN CONTRACT (one token per whitespace-separated word, in reading order):
 - "language" of every sentence object is exactly "${languageLabel}".
