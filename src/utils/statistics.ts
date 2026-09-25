@@ -1,4 +1,5 @@
 import { Word } from '../models/types';
+import { localDateKey } from './date';
 
 export interface DailyShows {
   [dateString: string]: number; // dateString in YYYY-MM-DD
@@ -39,7 +40,7 @@ export const getWordLastShown = (word: Word, lang: string): string | undefined =
  */
 export const wordMemoryWeight = (word: Word, lang: string, nowMs: number = Date.now()): number => {
   const shows = readWordStats(word.show_stats)[lang];
-  if (typeof shows !== 'number' || shows <= 0) return 0;
+  if (typeof shows !== 'number' || !Number.isFinite(shows) || shows <= 0) return 0;
 
   const known = readWordStats(word.knowledge_stats)[lang] === true;
   const exposureProgress = Math.min(1, shows / WORD_MEMORY.TARGET_SHOWS);
@@ -47,7 +48,7 @@ export const wordMemoryWeight = (word: Word, lang: string, nowMs: number = Date.
 
   const lastShown = getWordLastShown(word, lang);
   let retention = 1;
-  if (lastShown) {
+  if (lastShown && Number.isFinite(Date.parse(lastShown))) {
     const deltaDays = Math.max(0, (nowMs - new Date(lastShown).getTime()) / MS_PER_DAY);
     const stabilityDays = WORD_MEMORY.BASE_STABILITY_DAYS * (1 + shows / 10) * (known ? 3 : 1);
     const r = Math.exp(-deltaDays / stabilityDays);
@@ -65,7 +66,7 @@ export type WordStats = Record<string, unknown>;
  */
 export const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | undefined): WordStats => {
   if (!value) return {};
-  if (typeof value !== 'string') return value;
+  if (typeof value !== 'string') return typeof value === 'object' && !Array.isArray(value) ? value : {};
 
   try {
     const parsed = JSON.parse(value);
@@ -164,11 +165,11 @@ export const calculateImwTrend = (snapshots: ImwSnapshot[]) => {
  */
 export const calculateFullyLearned = (words: Word[], activeLangs: string[]): number => {
   if (activeLangs.length === 0) return 0;
-  
+
   return words.filter(w => {
     const knowledgeStats = readWordStats(w.knowledge_stats);
     if (!knowledgeStats) return false;
-    
+
     // Check if it's learned (true or 1) in ALL active languages
     return activeLangs.every(lang => knowledgeStats[lang] === true || knowledgeStats[lang] === 1);
   }).length;
@@ -180,7 +181,7 @@ export const calculateFullyLearned = (words: Word[], activeLangs: string[]): num
  */
 export const calculateKnownByLanguage = (words: Word[], activeLangs: string[]) => {
   const byLanguage: Record<string, { count: number, percentage: number }> = {};
-  
+
   if (words.length === 0) return byLanguage;
 
   activeLangs.forEach(lang => {
@@ -203,7 +204,7 @@ export const calculateKnownByLanguage = (words: Word[], activeLangs: string[]) =
  * Общее количество показов слов за текущие сутки.
  */
 export const calculateShownToday = (dailyShows: DailyShows): number => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateKey();
   return dailyShows[today] || 0;
 };
 

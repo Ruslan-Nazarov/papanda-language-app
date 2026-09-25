@@ -16,7 +16,7 @@ export async function prefetchSentencesInBackground(): Promise<void> {
   if (now - lastPrefetchTime < MIN_PREFETCH_INTERVAL_MS) return;
 
   const state = useStore.getState();
-  const { activeLanguages, words, generatedSentences, learnedSentences, addGeneratedSentences } = state;
+  const { activeLanguages, words, addGeneratedSentences } = state;
   if (!activeLanguages || activeLanguages.length === 0 || !words || words.length === 0) return;
 
   isPrefetching = true;
@@ -24,17 +24,17 @@ export async function prefetchSentencesInBackground(): Promise<void> {
 
   try {
     for (const langCode of activeLanguages) {
+      if (!useStore.getState().activeLanguages.includes(langCode)) continue;
       const langObj = LANGUAGES.find(l => l.code === langCode);
       if (!langObj) continue;
 
-      const unlearnedCount = (generatedSentences || []).filter(s =>
+      const cachedCount = useStore.getState().generatedSentences.filter(s =>
         s.source === 'generated' &&
         s.language &&
-        s.language.toLowerCase().includes(langObj.label.toLowerCase()) &&
-        !learnedSentences.includes(s.id)
+        s.language.toLowerCase().includes(langObj.label.toLowerCase())
       ).length;
 
-      if (unlearnedCount < PREFETCH_THRESHOLD) {
+      if (cachedCount < PREFETCH_THRESHOLD) {
         try {
           const freshWords = useStore.getState().words;
           const batch = await generateSentenceBatch(langCode, freshWords, PREFETCH_BATCH_SIZE);

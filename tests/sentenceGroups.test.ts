@@ -72,3 +72,17 @@ describe('computeSentenceGroups', () => {
     assert.deepStrictEqual(order(words), ['Predicate@0', 'Subject@0', 'Object@0', 'Article@0']);
   });
 });
+
+it('does not mistake coordinated nouns for clauses in legacy annotations', () => {
+  for (const words of [
+    [tok('Anna', 'Subject'), tok('and', 'Conjunction'), tok('Tom', 'Subject'), tok('work', 'Predicate')],
+    [tok('Does', 'Predicate'), tok('Anna', 'Subject'), tok('and', 'Conjunction'), tok('Tom', 'Subject'), tok('work', 'Predicate')].map(word => ({ ...word, clauseIndex: 0 })),
+  ]) assert.ok(computeSentenceGroups(words).every(group => group.clauseIndex === 0));
+});
+it('groups an interrupted main clause explicitly and reveals its predicate first', () => {
+  const words = [tok('The', 'Article'), tok('man', 'Subject'), tok('who', 'Subject'), tok('called', 'Predicate'), tok('left', 'Predicate')]
+    .map((word, i) => ({ ...word, clauseIndex: i === 2 || i === 3 ? 1 : 0 }));
+  const groups = computeSentenceGroups(words);
+  assert.deepEqual(groups[0], { clauseIndex: 0, role: 'Predicate', tokenIndices: [4] });
+  assert.deepEqual(groups.find(group => group.clauseIndex === 1 && group.role === 'Predicate')?.tokenIndices, [3]);
+});

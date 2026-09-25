@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,9 +14,14 @@ export default function DictionaryScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, userWordProgress, toggleWordFavorite } = useStore();
+  const { words, activeLanguages, userWordProgress, toggleWordFavorite } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    userWordProgress: state.userWordProgress,
+    toggleWordFavorite: state.toggleWordFavorite,
+  })));
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // State for editing/adding
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
@@ -28,7 +34,7 @@ export default function DictionaryScreen() {
       const ruMatch = w.ru?.toLowerCase().includes(query);
       const engMatch = (w.eng || w.word)?.toLowerCase().includes(query);
       const assocMatch = w.personal_association?.toLowerCase().includes(query);
-      
+
       // Check active languages translations
       const transMatch = activeLanguages.some(lang => {
         const trans = getWordTranslation(w, lang);
@@ -47,7 +53,7 @@ export default function DictionaryScreen() {
   const renderItem = ({ item }: { item: Word }) => {
     const wordKey = item.eng || item.word || '';
     const sourceLanguage = item.source_language ? LANGUAGES.find(lang => lang.code === item.source_language) : undefined;
-    const displayOriginal = sourceLanguage ? `${sourceLanguage.flag} ${item.word || ''}` : item.eng;
+    const displayOriginal = sourceLanguage ? `${sourceLanguage.flag} ${item.word || ''}` : getWordTranslation(item, 'en');
     const progress = userWordProgress[wordKey];
     const aiVerification = progress?.ai_verification;
     const isAiFlagged = aiVerification?.status === 'flagged';
@@ -134,7 +140,7 @@ export default function DictionaryScreen() {
           <Text style={styles.addBtnText}>+ Добавить</Text>
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.searchBar}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
@@ -167,10 +173,10 @@ export default function DictionaryScreen() {
         }
       />
 
-      <EditWordModal 
-        visible={isModalVisible} 
-        onClose={() => setIsModalVisible(false)} 
-        wordToEdit={editingWord} 
+      <EditWordModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        wordToEdit={editingWord}
       />
     </View>
   );

@@ -70,11 +70,9 @@ export const generateGeminiText = async (
         body: JSON.stringify({ prompt, generationConfig, provider }),
         signal: controller.signal,
       });
-      clearTimeout(timer);
-
       const data = (await response.json().catch(() => null)) as ProxyResponse | null;
 
-      if (response.ok && data?.text) {
+      if (response.ok && typeof data?.text === 'string' && data.text.trim()) {
         return data.text;
       }
 
@@ -87,17 +85,21 @@ export const generateGeminiText = async (
       if (data?.daily) {
         throw new GeminiFatalError(message);
       }
+      if (response.status >= 400 && response.status < 500 && response.status !== 429 && response.status !== 408) {
+        throw new GeminiFatalError(message);
+      }
 
       lastError = new Error(message);
       continue;
-    } catch (err: any) {
-      clearTimeout(timer);
+    } catch (err: unknown) {
       if (err instanceof GeminiFatalError) throw err;
-      if (err?.name === 'AbortError') {
+      if (err instanceof Error && err.name === 'AbortError') {
         lastError = new Error('Превышено время ожидания ответа (45 сек).');
         continue;
       }
-      lastError = new Error(err?.message || 'Ошибка сети при обращении к сервису генерации.');
+      lastError = new Error(err instanceof Error ? err.message : 'Ошибка сети при обращении к сервису генерации.');
+    } finally {
+      clearTimeout(timer);
     }
   }
 

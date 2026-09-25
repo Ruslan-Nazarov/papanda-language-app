@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +14,15 @@ const ONBOARDING_KEY = 'papanda-onboarded';
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount } = useStore();
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount } = useStore(useShallow(state => ({
+    activeLanguages: state.activeLanguages,
+    setLanguages: state.setLanguages,
+    resetStatistics: state.resetStatistics,
+    workoutWordCount: state.workoutWordCount,
+    setWorkoutWordCount: state.setWorkoutWordCount,
+    workoutLearnedWordCount: state.workoutLearnedWordCount,
+    setWorkoutLearnedWordCount: state.setWorkoutLearnedWordCount,
+  })));
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -94,13 +103,13 @@ export default function SettingsScreen() {
       "Вы уверены, что хотите обнулить весь прогресс, показы и статус выученных слов?",
       [
         { text: "Отмена", style: "cancel" },
-        { 
-          text: "Сбросить всё", 
-          style: "destructive", 
+        {
+          text: "Сбросить всё",
+          style: "destructive",
           onPress: () => {
             resetStatistics();
             Alert.alert("Готово", "Статистика успешно сброшена.");
-          } 
+          }
         }
       ]
     );
@@ -109,7 +118,7 @@ export default function SettingsScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
       <Text style={styles.header}>Настройки</Text>
-      
+
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Active Languages for Triples */}
         <View style={styles.section}>
@@ -118,8 +127,8 @@ export default function SettingsScreen() {
           {LANGUAGES.map(lang => {
             const isActive = activeLanguages.includes(lang.code);
             return (
-              <TouchableOpacity 
-                key={`triple-${lang.code}`} 
+              <TouchableOpacity
+                key={`triple-${lang.code}`}
                 style={[styles.row, isActive && styles.rowActive]}
                 onPress={() => toggleLanguage(lang.code)}
               >
@@ -139,16 +148,16 @@ export default function SettingsScreen() {
               <View key={`order-${code}`} style={styles.row}>
                 <Text style={styles.rowText}>{index + 1}. {getLanguageLabel(code)}</Text>
                 <View style={styles.orderControls}>
-                  <TouchableOpacity 
-                    style={styles.orderBtn} 
-                    onPress={() => moveLanguage(index, -1)} 
+                  <TouchableOpacity
+                    style={styles.orderBtn}
+                    onPress={() => moveLanguage(index, -1)}
                     disabled={index === 0}
                   >
                     <Text style={[styles.orderBtnText, index === 0 && styles.disabledText]}>⬆️</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.orderBtn} 
-                    onPress={() => moveLanguage(index, 1)} 
+                  <TouchableOpacity
+                    style={styles.orderBtn}
+                    onPress={() => moveLanguage(index, 1)}
                     disabled={index === activeLanguages.length - 1}
                   >
                     <Text style={[styles.orderBtnText, index === activeLanguages.length - 1 && styles.disabledText]}>⬇️</Text>
@@ -162,7 +171,7 @@ export default function SettingsScreen() {
         {/* Brain Workout Options */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Настройки тренировки (Brain Workout)</Text>
-          
+
           <Text style={styles.sectionSub}>Количество слов за одну сессию</Text>
           <View style={[styles.optionsRow, {marginBottom: 20}]}>
             {WORKOUT_COUNT_OPTIONS.map(count => (
@@ -222,8 +231,8 @@ export default function SettingsScreen() {
         {/* Reset Data Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Сброс данных и прогресса</Text>
-          <TouchableOpacity 
-            style={[styles.row, styles.resetRow]} 
+          <TouchableOpacity
+            style={[styles.row, styles.resetRow]}
             onPress={handleReset}
           >
             <Text style={styles.resetText}>🗑️ Сбросить всю статистику и показы</Text>
@@ -241,13 +250,13 @@ const styles = StyleSheet.create({
   section: { marginBottom: 28 },
   sectionTitle: { fontSize: 16, color: '#4A5568', marginBottom: 4, fontWeight: '700' },
   sectionSub: { fontSize: 13, color: '#A0AEC0', marginBottom: 12 },
-  row: { 
-    flexDirection: 'row', 
+  row: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFF', 
-    padding: 15, 
-    borderRadius: 12, 
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#E2E8F0',

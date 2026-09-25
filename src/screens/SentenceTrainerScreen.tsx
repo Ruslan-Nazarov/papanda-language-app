@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Platform, KeyboardAvoidingView, ActivityIndicator, Alert, PanResponder, Animated, Easing, LayoutAnimation, UIManager } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +10,7 @@ import Markdown from 'react-native-markdown-display';
 import { explainSentenceWithAI } from '../services/aiService';
 import { generateSentenceBatch, isSentenceGenerationConfigured, RequiredWord } from '../services/sentenceGeneration';
 import EditWordModal from '../components/EditWordModal';
-import { getWordTranslation } from '../utils/words';
+import { cleanDictionaryForm, getWordTranslation } from '../utils/words';
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 import { computeSentenceGroups } from '../utils/sentenceGroups';
 import { ACCENT, ACCENT_DARK } from '../constants/theme';
@@ -21,8 +22,8 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const REVEAL_ANIMATION = LayoutAnimation.create(220, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity);
 
 const STRICT_ORDER: SyntaxRole[] = [
-  'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 
-  'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction', 
+  'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
+  'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction',
   'Preposition', 'Particle', 'Article', 'Other'
 ];
 
@@ -64,8 +65,21 @@ const getRoleColor = (role: SyntaxRole) => {
 export default function SentenceTrainerScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, learnedSentences, markSentenceLearned, incrementShowCount } = useStore();
+  const { words, sentences, addSentence, addGeneratedSentences, clearGeneratedSentences, addWordFromSentenceToken, updateSentence, activeLanguages, targetSentenceInfo, setTargetSentenceInfo, incrementShowCount } = useStore(useShallow(state => ({
+    words: state.words,
+    sentences: state.sentences,
+    addSentence: state.addSentence,
+    addGeneratedSentences: state.addGeneratedSentences,
+    clearGeneratedSentences: state.clearGeneratedSentences,
+    addWordFromSentenceToken: state.addWordFromSentenceToken,
+    updateSentence: state.updateSentence,
+    activeLanguages: state.activeLanguages,
+    targetSentenceInfo: state.targetSentenceInfo,
+    setTargetSentenceInfo: state.setTargetSentenceInfo,
+    incrementShowCount: state.incrementShowCount,
+  })));
   const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
+  const [targetSentenceId, setTargetSentenceId] = useState<string | null>(null);
   // How many role-groups are revealed; 0 = fully hidden, >= orderedGroups.length = fully revealed.
   const [revealedSteps, setRevealedSteps] = useState(0);
   const [showTranslations, setShowTranslations] = useState(false);
@@ -84,6 +98,7 @@ export default function SentenceTrainerScreen() {
 
   // AI state
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const explanationRequest = useRef(0);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -164,6 +179,7 @@ export default function SentenceTrainerScreen() {
   ).current;
 
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(activeLanguages[0] || 'it');
+  useEffect(() => { setTargetSentenceId(null); }, [selectedLanguageCode]);
 
   // If the learner drops the currently-selected language in Settings, the old
   // language's sentences would keep showing (with no button to switch away).
@@ -224,7 +240,7 @@ export default function SentenceTrainerScreen() {
       }
     } finally {
       generatingLanguages.current.delete(languageCode);
-      setIsGenerating(false);
+      setIsGenerating(generatingLanguages.current.size > 0);
     }
   };
 
@@ -245,11 +261,11 @@ export default function SentenceTrainerScreen() {
   useEffect(() => {
     if (!isSentenceGenerationConfigured()) return;
     if (!showingGenerated || generationErrors[selectedLanguageCode]) return;
-    const unlearnedInPlay = filteredSentences.filter(s => !learnedSentences.includes(s.id)).length;
-    if (unlearnedInPlay <= GENERATION_RESERVE) {
+    const remainingInPlay = filteredSentences.length - currentFilteredIndex;
+    if (remainingInPlay <= GENERATION_RESERVE) {
       void generateSentences(selectedLanguageCode, GENERATION_BATCH);
     }
-  }, [selectedLanguageCode, currentFilteredIndex, generatedCacheCount, learnedSentences.length, showingGenerated]);
+  }, [selectedLanguageCode, currentFilteredIndex, generatedCacheCount, showingGenerated]);
 
   // Handle incoming target sentence from WordTriples or other screens
   useEffect(() => {
@@ -268,9 +284,8 @@ export default function SentenceTrainerScreen() {
       const sentencesForLang = sentences.filter(s =>
         s.language && langObj && s.language.toLowerCase().includes(langObj.label.toLowerCase())
       );
-      const foundIdx = sentencesForLang.findIndex(s => s.id === sentenceId);
-      if (foundIdx !== -1) {
-        setCurrentFilteredIndex(foundIdx);
+      if (sentencesForLang.some(s => s.id === sentenceId)) {
+        setTargetSentenceId(sentenceId);
         setRevealedSteps(FULLY_REVEALED);
         setShowTranslations(true);
       }
@@ -331,15 +346,19 @@ export default function SentenceTrainerScreen() {
     prevShowingSessionBatch.current = showingSessionBatch;
   }, [showingSessionBatch, filteredSentences.length, currentFilteredIndex]);
 
-  const currentSentence = filteredSentences[currentFilteredIndex];
+  const currentSentence = sentences.find(sentence => sentence.id === targetSentenceId) ?? filteredSentences[currentFilteredIndex];
 
   // Clear state when switching to a different sentence — start fully hidden.
   useEffect(() => {
+    explanationRequest.current++;
     setAiExplanation(null);
+    setIsAiLoading(false);
+    setShowAiModal(false);
     setRevealedSteps(0);
   }, [currentSentence?.id]);
 
   const moveToNextSentence = () => {
+    setTargetSentenceId(null);
     if (filteredSentences.length <= 1) {
       setRevealedSteps(0);
       setShowTranslations(false);
@@ -347,28 +366,7 @@ export default function SentenceTrainerScreen() {
       return;
     }
 
-    const learned: number[] = [];
-    const unlearned: number[] = [];
-    filteredSentences.forEach((s, idx) => {
-      if (idx !== currentFilteredIndex) {
-        if (learnedSentences.includes(s.id)) learned.push(idx);
-        else unlearned.push(idx);
-      }
-    });
-
-    let nextIdx = 0;
-    if (unlearned.length > 0 && learned.length > 0) {
-      if (Math.random() < 0.8) {
-        nextIdx = unlearned[Math.floor(Math.random() * unlearned.length)];
-      } else {
-        nextIdx = learned[Math.floor(Math.random() * learned.length)];
-      }
-    } else if (unlearned.length > 0) {
-      nextIdx = unlearned[Math.floor(Math.random() * unlearned.length)];
-    } else if (learned.length > 0) {
-      nextIdx = learned[Math.floor(Math.random() * learned.length)];
-    }
-
+    const nextIdx = (currentFilteredIndex + 1) % filteredSentences.length;
     setCurrentFilteredIndex(nextIdx);
     setRevealedSteps(0);
     setShowTranslations(false);
@@ -376,6 +374,7 @@ export default function SentenceTrainerScreen() {
   };
 
   const moveToPrevSentence = () => {
+    setTargetSentenceId(null);
     if (filteredSentences.length <= 1) {
       setRevealedSteps(0);
       setShowTranslations(false);
@@ -398,7 +397,7 @@ export default function SentenceTrainerScreen() {
   // model that batch, so a real dictionary word can still arrive flagged false.
   const findWordInStore = (token: Token): Word | undefined => {
     const rawForm = token.dictionary_form || token.dictionary_word || token.text;
-    const cleanForm = (rawForm || '').replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '').trim().toLowerCase();
+    const cleanForm = cleanDictionaryForm(rawForm || '').toLowerCase();
     if (!cleanForm) return undefined;
     return words.find(w => {
       const tr = getWordTranslation(w, selectedLanguageCode);
@@ -488,15 +487,9 @@ export default function SentenceTrainerScreen() {
     }
   };
 
-  const handleMarkLearned = () => {
-    if (!currentSentence) return;
-    markSentenceLearned(currentSentence.id, true);
-    moveToNextSentence();
-  };
-
   const handleExplainAI = async () => {
     if (!currentSentence) return;
-    
+
     // Check if we already have an explanation to avoid refetching
     if (aiExplanation) {
       setShowAiModal(true);
@@ -504,19 +497,20 @@ export default function SentenceTrainerScreen() {
     }
 
     const sentenceText = currentSentence.sentence || currentSentence.words.map(w => w.text).join(' ');
-    // Form a rough translation from token translations
-    const nativeTranslation = currentSentence.words.map(w => w.translation).filter(Boolean).join(' ');
-    
+    const nativeTranslation = currentSentence.literalTranslation || currentSentence.words.map(w => w.translation).filter(Boolean).join(' ');
+
     setIsAiLoading(true);
     setShowAiModal(true);
+    const requestId = ++explanationRequest.current;
     try {
       const result = await explainSentenceWithAI(sentenceText, activeLangObj?.label || 'Unknown', nativeTranslation, currentSentence.words);
-      setAiExplanation(result);
-    } catch (error: any) {
-      Alert.alert('Не удалось объяснить', error?.message || 'Попробуйте ещё раз.');
+      if (requestId === explanationRequest.current) setAiExplanation(result);
+    } catch (error) {
+      if (requestId !== explanationRequest.current) return;
+      Alert.alert('Не удалось объяснить', error instanceof Error ? error.message : 'Попробуйте ещё раз.');
       setShowAiModal(false);
     } finally {
-      setIsAiLoading(false);
+      if (requestId === explanationRequest.current) setIsAiLoading(false);
     }
   };
 
@@ -546,9 +540,10 @@ export default function SentenceTrainerScreen() {
           event.stopPropagation();
           handleAddTokenToDictionary(token);
         }}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         <Text style={[styles.addToDictionaryText, added && styles.addToDictionaryTextAdded]}>
-          {added ? '✓ В словаре' : '+ В словарь'}
+          {added ? '✓' : '+'}
         </Text>
       </TouchableOpacity>
     );
@@ -577,8 +572,8 @@ export default function SentenceTrainerScreen() {
     const tokens: Token[] = words.map((w) => ({
       text: w,
       label: w,
-      translation: '', 
-      role: 'Other', 
+      translation: '',
+      role: 'Other',
       is_in_my_dict: false,
       parts: [w]
     }));
@@ -586,28 +581,20 @@ export default function SentenceTrainerScreen() {
   };
 
   const updateTokenRole = (index: number, role: SyntaxRole) => {
-    const updated = [...parsedTokens];
-    updated[index].role = role;
-    setParsedTokens(updated);
+    setParsedTokens(previous => previous.map((token, i) => i === index ? { ...token, role } : token));
   };
 
   const updateTokenParts = (index: number, partsStr: string) => {
-    const updated = [...parsedTokens];
-    // Split by hyphen and filter out empty strings
-    updated[index].parts = partsStr.split('-').map(p => p.trim()).filter(Boolean);
-    setParsedTokens(updated);
+    const parts = partsStr.split('-').map(p => p.trim()).filter(Boolean);
+    setParsedTokens(previous => previous.map((token, i) => i === index ? { ...token, parts } : token));
   };
 
   const updateTokenTranslation = (index: number, trans: string) => {
-    const updated = [...parsedTokens];
-    updated[index].translation = trans;
-    setParsedTokens(updated);
+    setParsedTokens(previous => previous.map((token, i) => i === index ? { ...token, translation: trans } : token));
   };
 
   const toggleTokenDict = (index: number) => {
-    const updated = [...parsedTokens];
-    updated[index].is_in_my_dict = !updated[index].is_in_my_dict;
-    setParsedTokens(updated);
+    setParsedTokens(previous => previous.map((token, i) => i === index ? { ...token, is_in_my_dict: !token.is_in_my_dict } : token));
   };
 
   const saveSentence = () => {
@@ -615,7 +602,7 @@ export default function SentenceTrainerScreen() {
       Alert.alert('Не хватает данных', 'Введите предложение и разберите его на слова.');
       return;
     }
-    
+
     if (editingSentenceId) {
       updateSentence(editingSentenceId, {
         id: editingSentenceId,
@@ -623,15 +610,18 @@ export default function SentenceTrainerScreen() {
         sentence: newSentenceText,
         words: parsedTokens
       });
+      setTargetSentenceId(editingSentenceId);
     } else {
+      const id = `manual_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       addSentence({
-        id: Date.now().toString(),
+        id,
         language: activeLangObj?.label || 'Unknown',
         sentence: newSentenceText,
         words: parsedTokens
       });
+      setTargetSentenceId(id);
     }
-    
+
     setModalVisible(false);
   };
 
@@ -736,11 +726,11 @@ export default function SentenceTrainerScreen() {
                       ? part.charAt(0).toUpperCase() + part.slice(1)
                       : part;
                     return (
-                      <Text 
-                        key={i} 
+                      <Text
+                        key={i}
                         style={
-                          i === 0 
-                            ? styles.wordRoot 
+                          i === 0
+                            ? styles.wordRoot
                             : [styles.wordAffix, { color: AFFIX_COLORS[(i - 1) % AFFIX_COLORS.length] }]
                         }
                       >
@@ -794,15 +784,15 @@ export default function SentenceTrainerScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
       <Text style={styles.header}>Разбор предложений</Text>
-      
+
       {/* Language Selector */}
       <View style={{height: 50, marginBottom: 10}}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{alignItems: 'center'}}>
           {LANGUAGES.filter(lang => activeLanguages.includes(lang.code)).map(lang => (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={lang.code}
               style={[
-                styles.langSelectBtn, 
+                styles.langSelectBtn,
                 selectedLanguageCode === lang.code && styles.langSelectBtnActive
               ]}
               onPress={() => {
@@ -819,7 +809,7 @@ export default function SentenceTrainerScreen() {
               }}
             >
               <Text style={[
-                styles.langSelectText, 
+                styles.langSelectText,
                 selectedLanguageCode === lang.code && {color: '#FFF', fontWeight: 'bold'}
               ]}>
                 {lang.flag} {lang.label}
@@ -828,7 +818,7 @@ export default function SentenceTrainerScreen() {
           ))}
         </ScrollView>
       </View>
-      
+
       {filteredSentences.length > 0 ? (
         <Animated.View
           style={{
@@ -850,6 +840,16 @@ export default function SentenceTrainerScreen() {
               <Text style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
                 {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
               </Text>
+              {currentSentence?.learningGoal && (
+                <Text style={{ color: '#475569', textAlign: 'center', marginBottom: 8, paddingHorizontal: 16 }}>
+                  {currentSentence.learningGoal}
+                </Text>
+              )}
+              {showTranslations && currentSentence?.literalTranslation && (
+                <Text style={{ color: '#666', textAlign: 'center', marginBottom: 8, paddingHorizontal: 16 }}>
+                  {currentSentence.literalTranslation}
+                </Text>
+              )}
 
               <View style={styles.swipeHintContainer}>
                 <Ionicons name="chevron-back" size={13} color="#94A3B8" />
@@ -941,10 +941,6 @@ export default function SentenceTrainerScreen() {
           <Text style={styles.buttonText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.btnKnown]} onPress={handleMarkLearned}>
-          <Text style={styles.buttonText}>✓ Разобрался</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.button} onPress={handleReveal}>
           <Text style={styles.buttonText}>Разбор</Text>
         </TouchableOpacity>
@@ -961,7 +957,7 @@ export default function SentenceTrainerScreen() {
               <Ionicons name="list" size={20} color="#475569" style={{marginRight: 10}} />
               <Text style={styles.menuItemText}>Режим: {isTableMode ? 'Карточки' : 'Таблица'}</Text>
             </TouchableOpacity>
-            
+
             {isSentenceGenerationConfigured() && (
               <>
                 <View style={{height: 1, backgroundColor: '#E2E8F0', marginVertical: 5}} />
@@ -1012,8 +1008,8 @@ export default function SentenceTrainerScreen() {
               <Ionicons name="pencil" size={20} color="#475569" style={{marginRight: 10}} />
               <Text style={styles.menuItemText}>Изменить</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.menuItem} 
+            <TouchableOpacity
+              style={styles.menuItem}
               onPress={() => { setIsMenuVisible(false); openAddModal(); }}
             >
               <Ionicons name="add" size={20} color="#475569" style={{marginRight: 10}} />
@@ -1041,12 +1037,12 @@ export default function SentenceTrainerScreen() {
           <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={{paddingBottom: 20}}>
             {parsedTokens.map((token, i) => {
               const partsStr = (token.parts && token.parts.length > 0) ? token.parts.join('-') : token.text;
-              
+
               return (
                 <View key={i} style={styles.tokenEditorCard}>
                   <View style={styles.tokenEditorHeader}>
                     <Text style={styles.tokenEditorText}>{token.text}</Text>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={[styles.dictToggleBtn, token.is_in_my_dict && styles.dictToggleBtnActive]}
                       onPress={() => toggleTokenDict(i)}
                     >
@@ -1055,7 +1051,7 @@ export default function SentenceTrainerScreen() {
                       </Text>
                     </TouchableOpacity>
                   </View>
-                  
+
                   <View style={styles.tokenInputsRow}>
                     <View style={styles.tokenInputGroup}>
                       <Text style={styles.tokenInputLabel}>Состав (через дефис)</Text>
@@ -1076,16 +1072,16 @@ export default function SentenceTrainerScreen() {
                       />
                     </View>
                   </View>
-                  
+
                   <Text style={styles.tokenInputLabel}>Роль в предложении</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{flexDirection: 'row', paddingTop: 5}}>
                     {STRICT_ORDER.map(role => {
                       const isActive = token.role === role;
                       return (
-                        <TouchableOpacity 
-                          key={role} 
+                        <TouchableOpacity
+                          key={role}
                           style={[
-                            styles.roleSelectBtn, 
+                            styles.roleSelectBtn,
                             isActive && { backgroundColor: getRoleColor(role), borderColor: getRoleColor(role) }
                           ]}
                           onPress={() => updateTokenRole(i, role)}
@@ -1126,7 +1122,7 @@ export default function SentenceTrainerScreen() {
                 <Text style={{fontSize: 20, color: '#94A3B8'}}>✕</Text>
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView showsVerticalScrollIndicator={false}>
               {isAiLoading ? (
                 <View style={{padding: 40, alignItems: 'center'}}>
@@ -1139,7 +1135,7 @@ export default function SentenceTrainerScreen() {
                 </Markdown>
               )}
             </ScrollView>
-            
+
             <View style={{marginTop: 15, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#E2E8F0'}}>
               <Text style={{fontSize: 12, color: '#94A3B8', textAlign: 'center'}}>Сгенерировано нейросетью. Возможны неточности.</Text>
             </View>
@@ -1172,9 +1168,9 @@ const styles = StyleSheet.create({
   wordAffix: { fontWeight: '800' },
   translationText: { fontSize: 14, color: '#666', marginTop: 4 },
   roleText: { fontSize: 10, fontWeight: '600', marginTop: 4, opacity: 0.8 },
-  addToDictionaryBtn: { marginTop: 7, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
+  addToDictionaryBtn: { position: 'absolute', bottom: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, alignItems: 'center', justifyContent: 'center', zIndex: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 2 },
   addToDictionaryBtnAdded: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
-  addToDictionaryText: { fontSize: 10, color: ACCENT_DARK, fontWeight: '700' },
+  addToDictionaryText: { fontSize: 14, color: ACCENT_DARK, fontWeight: '800', lineHeight: 16 },
   addToDictionaryTextAdded: { color: '#15803D' },
   hiddenText: { fontSize: 18, color: '#999' },
   controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
@@ -1195,7 +1191,7 @@ const styles = StyleSheet.create({
   btnKnown: { backgroundColor: '#28A745' },
   buttonSecondary: { backgroundColor: '#6C757D' },
   buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
-  
+
   // Table Mode Styles
   tableContainer: { width: '100%', marginTop: 20, backgroundColor: '#FFF', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0', paddingBottom: 10 },
   tableRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#E2E8F0', padding: 10 },
@@ -1203,34 +1199,34 @@ const styles = StyleSheet.create({
   tableColTrans: { flex: 2, paddingHorizontal: 10 },
   tableColRole: { flex: 1.5, alignItems: 'flex-end' },
   tableRoleActions: { alignItems: 'flex-end' },
-  
+
   modalContainer: { flex: 1, padding: 20, backgroundColor: '#F8FAFC', alignItems: 'center' },
   modalHeader: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#1E293B' },
   mainInput: { width: '100%', borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFF', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
-  
+
   menuCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6, minWidth: 200 },
   menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 15 },
   menuItemText: { fontSize: 16, color: '#1E293B', fontWeight: '500' },
-  
+
   tokenEditorCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
   tokenEditorHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   tokenEditorText: { fontSize: 20, fontWeight: 'bold', color: '#0F172A' },
-  
+
   dictToggleBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#CBD5E1' },
   dictToggleBtnActive: { backgroundColor: '#EAB308', borderColor: '#EAB308' },
   dictToggleText: { fontSize: 12, color: '#475569', fontWeight: '600' },
-  
+
   tokenInputsRow: { flexDirection: 'row', gap: 10, marginBottom: 15 },
   tokenInputGroup: { flex: 1 },
   tokenInputLabel: { fontSize: 12, color: '#64748B', marginBottom: 4, fontWeight: '500' },
   tokenInput: { width: '100%', borderWidth: 1, borderColor: '#E2E8F0', backgroundColor: '#F8FAFC', padding: 10, borderRadius: 8, fontSize: 14 },
-  
+
   roleSelectBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', marginHorizontal: 4 },
   roleSelectText: { fontSize: 12, color: '#475569', fontWeight: '500' },
   langSelectBtn: { paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, backgroundColor: '#E0E0E0', marginHorizontal: 5 },
   langSelectBtnActive: { backgroundColor: ACCENT },
   langSelectText: { fontSize: 14, color: '#333' },
-  
+
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6 },
   aiButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: '#FDE047', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },

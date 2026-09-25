@@ -1,3 +1,4 @@
+import { parseWordAudit } from '../utils/wordAudit';
 import { Word } from '../models/types';
 import { useStore, WordAiVerification } from '../store/useStore';
 import { generateGeminiText, isGeminiConfigured } from './geminiClient';
@@ -8,14 +9,6 @@ let isAuditing = false;
 let lastAuditTime = 0;
 const MIN_AUDIT_INTERVAL_MS = 12000; // at least 12 seconds between background audits
 
-interface AiCheckResponse {
-  isValid: boolean;
-  issues?: Array<{
-    lang: string;
-    issue: string;
-    suggestion?: string;
-  }>;
-}
 
 /**
  * Validates active translations of a word against Russian meaning using Gemini.
@@ -75,25 +68,7 @@ ${validActiveTranslations.map(t => `- ${t.langName} (код: ${t.langCode}): "${
       thinkingConfig: { thinkingBudget: 256 }
     });
 
-    let result: AiCheckResponse;
-    try {
-      result = JSON.parse(text);
-    } catch {
-      return null;
-    }
-
-    const issues = Array.isArray(result.issues) ? result.issues : [];
-    const isFlagged = !result.isValid || issues.length > 0;
-
-    return {
-      status: isFlagged ? 'flagged' : 'verified',
-      issues: issues.map(iss => ({
-        lang: iss.lang || 'unknown',
-        issue: iss.issue || 'Неточность перевода',
-        suggestion: iss.suggestion
-      })),
-      checkedAt: new Date().toISOString()
-    };
+    return parseWordAudit(JSON.parse(text));
   } catch (err) {
     // Background audit should fail silently
     console.warn('[WordAudit] Check error:', err);
@@ -133,7 +108,8 @@ export async function auditNextWordInBackground(): Promise<void> {
 
   try {
     const verification = await auditWordTranslations(candidate, activeLanguages);
-    if (verification) {
+    const current = useStore.getState().words.find(word => (word.eng || word.word) === (candidate.eng || candidate.word));
+    if (verification && current && current.ru === candidate.ru && activeLanguages.every(lang => getWordTranslation(current, lang) === getWordTranslation(candidate, lang))) {
       const key = candidate.eng || candidate.word || '';
       setWordAiVerification(key, verification);
     }

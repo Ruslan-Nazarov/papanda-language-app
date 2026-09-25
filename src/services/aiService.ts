@@ -1,17 +1,12 @@
 import { Token } from '../models/types';
-import { AI_SYSTEM_PROMPT } from './aiPrompt';
+import { AI_SYSTEM_PROMPT, AI_PRONUNCIATION_PROMPT } from './aiPrompt';
 import { generateGeminiText } from './geminiClient';
 
-/** The trainer already has a correct token-level breakdown (role, morphemes,
- * contextual translation) from generation — hand it to the model as ground
- * truth instead of asking it to re-derive the whole analysis blind from a bare
- * string. This turns "analyze from scratch" into "narrate this known structure
- * in Russian", which a small model does far more reliably and consistently
- * with what the trainer already shows on screen. */
+/** Pass the displayed annotation as context, while allowing explicit corrections. */
 const describeTokens = (tokens: Token[]): string =>
   tokens
     .map((token, index) => {
-      const morphemes = token.parts && token.parts.length > 1 ? token.parts.join('-') : '(неделимо)';
+      const morphemes = token.parts && token.parts.length > 1 ? token.parts.join('-') : '(деление не задано)';
       return `${index + 1}. "${token.text}" — роль: ${token.role}; часть речи: ${token.label}; морфемы: ${morphemes}; словарная форма: ${token.dictionary_form || token.text}; перевод здесь: ${token.translation || '—'}`;
     })
     .join('\n');
@@ -59,7 +54,7 @@ export async function explainSentenceWithAI(
   tokens?: Token[]
 ): Promise<string> {
   const tokenBlock = tokens && tokens.length > 0
-    ? `\nГотовый разбор по токенам (используй его как основу — это уже проверенные роли и морфемы, не придумывай другой разбор структуры, а объясни именно этот, по-русски и педагогично):\n${describeTokens(tokens)}\n`
+    ? `\nРазбор по токенам из карточки (сверь с предложением; явно объясни обнаруженные расхождения, не принимай разметку за доказанный факт):\n${describeTokens(tokens)}\n`
     : '';
 
   const userPrompt = `Пожалуйста, разбери это предложение (язык оригинала: ${targetLanguage}): "${sentence}".
@@ -93,3 +88,34 @@ ${tokenBlock}`;
     throw new Error(error instanceof Error ? error.message : 'Не удалось получить объяснение');
   }
 }
+
+export async function explainPronunciationWithAI(
+  word: string,
+  targetLanguage: string,
+  nativeTranslation: string
+): Promise<string> {
+  const userPrompt = `Пожалуйста, объясни правила произношения этого слова (язык оригинала: ${targetLanguage}): "${word}".
+Его перевод: "${nativeTranslation}".`;
+
+  const ask = async (extraInstruction?: string): Promise<string> => {
+    const prompt = extraInstruction
+      ? `${AI_PRONUNCIATION_PROMPT}\n\n${userPrompt}\n\nИСПРАВЬ ПРЕДЫДУЩИЙ ОТВЕТ: ${extraInstruction} Перепиши разбор целиком с соблюдением всех правил.`
+      : `${AI_PRONUNCIATION_PROMPT}\n\n${userPrompt}`;
+
+    return generateGeminiText(prompt, {
+      temperature: 0.4,
+      maxOutputTokens: 2048
+    });
+  };
+
+  try {
+    const first = await ask();
+    const issues = findExplanationIssues(first);
+    if (issues.length === 0) return first;
+
+    return await ask(issues.map(i => i.detail).join('; '));
+  } catch (error: unknown) {
+    throw new Error(error instanceof Error ? error.message : 'Не удалось получить объяснение произношения');
+  }
+}
+

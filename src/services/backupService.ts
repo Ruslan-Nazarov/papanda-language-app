@@ -76,8 +76,11 @@ export async function importProgressFromFile(): Promise<{ ok: boolean; error?: s
     }
 
     const backup = parsed as Partial<BackupFile>;
-    if (!backup || backup.app !== 'papanda' || typeof backup.data !== 'object') {
+    if (!backup || backup.app !== 'papanda' || !backup.data || typeof backup.data !== 'object') {
       return { ok: false, error: 'Это не похоже на резервную копию Papanda.' };
+    }
+    if (backup.version !== BACKUP_VERSION) {
+      return { ok: false, error: 'Эта версия резервной копии не поддерживается.' };
     }
 
     const result = useStore.getState().importProgress(backup.data);

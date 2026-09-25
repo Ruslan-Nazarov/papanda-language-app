@@ -11,9 +11,9 @@ const makeId = () =>
   });
 
 let cached: string | null = null;
+let pending: Promise<string> | null = null;
 
-export async function getInstallId(): Promise<string> {
-  if (cached) return cached;
+async function loadInstallId(): Promise<string> {
   try {
     const existing = await AsyncStorage.getItem(KEY);
     if (existing && /^[a-z0-9-]{8,64}$/i.test(existing)) {
@@ -31,4 +31,10 @@ export async function getInstallId(): Promise<string> {
     // non-fatal; it just won't persist across launches
   }
   return fresh;
+}
+
+export function getInstallId(): Promise<string> {
+  if (cached) return Promise.resolve(cached);
+  if (!pending) pending = loadInstallId().finally(() => { pending = null; });
+  return pending;
 }

@@ -1,46 +1,49 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder, Modal, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder, Modal, Animated, Easing, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useStore } from '../store/useStore';
+import { useStore, UserWordProgress } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
-import { wordMemoryWeight } from '../utils/statistics';
+import { wordMemoryWeight, readWordStats } from '../utils/statistics';
 import { auditNextWordInBackground } from '../services/wordAuditService';
 import { prefetchSentencesInBackground } from '../services/sentencePrefetch';
+import { usePronunciation } from '../hooks/usePronunciation';
+import Markdown from 'react-native-markdown-display';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
-type WordStats = Record<string, boolean | number>;
 
 const SWIPE_THRESHOLD = 72;
 const SWIPE_EXIT_DISTANCE = 520;
 const SWIPE_ENTRY_OFFSET = 56;
 
-const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | undefined): WordStats => {
-  if (!value) return {};
-  if (typeof value === 'object') return value;
-
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-};
 
 export default function WordTriplesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { words, activeLanguages, markTripleKnown, recordTripleCardShow, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore();
+  const { words, activeLanguages, markTripleKnown, recordTripleCardShow, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    markTripleKnown: state.markTripleKnown,
+    recordTripleCardShow: state.recordTripleCardShow,
+    saveWordAssociation: state.saveWordAssociation,
+    restoreWordProgress: state.restoreWordProgress,
+    toggleWordFavorite: state.toggleWordFavorite,
+    userWordProgress: state.userWordProgress,
+    setTargetSentenceInfo: state.setTargetSentenceInfo,
+  })));
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
-  const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: any}[]>([]);
+  const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: UserWordProgress | null}[]>([]);
+  const { isPronunciationModalVisible, setIsPronunciationModalVisible, pronunciationExplanation,
+    setPronunciationExplanation, isPronunciationLoading, handlePronunciation } = usePronunciation();
 
   // Avoid stale closures in PanResponder
   const callbacks = React.useRef({
@@ -75,6 +78,7 @@ export default function WordTriplesScreen() {
   ).current;
 
   const pickRandomWord = () => {
+    const { words, activeLanguages } = useStore.getState();
     const pending = words.filter(w => {
       const hasAllTranslations = activeLanguages.every(lang =>
         Boolean(getWordTranslation(w, lang))
@@ -109,6 +113,7 @@ export default function WordTriplesScreen() {
     setCurrentWord(chosen);
     setAssociationText(chosen.personal_association || '');
     recordTripleCardShow(chosen.eng || chosen.word || '');
+    setPronunciationExplanation(null);
   };
 
   useEffect(() => {
@@ -123,24 +128,26 @@ export default function WordTriplesScreen() {
     if (!currentWord) return;
     const wordKey = currentWord.eng || currentWord.word;
     const latestWord = words.find(w => (w.eng || w.word) === wordKey);
-    if (latestWord && latestWord !== currentWord) {
+    if (!latestWord || !activeLanguages.every(lang => getWordTranslation(latestWord, lang))) {
+      pickRandomWord();
+    } else if (latestWord !== currentWord) {
       setCurrentWord(latestWord);
       setAssociationText(latestWord.personal_association || '');
     }
-  }, [words, currentWord]);
+  }, [words, currentWord, activeLanguages]);
 
   const handleNext = () => {
     if (currentWord && associationText !== currentWord.personal_association) {
       saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
     }
-    
+
     if (currentWord) {
       const wordKey = currentWord.eng || currentWord.word || '';
       const previousProgress = useStore.getState().userWordProgress[wordKey];
       setHistory(prev => [...prev, {
         word: currentWord,
         markedLearned: false,
-        previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+        previousProgress: previousProgress ?? null
       }]);
     }
 
@@ -153,13 +160,13 @@ export default function WordTriplesScreen() {
       if (associationText !== currentWord.personal_association) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
       }
-      
+
       const wordKey = currentWord.eng || currentWord.word || '';
       const previousProgress = useStore.getState().userWordProgress[wordKey];
       setHistory(prev => [...prev, {
         word: currentWord,
         markedLearned: true,
-        previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+        previousProgress: previousProgress ?? null
       }]);
 
       markTripleKnown(wordKey);
@@ -172,12 +179,12 @@ export default function WordTriplesScreen() {
     if (history.length > 0) {
       const lastAction = history[history.length - 1];
       const wordKey = lastAction.word.eng || lastAction.word.word || '';
-      
+
       restoreWordProgress(wordKey, lastAction.previousProgress);
-      
+
       setSessionCount(prev => Math.max(0, prev - 1));
       setHistory(prev => prev.slice(0, -1));
-      
+
       setCurrentWord(lastAction.word);
       setAssociationText(lastAction.word.personal_association || '');
     }
@@ -192,6 +199,7 @@ export default function WordTriplesScreen() {
       bounciness: 5,
     }).start();
   };
+
 
   const handleSwipe = (direction: 'left' | 'right') => {
     // Right swipe undoes the previous card; keep it in place if nothing to undo.
@@ -288,8 +296,8 @@ export default function WordTriplesScreen() {
   }
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       {...panResponder.panHandlers}
     >
@@ -302,8 +310,8 @@ export default function WordTriplesScreen() {
               <Text style={styles.sessionCountText}>Пройдено за заход: {sessionCount}</Text>
             )}
           </View>
-          <TouchableOpacity 
-            style={styles.dictionaryBtn} 
+          <TouchableOpacity
+            style={styles.dictionaryBtn}
             onPress={() => navigation.navigate('Dictionary')}
           >
             <Text style={{fontSize: 24}}>📖</Text>
@@ -354,7 +362,7 @@ export default function WordTriplesScreen() {
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
 
           {currentProgress?.ai_verification?.status === 'flagged' && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.aiWarningBanner}
               activeOpacity={0.8}
               onPress={() => {
@@ -403,13 +411,25 @@ export default function WordTriplesScreen() {
                   >
                     <Text style={styles.langTranslation} numberOfLines={2}>{translation || '—'}</Text>
                   </TouchableOpacity>
+
+                  {/* Pronunciation Button */}
+                  {translation && (
+                    <TouchableOpacity
+                      style={styles.pronunciationBtn}
+                      activeOpacity={0.7}
+                      onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Text style={styles.pronunciationBtnText}>📢</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
             })}
           </View>
 
           <View style={styles.divider} />
-          
+
           {/* Association Input */}
           <View style={styles.assocHeaderRow}>
             <Text style={styles.assocLabel}>💡 Личная ассоциация:</Text>
@@ -429,27 +449,16 @@ export default function WordTriplesScreen() {
 
         {/* Bottom Actions */}
         <View style={styles.controls}>
-          <TouchableOpacity 
-            style={[styles.button, styles.btnPrev, history.length === 0 && { opacity: 0.5 }]} 
-            activeOpacity={0.8} 
-            onPress={handlePrev}
-            disabled={history.length === 0}
-          >
-            <Text style={styles.buttonText}>Назад</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.btnNext]} activeOpacity={0.8} onPress={handleNext}>
-            <Text style={styles.buttonText}>Дальше</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.btnKnown]} activeOpacity={0.8} onPress={handleMarkLearned}>
             <Text style={styles.buttonText}>✓ Выучено</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <EditWordModal 
-        visible={isModalVisible} 
-        onClose={() => setIsModalVisible(false)} 
-        wordToEdit={editingWord} 
+      <EditWordModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        wordToEdit={editingWord}
       />
 
       <Modal
@@ -498,14 +507,52 @@ export default function WordTriplesScreen() {
           </View>
         </View>
       </Modal>
+      <Modal
+        visible={isPronunciationModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsPronunciationModalVisible(false)}
+      >
+        <View style={styles.pronunciationModalOverlay}>
+          <View style={styles.pronunciationModalContent}>
+            <View style={styles.pronunciationModalHeader}>
+              <Text style={styles.pronunciationModalTitle}>🗣 Разбор произношения</Text>
+              <TouchableOpacity onPress={() => setIsPronunciationModalVisible(false)} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                <Text style={styles.pronunciationModalCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.pronunciationModalScroll}>
+              {isPronunciationLoading ? (
+                <View style={styles.pronunciationLoadingContainer}>
+                  <ActivityIndicator size="large" color={ACCENT} />
+                  <Text style={styles.pronunciationLoadingText}>Анализируем правила произношения...</Text>
+                </View>
+              ) : (
+                <Markdown
+                  style={{
+                    body: { fontSize: 16, lineHeight: 24, color: '#334155' },
+                    strong: { fontWeight: '700', color: '#0F172A' },
+                    bullet_list: { marginTop: 10, marginBottom: 10 },
+                    list_item: { marginBottom: 6 },
+                  }}
+                >
+                  {pronunciationExplanation || ''}
+                </Markdown>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#F8F9FA' 
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA'
   },
   innerWrapper: {
     flex: 1,
@@ -524,9 +571,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
-  headerTitle: { 
-    fontSize: 22, 
-    fontWeight: 'bold', 
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
     color: '#1A202C',
     letterSpacing: 0.3,
   },
@@ -536,10 +583,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontWeight: '600'
   },
-  info: { 
-    fontSize: 16, 
-    color: '#718096', 
-    textAlign: 'center' 
+  info: {
+    fontSize: 16,
+    color: '#718096',
+    textAlign: 'center'
   },
   card: {
     backgroundColor: '#FFF',
@@ -590,25 +637,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  nativeWord: { 
-    fontSize: 28, 
-    fontWeight: 'bold', 
-    textAlign: 'center', 
+  nativeWord: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
     color: '#1A202C',
     marginVertical: 4,
   },
-  divider: { 
-    height: 1, 
-    backgroundColor: '#EDF2F7', 
-    marginVertical: 10 
+  wordCenterContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 58,
   },
-  langsContainer: { 
-    flexDirection: 'column', 
-    gap: 10 
+  pronunciationBtn: {
+    marginLeft: 8,
+    padding: 8,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  langBlock: { 
-    backgroundColor: '#F8F9FA', 
-    paddingVertical: 12, 
+  pronunciationBtnText: {
+    fontSize: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EDF2F7',
+    marginVertical: 10
+  },
+  langsContainer: {
+    flexDirection: 'column',
+    gap: 10
+  },
+  langBlock: {
+    backgroundColor: '#F8F9FA',
+    paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 14,
     borderWidth: 1,
@@ -627,7 +691,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    width: '100%',
   },
   aiWarningIcon: {
     fontSize: 18,
@@ -666,18 +729,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#64748B',
   },
-  wordCenterContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // Reserve room for the absolutely-positioned language badge on the left so a
-    // long word (e.g. Kazakh) never slides under the flag. Symmetric so the word
-    // stays visually centred, it just wraps sooner.
-    paddingHorizontal: 58,
-  },
-  langTranslation: { 
-    fontSize: 24, 
-    color: ACCENT, 
+
+  langTranslation: {
+    fontSize: 24,
+    color: ACCENT,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -687,10 +742,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  assocLabel: { 
-    fontSize: 12, 
-    fontWeight: 'bold', 
-    color: '#475569', 
+  assocLabel: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#475569',
   },
   assocSavedBadge: {
     fontSize: 11,
@@ -719,15 +774,15 @@ const styles = StyleSheet.create({
     borderColor: '#FEF08A',
     color: '#1E293B',
   },
-  controls: { 
-    flexDirection: 'row', 
+  controls: {
+    flexDirection: 'row',
     gap: 12,
     marginTop: 8,
   },
-  button: { 
-    flex: 1, 
-    paddingVertical: 15, 
-    borderRadius: 14, 
+  button: {
+    flex: 1,
+    paddingVertical: 15,
+    borderRadius: 14,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -748,16 +803,16 @@ const styles = StyleSheet.create({
   btnPrev: {
     backgroundColor: '#94A3B8'
   },
-  btnNext: { 
-    backgroundColor: '#64748B' 
+  btnNext: {
+    backgroundColor: '#64748B'
   },
-  btnKnown: { 
-    backgroundColor: '#28A745' 
+  btnKnown: {
+    backgroundColor: '#28A745'
   },
-  buttonText: { 
-    color: '#FFF', 
-    fontSize: 16, 
-    fontWeight: 'bold' 
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold'
   },
   modalOverlay: {
     flex: 1,
@@ -866,5 +921,46 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pronunciationModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  pronunciationModalContent: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    height: '80%',
+    padding: 20,
+  },
+  pronunciationModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  pronunciationModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E293B',
+  },
+  pronunciationModalCloseText: {
+    fontSize: 24,
+    color: '#64748B',
+    fontWeight: '300',
+  },
+  pronunciationModalScroll: {
+    flex: 1,
+  },
+  pronunciationLoadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pronunciationLoadingText: {
+    marginTop: 16,
+    color: '#64748B',
+    fontSize: 15,
   }
 });

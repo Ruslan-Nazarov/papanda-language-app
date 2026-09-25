@@ -1,103 +1,82 @@
 import { Sentence, Word } from '../models/types';
 import { generateGeminiText, isGeminiConfigured } from './geminiClient';
-import { buildSentenceGenerationPrompt, getDictionaryCandidates, getLanguagePrompt, SENTENCE_ARRAY_SCHEMA } from './sentencePrompts';
+import { buildSentenceGenerationPrompt, buildSentenceAnnotationPrompt, getAllDictionaryCandidates, getSeedWords, getLanguagePrompt, SENTENCE_ARRAY_SCHEMA, DRAFT_ARRAY_SCHEMA } from './sentencePrompts';
+import { parseSentenceDrafts, planSentenceBatch, SentenceDraft } from './sentenceCurriculum';
 import { sentenceFingerprint, validateGeneratedSentences } from '../utils/sentenceValidation';
 
 const DEFAULT_BATCH_SIZE = 8;
-// Strict per-sentence validation (predicate, ≥4 tokens, ≥2 dictionary words) plus a
-// "lite" model means a single AI call often yields far fewer usable sentences than
-// requested. Re-prompt for the shortfall instead of silently accepting whatever
-// survived one pass — this is the fix for the "only 2 sentences, looping" symptom.
-const MAX_GENERATION_ROUNDS = 3;
+// Two batched requests per round; one bounded repair round for rejected tasks.
+const MAX_GENERATION_ROUNDS = 2;
+export const isSentenceGenerationConfigured = isGeminiConfigured;
+export interface RequiredWord { lemma: string; translation?: string }
 
-const requestOneRound = async (
-  languageCode: string,
-  dictionary: ReturnType<typeof getDictionaryCandidates>,
-  languageLabel: string,
-  count: number,
-  avoidSentences: string[],
-  requiredWord?: string
-): Promise<{ sentences: Sentence[]; errors: string[] }> => {
-  const text = await generateGeminiText(buildSentenceGenerationPrompt(languageCode, dictionary, count, avoidSentences, requiredWord), {
-    // Higher temperature — the batch needs varied sentences, not the single most
-    // probable "subject + verb" for the given words.
-    temperature: 0.95,
-    topP: 0.95,
-    responseMimeType: 'application/json',
-    responseJsonSchema: SENTENCE_ARRAY_SCHEMA
-  });
-
-  let body: unknown;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    throw new Error('ИИ вернул некорректный JSON. Попробуйте ещё раз.');
-  }
-
-  return validateGeneratedSentences(body, languageCode, languageLabel, dictionary);
+const parseJSON = (text: string): unknown => {
+  try { return JSON.parse(text); } catch { return null; }
 };
 
-export const isSentenceGenerationConfigured = isGeminiConfigured;
-
-export interface RequiredWord {
-  lemma: string;
-  translation?: string;
-}
-
-export const generateSentenceBatch = async (
-  languageCode: string,
-  words: Word[],
-  count = DEFAULT_BATCH_SIZE,
-  requiredWord?: RequiredWord
-): Promise<Sentence[]> => {
-  const language = getLanguagePrompt(languageCode);
-  const dictionary = getDictionaryCandidates(words, languageCode);
-
-  // The tapped word might not have made it into the random candidate sample
-  // (or might not even be in the dictionary yet) — force it in so the model
-  // is actually allowed to use it and satisfy the REQUIRED WORD instruction.
-  if (requiredWord?.lemma) {
-    const normalized = requiredWord.lemma.trim().toLocaleLowerCase();
-    const alreadyThere = dictionary.some(item => item.lemma.trim().toLocaleLowerCase() === normalized);
-    if (!alreadyThere && normalized) {
-      dictionary.unshift({ lemma: requiredWord.lemma.trim(), translation: requiredWord.translation || '' });
-    }
+const generateBatch = async (code: string, words: Word[], count: number, required?: RequiredWord): Promise<Sentence[]> => {
+  const language = getLanguagePrompt(code);
+  const dictionary = getAllDictionaryCandidates(words, code);
+  if (required?.lemma && !dictionary.some(entry => entry.lemma.toLocaleLowerCase() === required.lemma.trim().toLocaleLowerCase())) {
+    dictionary.push({ lemma: required.lemma.trim(), translation: required.translation || '' });
   }
-
-  if (dictionary.length < 2) throw new Error('Для генерации нужны хотя бы два слова с переводом в активном словаре.');
-
-  const collected: Sentence[] = [];
-  const seenFingerprints = new Set<string>();
-  const lastErrors: string[] = [];
-
-  for (let round = 0; round < MAX_GENERATION_ROUNDS && collected.length < count; round++) {
-    const shortfall = count - collected.length;
-    // Ask for a bit more than the shortfall to absorb validation drop-off.
-    const requestCount = round === 0 ? count : Math.min(count, Math.max(shortfall + 2, 4));
-    const avoidSentences = collected.map(s => s.sentence);
-
-    let result: { sentences: Sentence[]; errors: string[] };
+  const tasks = planSentenceBatch(count);
+  const accepted = new Map<string, Sentence>();
+  const fingerprints = new Set<string>();
+  let errors: string[] = [];
+  for (let round = 0; round < MAX_GENERATION_ROUNDS && accepted.size < count; round++) {
+    const pending = tasks.filter(task => !accepted.has(task.id));
+    const context: SentenceDraft[] = [...accepted].map(([taskId, sentence]) => ({ taskId, sentence: sentence.sentence }));
+    const seeds = getSeedWords(words, code);
+    if (required?.lemma) seeds.unshift({ lemma: required.lemma.trim(), translation: required.translation || '' });
     try {
-      result = await requestOneRound(languageCode, dictionary, language.label, requestCount, avoidSentences, requiredWord?.lemma);
+      const draftText = await generateGeminiText(buildSentenceGenerationPrompt(code, seeds, pending.length,
+        context.map(item => item.sentence), required?.lemma, pending, errors, context), {
+        temperature: 0.8, topP: 0.92, maxOutputTokens: 4096,
+        responseMimeType: 'application/json', responseJsonSchema: DRAFT_ARRAY_SCHEMA,
+      });
+      const drafts = parseSentenceDrafts(parseJSON(draftText), pending);
+      if (!drafts.length) { errors = ['Не получены тексты для заданий.']; continue; }
+      const annotationText = await generateGeminiText(buildSentenceAnnotationPrompt(code, pending, drafts, context), {
+        temperature: 0.2, maxOutputTokens: 16384,
+        responseMimeType: 'application/json', responseJsonSchema: SENTENCE_ARRAY_SCHEMA,
+      });
+      const result = validateGeneratedSentences(parseJSON(annotationText), code, language.label, dictionary,
+        { tasks: pending, drafts, requiredWord: required?.lemma });
+      errors = result.errors;
+      // Task order is authoritative even if the model reverses its response.
+      for (const task of pending) {
+        const sentence = result.sentences.find(item => item.generationTaskId === task.id);
+        if (!sentence) { errors.push(`${task.id}: составьте новый естественный пример и надёжный разбор.`); continue; }
+        if (task.develops && !accepted.has(task.develops)) {
+          errors.push(`${task.id}: сначала нужна принятая основа ${task.develops}.`); continue;
+        }
+        const fingerprint = sentenceFingerprint(sentence.language, sentence.sentence);
+        if (fingerprints.has(fingerprint)) { errors.push(`${task.id}: повтор предложения.`); continue; }
+        fingerprints.add(fingerprint);
+        accepted.set(task.id, sentence);
+      }
     } catch (error) {
-      if (collected.length > 0) break; // keep what we already have rather than failing the whole batch
+      // Partial background batches are useful, but targeted generation must never
+      // succeed without its requested lexeme.
+      if (accepted.size && (!required?.lemma || accepted.has('task-1'))) break;
       throw error;
     }
-
-    lastErrors.length = 0;
-    lastErrors.push(...result.errors);
-
-    for (const sentence of result.sentences) {
-      const fp = sentenceFingerprint(sentence.language, sentence.sentence);
-      if (seenFingerprints.has(fp)) continue;
-      seenFingerprints.add(fp);
-      collected.push(sentence);
-      if (collected.length >= count) break;
-    }
   }
-
-  if (collected.length === 0) {
-    throw new Error(lastErrors[0] || 'ИИ вернул предложения, не прошедшие проверку.');
+  if (!accepted.size || (required?.lemma && !accepted.has('task-1'))) {
+    throw new Error(errors[0] || 'ИИ вернул предложения, не прошедшие проверку.');
   }
-  return collected;
+  return tasks.flatMap(task => accepted.has(task.id) ? [accepted.get(task.id)!] : []);
+};
+
+// Coalesce only genuinely identical work, including dictionary projection.
+const pendingBatches = new Map<string, Promise<Sentence[]>>();
+export const generateSentenceBatch = (code: string, words: Word[], count = DEFAULT_BATCH_SIZE, required?: RequiredWord): Promise<Sentence[]> => {
+  if (!Number.isSafeInteger(count) || count < 1 || count > 20) return Promise.reject(new Error('Размер набора должен быть от 1 до 20.'));
+  const key = JSON.stringify([code, count, required?.lemma?.trim().toLowerCase(), required?.translation, getAllDictionaryCandidates(words, code)]);
+  const pending = pendingBatches.get(key);
+  if (pending) return pending;
+  const task = generateBatch(code, words, count, required).finally(() => pendingBatches.delete(key));
+  pendingBatches.set(key, task);
+  return task;
 };

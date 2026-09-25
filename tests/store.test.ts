@@ -4,10 +4,11 @@ import assert from 'node:assert/strict';
 import { useStore } from '../src/store/useStore';
 import { Token, Sentence } from '../src/models/types';
 import { getWordTranslation } from '../src/utils/words';
+import { createDefaultProgress } from '../src/store/progressTypes';
 
 describe('Zustand useStore', () => {
   beforeEach(() => {
-    useStore.getState().initializeStore();
+    useStore.getState().importProgress(createDefaultProgress());
   });
 
   describe('addWordFromSentenceToken', () => {

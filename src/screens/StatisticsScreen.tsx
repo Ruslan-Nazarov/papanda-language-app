@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -90,7 +91,14 @@ function BarRow({ label, value, max, color, valueText }: { label: string; value:
 export default function StatisticsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, dailyShows, workoutSnapshots, imwSnapshots, recordImwSnapshot } = useStore();
+  const { words, activeLanguages, dailyShows, workoutSnapshots, imwSnapshots, recordImwSnapshot } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    dailyShows: state.dailyShows,
+    workoutSnapshots: state.workoutSnapshots,
+    imwSnapshots: state.imwSnapshots,
+    recordImwSnapshot: state.recordImwSnapshot,
+  })));
   const [efficiencyMode, setEfficiencyMode] = useState<'percentage' | 'absolute'>('percentage');
 
   // Refresh today's iMW point whenever the user opens this screen.
@@ -407,7 +415,7 @@ const styles = StyleSheet.create({
   cardBody: { paddingHorizontal: 16, paddingBottom: 16 },
 
   helpBtn: {
-    width: 22, height: 22, borderRadius: 11, marginRight: 10,
+    width: 22, height: 22, borderRadius: 11, marginRight: 18,
     backgroundColor: '#EEF2F7', borderWidth: 1, borderColor: '#D9E1EC',
     alignItems: 'center', justifyContent: 'center',
   },

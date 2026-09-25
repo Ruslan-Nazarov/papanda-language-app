@@ -1,15 +1,9 @@
-export type Language = 'EN' | 'RU' | 'ES' | 'IT' | 'DE' | 'KZ';
-
-export interface WordTranslation {
-  [lang: string]: string | undefined;
-}
-
 export interface Word {
   id?: string;
   word?: string; // from mock
   meaning?: string; // from mock
   translations?: Record<string, string>; // from mock
-  
+
   eng?: string;
   ru?: string;
   it?: string;
@@ -22,6 +16,7 @@ export interface Word {
   last_shown_by_lang?: Record<string, string>; // ISO date string per language code
   knowledge_stats?: string | Record<string, boolean>; // JSON string from DB, parsed to object
   show_stats?: string | Record<string, number>; // JSON string from DB, parsed to object
+  snoozed_until_by_lang?: Record<string, string>; // ISO date string per language code
   personal_association?: string; // user's personal context/meaning
   is_favorite?: boolean;
   /** Language of a word added from a sentence; the internal `eng` field remains its stable key. */
@@ -54,6 +49,8 @@ export interface Token {
   dictionary_word?: string | null;
   /** Canonical lemma for adding the token to the dictionary, even when it is not there yet. */
   dictionary_form?: string;
+  /** Explicit grammatical base; absent in legacy/manual data. */
+  clauseIndex?: number;
 }
 
 export interface Sentence {
@@ -64,4 +61,8 @@ export interface Sentence {
   source?: 'seed' | 'manual' | 'generated';
   /** Epoch ms when a generated sentence was created; used to surface fresh batches first. */
   createdAt?: number;
+  literalTranslation?: string;
+  learningGoal?: string;
+  /** Local task key used to preserve batch order through validation/retries. */
+  generationTaskId?: string;
 }

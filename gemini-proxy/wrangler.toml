@@ -20,11 +20,14 @@ PER_INSTALL_HOURLY = "40"
 PER_INSTALL_DAILY = "200"
 GLOBAL_DAILY = "1500"
 
-# Rate-limit counters. Create with:  npx wrangler kv namespace create RL
-# then paste the printed id below.
-[[kv_namespaces]]
-binding = "RL"
-id = "8e64fb14cc21484d92881dba047176f9"
+# Transactional quotas; migration is applied by wrangler deploy.
+[[durable_objects.bindings]]
+name = "QUOTA"
+class_name = "QuotaLimiter"
+
+[[migrations]]
+tag = "v1-quota"
+new_sqlite_classes = ["QuotaLimiter"]
 
 # API keys are secrets, not vars — set only the ones you use:
 #   npx wrangler secret put GEMINI_API_KEY

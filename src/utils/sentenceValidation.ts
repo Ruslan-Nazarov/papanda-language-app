@@ -1,156 +1,124 @@
 import { Sentence, SyntaxRole, Token } from '../models/types';
-import { DictionaryCandidate, makeGeneratedSentence } from '../services/sentencePrompts';
+import type { DictionaryCandidate } from '../services/sentencePrompts';
+import type { SentenceDraft, SentenceTask } from '../services/sentenceCurriculum';
+import { makeGeneratedSentence } from './sentences';
 
-const VALID_ROLES = new Set<SyntaxRole>([
-  'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
-  'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction',
-  'Preposition', 'Particle', 'Article', 'Other'
-]);
+const VALID_ROLES = new Set<SyntaxRole>(['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
+  'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction', 'Preposition', 'Particle', 'Article', 'Other']);
+const surface = (value: string) => value.normalize('NFC').replace(/[’‘]/gu, "'");
+const normalize = (value: string) => surface(value).trim().toLocaleLowerCase().replace(/\s+/g, ' ');
+const edgePunctuation = /^[.,;:!?¿¡"«»„“”()…—–]+|[.,;:!?¿¡"«»„“”()…—–]+$/gu;
+const separator = /[\s.,;:!?¿¡"«»„“”()…—–]/u;
 
-const ROLE_ALIASES: Record<string, SyntaxRole> = {
-  Verb: 'Predicate',
-  Noun: 'Subject',
-  Pronoun: 'Subject',
-  Adjective: 'Attribute',
-  Adverb: 'Adverbial',
-  Circumstantial: 'Circumstance'
+export const sentenceFingerprint = (label: string, text: string): string =>
+  `${normalize(label)}:${normalize(text).replace(/[.,;:!?¿¡"«»„“”()]/gu, '').replace(/\s+/g, ' ').trim()}`;
+
+/** Compare surface spans, retaining word boundaries, apostrophes and hyphens.
+ * Unlike stripping all whitespace, this cannot equate "a part" with "apart".
+ */
+export const tokensMatchSentence = (sentence: string, tokens: Pick<Token, 'text'>[]): boolean => {
+  const source = surface(sentence);
+  let cursor = 0;
+  for (const token of tokens) {
+    while (cursor < source.length && separator.test(source[cursor])) cursor++;
+    const text = surface(token.text);
+    if (!text || /\s/u.test(text) || !source.startsWith(text, cursor)) return false;
+    cursor += text.length;
+    if (cursor < source.length && !separator.test(source[cursor]) && !text.endsWith("'")) return false;
+  }
+  while (cursor < source.length && separator.test(source[cursor])) cursor++;
+  return cursor === source.length;
 };
 
-const normalize = (value: string) => value.trim().toLocaleLowerCase();
+/** Match a headword or expression against actual surface/lemma sequences, not a
+ * model's unverified dictionary_word reference. Lemma correctness needs review.
+ */
+export const findLemmaSpan = (tokens: Token[], lemma: string): number[] => {
+  const wanted = normalize(lemma).split(' ');
+  for (let i = 0; i <= tokens.length - wanted.length; i++) {
+    if (wanted.every((part, j) => [tokens[i + j].text, tokens[i + j].dictionary_form || ''].some(form => normalize(form) === part))) {
+      return wanted.map((_, j) => i + j);
+    }
+  }
+  return [];
+};
 
-// Structural fingerprint used to dedupe near-identical sentences that differ by
-// one token (e.g. swapped adjective) but are otherwise the same template. Case,
-// punctuation and spacing differences alone must NOT count as "different".
-export const sentenceFingerprint = (languageLabel: string, sentenceText: string): string =>
-  `${normalize(languageLabel)}:${normalize(sentenceText).replace(/[.,;:!?"«»„“”()]/gu, '').replace(/\s+/g, ' ').trim()}`;
-
-export interface ValidationResult {
-  sentences: Sentence[];
-  errors: string[];
-}
+export interface ValidationResult { sentences: Sentence[]; errors: string[] }
+export interface GenerationValidationContext { tasks: SentenceTask[]; drafts: SentenceDraft[]; requiredWord?: string }
 
 export const validateGeneratedSentences = (
-  value: unknown,
-  languageCode: string,
-  languageLabel: string,
-  dictionary: DictionaryCandidate[]
+  value: unknown, code: string, label: string, dictionary: DictionaryCandidate[], context?: GenerationValidationContext,
 ): ValidationResult => {
   if (!Array.isArray(value)) return { sentences: [], errors: ['ИИ вернул данные не в виде массива.'] };
-
-  const dictionaryMap = new Map<string, string>();
-  dictionary.forEach(item => {
-    dictionaryMap.set(normalize(item.lemma), item.lemma);
-  });
-
+  const sentences: Sentence[] = [];
   const errors: string[] = [];
-  const valid: Sentence[] = [];
-
-  value.forEach((candidate, index) => {
-    const data = candidate as Partial<Sentence>;
-    if (!data || typeof data.sentence !== 'string' || !Array.isArray(data.words) || data.words.length === 0) {
-      errors.push(`Предложение ${index + 1}: отсутствуют sentence или words.`);
-      return;
+  const acceptedTasks = new Set<string>();
+  for (const [index, candidate] of value.entries()) {
+    const fail = (reason: string) => errors.push(`Предложение ${index + 1}: ${reason}`);
+    if (!candidate || typeof candidate !== 'object' || typeof candidate.sentence !== 'string' ||
+      !candidate.sentence.trim() || !Array.isArray(candidate.words) || !candidate.words.length) {
+      fail('отсутствуют sentence или words.'); continue;
     }
-
-    const rawTokens = data.words as Partial<Token>[];
-    const sanitizedTokens: Token[] = [];
-    let dictionaryTokenCount = 0;
-
-    for (const raw of rawTokens) {
-      if (!raw || typeof raw.text !== 'string') continue;
-      // The contract forbids punctuation in token.text, but models sometimes emit a
-      // stray "," or "." token, or glue sentence punctuation to a word. Strip the
-      // sentence punctuation (keep apostrophes and hyphens — they belong to tokens
-      // like French "n'" or compound words).
-      const text = raw.text.trim().replace(/^[.,;:!?"«»„“”()]+|[.,;:!?"«»„“”()]+$/gu, '').trim();
-      if (!text) continue;
-
-      const label = (typeof raw.label === 'string' && raw.label.trim()) || text;
-      
-      let role: SyntaxRole = 'Other';
-      if (raw.role && VALID_ROLES.has(raw.role as SyntaxRole)) {
-        role = raw.role as SyntaxRole;
-      } else if (raw.role && ROLE_ALIASES[raw.role]) {
-        role = ROLE_ALIASES[raw.role];
+    const task = context?.tasks.find(item => item.id === candidate.taskId);
+    if (context) {
+      const draft = context.drafts.find(item => item.taskId === candidate.taskId);
+      if (!task || !draft || draft.sentence !== candidate.sentence || acceptedTasks.has(task.id)) {
+        fail('разбор не соответствует исходному заданию или тексту.'); continue;
       }
-
-      // Check morpheme breakdown integrity
-      let parts: string[] = [text];
-      if (Array.isArray(raw.parts) && raw.parts.length > 0 && raw.parts.every(p => typeof p === 'string' && p.trim())) {
-        const rebuilt = raw.parts.join('').replace(/[\s-]/g, '');
-        if (normalize(rebuilt) === normalize(text.replace(/[\s-]/g, ''))) {
-          parts = raw.parts;
-        }
+      if (candidate.review?.natural !== true || candidate.review?.taskFit !== true || candidate.review?.analysisReliable !== true) {
+        fail(`${task.id}: фраза не прошла проверку естественности, задания или разбора.`); continue;
       }
-
-      const dictForm = (typeof raw.dictionary_form === 'string' && raw.dictionary_form.trim()) || label;
-      const rawDictWord = typeof raw.dictionary_word === 'string' ? raw.dictionary_word.trim() : null;
-
-      let isInDict = Boolean(raw.is_in_my_dict);
-      let matchedLemma: string | null = null;
-
-      // Try matching dictionary lemma by dictionary_word, dictionary_form, or text
-      if (rawDictWord && dictionaryMap.has(normalize(rawDictWord))) {
-        matchedLemma = dictionaryMap.get(normalize(rawDictWord)) || rawDictWord;
-      } else if (dictForm && dictionaryMap.has(normalize(dictForm))) {
-        matchedLemma = dictionaryMap.get(normalize(dictForm)) || dictForm;
-      } else if (dictionaryMap.has(normalize(text))) {
-        matchedLemma = dictionaryMap.get(normalize(text)) || text;
+      if (typeof candidate.literalTranslation !== 'string' || !candidate.literalTranslation.trim()) {
+        fail(`${task.id}: отсутствует дословный перевод предложения.`); continue;
       }
-
-      if (matchedLemma) {
-        isInDict = true;
-        dictionaryTokenCount++;
-      } else {
-        isInDict = false;
-        matchedLemma = null;
+    }
+    const tokens: Token[] = [];
+    let invalid = false;
+    for (const raw of candidate.words) {
+      if (!raw || typeof raw.text !== 'string' || !VALID_ROLES.has(raw.role)) { invalid = true; break; }
+      const text = raw.text.trim().replace(edgePunctuation, '');
+      if (!text || typeof raw.translation !== 'string' || (context && (!raw.translation.trim() ||
+        typeof raw.label !== 'string' || !raw.label.trim() || typeof raw.dictionary_form !== 'string' || !raw.dictionary_form.trim()))) {
+        invalid = true; break;
       }
-
-      sanitizedTokens.push({
-        text,
-        label,
-        role,
-        parts,
-        translation: typeof raw.translation === 'string' ? raw.translation : '',
-        is_in_my_dict: isInDict,
-        dictionary_word: matchedLemma,
-        dictionary_form: dictForm
-      });
+      if ((context || raw.clauseIndex !== undefined) && (!Number.isSafeInteger(raw.clauseIndex) || raw.clauseIndex < 0)) { invalid = true; break; }
+      const parts = Array.isArray(raw.parts) && raw.parts.length > 0 && raw.parts.every((p: unknown) => typeof p === 'string' && p.trim()) &&
+        normalize(raw.parts.join('')) === normalize(text) ? raw.parts : [text];
+      tokens.push({ text, label: typeof raw.label === 'string' ? raw.label : text, role: raw.role, parts,
+        translation: raw.translation, dictionary_form: typeof raw.dictionary_form === 'string' ? raw.dictionary_form.trim() : text,
+        is_in_my_dict: false, dictionary_word: null, ...(raw.clauseIndex !== undefined ? { clauseIndex: raw.clauseIndex } : {}) });
     }
-
-    if (sanitizedTokens.length === 0) {
-      errors.push(`Предложение ${index + 1}: не удалось распознать токены.`);
-      return;
+    if (invalid) { fail('некорректные роли, перевод или номера частей предложения.'); continue; }
+    if (!tokensMatchSentence(candidate.sentence, tokens)) { fail('токены не воспроизводят текст предложения.'); continue; }
+    if (!tokens.some(token => token.role === 'Predicate')) { fail('нет сказуемого.'); continue; }
+    if (tokens.some(token => token.clauseIndex !== undefined)) {
+      const clauses = [...new Set(tokens.map(token => token.clauseIndex))].sort((a, b) => (a ?? -1) - (b ?? -1));
+      if (clauses.some((clause, i) => clause !== i || !tokens.some(token => token.clauseIndex === clause && token.role === 'Predicate'))) {
+        fail('каждая часть должна иметь сказуемое, номера частей — идти от нуля без пропусков.'); continue;
+      }
+      if (task && ((task.focus === 'complex') !== (clauses.length > 1))) {
+        fail(`${task.id}: число грамматических основ не соответствует заданию.`); continue;
+      }
     }
-
-    // Structural floor: the trainer analyses members of a sentence, so a fragment
-    // like "Адам айтады." (subject + verb, nothing else) is not worth showing.
-    const hasPredicate = sanitizedTokens.some(token => token.role === 'Predicate');
-    if (!hasPredicate) {
-      errors.push(`Предложение ${index + 1}: нет сказуемого.`);
-      return;
+    const requiredRoles: Partial<Record<SentenceTask['focus'], SyntaxRole[]>> = {
+      attribute: ['Attribute', 'Attribute_Subject', 'Attribute_Object'], object: ['Object'], circumstance: ['Circumstance', 'Adverbial'],
+    };
+    if (task && requiredRoles[task.focus] && !tokens.some(token => requiredRoles[task.focus]!.includes(token.role))) {
+      fail(`${task.id}: отсутствует член предложения, который требуется найти.`); continue;
     }
-    if (sanitizedTokens.length < 4) {
-      errors.push(`Предложение ${index + 1}: слишком короткое (${sanitizedTokens.length} сл.).`);
-      return;
+    if (task?.id === 'task-1' && context?.requiredWord && !findLemmaSpan(tokens, context.requiredWord).length) {
+      fail(`task-1: отсутствует запрошенное слово «${context.requiredWord}».`); continue;
     }
-    if (dictionaryTokenCount < 2) {
-      errors.push(`Предложение ${index + 1}: менее двух слов из словаря.`);
-      return;
+    // Prefer a whole expression over overlapping single headwords.
+    for (const entry of [...dictionary].sort((a, b) => b.lemma.split(' ').length - a.lemma.split(' ').length)) {
+      for (const i of findLemmaSpan(tokens, entry.lemma)) {
+        if (!tokens[i].is_in_my_dict) { tokens[i].is_in_my_dict = true; tokens[i].dictionary_word = entry.lemma; }
+      }
     }
-
-    valid.push(
-      makeGeneratedSentence(
-        {
-          language: languageLabel,
-          sentence: data.sentence.trim(),
-          words: sanitizedTokens
-        },
-        languageCode,
-        index
-      )
-    );
-  });
-
-  return { sentences: valid, errors };
+    sentences.push(makeGeneratedSentence({ language: label, sentence: candidate.sentence.trim(), words: tokens,
+      ...(context && task ? { literalTranslation: candidate.literalTranslation.trim(), learningGoal: task.goal, generationTaskId: task.id } : {}),
+    }, code));
+    if (task) acceptedTasks.add(task.id);
+  }
+  return { sentences, errors };
 };

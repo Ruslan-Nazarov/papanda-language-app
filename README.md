@@ -61,7 +61,12 @@ npm install
 npx expo start
 ```
 
-Тесты: `npx tsx --test tests/*.test.ts`. Типы: `npx tsc --noEmit`.
+Установите также зависимости прокси: `npm ci --prefix gemini-proxy`.
+Все тесты и типы приложения/прокси: `npm run check`.
+Локальная сборка прокси без публикации: `npm run build --prefix gemini-proxy`.
+Проверка web-интерфейса: `npx expo export --platform web --output-dir dist-audit`,
+затем `node scripts/smoke-web.cjs` (внешние запросы в тесте блокируются).
+Результаты аудита и ограничения проверки: [docs/audit-2026-09-24.md](docs/audit-2026-09-24.md).
 
 Сборка Android APK (через EAS):
 

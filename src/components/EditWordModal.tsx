@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
 import { Word } from '../models/types';
@@ -13,7 +14,14 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
-  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore();
+  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    updateWordDetails: state.updateWordDetails,
+    addCustomWord: state.addCustomWord,
+    userWordProgress: state.userWordProgress,
+    setWordAiVerification: state.setWordAiVerification,
+  })));
   const [tempWord, setTempWord] = useState<{
     eng: string;
     ru: string;
@@ -43,7 +51,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
         });
 
         setTempWord({
-          eng: wordToEdit.source_language ? (wordToEdit.word || '') : (wordToEdit.eng || wordToEdit.word || ''),
+          eng: wordToEdit.source_language ? (wordToEdit.word || '') : getWordTranslation(wordToEdit, 'en'),
           ru: wordToEdit.ru || wordToEdit.translations?.ru || '',
           personal_association: wordToEdit.personal_association || '',
           translations: trans

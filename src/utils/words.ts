@@ -1,5 +1,11 @@
 import { Word } from '../models/types';
 
+export const getWordKey = (word: Word): string => word.eng || word.word || '';
+
+/** Strip sentence punctuation at the edges without corrupting hyphens/apostrophes. */
+export const cleanDictionaryForm = (value: string): string =>
+  value.trim().replace(/^[.,;:!?"«»„“”()]+|[.,;:!?"«»„“”()]+$/gu, '').trim();
+
 /**
  * Returns the translation of a word for a given language code.
  * Prioritizes user edits / custom translations stored in `word.translations[langCode]`
@@ -17,6 +23,7 @@ export const getWordTranslation = (word: Word | undefined | null, langCode: stri
   if (langCode === 'en') {
     const customEn = word.translations?.en;
     if (typeof customEn === 'string' && customEn.trim()) return customEn.trim();
+    if (word.source_language) return word.source_language === 'en' ? (word.word || '').trim() : '';
     return (word.eng || word.word || '').trim();
   }
 

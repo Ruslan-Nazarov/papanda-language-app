@@ -1,41 +1,47 @@
+import { useShallow } from 'zustand/react/shallow';
+import { buildWorkoutQueue, QueueItem } from '../utils/workout';
+import { localDateKey } from '../utils/date';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Easing, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useStore } from '../store/useStore';
+import { useStore, UserWordProgress } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
-import { wordMemoryWeight } from '../utils/statistics';
+import { usePronunciation } from '../hooks/usePronunciation';
+import Markdown from 'react-native-markdown-display';
+import { readWordStats } from '../utils/statistics';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
-interface QueueItem {
-  word: Word;
-  langCode: string;
-}
 
-type WordStats = Record<string, boolean | number>;
 
 const SWIPE_THRESHOLD = 72;
 const SWIPE_EXIT_DISTANCE = 520;
 const SWIPE_ENTRY_OFFSET = 56;
 
-const readWordStats = (value: Word['knowledge_stats'] | Word['show_stats'] | undefined): WordStats => {
-  if (!value) return {};
-  if (typeof value === 'object') return value;
-
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-};
 
 export default function BrainWorkoutScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, restoreWordProgress, userWordProgress } = useStore();
+  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, restoreWordProgress, userWordProgress, snoozeWord, hasSeenSnoozeHint, setHasSeenSnoozeHint } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    markWordKnown: state.markWordKnown,
+    incrementShowCount: state.incrementShowCount,
+    workoutWordCount: state.workoutWordCount,
+    workoutLearnedWordCount: state.workoutLearnedWordCount,
+    addWorkoutSnapshot: state.addWorkoutSnapshot,
+    recordImwSnapshot: state.recordImwSnapshot,
+    workoutFavoritesOnly: state.workoutFavoritesOnly,
+    setWorkoutFavoritesOnly: state.setWorkoutFavoritesOnly,
+    toggleWordFavorite: state.toggleWordFavorite,
+    restoreWordProgress: state.restoreWordProgress,
+    userWordProgress: state.userWordProgress,
+    snoozeWord: state.snoozeWord,
+    hasSeenSnoozeHint: state.hasSeenSnoozeHint,
+    setHasSeenSnoozeHint: state.setHasSeenSnoozeHint,
+  })));
   const [queue, setQueue] = useState<QueueItem[]>([]);
   // Bumped to force a fresh workout queue (finishing a session, closing the result modal).
   const [regenNonce, setRegenNonce] = useState(0);
@@ -44,7 +50,11 @@ export default function BrainWorkoutScreen() {
   const [score, setScore] = useState({ known: 0, unknown: 0 });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
-  const [history, setHistory] = useState<{index: number, knew: boolean, previousProgress: any}[]>([]);
+
+  const { isPronunciationModalVisible, setIsPronunciationModalVisible, pronunciationExplanation,
+    setPronunciationExplanation, isPronunciationLoading, handlePronunciation } = usePronunciation();
+
+  const [history, setHistory] = useState<{index: number, knew: boolean, previousProgress: UserWordProgress | null}[]>([]);
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [workoutResult, setWorkoutResult] = useState({ known: 0, unknown: 0 });
   const [isStatsVisible, setIsStatsVisible] = useState(false);
@@ -82,107 +92,12 @@ export default function BrainWorkoutScreen() {
 
   // Generate workout queue
   useEffect(() => {
-    if (words.length > 0 && activeLanguages.length > 0) {
-      const failedItems: QueueItem[] = [];
-      const newItems: QueueItem[] = [];
-      const learnedItems: QueueItem[] = [];
-
-      words.forEach(w => {
-        activeLanguages.forEach(langCode => {
-          const hasTranslation = Boolean(getWordTranslation(w, langCode));
-          if (!hasTranslation) return;
-
-          if (workoutFavoritesOnly && !w.is_favorite) return;
-
-          const stats = w.knowledge_stats as Record<string, boolean>;
-          const isKnown = stats && stats[langCode] === true;
-          const isFailed = stats && stats[langCode] === false;
-
-          if (isKnown) {
-            learnedItems.push({ word: w, langCode });
-          } else if (isFailed) {
-            failedItems.push({ word: w, langCode });
-          } else {
-            newItems.push({ word: w, langCode });
-          }
-        });
-      });
-
-      // All queues: weakest memory weight first (least retained / most due for review),
-      // with a little jitter so the order isn't fully deterministic.
-      const now = Date.now();
-      const dueScore = (it: QueueItem) => wordMemoryWeight(it.word, it.langCode, now) + Math.random() * 0.08;
-
-      failedItems.sort((a, b) => dueScore(a) - dueScore(b));
-      learnedItems.sort((a, b) => dueScore(a) - dueScore(b));
-      // Never-shown words all score 0 (see wordMemoryWeight) — shuffle instead of
-      // sorting so the same front-of-array words don't win every rebuild.
-      for (let i = newItems.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newItems[i], newItems[j]] = [newItems[j], newItems[i]];
-      }
-
-      const numLearnedToTake = Math.min(workoutLearnedWordCount, learnedItems.length);
-      const numUnlearnedToTake = workoutWordCount - numLearnedToTake;
-
-      // Split unlearned slots between "review" (previously failed, due for another
-      // shot) and "new" (never shown). Reserving a minimum share for new words
-      // stops a large failed backlog from crowding them out of every single
-      // session — before this, isFailed items always sorted ahead of new ones,
-      // so once you had more due failures than fit the window, new words never
-      // appeared again and the same hard words kept looping forever.
-      const numFailedToTake = Math.min(failedItems.length, Math.ceil(numUnlearnedToTake * 0.6));
-      let numNewToTake = numUnlearnedToTake - numFailedToTake;
-      let finalNumFailedToTake = numFailedToTake;
-      if (numNewToTake > newItems.length) {
-        finalNumFailedToTake = Math.min(failedItems.length, finalNumFailedToTake + (numNewToTake - newItems.length));
-        numNewToTake = newItems.length;
-      }
-
-      // Pick from a window ~3x the size of what we need, then randomise inside it,
-      // so consecutive workouts rotate through the "most due" region instead of
-      // replaying the exact same front-of-queue words every time. The same word
-      // CAN legitimately appear twice in a batch (once per active language) —
-      // that's fine, each (word, language) pair has its own due score / known
-      // status driving how often it comes up.
-      const pickFromWindow = <T,>(sorted: T[], take: number): T[] => {
-        if (take <= 0) return [];
-        const windowSize = Math.min(sorted.length, Math.max(take + 4, take * 3));
-        const windowed = sorted.slice(0, windowSize);
-        for (let i = windowed.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [windowed[i], windowed[j]] = [windowed[j], windowed[i]];
-        }
-        return windowed.slice(0, take);
-      };
-
-      let finalQueue: QueueItem[] = [
-        ...pickFromWindow(failedItems, finalNumFailedToTake),
-        ...newItems.slice(0, numNewToTake),
-        ...pickFromWindow(learnedItems, numLearnedToTake),
-      ];
-
-      // If we don't have enough unlearned, fill with more learned
-      if (finalQueue.length < workoutWordCount && learnedItems.length > numLearnedToTake) {
-        const extraLearned = workoutWordCount - finalQueue.length;
-        const usedKeys = new Set(finalQueue.map(it => `${it.word.eng || it.word.word}:${it.langCode}`));
-        finalQueue = [
-          ...finalQueue,
-          ...learnedItems
-            .filter(it => !usedKeys.has(`${it.word.eng || it.word.word}:${it.langCode}`))
-            .slice(0, extraLearned),
-        ];
-      }
-
-      finalQueue.sort(() => Math.random() - 0.5);
-
-      setQueue(finalQueue);
-      setCurrentIndex(0);
-      setShowAnswer(false);
-      setHistory([]);
-    } else {
-      setQueue([]);
-    }
+    setQueue(buildWorkoutQueue(useStore.getState()));
+    setCurrentIndex(0);
+    setShowAnswer(false);
+    setHistory([]);
+    setScore({ known: 0, unknown: 0 });
+    setPronunciationExplanation(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [words.length, activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount, regenNonce]);
 
@@ -190,7 +105,7 @@ export default function BrainWorkoutScreen() {
   // Always use the freshest word data from the store in case it was edited
   const currentWord = currentItem ? (words.find(w => (w.eng || w.word) === (currentItem.word.eng || currentItem.word.word)) || currentItem.word) : undefined;
   const currentLang = currentItem?.langCode;
-  
+
   // Always read the latest favorite status directly from the store
   const currentWordKey = currentWord?.eng || currentWord?.word || '';
   const currentProgress = currentWordKey ? userWordProgress[currentWordKey] : undefined;
@@ -212,11 +127,11 @@ export default function BrainWorkoutScreen() {
 
     const wordKey = currentWord.eng || currentWord.word || '';
     const previousProgress = useStore.getState().userWordProgress[wordKey];
-    
+
     setHistory(prev => [...prev, {
       index: currentIndex,
       knew,
-      previousProgress: previousProgress ? JSON.parse(JSON.stringify(previousProgress)) : null
+      previousProgress: previousProgress ?? null
     }]);
 
     markWordKnown(wordKey, currentLang, knew);
@@ -231,12 +146,13 @@ export default function BrainWorkoutScreen() {
     if (currentIndex < queue.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setShowAnswer(false);
+      setPronunciationExplanation(null);
     } else {
       const finalKnown = score.known + (knew ? 1 : 0);
       const finalUnknown = score.unknown + (knew ? 0 : 1);
-      
+
       addWorkoutSnapshot({
-        date: new Date().toISOString().split('T')[0],
+        date: localDateKey(),
         total: finalKnown + finalUnknown,
         correct: finalKnown
       });
@@ -245,29 +161,81 @@ export default function BrainWorkoutScreen() {
 
       setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
       setResultModalVisible(true);
-      
+
       setScore({ known: 0, unknown: 0 });
       // Rebuild a fresh queue for the next session (the effect resets index/history).
       setRegenNonce(n => n + 1);
     }
   };
 
+  const executeSnooze = React.useCallback(() => {
+    if (!currentWord || !currentLang) return;
+    const wordKey = currentWord.eng || currentWord.word || '';
+
+    // Snooze for 7 days
+    snoozeWord(wordKey, currentLang, 7);
+
+    if (currentIndex < queue.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setShowAnswer(false);
+      setPronunciationExplanation(null);
+    } else {
+      const finalKnown = score.known;
+      const finalUnknown = score.unknown;
+
+      addWorkoutSnapshot({
+        date: localDateKey(),
+        total: finalKnown + finalUnknown,
+        correct: finalKnown
+      });
+      recordImwSnapshot();
+
+      setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
+      setResultModalVisible(true);
+
+      setScore({ known: 0, unknown: 0 });
+      setRegenNonce(n => n + 1);
+    }
+  }, [currentWord, currentLang, currentIndex, queue.length, score, snoozeWord, addWorkoutSnapshot, recordImwSnapshot]);
+
+  const handleSnooze = React.useCallback(() => {
+    if (!hasSeenSnoozeHint) {
+      Alert.alert(
+        'Отложить слово',
+        'Это слово не будет попадаться в тренировках следующие 7 дней. Отложить?',
+        [
+          { text: 'Отмена', style: 'cancel' },
+          {
+            text: 'Отложить',
+            onPress: () => {
+              setHasSeenSnoozeHint(true);
+              executeSnooze();
+            }
+          }
+        ]
+      );
+    } else {
+      executeSnooze();
+    }
+  }, [hasSeenSnoozeHint, executeSnooze, setHasSeenSnoozeHint]);
+
   const handlePrevStep = () => {
     if (history.length > 0) {
       const lastAction = history[history.length - 1];
       const wordKey = queue[lastAction.index].word.eng || queue[lastAction.index].word.word || '';
-      
+
       restoreWordProgress(wordKey, lastAction.previousProgress);
-      
+
       if (lastAction.knew) {
         setScore(s => ({ ...s, known: Math.max(0, s.known - 1) }));
       } else {
         setScore(s => ({ ...s, unknown: Math.max(0, s.unknown - 1) }));
       }
-      
+
       setHistory(prev => prev.slice(0, -1));
       setCurrentIndex(lastAction.index);
       setShowAnswer(false);
+      setPronunciationExplanation(null);
     }
   };
 
@@ -320,12 +288,13 @@ export default function BrainWorkoutScreen() {
     });
   };
 
+
   if (queue.length === 0 || !currentWord || !currentLang) {
     return (
       <View style={[styles.container, { paddingTop: topPadding }]}>
         <View style={styles.headerSection}>
-          <TouchableOpacity 
-            style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]} 
+          <TouchableOpacity
+            style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]}
             onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
           >
             <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
@@ -365,9 +334,9 @@ export default function BrainWorkoutScreen() {
         <View style={styles.langBadge}>
           <Text style={styles.langBadgeText}>{activeLangObj?.flag} {activeLangObj?.label || currentLang.toUpperCase()}</Text>
         </View>
-        
-        <TouchableOpacity 
-          style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]} 
+
+        <TouchableOpacity
+          style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]}
           onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
         >
           <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
@@ -447,10 +416,21 @@ export default function BrainWorkoutScreen() {
 
             {showAnswer ? (
               <View style={styles.answerBox}>
-                <Text style={styles.nativeRu}>{currentWord.ru}</Text>
-                {!!currentWord.eng && currentWord.eng !== currentWord.ru && (
-                  <Text style={styles.engWord}>🇬🇧 {currentWord.eng}</Text>
-                )}
+                <View style={styles.answerBoxHeader}>
+                  <Text style={styles.nativeRu}>{currentWord.ru}</Text>
+                  {targetTranslation && (
+                    <TouchableOpacity
+                      style={styles.workoutPronunciationBtn}
+                      activeOpacity={0.7}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handlePronunciation(targetTranslation, currentLang, currentWord.ru || currentWord.meaning || '');
+                      }}
+                    >
+                      <Text style={styles.workoutPronunciationBtnText}>📢</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {!!currentWord.personal_association && (
                   <View style={styles.assocNote}>
                     <Text style={styles.assocNoteTitle}>💡 Ассоциация:</Text>
@@ -474,7 +454,7 @@ export default function BrainWorkoutScreen() {
       {/* Bottom Zone: Always Visible Action Buttons (Thumb Friendly) */}
       <View style={styles.bottomZone}>
         <View style={styles.scoreRow}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={handlePrevStep}
             disabled={history.length === 0}
             style={[styles.backBtn, { opacity: history.length === 0 ? 0.3 : 1 }]}
@@ -499,6 +479,15 @@ export default function BrainWorkoutScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            style={[styles.actionBtn, styles.btnSnooze]}
+            activeOpacity={0.8}
+            onPress={handleSnooze}
+          >
+            <Text style={[styles.btnIcon, styles.btnSnoozeText]}>⏱</Text>
+            <Text style={[styles.btnText, styles.btnSnoozeText]}>Реже</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.actionBtn, styles.btnKnown]}
             activeOpacity={0.8}
             onPress={() => handleSwipe('right')}
@@ -509,11 +498,49 @@ export default function BrainWorkoutScreen() {
         </View>
       </View>
 
-      <EditWordModal 
-        visible={isModalVisible} 
-        onClose={() => setIsModalVisible(false)} 
-        wordToEdit={editingWord} 
+      <EditWordModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        wordToEdit={editingWord}
       />
+
+      <Modal
+        visible={isPronunciationModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsPronunciationModalVisible(false)}
+      >
+        <View style={styles.pronunciationModalOverlay}>
+          <View style={styles.pronunciationModalContent}>
+            <View style={styles.pronunciationModalHeader}>
+              <Text style={styles.pronunciationModalTitle}>🗣 Разбор произношения</Text>
+              <TouchableOpacity onPress={() => setIsPronunciationModalVisible(false)} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                <Text style={styles.pronunciationModalCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.pronunciationModalScroll}>
+              {isPronunciationLoading ? (
+                <View style={styles.pronunciationLoadingContainer}>
+                  <ActivityIndicator size="large" color={ACCENT} />
+                  <Text style={styles.pronunciationLoadingText}>Анализируем правила произношения...</Text>
+                </View>
+              ) : (
+                <Markdown
+                  style={{
+                    body: { fontSize: 16, lineHeight: 24, color: '#334155' },
+                    strong: { fontWeight: '700', color: '#0F172A' },
+                    bullet_list: { marginTop: 10, marginBottom: 10 },
+                    list_item: { marginBottom: 6 },
+                  }}
+                >
+                  {pronunciationExplanation || ''}
+                </Markdown>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         visible={isStatsVisible}
@@ -567,7 +594,7 @@ export default function BrainWorkoutScreen() {
           <View style={styles.resultModalCard}>
             <Text style={styles.resultIcon}>🎉</Text>
             <Text style={styles.resultTitle}>Тренировка завершена!</Text>
-            
+
             <View style={styles.resultStatsRow}>
               <View style={styles.resultStatBox}>
                 <Text style={styles.resultStatValueKnown}>{workoutResult.known}</Text>
@@ -580,7 +607,7 @@ export default function BrainWorkoutScreen() {
               </View>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.resultOkBtn}
               onPress={() => setResultModalVisible(false)}
             >
@@ -740,6 +767,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 6,
   },
+  answerBoxHeader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    position: 'relative',
+  },
+  workoutPronunciationBtn: {
+    position: 'absolute',
+    right: 0,
+    padding: 6,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  workoutPronunciationBtnText: {
+    fontSize: 16,
+  },
   engWord: {
     fontSize: 16,
     color: '#718096',
@@ -837,6 +883,12 @@ const styles = StyleSheet.create({
   },
   btnUnknown: {
     backgroundColor: '#DC3545',
+  },
+  btnSnooze: {
+    backgroundColor: '#E2E8F0',
+  },
+  btnSnoozeText: {
+    color: '#475569',
   },
   btnKnown: {
     backgroundColor: '#28A745',
@@ -1079,5 +1131,46 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pronunciationModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  pronunciationModalContent: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    height: '80%',
+    padding: 20,
+  },
+  pronunciationModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  pronunciationModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E293B',
+  },
+  pronunciationModalCloseText: {
+    fontSize: 24,
+    color: '#64748B',
+    fontWeight: '300',
+  },
+  pronunciationModalScroll: {
+    flex: 1,
+  },
+  pronunciationLoadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pronunciationLoadingText: {
+    marginTop: 16,
+    color: '#64748B',
+    fontSize: 15,
   },
 });

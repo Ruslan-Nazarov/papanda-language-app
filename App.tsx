@@ -16,7 +16,7 @@ import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { prefetchSentencesInBackground } from './src/services/sentencePrefetch';
-import { useStore } from './src/store/useStore';
+import { useStore, useHydrationState } from './src/store/useStore';
 
 const ONBOARDING_KEY = 'papanda-onboarded';
 
@@ -143,6 +143,7 @@ function MainTabs() {
 }
 
 export default function App() {
+  const hydration = useHydrationState();
   // Store hydration (and the derived `words`/`sentences` rebuild) is handled by
   // the persist `onRehydrateStorage` hook in the store itself.
   // `null` = still reading the flag, `false` = show onboarding, `true` = go to the app.
@@ -163,7 +164,14 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <ErrorBoundary>
-        {onboarded === null ? (
+        {hydration.error ? (
+          <View style={boundaryStyles.container}>
+            <Text style={boundaryStyles.sub}>{hydration.error}</Text>
+            <TouchableOpacity style={boundaryStyles.button} onPress={() => void useStore.persist.rehydrate()}>
+              <Text style={boundaryStyles.buttonText}>Повторить загрузку</Text>
+            </TouchableOpacity>
+          </View>
+        ) : onboarded === null || !hydration.ready ? (
           <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
         ) : onboarded === false ? (
           <OnboardingScreen onDone={finishOnboarding} />

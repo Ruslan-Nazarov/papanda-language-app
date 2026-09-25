@@ -38,6 +38,15 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Local validation output
+.npm-audit-cache/
+dependency-audit*.json
+dependency-fix.log
+.wrangler/
+dist-audit/
+export-audit.log
+check-audit.log
+
 # generated native folders
 /ios
 /android

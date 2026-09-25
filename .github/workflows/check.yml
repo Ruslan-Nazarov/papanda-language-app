@@ -1,0 +1,27 @@
+name: Check
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            gemini-proxy/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix gemini-proxy
+      - run: npm run check
+      - run: npx expo export --platform all --output-dir dist-audit
+        env:
+          EXPO_NO_TELEMETRY: '1'
+          EXPO_OFFLINE: '1'
+      - run: npm run build --prefix gemini-proxy
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - run: node scripts/smoke-web.cjs

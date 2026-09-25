@@ -1,3 +1,7 @@
+import { GenerationConfig, parseGenerationRequest, readRequestJSON } from './requestValidation';
+import type { QuotaFailure } from './quota';
+export { QuotaLimiter } from './quota';
+
 /**
  * Papanda AI proxy.
  *
@@ -20,7 +24,7 @@ export interface Env {
   CEREBRAS_MODEL?: string;
   GROQ_MODEL?: string;
 
-  RL: KVNamespace; // KV namespace binding for rate-limit counters
+  QUOTA: DurableObjectNamespace; // Atomic global and per-install quota coordinator
   PER_INSTALL_HOURLY?: string; // vars (strings) — override without redeploy
   PER_INSTALL_DAILY?: string;
   GLOBAL_DAILY?: string;
@@ -39,14 +43,6 @@ const GEMINI_URL = (model: string) =>
 const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-interface GenerationConfig {
-  temperature?: number;
-  topP?: number;
-  maxOutputTokens?: number;
-  responseMimeType?: 'application/json';
-  responseJsonSchema?: unknown;
-  thinkingConfig?: { thinkingBudget?: number; includeThoughts?: boolean };
-}
 
 interface UpstreamResult {
   ok: true;
@@ -59,25 +55,27 @@ interface UpstreamError {
   message: string;
 }
 
+const positiveLimit = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
 const LIMITS = (env: Env) => ({
-  perInstallHourly: Number(env.PER_INSTALL_HOURLY) || 40,
-  perInstallDaily: Number(env.PER_INSTALL_DAILY) || 200,
-  globalDaily: Number(env.GLOBAL_DAILY) || 1500,
+  perInstallHourly: positiveLimit(env.PER_INSTALL_HOURLY, 40),
+  perInstallDaily: positiveLimit(env.PER_INSTALL_DAILY, 200),
+  globalDaily: positiveLimit(env.GLOBAL_DAILY, 1500),
 });
 
 const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  new Response(JSON.stringify(body), { status, headers: {
+    'content-type': 'application/json',
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
+    'access-control-allow-headers': 'Content-Type, X-Install-Id',
+  } });
 
 const INSTALL_ID_RE = /^[a-z0-9-]{8,64}$/i;
 const PROVIDERS: Provider[] = ['gemini', 'cerebras', 'groq'];
 
-/** KV counter with TTL. KV is eventually consistent — fine for abuse prevention. */
-async function bump(kv: KVNamespace, key: string, ttlSeconds: number): Promise<number> {
-  const current = Number(await kv.get(key)) || 0;
-  const next = current + 1;
-  await kv.put(key, String(next), { expirationTtl: ttlSeconds });
-  return next;
-}
 
 function apiKeyFor(provider: Provider, env: Env): string | undefined {
   if (provider === 'gemini') return env.GEMINI_API_KEY;
@@ -168,7 +166,7 @@ async function callOpenAiCompatible(
     // then fails the provider's own "must be valid JSON" check before we ever see
     // it. Keep reasoning short and guarantee enough budget for the actual JSON body
     // (our schemas run large — dictionary + few-shot example + an array of sentences).
-    body.reasoning_effort = 'low';
+    if (model.includes('gpt-oss')) body.reasoning_effort = 'low';
     body.max_tokens = Math.max(cfg.maxOutputTokens ?? 0, 6144);
   } else if (cfg.maxOutputTokens !== undefined) {
     body.max_tokens = cfg.maxOutputTokens;
@@ -218,7 +216,7 @@ async function callProvider(
   cfg: GenerationConfig
 ): Promise<UpstreamResult | UpstreamError> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 40_000);
+  const timer = setTimeout(() => controller.abort(), 20_000);
   try {
     return provider === 'gemini'
       ? await callGemini(apiKey, model, prompt, cfg, controller.signal)
@@ -238,6 +236,7 @@ async function callProvider(
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (request.method === 'OPTIONS') return json({ ok: true });
 
     if (request.method === 'GET' && url.pathname === '/health') {
       return json({ ok: true });
@@ -251,20 +250,13 @@ export default {
       return json({ error: 'Missing or malformed X-Install-Id.' }, 400);
     }
 
-    let payload: { prompt?: unknown; generationConfig?: unknown; provider?: unknown };
+    let payload: ReturnType<typeof parseGenerationRequest>;
     try {
-      payload = await request.json();
-    } catch {
-      return json({ error: 'Body must be JSON.' }, 400);
+      payload = parseGenerationRequest(await readRequestJSON(request));
+    } catch (error) {
+      return json({ error: error instanceof Error ? error.message : 'Invalid request.', retryable: false }, 400);
     }
-    const prompt = payload.prompt;
-    if (typeof prompt !== 'string' || prompt.length < 1 || prompt.length > 60_000) {
-      return json({ error: 'prompt must be a non-empty string.' }, 400);
-    }
-    const generationConfig: GenerationConfig =
-      payload.generationConfig && typeof payload.generationConfig === 'object'
-        ? (payload.generationConfig as GenerationConfig)
-        : {};
+    const { prompt, generationConfig } = payload;
 
     const requestedProvider = typeof payload.provider === 'string' ? payload.provider : undefined;
     const defaultProvider = (env.DEFAULT_PROVIDER as Provider) || 'gemini';
@@ -279,27 +271,24 @@ export default {
       return json({ error: `Proxy is not configured for provider "${provider}".` }, 500);
     }
 
-    // ---- rate limiting ----
-    const now = new Date();
-    const hourBucket = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH
-    const dayBucket = now.toISOString().slice(0, 10); // YYYY-MM-DD
-    const limits = LIMITS(env);
-
-    const globalDay = await bump(env.RL, `g:${dayBucket}`, 90_000);
-    if (globalDay > limits.globalDaily) {
-      return json(
-        { error: 'Дневной общий лимит генерации исчерпан. Попробуйте завтра.', code: 'GLOBAL_DAILY', retryable: false, daily: true },
-        429,
-      );
-    }
-
-    const instHour = await bump(env.RL, `i:${installId}:h:${hourBucket}`, 4000);
-    const instDay = await bump(env.RL, `i:${installId}:d:${dayBucket}`, 90_000);
-    if (instHour > limits.perInstallHourly) {
-      return json({ error: 'Слишком много запросов за час. Подождите немного.', code: 'INSTALL_HOURLY', retryable: false }, 429);
-    }
-    if (instDay > limits.perInstallDaily) {
-      return json({ error: 'Дневной лимит генерации для этого устройства исчерпан.', code: 'INSTALL_DAILY', retryable: false, daily: true }, 429);
+    // Reserve all budgets atomically; rejected requests consume no shared quota.
+    try {
+      const quota = env.QUOTA.get(env.QUOTA.idFromName('global'));
+      const response = await quota.fetch('https://quota/reserve', {
+        method: 'POST', body: JSON.stringify({ installId, limits: LIMITS(env) }),
+      });
+      if (!response.ok) throw new Error('Quota unavailable');
+      const { failure } = await response.json() as { failure?: QuotaFailure };
+      if (failure) {
+        const messages: Record<QuotaFailure, string> = {
+          GLOBAL_DAILY: 'Дневной общий лимит генерации исчерпан. Попробуйте завтра.',
+          INSTALL_DAILY: 'Дневной лимит генерации для этого устройства исчерпан.',
+          INSTALL_HOURLY: 'Слишком много запросов за час. Подождите немного.',
+        };
+        return json({ error: messages[failure], code: failure, retryable: false, daily: failure !== 'INSTALL_HOURLY' }, 429);
+      }
+    } catch {
+      return json({ error: 'Проверка лимита временно недоступна.', code: 'QUOTA_UNAVAILABLE', retryable: true }, 503);
     }
 
     // ---- forward to the chosen provider, falling back to a backup provider on
@@ -311,7 +300,6 @@ export default {
       fallbackProvider !== provider && fallbackApiKey ? [provider, fallbackProvider] : [provider];
 
     let result: UpstreamResult | UpstreamError = { ok: false, status: 502, message: 'Не удалось связаться с сервисом генерации.' };
-    let usedProvider: Provider = provider;
 
     for (const attemptProvider of attempts) {
       const attemptKey = attemptProvider === provider ? apiKey : (fallbackApiKey as string);
@@ -321,18 +309,16 @@ export default {
       } catch {
         result = { ok: false, status: 502, message: 'Не удалось связаться с сервисом генерации.' };
       }
-      usedProvider = attemptProvider;
 
       const succeeded = result.ok && Boolean(result.text);
       const isLastAttempt = attemptProvider === attempts[attempts.length - 1];
       if (succeeded || isLastAttempt) break;
       // Otherwise: this attempt failed or came back empty — fall through to the next provider.
     }
-    void usedProvider; // kept for future logging/telemetry
 
     if (!result.ok) {
       const isQuota = result.status === 429;
-      const isOverload = result.status === 503 || result.status === 500;
+      const isOverload = result.status >= 500;
       return json(
         {
           error: isQuota
@@ -347,7 +333,7 @@ export default {
           // rather than surfacing a hard failure to the learner immediately.
           retryable: isOverload || isQuota,
         },
-        isOverload ? 503 : 429,
+        isQuota ? 429 : isOverload ? 503 : 502,
       );
     }
 
