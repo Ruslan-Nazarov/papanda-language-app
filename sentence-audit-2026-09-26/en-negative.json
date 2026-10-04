@@ -1,0 +1,316 @@
+{
+  "scenario": {
+    "id": "en-negative",
+    "code": "en",
+    "count": 1,
+    "lemma": "never"
+  },
+  "startedAt": "2026-09-26T12:57:54.523Z",
+  "elapsedMs": 43482,
+  "accepted": 1,
+  "sentences": [
+    {
+      "language": "English",
+      "sentence": "She has never seen such a wild animal on the farm.",
+      "words": [
+        {
+          "text": "She",
+          "label": "PRON",
+          "role": "Subject",
+          "parts": [
+            "She"
+          ],
+          "translation": "она",
+          "dictionary_form": "she",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "has",
+          "label": "AUX",
+          "role": "Predicate",
+          "parts": [
+            "has"
+          ],
+          "translation": "имеет",
+          "dictionary_form": "have",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "never",
+          "label": "ADV",
+          "role": "Adverbial",
+          "parts": [
+            "never"
+          ],
+          "translation": "никогда",
+          "dictionary_form": "never",
+          "is_in_my_dict": true,
+          "dictionary_word": "never",
+          "clauseIndex": 0
+        },
+        {
+          "text": "seen",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "seen"
+          ],
+          "translation": "видела",
+          "dictionary_form": "see",
+          "is_in_my_dict": true,
+          "dictionary_word": "see",
+          "clauseIndex": 0
+        },
+        {
+          "text": "such",
+          "label": "DET",
+          "role": "Attribute_Object",
+          "parts": [
+            "such"
+          ],
+          "translation": "такого",
+          "dictionary_form": "such",
+          "is_in_my_dict": true,
+          "dictionary_word": "such",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "одного",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "wild",
+          "label": "ADJ",
+          "role": "Attribute_Object",
+          "parts": [
+            "wild"
+          ],
+          "translation": "дикого",
+          "dictionary_form": "wild",
+          "is_in_my_dict": true,
+          "dictionary_word": "wild",
+          "clauseIndex": 0
+        },
+        {
+          "text": "animal",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "animal"
+          ],
+          "translation": "животного",
+          "dictionary_form": "animal",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "on",
+          "label": "ADP",
+          "role": "Preposition",
+          "parts": [
+            "on"
+          ],
+          "translation": "на",
+          "dictionary_form": "on",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "ферме",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "farm",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "farm"
+          ],
+          "translation": "ферме",
+          "dictionary_form": "farm",
+          "is_in_my_dict": true,
+          "dictionary_word": "farm",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Она никогда не видела такого дикого животного на ферме.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.",
+      "generationTaskId": "task-1",
+      "id": "generated_en_1790427518005_61",
+      "source": "generated",
+      "createdAt": 1790427518005
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"never\",\"translation\":\"\"},{\"lemma\":\"persecute\",\"translation\":\"преследовать\"},{\"lemma\":\"beside\",\"translation\":\"рядом\"},{\"lemma\":\"wild\",\"translation\":\"дикий\"},{\"lemma\":\"recognizable\",\"translation\":\"узнаваемый\"},{\"lemma\":\"pair\",\"translation\":\"пара\"},{\"lemma\":\"shop\",\"translation\":\"магазин\"},{\"lemma\":\"uncle\",\"translation\":\"дядя\"},{\"lemma\":\"input\",\"translation\":\"вход\"},{\"lemma\":\"pray\",\"translation\":\"молиться\"},{\"lemma\":\"need\",\"translation\":\"нуждаться\"},{\"lemma\":\"flame\",\"translation\":\"пламя\"},{\"lemma\":\"versprechen\",\"translation\":\"обещать\"},{\"lemma\":\"farm\",\"translation\":\"ферма\"},{\"lemma\":\"production\",\"translation\":\"производство\"},{\"lemma\":\"reject\",\"translation\":\"отклонять\"},{\"lemma\":\"participate\",\"translation\":\"участвовать\"},{\"lemma\":\"power\",\"translation\":\"власть\"},{\"lemma\":\"pleasant\",\"translation\":\"приятный\"},{\"lemma\":\"study\",\"translation\":\"изучать\"},{\"lemma\":\"entire\",\"translation\":\"весь\"},{\"lemma\":\"conquer\",\"translation\":\"завоевывать\"},{\"lemma\":\"price\",\"translation\":\"цена\"},{\"lemma\":\"sad\",\"translation\":\"грустно\"},{\"lemma\":\"anticipate\",\"translation\":\"предвидеть\"},{\"lemma\":\"rouse\",\"translation\":\"пробуждение\"}]\nThe task task-1 must use the lexeme/expression \"never\" naturally, inflected if needed.\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The artist paints a canvas.\",\"The talented artist paints a canvas.\",\"The talented artist paints a large canvas.\",\"The talented artist paints a large canvas in the studio.\",\"The chef does not cook the soup.\",\"The culture defines the future.\",\"Does the gardener water the plants?\",\"The wall falls because the rust spreads.\",\"The mountain rises.\",\"The high mountain rises.\",\"The manager submits.\",\"The proper manager submits.\",\"The proper manager submits the operation.\",\"The proper manager submits the operation afterwards.\",\"The bold child does not draw the object below.\",\"The bold child draws the object below.\",\"Does the bold child draw the object below?\",\"The bold child draws the object below because the lesson ends.\",\"The student invests.\",\"The wise student invests.\",\"Parents take care of their children.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"She has never seen such a wild animal on the farm.\"\n  }\n]"
+      },
+      "elapsedMs": 1860
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"She has never seen such a wild animal on the farm.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"She has never seen such a wild animal on the farm.\",\"literalTranslation\":\"Она никогда не видела такого дикого животного на ферме.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"She\",\"label\":\"PRON\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"She\"],\"translation\":\"она\",\"dictionary_form\":\"she\"},{\"text\":\"has\",\"label\":\"AUX\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"has\"],\"translation\":\"имеет\",\"dictionary_form\":\"have\"},{\"text\":\"never\",\"label\":\"ADV\",\"role\":\"Adverbial\",\"clauseIndex\":0,\"parts\":[\"never\"],\"translation\":\"никогда\",\"dictionary_form\":\"never\"},{\"text\":\"seen\",\"label\":\"VERB\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"seen\"],\"translation\":\"видела\",\"dictionary_form\":\"see\"},{\"text\":\"such\",\"label\":\"DET\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"such\"],\"translation\":\"такого\",\"dictionary_form\":\"such\"},{\"text\":\"a\",\"label\":\"DET\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"одного\",\"dictionary_form\":\"a\"},{\"text\":\"wild\",\"label\":\"ADJ\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"wild\"],\"translation\":\"дикого\",\"dictionary_form\":\"wild\"},{\"text\":\"animal\",\"label\":\"NOUN\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"animal\"],\"translation\":\"животного\",\"dictionary_form\":\"animal\"},{\"text\":\"on\",\"label\":\"ADP\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"on\"],\"translation\":\"на\",\"dictionary_form\":\"on\"},{\"text\":\"the\",\"label\":\"DET\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"ферме\",\"dictionary_form\":\"the\"},{\"text\":\"farm\",\"label\":\"NOUN\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"farm\"],\"translation\":\"ферме\",\"dictionary_form\":\"farm\"}]}]"
+      },
+      "elapsedMs": 41594
+    }
+  ]
+}

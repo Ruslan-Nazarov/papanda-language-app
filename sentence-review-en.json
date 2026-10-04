@@ -1,0 +1,694 @@
+{
+  "code": "en",
+  "requested": 10,
+  "accepted": 10,
+  "elapsedMs": 40150,
+  "sentences": [
+    {
+      "language": "English",
+      "sentence": "Children play.",
+      "words": [
+        {
+          "text": "Children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "Children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Дети играют.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_en_1790426562642_1",
+      "source": "generated",
+      "createdAt": 1790426562642
+    },
+    {
+      "language": "English",
+      "sentence": "Small children play.",
+      "words": [
+        {
+          "text": "Small",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Small"
+          ],
+          "translation": "маленькие",
+          "dictionary_form": "small",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькие дети играют.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_en_1790426562642_2",
+      "source": "generated",
+      "createdAt": 1790426562642
+    },
+    {
+      "language": "English",
+      "sentence": "Small children play games.",
+      "words": [
+        {
+          "text": "Small",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Small"
+          ],
+          "translation": "маленькие",
+          "dictionary_form": "small",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "games",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "game",
+            "s"
+          ],
+          "translation": "игры",
+          "dictionary_form": "game",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькие дети играют в игры.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_en_1790426562642_3",
+      "source": "generated",
+      "createdAt": 1790426562642
+    },
+    {
+      "language": "English",
+      "sentence": "Small children play games outside.",
+      "words": [
+        {
+          "text": "Small",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Small"
+          ],
+          "translation": "маленькие",
+          "dictionary_form": "small",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "games",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "game",
+            "s"
+          ],
+          "translation": "игры",
+          "dictionary_form": "game",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "outside",
+          "label": "ADV",
+          "role": "Circumstance",
+          "parts": [
+            "outside"
+          ],
+          "translation": "на улице",
+          "dictionary_form": "outside",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькие дети играют в игры на улице.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_en_1790426562642_4",
+      "source": "generated",
+      "createdAt": 1790426562642
+    },
+    {
+      "language": "English",
+      "sentence": "Small children do not play games outside.",
+      "words": [
+        {
+          "text": "Small",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Small"
+          ],
+          "translation": "маленькие",
+          "dictionary_form": "small",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "do",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "do"
+          ],
+          "translation": "не",
+          "dictionary_form": "do",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "not",
+          "label": "PART",
+          "role": "Predicate",
+          "parts": [
+            "not"
+          ],
+          "translation": "не",
+          "dictionary_form": "not",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "games",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "game",
+            "s"
+          ],
+          "translation": "игры",
+          "dictionary_form": "game",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "outside",
+          "label": "ADV",
+          "role": "Circumstance",
+          "parts": [
+            "outside"
+          ],
+          "translation": "на улице",
+          "dictionary_form": "outside",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькие дети не играют в игры на улице.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_en_1790426562643_5",
+      "source": "generated",
+      "createdAt": 1790426562643
+    },
+    {
+      "language": "English",
+      "sentence": "Children read books.",
+      "words": [
+        {
+          "text": "Children",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "read",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "read"
+          ],
+          "translation": "читают",
+          "dictionary_form": "read",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "books",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "books"
+          ],
+          "translation": "книги",
+          "dictionary_form": "book",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Дети читают книги.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_en_1790426589268_11",
+      "source": "generated",
+      "createdAt": 1790426589268
+    },
+    {
+      "language": "English",
+      "sentence": "Do small children play games outside?",
+      "words": [
+        {
+          "text": "Do",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "Do"
+          ],
+          "translation": "ли",
+          "dictionary_form": "do",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "small",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "small"
+          ],
+          "translation": "маленькие",
+          "dictionary_form": "small",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "games",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "game",
+            "s"
+          ],
+          "translation": "игры",
+          "dictionary_form": "game",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "outside",
+          "label": "ADV",
+          "role": "Circumstance",
+          "parts": [
+            "outside"
+          ],
+          "translation": "на улице",
+          "dictionary_form": "outside",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Играют ли маленькие дети в игры на улице?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_en_1790426562643_7",
+      "source": "generated",
+      "createdAt": 1790426562643
+    },
+    {
+      "language": "English",
+      "sentence": "Children play games when the weather is warm.",
+      "words": [
+        {
+          "text": "Children",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "Children"
+          ],
+          "translation": "дети",
+          "dictionary_form": "child",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "play",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "play"
+          ],
+          "translation": "играют",
+          "dictionary_form": "play",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "games",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "game",
+            "s"
+          ],
+          "translation": "в игры",
+          "dictionary_form": "game",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "when",
+          "label": "SCONJ",
+          "role": "Conjunction",
+          "parts": [
+            "when"
+          ],
+          "translation": "когда",
+          "dictionary_form": "when",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "the",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "эту",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "weather",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "weather"
+          ],
+          "translation": "погода",
+          "dictionary_form": "weather",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "is",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "is"
+          ],
+          "translation": "стоит",
+          "dictionary_form": "be",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "warm",
+          "label": "ADJ",
+          "role": "Predicate",
+          "parts": [
+            "warm"
+          ],
+          "translation": "теплая",
+          "dictionary_form": "warm",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Дети играют в игры, когда погода теплая.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_en_1790426562643_8",
+      "source": "generated",
+      "createdAt": 1790426562643
+    },
+    {
+      "language": "English",
+      "sentence": "Water flows.",
+      "words": [
+        {
+          "text": "Water",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "Water"
+          ],
+          "translation": "вода",
+          "dictionary_form": "water",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "flows",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "flow",
+            "s"
+          ],
+          "translation": "течет",
+          "dictionary_form": "flow",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Вода течет.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-9",
+      "id": "generated_en_1790426562643_9",
+      "source": "generated",
+      "createdAt": 1790426562643
+    },
+    {
+      "language": "English",
+      "sentence": "Clean water flows.",
+      "words": [
+        {
+          "text": "Clean",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Clean"
+          ],
+          "translation": "чистая",
+          "dictionary_form": "clean",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "water",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "water"
+          ],
+          "translation": "вода",
+          "dictionary_form": "water",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "flows",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "flow",
+            "s"
+          ],
+          "translation": "течет",
+          "dictionary_form": "flow",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Чистая вода течет.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-10",
+      "id": "generated_en_1790426562643_10",
+      "source": "generated",
+      "createdAt": 1790426562643
+    }
+  ]
+}

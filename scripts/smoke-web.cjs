@@ -20,9 +20,10 @@ async function main() {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   let browser;
+  let page;
   try {
     browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    page = await browser.newPage();
     await page.setViewport({ width: 430, height: 932 });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -39,10 +40,36 @@ async function main() {
     console.log('Screen:', (await page.$eval('body', body => body.innerText)).slice(0, 900));
     assert.equal(errors.length, 0, errors.join('\n'));
     assert.equal(tabs.length, 5);
+    for (const width of [320, 430]) {
+      await page.setViewport({ width, height: 740 });
+      const center = await page.$eval('[role="tab"][aria-label="Sentence Trainer"]', el => {
+        const rect = el.getBoundingClientRect();
+        return Math.abs(rect.left + rect.width / 2 - innerWidth / 2);
+      });
+      assert.ok(center < 2, 'Sentence trainer must be centered');
+    }
     for (let index = 0; index < tabs.length; index++) {
       const elements = await page.$$('[role="tab"]');
       await elements[index].click();
       await page.waitForFunction(() => !document.body.innerText.includes('Что-то пошло не так'));
+      if (index === 3) {
+        await page.waitForFunction(() => document.body.innerText.includes('Нажмите на карточку, чтобы увидеть перевод'));
+        await page.evaluate(() => {
+          const hint = [...document.querySelectorAll('div')].find(element => element.textContent === 'Нажмите на карточку, чтобы увидеть перевод');
+          hint.click();
+        });
+        await page.waitForSelector('[aria-label="Разбор произношения"]');
+        for (const width of [320, 430]) {
+          await page.setViewport({ width, height: 932 });
+          const separated = await page.$eval('[aria-label="Разбор произношения"]', button => {
+            const text = button.previousElementSibling.getBoundingClientRect();
+            const icon = button.getBoundingClientRect();
+            return text.right <= icon.left && icon.right <= innerWidth;
+          });
+          assert.ok(separated, `Pronunciation overlaps translation at ${width}px`);
+        }
+        await page.screenshot({ path: path.join(root, 'workout-layout.png') });
+      }
     }
     assert.equal(errors.length, 0, errors.join('\n'));
     await page.reload({ waitUntil: 'networkidle0' });
@@ -52,7 +79,13 @@ async function main() {
     await page.reload({ waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('Не удалось прочитать сохранённый прогресс'));
     assert.equal(await page.evaluate(() => localStorage.getItem('papanda-storage')), 'broken-json');
-    console.log('Web smoke passed: hydration, 5 tabs, reload, corrupt storage preserved; no uncaught exceptions.');
+    console.log('Web smoke passed: 5 symmetric tabs, non-overlapping pronunciation, corrupt storage preserved; no uncaught exceptions.');
+  } catch (error) {
+    if (page) {
+      console.error('Failed screen:', (await page.$eval('body', body => body.innerText)).slice(-5000));
+      await page.screenshot({ path: path.join(root, 'smoke-failure.png') });
+    }
+    throw error;
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

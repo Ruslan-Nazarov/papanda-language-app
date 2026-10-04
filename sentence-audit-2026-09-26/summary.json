@@ -1,0 +1,151 @@
+{
+  "finishedAt": "2026-09-26T12:59:35.570Z",
+  "requestCount": 38,
+  "stopReason": "Audit request budget reached",
+  "results": [
+    {
+      "scenario": {
+        "id": "kz-1",
+        "code": "kz",
+        "count": 10
+      },
+      "startedAt": "2026-09-26T12:54:53.065Z",
+      "elapsedMs": 91248,
+      "accepted": 10,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "en-1",
+        "code": "en",
+        "count": 10
+      },
+      "startedAt": "2026-09-26T12:54:53.060Z",
+      "elapsedMs": 97335,
+      "accepted": 10,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "en-2",
+        "code": "en",
+        "count": 10
+      },
+      "startedAt": "2026-09-26T12:56:30.396Z",
+      "elapsedMs": 31148,
+      "accepted": 10,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "kz-2",
+        "code": "kz",
+        "count": 10
+      },
+      "startedAt": "2026-09-26T12:56:24.318Z",
+      "elapsedMs": 51734,
+      "accepted": 4,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "kz-noun",
+        "code": "kz",
+        "count": 1,
+        "lemma": "үй"
+      },
+      "startedAt": "2026-09-26T12:57:16.055Z",
+      "elapsedMs": 7404,
+      "accepted": 1,
+      "requestCount": 2
+    },
+    {
+      "scenario": {
+        "id": "en-expression",
+        "code": "en",
+        "count": 1,
+        "lemma": "take care of"
+      },
+      "startedAt": "2026-09-26T12:57:01.545Z",
+      "elapsedMs": 52976,
+      "accepted": 1,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "kz-verb",
+        "code": "kz",
+        "count": 1,
+        "lemma": "оқу"
+      },
+      "startedAt": "2026-09-26T12:57:23.461Z",
+      "elapsedMs": 42468,
+      "accepted": 1,
+      "requestCount": 2
+    },
+    {
+      "scenario": {
+        "id": "de-1",
+        "code": "de",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T12:58:05.932Z",
+      "elapsedMs": 19554,
+      "accepted": 8,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "en-negative",
+        "code": "en",
+        "count": 1,
+        "lemma": "never"
+      },
+      "startedAt": "2026-09-26T12:57:54.523Z",
+      "elapsedMs": 43482,
+      "accepted": 1,
+      "requestCount": 2
+    },
+    {
+      "scenario": {
+        "id": "fr-1",
+        "code": "fr",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T12:58:25.487Z",
+      "elapsedMs": 61882,
+      "accepted": 8,
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "es-1",
+        "code": "es",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T12:59:27.372Z",
+      "elapsedMs": 13,
+      "accepted": 0,
+      "error": "Audit request budget reached",
+      "requestCount": 0
+    },
+    {
+      "scenario": {
+        "id": "it-1",
+        "code": "it",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T12:58:38.006Z",
+      "elapsedMs": 57562,
+      "accepted": 7,
+      "requestCount": 4
+    }
+  ],
+  "skipped": [
+    {
+      "id": "la-1",
+      "code": "la",
+      "count": 8
+    }
+  ]
+}

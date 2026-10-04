@@ -9,7 +9,7 @@ const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
   en: {
     label: 'English',
     grammar: 'Natural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.',
-    morphology: 'works → ["work","s"], melted → ["melt","ed"]. Keep went and other opaque forms whole. Surface parts must concatenate to the written form: happier → ["happi","er"], dictionary_form happy, never parts ["happy","er"].',
+    morphology: 'works → ["work","s"], melted → ["melt","ed"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → ["happi","er"], dictionary_form happy, never parts ["happy","er"].',
   },
   kz: {
     label: 'Қазақша',
@@ -76,6 +76,7 @@ Develop from a simple basis to added meaning. Unknown words are allowed: structu
 Short complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.
 Prefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.
 Use frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.
+Modifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.
 Preserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.`;
 
 /** First pass: compose whole utterances without token annotation. */
@@ -88,12 +89,17 @@ LANGUAGE: ${getLanguagePrompt(code).label} (${code})
 ${getLanguagePrompt(code).grammar}
 Write one complete sentence per task, return ONLY JSON [{"taskId":"task-1","sentence":"..."}].
 For core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.
-For negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.
+For negative/question use a simple, natural scene; complex needs a clear relation between two grammatical bases. Reading is an independent simple affirmative.
+Usage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.
 If develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.
+Plan the whole development chain BACKWARDS from the object step: first choose one predicate and participant for which both the short core AND an added direct object are natural. Then derive all earlier and later steps from that same predicate and scene. Never switch verbs between task-1 and task-3. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.
+In a chain containing an object task, choose a predicate allowing an optional object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. If the verb requires an object, include it from task-1 and make it more specific at the object step. Do not write an incomplete core.
+For complex, use two closely related actions with an obvious temporal or coordinating link. Use a causal conjunction only when the second clause really explains the first; the result of an action is not its cause.
 Otherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.
 TASKS: ${JSON.stringify(tasks)}
 Already accepted development context: ${JSON.stringify(context)}
-Optional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): ${JSON.stringify(seeds)}
+For ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.
+Requested word hint, if any: ${JSON.stringify(seeds)}
 ${requiredWord ? `The task task-1 must use the lexeme/expression ${JSON.stringify(requiredWord)} naturally, inflected if needed.` : ''}
 Avoid exact duplicates: ${JSON.stringify(avoid)}
 Correct these problems from the previous attempt: ${JSON.stringify(feedback.slice(0, 8))}`;
@@ -102,20 +108,23 @@ export const buildSentenceAnnotationPrompt = (code: string, tasks: SentenceTask[
 ${METHOD}
 LANGUAGE: ${getLanguagePrompt(code).label} (${code})
 ${getLanguagePrompt(code).grammar}
-Review drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis (analysisReliable).
+Review drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).
 Reject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.
+Check meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.
 TASKS: ${JSON.stringify(tasks)}
 DRAFTS: ${JSON.stringify(drafts)}
 Previously accepted context, only for checking development relationships (do not return it): ${JSON.stringify(context)}
 For each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.
-literalTranslation: Russian translation of the WHOLE sentence, preserving source order as far as Russian grammar permits. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Do not concatenate grammatical labels instead of translating.
+literalTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.
+Russian must remain grammatical and convey the same tense and negation. Natural Russian word order takes priority over mechanically copying the source order, especially in questions: Қыз кітап оқыды ма? → Читала ли девочка книгу?, not Девочка книгу читала ли? Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.
+For example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.
 words in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.
 text must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.
-role is a sentence member, NOT a part of speech: ${ROLE_VALUES.join(', ')}. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Articles retain Article.
+role is a sentence member, NOT a part of speech: ${ROLE_VALUES.join(', ')}. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.
 clauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.
 parts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. ${getLanguagePrompt(code).morphology}
 dictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.
-translation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.
+translation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words. A grammatical article is not a demonstrative or numeral: the ≠ этот, a ≠ один. When an English do/does/has auxiliary accompanies another verb, gloss its auxiliary function, not lexical «делает» or «имеет». In a Kazakh analytical negative with жоқ, the preceding verbal form must not receive an isolated Russian participial gloss such as «спавшая» or «сорвавшая».
 Return ONLY the JSON array. Do not accept weak candidates to fill a quota.`;
 
 const ROLE_VALUES: SyntaxRole[] = ['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 'Attribute_Object',

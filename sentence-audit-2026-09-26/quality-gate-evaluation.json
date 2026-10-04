@@ -1,0 +1,692 @@
+{
+  "evaluatedAt": "2026-09-26T13:16:37.855Z",
+  "results": [
+    {
+      "id": "en-2",
+      "elapsedMs": 3676,
+      "expectedFix": [
+        "task-3",
+        "task-4",
+        "task-7"
+      ],
+      "expectedWeak": [
+        "task-1",
+        "task-2",
+        "task-5",
+        "task-6",
+        "task-8"
+      ],
+      "raw": [
+        {
+          "taskId": "task-1",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": false,
+          "chain": true,
+          "reason": "Морфемный разбор слова Does некорректен: разбиение на части Doe и s неверно."
+        },
+        {
+          "taskId": "task-8",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-9",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-10",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        }
+      ],
+      "verdicts": [
+        {
+          "taskId": "task-1",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "passed": false,
+          "reason": "morphology: Морфемный разбор слова Does некорректен: разбиение на части Doe и s неверно."
+        },
+        {
+          "taskId": "task-8",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-9",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-10",
+          "passed": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "kz-1",
+      "elapsedMs": 3292,
+      "expectedFix": [
+        "task-4",
+        "task-5",
+        "task-6",
+        "task-7",
+        "task-8",
+        "task-9",
+        "task-10"
+      ],
+      "expectedWeak": [],
+      "raw": [
+        {
+          "taskId": "task-1",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-8",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-9",
+          "natural": true,
+          "translation": false,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": "Несогласование в числе в русской лит. перевод: облако парило"
+        },
+        {
+          "taskId": "task-10",
+          "natural": true,
+          "translation": false,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": "Несогласование в числе в русской лит. перевод: белое облако парило"
+        }
+      ],
+      "verdicts": [
+        {
+          "taskId": "task-1",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-8",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-9",
+          "passed": false,
+          "reason": "translation: Несогласование в числе в русской лит. перевод: облако парило"
+        },
+        {
+          "taskId": "task-10",
+          "passed": false,
+          "reason": "translation: Несогласование в числе в русской лит. перевод: белое облако парило"
+        }
+      ]
+    },
+    {
+      "id": "de-1",
+      "elapsedMs": 5053,
+      "expectedFix": [
+        "task-3",
+        "task-4",
+        "task-5",
+        "task-7",
+        "task-8"
+      ],
+      "expectedWeak": [
+        "task-1",
+        "task-2"
+      ],
+      "raw": [
+        {
+          "taskId": "task-1",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "natural": false,
+          "translation": false,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "Пропущено обязательное артиклевое слово или местоимение перед существительным Sekretär (требуется 'den Sekretär')."
+        },
+        {
+          "taskId": "task-4",
+          "natural": false,
+          "translation": false,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "Пропущен определенный артикль перед Sekretär (требуется 'den Sekretär')."
+        },
+        {
+          "taskId": "task-5",
+          "natural": false,
+          "translation": false,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "Пропущен артикль перед Sekretär, а также нарушена грамматика объектной группы."
+        },
+        {
+          "taskId": "task-6",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "natural": false,
+          "translation": false,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "В предложении 'Treffen berühmte Priester Sekretär?' отсутствует артикль у дополнения Sekretär."
+        },
+        {
+          "taskId": "task-8",
+          "natural": false,
+          "translation": false,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "В главной части предложения пропущен обязательный определенный артикль перед Sekretär."
+        }
+      ],
+      "verdicts": [
+        {
+          "taskId": "task-1",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "passed": false,
+          "reason": "natural, translation, roles: Пропущено обязательное артиклевое слово или местоимение перед существительным Sekretär (требуется 'den Sekretär')."
+        },
+        {
+          "taskId": "task-4",
+          "passed": false,
+          "reason": "natural, translation, roles: Пропущен определенный артикль перед Sekretär (требуется 'den Sekretär')."
+        },
+        {
+          "taskId": "task-5",
+          "passed": false,
+          "reason": "natural, translation, roles: Пропущен артикль перед Sekretär, а также нарушена грамматика объектной группы."
+        },
+        {
+          "taskId": "task-6",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "passed": false,
+          "reason": "natural, translation, roles: В предложении 'Treffen berühmte Priester Sekretär?' отсутствует артикль у дополнения Sekretär."
+        },
+        {
+          "taskId": "task-8",
+          "passed": false,
+          "reason": "natural, translation, roles: В главной части предложения пропущен обязательный определенный артикль перед Sekretär."
+        }
+      ]
+    },
+    {
+      "id": "fr-1",
+      "elapsedMs": 3004,
+      "expectedFix": [
+        "task-7"
+      ],
+      "expectedWeak": [],
+      "raw": [
+        {
+          "taskId": "task-1",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "natural": true,
+          "translation": true,
+          "roles": false,
+          "morphology": true,
+          "chain": true,
+          "reason": "Маркеры отрицания ne и pas помечены как Predicate, хотя они являются частью отрицательной конструкции, а не частью сказуемого."
+        },
+        {
+          "taskId": "task-6",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-8",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        }
+      ],
+      "verdicts": [
+        {
+          "taskId": "task-1",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-4",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "passed": false,
+          "reason": "roles: Маркеры отрицания ne и pas помечены как Predicate, хотя они являются частью отрицательной конструкции, а не частью сказуемого."
+        },
+        {
+          "taskId": "task-6",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-8",
+          "passed": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "it-1",
+      "elapsedMs": 6230,
+      "expectedFix": [
+        "task-5",
+        "task-7",
+        "task-8"
+      ],
+      "expectedWeak": [
+        "task-6"
+      ],
+      "raw": [
+        {
+          "taskId": "task-1",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "natural": true,
+          "translation": true,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "natural": true,
+          "translation": false,
+          "roles": true,
+          "morphology": true,
+          "chain": false,
+          "reason": "В переводе упущено слово straniero (иностранный), присутствующее в итальянском тексте."
+        },
+        {
+          "taskId": "task-8",
+          "natural": true,
+          "translation": false,
+          "roles": true,
+          "morphology": true,
+          "chain": true,
+          "reason": "В русском переводе добавлено слово 'иностранный' для scienziato, которого нет в этой части карточки."
+        }
+      ],
+      "verdicts": [
+        {
+          "taskId": "task-1",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-2",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-3",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-5",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-6",
+          "passed": true,
+          "reason": ""
+        },
+        {
+          "taskId": "task-7",
+          "passed": false,
+          "reason": "translation, chain: В переводе упущено слово straniero (иностранный), присутствующее в итальянском тексте."
+        },
+        {
+          "taskId": "task-8",
+          "passed": false,
+          "reason": "translation: В русском переводе добавлено слово 'иностранный' для scienziato, которого нет в этой части карточки."
+        }
+      ]
+    }
+  ]
+}

@@ -11,14 +11,14 @@
 </p>
 
 <p align="center">
-  <a href="https://expo.dev/artifacts/eas/D8hgjS0EeOseCSn2wzUiStcdH4n-8cXwQC1H1mptro8.apk">
+  <a href="https://expo.dev/artifacts/eas/azvaNEuwSyrlp43E7xe97EcbB1PvNvSFiIgEOQQEIBA.apk">
     <img src="https://img.shields.io/badge/Скачать-APK-F97316?style=for-the-badge" alt="Скачать APK" />
   </a>
 </p>
 
 ## Скачать и установить (Android)
 
-1. Скачай **[papanda.apk](https://expo.dev/artifacts/eas/D8hgjS0EeOseCSn2wzUiStcdH4n-8cXwQC1H1mptro8.apk)** (последняя сборка, v1.0.1). Все сборки: [expo.dev/.../builds](https://expo.dev/accounts/runaz/projects/papanda-app/builds).
+1. Скачай **[papanda.apk](https://expo.dev/artifacts/eas/azvaNEuwSyrlp43E7xe97EcbB1PvNvSFiIgEOQQEIBA.apk)** (последняя тестовая сборка, v1.0.1, Android build 8). Все сборки: [expo.dev/.../builds](https://expo.dev/accounts/runaz/projects/papanda-app/builds).
 2. Открой скачанный файл на телефоне.
 3. Android спросит разрешение ставить приложения из этого источника — разреши.
 4. Появится предупреждение Play Protect («Неизвестное приложение») — нажми **Подробнее → Всё равно установить**.

@@ -7,6 +7,7 @@ import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
 import { exportProgressToFile, importProgressFromFile } from '../services/backupService';
 import { ACCENT, ACCENT_LIGHT } from '../constants/theme';
+import appConfig from '../../app.json';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 const ONBOARDING_KEY = 'papanda-onboarded';
@@ -120,6 +121,7 @@ export default function SettingsScreen() {
       <Text style={styles.header}>Настройки</Text>
 
       <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.sectionSub}>papanda {appConfig.expo.version} · сборка {appConfig.expo.android.versionCode}</Text>
         {/* Active Languages for Triples */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Изучаемые языки</Text>

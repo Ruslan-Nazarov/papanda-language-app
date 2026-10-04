@@ -1,0 +1,79 @@
+{
+  "finishedAt": "2026-09-26T13:22:04.068Z",
+  "requestCount": 23,
+  "stopReason": "Proxy quota/rate limit reached",
+  "results": [
+    {
+      "scenario": {
+        "id": "en-1",
+        "code": "en",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T13:21:27.036Z",
+      "elapsedMs": 22879,
+      "accepted": 7,
+      "requestCount": 6
+    },
+    {
+      "scenario": {
+        "id": "kz-1",
+        "code": "kz",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T13:21:27.039Z",
+      "elapsedMs": 28199,
+      "accepted": 6,
+      "requestCount": 6
+    },
+    {
+      "scenario": {
+        "id": "en-expression",
+        "code": "en",
+        "count": 1,
+        "lemma": "take care of"
+      },
+      "startedAt": "2026-09-26T13:21:49.921Z",
+      "elapsedMs": 11545,
+      "accepted": 0,
+      "error": "task-1: roles: роль слова «care» указана как Predicate, но это часть фразового глагола «takes care of», а не отдельное сказуемое",
+      "requestCount": 6
+    },
+    {
+      "scenario": {
+        "id": "kz-noun",
+        "code": "kz",
+        "count": 1,
+        "lemma": "үй"
+      },
+      "startedAt": "2026-09-26T13:21:55.241Z",
+      "elapsedMs": 7890,
+      "accepted": 0,
+      "error": "Proxy quota/rate limit reached",
+      "requestCount": 4
+    },
+    {
+      "scenario": {
+        "id": "de-1",
+        "code": "de",
+        "count": 8
+      },
+      "startedAt": "2026-09-26T13:22:01.469Z",
+      "elapsedMs": 2594,
+      "accepted": 0,
+      "error": "Proxy quota/rate limit reached",
+      "requestCount": 1
+    }
+  ],
+  "skipped": [
+    {
+      "id": "fr-1",
+      "code": "fr",
+      "count": 8
+    },
+    {
+      "id": "it-1",
+      "code": "it",
+      "count": 8
+    }
+  ]
+}

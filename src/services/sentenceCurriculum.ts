@@ -2,7 +2,7 @@
  * Structure, not vocabulary mastery, determines the exercise.
  * This is a batch composition policy, not a claim about learner proficiency.
  */
-export type SentenceFocus = 'core' | 'attribute' | 'object' | 'circumstance' | 'negative' | 'reading' | 'question' | 'complex';
+export type SentenceFocus = 'core' | 'attribute' | 'object' | 'circumstance' | 'negative' | 'reading' | 'question' | 'complex' | 'usage';
 
 const GOALS: Record<SentenceFocus, string> = {
   core: 'Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.',
@@ -12,7 +12,8 @@ const GOALS: Record<SentenceFocus, string> = {
   negative: 'Найдите всё сказуемое и определите, какими средствами выражено отрицание.',
   reading: 'Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.',
   question: 'Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.',
-  complex: 'Найдите грамматические основы и связь между ними. Начните разбор с главной части.',
+  complex: 'Найдите грамматические основы и смысловую связь между ними.',
+  usage: 'Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.',
 };
 
 export interface SentenceTask {
@@ -25,11 +26,12 @@ export interface SentenceTask {
 
 export interface SentenceDraft { taskId: string; sentence: string }
 
-export const planSentenceBatch = (count: number): SentenceTask[] => {
+export const planSentenceBatch = (count: number, targeted = false): SentenceTask[] => {
   const sequence: SentenceFocus[] = ['core', 'attribute', 'object', 'circumstance', 'negative', 'reading', 'question', 'complex'];
   return Array.from({ length: count }, (_, i) => ({
-    id: `task-${i + 1}`, focus: sequence[i % sequence.length], goal: GOALS[sequence[i % sequence.length]],
-    ...(count >= 6 && (i === 1 || i === 3) ? { develops: i === 1 ? 'task-1' : 'task-2' } : {}),
+    id: `task-${i + 1}`, focus: targeted && i === 0 ? 'usage' : sequence[i % sequence.length],
+    goal: GOALS[targeted && i === 0 ? 'usage' : sequence[i % sequence.length]],
+    ...(count >= 4 && !targeted && i > 0 && i < 4 ? { develops: `task-${i}` } : {}),
   }));
 };
 

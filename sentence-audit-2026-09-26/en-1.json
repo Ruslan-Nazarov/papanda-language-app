@@ -1,0 +1,1220 @@
+{
+  "scenario": {
+    "id": "en-1",
+    "code": "en",
+    "count": 10
+  },
+  "startedAt": "2026-09-26T12:54:53.060Z",
+  "elapsedMs": 97335,
+  "accepted": 10,
+  "sentences": [
+    {
+      "language": "English",
+      "sentence": "The artist paints a canvas.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "artist",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "artist"
+          ],
+          "translation": "художник",
+          "dictionary_form": "artist",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "paints",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "paint",
+            "s"
+          ],
+          "translation": "пишет",
+          "dictionary_form": "paint",
+          "is_in_my_dict": true,
+          "dictionary_word": "paint",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "неопределенный артикль",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "canvas",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "canvas"
+          ],
+          "translation": "холст",
+          "dictionary_form": "canvas",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Художник пишет холст.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_en_1790427390369_23",
+      "source": "generated",
+      "createdAt": 1790427390369
+    },
+    {
+      "language": "English",
+      "sentence": "The talented artist paints a canvas.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "talented",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "talent",
+            "ed"
+          ],
+          "translation": "талантливый",
+          "dictionary_form": "talented",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "artist",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "artist"
+          ],
+          "translation": "художник",
+          "dictionary_form": "artist",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "paints",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "paint",
+            "s"
+          ],
+          "translation": "пишет",
+          "dictionary_form": "paint",
+          "is_in_my_dict": true,
+          "dictionary_word": "paint",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "неопределенный артикль",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "canvas",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "canvas"
+          ],
+          "translation": "холст",
+          "dictionary_form": "canvas",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Талантливый художник пишет холст.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_en_1790427390373_24",
+      "source": "generated",
+      "createdAt": 1790427390373
+    },
+    {
+      "language": "English",
+      "sentence": "The talented artist paints a large canvas.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "talented",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "talent",
+            "ed"
+          ],
+          "translation": "талантливый",
+          "dictionary_form": "talented",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "artist",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "artist"
+          ],
+          "translation": "художник",
+          "dictionary_form": "artist",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "paints",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "paint",
+            "s"
+          ],
+          "translation": "пишет",
+          "dictionary_form": "paint",
+          "is_in_my_dict": true,
+          "dictionary_word": "paint",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "неопределенный артикль",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "large",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "large"
+          ],
+          "translation": "большой",
+          "dictionary_form": "large",
+          "is_in_my_dict": true,
+          "dictionary_word": "large",
+          "clauseIndex": 0
+        },
+        {
+          "text": "canvas",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "canvas"
+          ],
+          "translation": "холст",
+          "dictionary_form": "canvas",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Талантливый художник пишет большой холст.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_en_1790427390378_25",
+      "source": "generated",
+      "createdAt": 1790427390378
+    },
+    {
+      "language": "English",
+      "sentence": "The talented artist paints a large canvas in the studio.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "talented",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "talent",
+            "ed"
+          ],
+          "translation": "талантливый",
+          "dictionary_form": "talented",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "artist",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "artist"
+          ],
+          "translation": "художник",
+          "dictionary_form": "artist",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "paints",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "paint",
+            "s"
+          ],
+          "translation": "пишет",
+          "dictionary_form": "paint",
+          "is_in_my_dict": true,
+          "dictionary_word": "paint",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "неопределенный артикль",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "large",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "large"
+          ],
+          "translation": "большой",
+          "dictionary_form": "large",
+          "is_in_my_dict": true,
+          "dictionary_word": "large",
+          "clauseIndex": 0
+        },
+        {
+          "text": "canvas",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "canvas"
+          ],
+          "translation": "холст",
+          "dictionary_form": "canvas",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "in",
+          "label": "preposition",
+          "role": "Preposition",
+          "parts": [
+            "in"
+          ],
+          "translation": "в",
+          "dictionary_form": "in",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "studio",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "studio"
+          ],
+          "translation": "студии",
+          "dictionary_form": "studio",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Талантливый художник пишет большой холст в студии.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_en_1790427390385_26",
+      "source": "generated",
+      "createdAt": 1790427390385
+    },
+    {
+      "language": "English",
+      "sentence": "The chef does not cook the soup.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chef",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "chef"
+          ],
+          "translation": "шеф-повар",
+          "dictionary_form": "chef",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "does",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "does"
+          ],
+          "translation": "вспомогательный глагол",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "not",
+          "label": "particle",
+          "role": "Predicate",
+          "parts": [
+            "not"
+          ],
+          "translation": "не",
+          "dictionary_form": "not",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "cook",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "cook"
+          ],
+          "translation": "готовить",
+          "dictionary_form": "cook",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "soup",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "soup"
+          ],
+          "translation": "суп",
+          "dictionary_form": "soup",
+          "is_in_my_dict": true,
+          "dictionary_word": "soup",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Шеф-повар не готовит суп.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_en_1790427390390_27",
+      "source": "generated",
+      "createdAt": 1790427390390
+    },
+    {
+      "language": "English",
+      "sentence": "The culture defines the future.",
+      "words": [
+        {
+          "text": "The",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "culture",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "culture"
+          ],
+          "translation": "культура",
+          "dictionary_form": "culture",
+          "is_in_my_dict": true,
+          "dictionary_word": "culture",
+          "clauseIndex": 0
+        },
+        {
+          "text": "defines",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "define",
+            "s"
+          ],
+          "translation": "определяет",
+          "dictionary_form": "define",
+          "is_in_my_dict": true,
+          "dictionary_word": "define",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "future",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "future"
+          ],
+          "translation": "будущее",
+          "dictionary_form": "future",
+          "is_in_my_dict": true,
+          "dictionary_word": "future",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Культура определяет будущее.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_en_1790427340233_15",
+      "source": "generated",
+      "createdAt": 1790427340233
+    },
+    {
+      "language": "English",
+      "sentence": "Does the gardener water the plants?",
+      "words": [
+        {
+          "text": "Does",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "Does"
+          ],
+          "translation": "вспомогательный глагол",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "gardener",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "garden",
+            "er"
+          ],
+          "translation": "садовник",
+          "dictionary_form": "gardener",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "water",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "water"
+          ],
+          "translation": "поливает",
+          "dictionary_form": "water",
+          "is_in_my_dict": true,
+          "dictionary_word": "water",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "plants",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "plant",
+            "s"
+          ],
+          "translation": "растения",
+          "dictionary_form": "plant",
+          "is_in_my_dict": true,
+          "dictionary_word": "plant",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Садовник поливает растения?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_en_1790427390395_28",
+      "source": "generated",
+      "createdAt": 1790427390395
+    },
+    {
+      "language": "English",
+      "sentence": "The wall falls because the rust spreads.",
+      "words": [
+        {
+          "text": "The",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "wall",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "wall"
+          ],
+          "translation": "стена",
+          "dictionary_form": "wall",
+          "is_in_my_dict": true,
+          "dictionary_word": "wall",
+          "clauseIndex": 0
+        },
+        {
+          "text": "falls",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "fall",
+            "s"
+          ],
+          "translation": "падает",
+          "dictionary_form": "fall",
+          "is_in_my_dict": true,
+          "dictionary_word": "fall",
+          "clauseIndex": 0
+        },
+        {
+          "text": "because",
+          "label": "CONJUNCTION",
+          "role": "Conjunction",
+          "parts": [
+            "because"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "because",
+          "is_in_my_dict": true,
+          "dictionary_word": "because",
+          "clauseIndex": 1
+        },
+        {
+          "text": "the",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "rust",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "rust"
+          ],
+          "translation": "ржавчина",
+          "dictionary_form": "rust",
+          "is_in_my_dict": true,
+          "dictionary_word": "rust",
+          "clauseIndex": 1
+        },
+        {
+          "text": "spreads",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "spread",
+            "s"
+          ],
+          "translation": "распространяется",
+          "dictionary_form": "spread",
+          "is_in_my_dict": true,
+          "dictionary_word": "spread",
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Стена падает, потому что ржавчина распространяется.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_en_1790427340248_16",
+      "source": "generated",
+      "createdAt": 1790427340248
+    },
+    {
+      "language": "English",
+      "sentence": "The mountain rises.",
+      "words": [
+        {
+          "text": "The",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "mountain",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "mountain"
+          ],
+          "translation": "гора",
+          "dictionary_form": "mountain",
+          "is_in_my_dict": true,
+          "dictionary_word": "mountain",
+          "clauseIndex": 0
+        },
+        {
+          "text": "rises",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "rise",
+            "s"
+          ],
+          "translation": "возвышается",
+          "dictionary_form": "rise",
+          "is_in_my_dict": true,
+          "dictionary_word": "rise",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Гора возвышается.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-9",
+      "id": "generated_en_1790427340255_17",
+      "source": "generated",
+      "createdAt": 1790427340255
+    },
+    {
+      "language": "English",
+      "sentence": "The high mountain rises.",
+      "words": [
+        {
+          "text": "The",
+          "label": "ARTICLE",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "high",
+          "label": "ADJECTIVE",
+          "role": "Attribute_Subject",
+          "parts": [
+            "high"
+          ],
+          "translation": "высокая",
+          "dictionary_form": "high",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "mountain",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "mountain"
+          ],
+          "translation": "гора",
+          "dictionary_form": "mountain",
+          "is_in_my_dict": true,
+          "dictionary_word": "mountain",
+          "clauseIndex": 0
+        },
+        {
+          "text": "rises",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "rise",
+            "s"
+          ],
+          "translation": "возвышается",
+          "dictionary_form": "rise",
+          "is_in_my_dict": true,
+          "dictionary_word": "rise",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Высокая гора возвышается.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-10",
+      "id": "generated_en_1790427340264_18",
+      "source": "generated",
+      "createdAt": 1790427340264
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"seaman\",\"translation\":\"моряк\"},{\"lemma\":\"injustice\",\"translation\":\"несправедливость\"},{\"lemma\":\"year\",\"translation\":\"год\"},{\"lemma\":\"mountain\",\"translation\":\"гора\"},{\"lemma\":\"require\",\"translation\":\"требовать\"},{\"lemma\":\"curtain\",\"translation\":\"занавес\"},{\"lemma\":\"health\",\"translation\":\"здоровье\"},{\"lemma\":\"son\",\"translation\":\"сын\"},{\"lemma\":\"drag\",\"translation\":\"тащить\"},{\"lemma\":\"minor\",\"translation\":\"незначительный\"},{\"lemma\":\"culture\",\"translation\":\"культура\"},{\"lemma\":\"brief\",\"translation\":\"краткий\"},{\"lemma\":\"safe\",\"translation\":\"безопасный\"},{\"lemma\":\"leather\",\"translation\":\"кожа\"},{\"lemma\":\"stumble\",\"translation\":\"спотыкаться\"},{\"lemma\":\"waver\",\"translation\":\"волнение\"},{\"lemma\":\"tender\",\"translation\":\"нежный\"},{\"lemma\":\"future\",\"translation\":\"будущее\"},{\"lemma\":\"low\",\"translation\":\"низкий\"},{\"lemma\":\"rust\",\"translation\":\"ржавчина\"},{\"lemma\":\"lush\",\"translation\":\"пышный\"},{\"lemma\":\"adult\",\"translation\":\"взрослый\"},{\"lemma\":\"dependence\",\"translation\":\"зависимость\"},{\"lemma\":\"inherent\",\"translation\":\"присущий\"},{\"lemma\":\"exchange\",\"translation\":\"обмен\"}]\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The seaman works.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The young seaman works.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The young seaman drags the leather.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The young seaman drags the leather outside.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The doctor does not examine the adult.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"The culture defines the future.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the son require help?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The wall falls because the rust spreads.\"\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"The mountain rises.\"\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"The high mountain rises.\"\n  }\n]"
+      },
+      "elapsedMs": 34661
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The seaman works.\"},{\"taskId\":\"task-2\",\"sentence\":\"The young seaman works.\"},{\"taskId\":\"task-3\",\"sentence\":\"The young seaman drags the leather.\"},{\"taskId\":\"task-4\",\"sentence\":\"The young seaman drags the leather outside.\"},{\"taskId\":\"task-5\",\"sentence\":\"The doctor does not examine the adult.\"},{\"taskId\":\"task-6\",\"sentence\":\"The culture defines the future.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the son require help?\"},{\"taskId\":\"task-8\",\"sentence\":\"The wall falls because the rust spreads.\"},{\"taskId\":\"task-9\",\"sentence\":\"The mountain rises.\"},{\"taskId\":\"task-10\",\"sentence\":\"The high mountain rises.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The seaman works.\",\n    \"literalTranslation\": \"Моряк работает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"seaman\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"seaman\"],\n        \"translation\": \"моряк\",\n        \"dictionary_form\": \"seaman\"\n      },\n      {\n        \"text\": \"works\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"work\", \"s\"],\n        \"translation\": \"работает\",\n        \"dictionary_form\": \"work\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The young seaman works.\",\n    \"literalTranslation\": \"Молодой моряк работает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"young\",\n        \"label\": \"ADJECTIVE\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"young\"],\n        \"translation\": \"молодой\",\n        \"dictionary_form\": \"young\"\n      },\n      {\n        \"text\": \"seaman\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"seaman\"],\n        \"translation\": \"моряк\",\n        \"dictionary_form\": \"seaman\"\n      },\n      {\n        \"text\": \"works\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"work\", \"s\"],\n        \"translation\": \"работает\",\n        \"dictionary_form\": \"work\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The young seaman drags the leather.\",\n    \"literalTranslation\": \"Молодой моряк тащит кожу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"young\",\n        \"label\": \"ADJECTIVE\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"young\"],\n        \"translation\": \"молодой\",\n        \"dictionary_form\": \"young\"\n      },\n      {\n        \"text\": \"seaman\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"seaman\"],\n        \"translation\": \"моряк\",\n        \"dictionary_form\": \"seaman\"\n      },\n      {\n        \"text\": \"drags\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"drag\", \"s\"],\n        \"translation\": \"тащит\",\n        \"dictionary_form\": \"drag\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"leather\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"leather\"],\n        \"translation\": \"кожу\",\n        \"dictionary_form\": \"leather\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The young seaman drags the leather outside.\",\n    \"literalTranslation\": \"Молодой моряк тащит кожу наружу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"young\",\n        \"label\": \"ADJECTIVE\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"young\"],\n        \"translation\": \"молодой\",\n        \"dictionary_form\": \"young\"\n      },\n      {\n        \"text\": \"seaman\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"seaman\"],\n        \"translation\": \"моряк\",\n        \"dictionary_form\": \"seaman\"\n      },\n      {\n        \"text\": \"drags\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"drag\", \"s\"],\n        \"translation\": \"тащит\",\n        \"dictionary_form\": \"drag\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"leather\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"leather\"],\n        \"translation\": \"кожу\",\n        \"dictionary_form\": \"leather\"\n      },\n      {\n        \"text\": \"outside\",\n        \"label\": \"ADVERB\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"outside\"],\n        \"translation\": \"наружу\",\n        \"dictionary_form\": \"outside\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The doctor does not examine the adult.\",\n    \"literalTranslation\": \"Врач не осматривает взрослого.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"doctor\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"doctor\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"doctor\"\n      },\n      {\n        \"text\": \"does\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"does\"],\n        \"translation\": \"\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"not\",\n        \"label\": \"PARTICLE\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"not\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"not\"\n      },\n      {\n        \"text\": \"examine\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"examine\"],\n        \"translation\": \"осматривает\",\n        \"dictionary_form\": \"examine\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"adult\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"adult\"],\n        \"translation\": \"взрослого\",\n        \"dictionary_form\": \"adult\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"The culture defines the future.\",\n    \"literalTranslation\": \"Культура определяет будущее.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"culture\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"culture\"],\n        \"translation\": \"культура\",\n        \"dictionary_form\": \"culture\"\n      },\n      {\n        \"text\": \"defines\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"define\", \"s\"],\n        \"translation\": \"определяет\",\n        \"dictionary_form\": \"define\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"future\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"future\"],\n        \"translation\": \"будущее\",\n        \"dictionary_form\": \"future\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the son require help?\",\n    \"literalTranslation\": \"Требуется ли сыну помощь?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Does\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Does\"],\n        \"translation\": \"требуется\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"son\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"son\"],\n        \"translation\": \"сын\",\n        \"dictionary_form\": \"son\"\n      },\n      {\n        \"text\": \"require\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"require\"],\n        \"translation\": \"\",\n        \"dictionary_form\": \"require\"\n      },\n      {\n        \"text\": \"help\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"help\"],\n        \"translation\": \"помощь\",\n        \"dictionary_form\": \"help\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The wall falls because the rust spreads.\",\n    \"literalTranslation\": \"Стена падает, потому что ржавчина распространяется.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"wall\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"wall\"],\n        \"translation\": \"стена\",\n        \"dictionary_form\": \"wall\"\n      },\n      {\n        \"text\": \"falls\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"fall\", \"s\"],\n        \"translation\": \"падает\",\n        \"dictionary_form\": \"fall\"\n      },\n      {\n        \"text\": \"because\",\n        \"label\": \"CONJUNCTION\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"because\"],\n        \"translation\": \"потому что\",\n        \"dictionary_form\": \"because\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"rust\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"rust\"],\n        \"translation\": \"ржавчина\",\n        \"dictionary_form\": \"rust\"\n      },\n      {\n        \"text\": \"spreads\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"spread\", \"s\"],\n        \"translation\": \"распространяется\",\n        \"dictionary_form\": \"spread\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"The mountain rises.\",\n    \"literalTranslation\": \"Гора возвышается.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"mountain\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"mountain\"],\n        \"translation\": \"гора\",\n        \"dictionary_form\": \"mountain\"\n      },\n      {\n        \"text\": \"rises\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"rise\", \"s\"],\n        \"translation\": \"возвышается\",\n        \"dictionary_form\": \"rise\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"The high mountain rises.\",\n    \"literalTranslation\": \"Высокая гора возвышается.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"ARTICLE\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"high\",\n        \"label\": \"ADJECTIVE\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"high\"],\n        \"translation\": \"высокая\",\n        \"dictionary_form\": \"high\"\n      },\n      {\n        \"text\": \"mountain\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"mountain\"],\n        \"translation\": \"гора\",\n        \"dictionary_form\": \"mountain\"\n      },\n      {\n        \"text\": \"rises\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"rise\", \"s\"],\n        \"translation\": \"возвышается\",\n        \"dictionary_form\": \"rise\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 12422
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"}]\nAlready accepted development context: [{\"taskId\":\"task-6\",\"sentence\":\"The culture defines the future.\"},{\"taskId\":\"task-8\",\"sentence\":\"The wall falls because the rust spreads.\"},{\"taskId\":\"task-9\",\"sentence\":\"The mountain rises.\"},{\"taskId\":\"task-10\",\"sentence\":\"The high mountain rises.\"}]\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"vagueness\",\"translation\":\"неопределенность\"},{\"lemma\":\"connection\",\"translation\":\"связь\"},{\"lemma\":\"separate\",\"translation\":\"отдельный\"},{\"lemma\":\"exhibition\",\"translation\":\"выставка\"},{\"lemma\":\"son\",\"translation\":\"сын\"},{\"lemma\":\"stink\",\"translation\":\"вонь\"},{\"lemma\":\"dreadful\",\"translation\":\"ужасный\"},{\"lemma\":\"group\",\"translation\":\"группа\"},{\"lemma\":\"avoid\",\"translation\":\"избегать\"},{\"lemma\":\"density\",\"translation\":\"плотность\"},{\"lemma\":\"clear\",\"translation\":\"прозрачный\"},{\"lemma\":\"bird\",\"translation\":\"птица\"},{\"lemma\":\"ridge\",\"translation\":\"гребень\"},{\"lemma\":\"seem\",\"translation\":\"казаться\"},{\"lemma\":\"strain\",\"translation\":\"напряжение\"},{\"lemma\":\"coin\",\"translation\":\"монета\"},{\"lemma\":\"jump\",\"translation\":\"прыжок\"},{\"lemma\":\"speak\",\"translation\":\"говорить\"},{\"lemma\":\"require\",\"translation\":\"требовать\"},{\"lemma\":\"adverb\",\"translation\":\"наречие\"},{\"lemma\":\"deceive\",\"translation\":\"обманывать\"},{\"lemma\":\"shelter\",\"translation\":\"приют\"},{\"lemma\":\"peace\",\"translation\":\"мир\"},{\"lemma\":\"terminate\",\"translation\":\"завершить\"},{\"lemma\":\"fabric\",\"translation\":\"ткань\"}]\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The culture defines the future.\",\"The wall falls because the rust spreads.\",\"The mountain rises.\",\"The high mountain rises.\"]\nCorrect these problems from the previous attempt: [\"Пересоставьте всю связанную серию вместе: выберите основу, которую можно естественно дополнить признаком, дополнением и обстоятельством.\",\"Предложение 5: некорректные роли, перевод или номера частей предложения.\",\"Предложение 7: некорректные роли, перевод или номера частей предложения.\",\"task-3: сохраните подлежащее, форму сказуемого и уже добавленные детали из task-2; добавьте только требуемую деталь.\",\"task-4: сначала нужна принятая основа task-3.\",\"task-5: составьте новый естественный пример и надёжный разбор.\",\"task-7: составьте новый естественный пример и надёжный разбор.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"The artist paints a canvas.\"},{\"taskId\":\"task-2\",\"sentence\":\"The talented artist paints a canvas.\"},{\"taskId\":\"task-3\",\"sentence\":\"The talented artist paints a large canvas.\"},{\"taskId\":\"task-4\",\"sentence\":\"The talented artist paints a large canvas in the studio.\"},{\"taskId\":\"task-5\",\"sentence\":\"The chef does not cook the soup.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the gardener water the plants?\"}]"
+      },
+      "elapsedMs": 41161
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The artist paints a canvas.\"},{\"taskId\":\"task-2\",\"sentence\":\"The talented artist paints a canvas.\"},{\"taskId\":\"task-3\",\"sentence\":\"The talented artist paints a large canvas.\"},{\"taskId\":\"task-4\",\"sentence\":\"The talented artist paints a large canvas in the studio.\"},{\"taskId\":\"task-5\",\"sentence\":\"The chef does not cook the soup.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the gardener water the plants?\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-6\",\"sentence\":\"The culture defines the future.\"},{\"taskId\":\"task-8\",\"sentence\":\"The wall falls because the rust spreads.\"},{\"taskId\":\"task-9\",\"sentence\":\"The mountain rises.\"},{\"taskId\":\"task-10\",\"sentence\":\"The high mountain rises.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The artist paints a canvas.\",\n    \"literalTranslation\": \"Художник пишет холст.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"artist\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"artist\"],\n        \"translation\": \"художник\",\n        \"dictionary_form\": \"artist\"\n      },\n      {\n        \"text\": \"paints\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"paint\", \"s\"],\n        \"translation\": \"пишет\",\n        \"dictionary_form\": \"paint\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"canvas\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"canvas\"],\n        \"translation\": \"холст\",\n        \"dictionary_form\": \"canvas\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The talented artist paints a canvas.\",\n    \"literalTranslation\": \"Талантливый художник пишет холст.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"talented\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"talent\", \"ed\"],\n        \"translation\": \"талантливый\",\n        \"dictionary_form\": \"talented\"\n      },\n      {\n        \"text\": \"artist\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"artist\"],\n        \"translation\": \"художник\",\n        \"dictionary_form\": \"artist\"\n      },\n      {\n        \"text\": \"paints\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"paint\", \"s\"],\n        \"translation\": \"пишет\",\n        \"dictionary_form\": \"paint\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"canvas\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"canvas\"],\n        \"translation\": \"холст\",\n        \"dictionary_form\": \"canvas\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The talented artist paints a large canvas.\",\n    \"literalTranslation\": \"Талантливый художник пишет большой холст.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"talented\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"talent\", \"ed\"],\n        \"translation\": \"талантливый\",\n        \"dictionary_form\": \"talented\"\n      },\n      {\n        \"text\": \"artist\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"artist\"],\n        \"translation\": \"художник\",\n        \"dictionary_form\": \"artist\"\n      },\n      {\n        \"text\": \"paints\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"paint\", \"s\"],\n        \"translation\": \"пишет\",\n        \"dictionary_form\": \"paint\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"large\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"large\"],\n        \"translation\": \"большой\",\n        \"dictionary_form\": \"large\"\n      },\n      {\n        \"text\": \"canvas\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"canvas\"],\n        \"translation\": \"холст\",\n        \"dictionary_form\": \"canvas\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The talented artist paints a large canvas in the studio.\",\n    \"literalTranslation\": \"Талантливый художник пишет большой холст в студии.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"talented\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"talent\", \"ed\"],\n        \"translation\": \"талантливый\",\n        \"dictionary_form\": \"talented\"\n      },\n      {\n        \"text\": \"artist\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"artist\"],\n        \"translation\": \"художник\",\n        \"dictionary_form\": \"artist\"\n      },\n      {\n        \"text\": \"paints\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"paint\", \"s\"],\n        \"translation\": \"пишет\",\n        \"dictionary_form\": \"paint\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"large\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"large\"],\n        \"translation\": \"большой\",\n        \"dictionary_form\": \"large\"\n      },\n      {\n        \"text\": \"canvas\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"canvas\"],\n        \"translation\": \"холст\",\n        \"dictionary_form\": \"canvas\"\n      },\n      {\n        \"text\": \"in\",\n        \"label\": \"preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"in\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"in\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"studio\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"studio\"],\n        \"translation\": \"студии\",\n        \"dictionary_form\": \"studio\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The chef does not cook the soup.\",\n    \"literalTranslation\": \"Шеф-повар не готовит суп.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"chef\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chef\"],\n        \"translation\": \"шеф-повар\",\n        \"dictionary_form\": \"chef\"\n      },\n      {\n        \"text\": \"does\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"does\"],\n        \"translation\": \"вспомогательный глагол\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"not\",\n        \"label\": \"particle\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"not\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"not\"\n      },\n      {\n        \"text\": \"cook\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"cook\"],\n        \"translation\": \"готовить\",\n        \"dictionary_form\": \"cook\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"soup\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"soup\"],\n        \"translation\": \"суп\",\n        \"dictionary_form\": \"soup\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the gardener water the plants?\",\n    \"literalTranslation\": \"Садовник поливает растения?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Does\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Does\"],\n        \"translation\": \"вспомогательный глагол\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"gardener\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"garden\", \"er\"],\n        \"translation\": \"садовник\",\n        \"dictionary_form\": \"gardener\"\n      },\n      {\n        \"text\": \"water\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"water\"],\n        \"translation\": \"поливает\",\n        \"dictionary_form\": \"water\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"plants\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"plant\", \"s\"],\n        \"translation\": \"растения\",\n        \"dictionary_form\": \"plant\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 8934
+    }
+  ]
+}

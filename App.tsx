@@ -95,6 +95,7 @@ function MainTabs() {
         const isCenter = route.name === CENTER_TAB;
         return {
           tabBarShowLabel: false,
+          tabBarAccessibilityLabel: route.name,
           tabBarIcon: ({ focused }) =>
             isCenter ? (
               <View

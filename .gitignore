@@ -46,7 +46,10 @@ dependency-fix.log
 dist-audit/
 export-audit.log
 check-audit.log
+check-build*.log
 
 # generated native folders
 /ios
 /android
+/credentials.json
+/credentials/

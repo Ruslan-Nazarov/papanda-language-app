@@ -1,0 +1,1132 @@
+{
+  "scenario": {
+    "id": "fr-1",
+    "code": "fr",
+    "count": 8
+  },
+  "startedAt": "2026-09-26T12:58:25.487Z",
+  "elapsedMs": 61882,
+  "accepted": 8,
+  "sentences": [
+    {
+      "language": "Français",
+      "sentence": "Le chat chasse la souris.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chat",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "chat"
+          ],
+          "translation": "кот",
+          "dictionary_form": "chat",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chasse",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "chasse"
+          ],
+          "translation": "охотится",
+          "dictionary_form": "chasser",
+          "is_in_my_dict": true,
+          "dictionary_word": "chasse",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "souris",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "souris"
+          ],
+          "translation": "мышь",
+          "dictionary_form": "souris",
+          "is_in_my_dict": true,
+          "dictionary_word": "souris",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Кот охотится на мышь.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_fr_1790427561313_66",
+      "source": "generated",
+      "createdAt": 1790427561313
+    },
+    {
+      "language": "Français",
+      "sentence": "Le petit chat chasse la souris.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "petit",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "petit"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "petit",
+          "is_in_my_dict": true,
+          "dictionary_word": "petit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chat",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "chat"
+          ],
+          "translation": "кот",
+          "dictionary_form": "chat",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chasse",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "chasse"
+          ],
+          "translation": "охотится",
+          "dictionary_form": "chasser",
+          "is_in_my_dict": true,
+          "dictionary_word": "chasse",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "souris",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "souris"
+          ],
+          "translation": "мышь",
+          "dictionary_form": "souris",
+          "is_in_my_dict": true,
+          "dictionary_word": "souris",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький кот охотится на мышь.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_fr_1790427561330_67",
+      "source": "generated",
+      "createdAt": 1790427561330
+    },
+    {
+      "language": "Français",
+      "sentence": "Le petit chat chasse la petite souris grise.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "petit",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "petit"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "petit",
+          "is_in_my_dict": true,
+          "dictionary_word": "petit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chat",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "chat"
+          ],
+          "translation": "кот",
+          "dictionary_form": "chat",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chasse",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "chasse"
+          ],
+          "translation": "охотится",
+          "dictionary_form": "chasser",
+          "is_in_my_dict": true,
+          "dictionary_word": "chasse",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "petite",
+          "label": "ADJ",
+          "role": "Attribute_Object",
+          "parts": [
+            "petite"
+          ],
+          "translation": "маленькую",
+          "dictionary_form": "petit",
+          "is_in_my_dict": true,
+          "dictionary_word": "petit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "souris",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "souris"
+          ],
+          "translation": "мышь",
+          "dictionary_form": "souris",
+          "is_in_my_dict": true,
+          "dictionary_word": "souris",
+          "clauseIndex": 0
+        },
+        {
+          "text": "grise",
+          "label": "ADJ",
+          "role": "Attribute_Object",
+          "parts": [
+            "grise"
+          ],
+          "translation": "серую",
+          "dictionary_form": "gris",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький кот охотится на маленькую серую мышь.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_fr_1790427561363_68",
+      "source": "generated",
+      "createdAt": 1790427561363
+    },
+    {
+      "language": "Français",
+      "sentence": "Le petit chat chasse la petite souris grise dans le jardin.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "petit",
+          "label": "ADJ",
+          "role": "Attribute_Subject",
+          "parts": [
+            "petit"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "petit",
+          "is_in_my_dict": true,
+          "dictionary_word": "petit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chat",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "chat"
+          ],
+          "translation": "кот",
+          "dictionary_form": "chat",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chasse",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "chasse"
+          ],
+          "translation": "охотится",
+          "dictionary_form": "chasser",
+          "is_in_my_dict": true,
+          "dictionary_word": "chasse",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "petite",
+          "label": "ADJ",
+          "role": "Attribute_Object",
+          "parts": [
+            "petite"
+          ],
+          "translation": "маленькую",
+          "dictionary_form": "petit",
+          "is_in_my_dict": true,
+          "dictionary_word": "petit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "souris",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "souris"
+          ],
+          "translation": "мышь",
+          "dictionary_form": "souris",
+          "is_in_my_dict": true,
+          "dictionary_word": "souris",
+          "clauseIndex": 0
+        },
+        {
+          "text": "grise",
+          "label": "ADJ",
+          "role": "Attribute_Object",
+          "parts": [
+            "grise"
+          ],
+          "translation": "серую",
+          "dictionary_form": "gris",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "dans",
+          "label": "ADP",
+          "role": "Preposition",
+          "parts": [
+            "dans"
+          ],
+          "translation": "в",
+          "dictionary_form": "dans",
+          "is_in_my_dict": true,
+          "dictionary_word": "dans",
+          "clauseIndex": 0
+        },
+        {
+          "text": "le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "jardin",
+          "label": "NOUN",
+          "role": "Circumstance",
+          "parts": [
+            "jardin"
+          ],
+          "translation": "саду",
+          "dictionary_form": "jardin",
+          "is_in_my_dict": true,
+          "dictionary_word": "jardin",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький кот охотится на маленькую серую мышь в саду.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_fr_1790427561404_69",
+      "source": "generated",
+      "createdAt": 1790427561404
+    },
+    {
+      "language": "Français",
+      "sentence": "Le chien ne mord pas le facteur.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "chien",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "chien"
+          ],
+          "translation": "собака",
+          "dictionary_form": "chien",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "ne",
+          "label": "ADV",
+          "role": "Predicate",
+          "parts": [
+            "ne"
+          ],
+          "translation": "не",
+          "dictionary_form": "ne",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "mord",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "mord"
+          ],
+          "translation": "кусает",
+          "dictionary_form": "mordre",
+          "is_in_my_dict": true,
+          "dictionary_word": "mordre",
+          "clauseIndex": 0
+        },
+        {
+          "text": "pas",
+          "label": "ADV",
+          "role": "Predicate",
+          "parts": [
+            "pas"
+          ],
+          "translation": "не",
+          "dictionary_form": "pas",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "facteur",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "facteur"
+          ],
+          "translation": "почтальона",
+          "dictionary_form": "facteur",
+          "is_in_my_dict": true,
+          "dictionary_word": "facteur",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Собака не кусает почтальона.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_fr_1790427561431_70",
+      "source": "generated",
+      "createdAt": 1790427561431
+    },
+    {
+      "language": "Français",
+      "sentence": "Le professeur explique la leçon.",
+      "words": [
+        {
+          "text": "Le",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "professeur",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "professeur"
+          ],
+          "translation": "преподаватель",
+          "dictionary_form": "professeur",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "explique",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "explique"
+          ],
+          "translation": "объясняет",
+          "dictionary_form": "expliquer",
+          "is_in_my_dict": true,
+          "dictionary_word": "expliquer",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "leçon",
+          "label": "NOUN",
+          "role": "Object",
+          "parts": [
+            "leçon"
+          ],
+          "translation": "урок",
+          "dictionary_form": "leçon",
+          "is_in_my_dict": true,
+          "dictionary_word": "leçon",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Преподаватель объясняет урок.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_fr_1790427561451_71",
+      "source": "generated",
+      "createdAt": 1790427561451
+    },
+    {
+      "language": "Français",
+      "sentence": "Le professeur explique-t-il la leçon ?",
+      "words": [
+        {
+          "text": "Le",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "Le"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "professeur",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "professeur"
+          ],
+          "translation": "учитель",
+          "dictionary_form": "professeur",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "explique-t-il",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "explique",
+            "-t-",
+            "il"
+          ],
+          "translation": "объясняет ли он",
+          "dictionary_form": "expliquer",
+          "is_in_my_dict": true,
+          "dictionary_word": "expliquer",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "leçon",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "leçon"
+          ],
+          "translation": "урок",
+          "dictionary_form": "leçon",
+          "is_in_my_dict": true,
+          "dictionary_word": "leçon",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Учитель объясняет-ли он урок?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_fr_1790427567368_73",
+      "source": "generated",
+      "createdAt": 1790427567368
+    },
+    {
+      "language": "Français",
+      "sentence": "Quand il pleut, les enfants restent à l'intérieur.",
+      "words": [
+        {
+          "text": "Quand",
+          "label": "SCONJ",
+          "role": "Conjunction",
+          "parts": [
+            "Quand"
+          ],
+          "translation": "когда",
+          "dictionary_form": "quand",
+          "is_in_my_dict": true,
+          "dictionary_word": "quand",
+          "clauseIndex": 1
+        },
+        {
+          "text": "il",
+          "label": "PRON",
+          "role": "Subject",
+          "parts": [
+            "il"
+          ],
+          "translation": "он",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "pleut",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "pleut"
+          ],
+          "translation": "идет дождь",
+          "dictionary_form": "pleuvoir",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "les",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "les"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "enfants",
+          "label": "NOUN",
+          "role": "Subject",
+          "parts": [
+            "enfants"
+          ],
+          "translation": "дети",
+          "dictionary_form": "enfant",
+          "is_in_my_dict": true,
+          "dictionary_word": "enfant",
+          "clauseIndex": 0
+        },
+        {
+          "text": "restent",
+          "label": "VERB",
+          "role": "Predicate",
+          "parts": [
+            "restent"
+          ],
+          "translation": "остаются",
+          "dictionary_form": "rester",
+          "is_in_my_dict": true,
+          "dictionary_word": "rester",
+          "clauseIndex": 0
+        },
+        {
+          "text": "à",
+          "label": "ADP",
+          "role": "Preposition",
+          "parts": [
+            "à"
+          ],
+          "translation": "в",
+          "dictionary_form": "à",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "l'",
+          "label": "DET",
+          "role": "Article",
+          "parts": [
+            "l'"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "le",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "intérieur",
+          "label": "NOUN",
+          "role": "Circumstance",
+          "parts": [
+            "intérieur"
+          ],
+          "translation": "помещении",
+          "dictionary_form": "intérieur",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Когда идет дождь, дети остаются внутри.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_fr_1790427561481_72",
+      "source": "generated",
+      "createdAt": 1790427561481
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Français (fr)\nNatural standard French: agreement, elision, negation scope (ne … pas), auxiliary choice. Use idiomatic compound forms where normal.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"suspect\",\"translation\":\"подозревать\"},{\"lemma\":\"succès\",\"translation\":\"успех\"},{\"lemma\":\"entrer\",\"translation\":\"входить\"},{\"lemma\":\"exécuter\",\"translation\":\"выполнять\"},{\"lemma\":\"arrivée\",\"translation\":\"прибытие\"},{\"lemma\":\"charrue\",\"translation\":\"плуг\"},{\"lemma\":\"briller\",\"translation\":\"светить\"},{\"lemma\":\"plutôt\",\"translation\":\"скорее\"},{\"lemma\":\"morte\",\"translation\":\"мертвый\"},{\"lemma\":\"souviens-toi\",\"translation\":\"помнить\"},{\"lemma\":\"attribut\",\"translation\":\"атрибут\"},{\"lemma\":\"échanger\",\"translation\":\"менять\"},{\"lemma\":\"pourquoi\",\"translation\":\"почему\"},{\"lemma\":\"grave\",\"translation\":\"серьезный\"},{\"lemma\":\"scie\",\"translation\":\"пила\"},{\"lemma\":\"s'est produit\",\"translation\":\"произошел\"},{\"lemma\":\"appartenir\",\"translation\":\"принадлежать\"},{\"lemma\":\"diamètre\",\"translation\":\"диаметр\"},{\"lemma\":\"ambassadrice\",\"translation\":\"посол\"},{\"lemma\":\"allusion\",\"translation\":\"аллюзия\"},{\"lemma\":\"parents\",\"translation\":\"родители\"},{\"lemma\":\"feuille\",\"translation\":\"лист\"},{\"lemma\":\"agenda\",\"translation\":\"дневник\"},{\"lemma\":\"féliciter\",\"translation\":\"поздравляю\"},{\"lemma\":\"attente\",\"translation\":\"напряжение\"}]\n\nAvoid exact duplicates: []\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"Le chat chasse la souris.\"},{\"taskId\":\"task-2\",\"sentence\":\"Le petit chat chasse la souris.\"},{\"taskId\":\"task-3\",\"sentence\":\"Le petit chat chasse la petite souris grise.\"},{\"taskId\":\"task-4\",\"sentence\":\"Le petit chat chasse la petite souris grise dans le jardin.\"},{\"taskId\":\"task-5\",\"sentence\":\"Le chien ne mord pas le facteur.\"},{\"taskId\":\"task-6\",\"sentence\":\"Le professeur explique la leçon.\"},{\"taskId\":\"task-7\",\"sentence\":\"Le garçon mange-t-il une pomme ?\"},{\"taskId\":\"task-8\",\"sentence\":\"Quand il pleut, les enfants restent à l'intérieur.\"}]"
+      },
+      "elapsedMs": 41889
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Français (fr)\nNatural standard French: agreement, elision, negation scope (ne … pas), auxiliary choice. Use idiomatic compound forms where normal.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Le chat chasse la souris.\"},{\"taskId\":\"task-2\",\"sentence\":\"Le petit chat chasse la souris.\"},{\"taskId\":\"task-3\",\"sentence\":\"Le petit chat chasse la petite souris grise.\"},{\"taskId\":\"task-4\",\"sentence\":\"Le petit chat chasse la petite souris grise dans le jardin.\"},{\"taskId\":\"task-5\",\"sentence\":\"Le chien ne mord pas le facteur.\"},{\"taskId\":\"task-6\",\"sentence\":\"Le professeur explique la leçon.\"},{\"taskId\":\"task-7\",\"sentence\":\"Le garçon mange-t-il une pomme ?\"},{\"taskId\":\"task-8\",\"sentence\":\"Quand il pleut, les enfants restent à l'intérieur.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. Elided clitics may be separated at the apostrophe: n’a → tokens n’ and a. n’ has parts [\"n’\"], dictionary_form ne. Keep du, au whole; explain their composition in the explanation, not by inventing letters in parts.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Le chat chasse la souris.\",\n    \"literalTranslation\": \"Кот охотится на мышь.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"chat\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chat\"],\n        \"translation\": \"кот\",\n        \"dictionary_form\": \"chat\"\n      },\n      {\n        \"text\": \"chasse\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chasse\"],\n        \"translation\": \"охотится\",\n        \"dictionary_form\": \"chasser\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"souris\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"souris\"],\n        \"translation\": \"мышь\",\n        \"dictionary_form\": \"souris\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Le petit chat chasse la souris.\",\n    \"literalTranslation\": \"Маленький кот охотится на мышь.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"petit\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"petit\"],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"petit\"\n      },\n      {\n        \"text\": \"chat\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chat\"],\n        \"translation\": \"кот\",\n        \"dictionary_form\": \"chat\"\n      },\n      {\n        \"text\": \"chasse\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chasse\"],\n        \"translation\": \"охотится\",\n        \"dictionary_form\": \"chasser\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"souris\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"souris\"],\n        \"translation\": \"мышь\",\n        \"dictionary_form\": \"souris\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Le petit chat chasse la petite souris grise.\",\n    \"literalTranslation\": \"Маленький кот охотится на маленькую серую мышь.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"petit\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"petit\"],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"petit\"\n      },\n      {\n        \"text\": \"chat\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chat\"],\n        \"translation\": \"кот\",\n        \"dictionary_form\": \"chat\"\n      },\n      {\n        \"text\": \"chasse\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chasse\"],\n        \"translation\": \"охотится\",\n        \"dictionary_form\": \"chasser\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"petite\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"petite\"],\n        \"translation\": \"маленькую\",\n        \"dictionary_form\": \"petit\"\n      },\n      {\n        \"text\": \"souris\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"souris\"],\n        \"translation\": \"мышь\",\n        \"dictionary_form\": \"souris\"\n      },\n      {\n        \"text\": \"grise\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"grise\"],\n        \"translation\": \"серую\",\n        \"dictionary_form\": \"gris\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Le petit chat chasse la petite souris grise dans le jardin.\",\n    \"literalTranslation\": \"Маленький кот охотится на маленькую серую мышь в саду.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"petit\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"petit\"],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"petit\"\n      },\n      {\n        \"text\": \"chat\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chat\"],\n        \"translation\": \"кот\",\n        \"dictionary_form\": \"chat\"\n      },\n      {\n        \"text\": \"chasse\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chasse\"],\n        \"translation\": \"охотится\",\n        \"dictionary_form\": \"chasser\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"petite\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"petite\"],\n        \"translation\": \"маленькую\",\n        \"dictionary_form\": \"petit\"\n      },\n      {\n        \"text\": \"souris\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"souris\"],\n        \"translation\": \"мышь\",\n        \"dictionary_form\": \"souris\"\n      },\n      {\n        \"text\": \"grise\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"grise\"],\n        \"translation\": \"серую\",\n        \"dictionary_form\": \"gris\"\n      },\n      {\n        \"text\": \"dans\",\n        \"label\": \"ADP\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"dans\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"dans\"\n      },\n      {\n        \"text\": \"le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"jardin\",\n        \"label\": \"NOUN\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"jardin\"],\n        \"translation\": \"саду\",\n        \"dictionary_form\": \"jardin\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Le chien ne mord pas le facteur.\",\n    \"literalTranslation\": \"Собака не кусает почтальона.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"chien\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"chien\"],\n        \"translation\": \"собака\",\n        \"dictionary_form\": \"chien\"\n      },\n      {\n        \"text\": \"ne\",\n        \"label\": \"ADV\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ne\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"ne\"\n      },\n      {\n        \"text\": \"mord\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"mord\"],\n        \"translation\": \"кусает\",\n        \"dictionary_form\": \"mordre\"\n      },\n      {\n        \"text\": \"pas\",\n        \"label\": \"ADV\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"pas\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"pas\"\n      },\n      {\n        \"text\": \"le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"facteur\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"facteur\"],\n        \"translation\": \"почтальона\",\n        \"dictionary_form\": \"facteur\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Le professeur explique la leçon.\",\n    \"literalTranslation\": \"Преподаватель объясняет урок.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"professeur\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"professeur\"],\n        \"translation\": \"преподаватель\",\n        \"dictionary_form\": \"professeur\"\n      },\n      {\n        \"text\": \"explique\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"explique\"],\n        \"translation\": \"объясняет\",\n        \"dictionary_form\": \"expliquer\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"leçon\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"leçon\"],\n        \"translation\": \"урок\",\n        \"dictionary_form\": \"leçon\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Le garçon mange-t-il une pomme ?\",\n    \"literalTranslation\": \"Мальчик ест яблоко?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"garçon\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"garçon\"],\n        \"translation\": \"мальчик\",\n        \"dictionary_form\": \"garçon\"\n      },\n      {\n        \"text\": \"mange\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"mange\"],\n        \"translation\": \"ест\",\n        \"dictionary_form\": \"manger\"\n      },\n      {\n        \"text\": \"-t-\",\n        \"label\": \"PART\",\n        \"role\": \"Particle\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"-t-\"],\n        \"translation\": \"эвфоническая частица\",\n        \"dictionary_form\": \"t\"\n      },\n      {\n        \"text\": \"il\",\n        \"label\": \"PRON\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"il\"],\n        \"translation\": \"он\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"une\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"une\"],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"un\"\n      },\n      {\n        \"text\": \"pomme\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"pomme\"],\n        \"translation\": \"яблоко\",\n        \"dictionary_form\": \"pomme\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Quand il pleut, les enfants restent à l'intérieur.\",\n    \"literalTranslation\": \"Когда идет дождь, дети остаются внутри.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Quand\",\n        \"label\": \"SCONJ\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"Quand\"],\n        \"translation\": \"когда\",\n        \"dictionary_form\": \"quand\"\n      },\n      {\n        \"text\": \"il\",\n        \"label\": \"PRON\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"il\"],\n        \"translation\": \"он\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"pleut\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"pleut\"],\n        \"translation\": \"идет дождь\",\n        \"dictionary_form\": \"pleuvoir\"\n      },\n      {\n        \"text\": \"les\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"les\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"enfants\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"enfants\"],\n        \"translation\": \"дети\",\n        \"dictionary_form\": \"enfant\"\n      },\n      {\n        \"text\": \"restent\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"restent\"],\n        \"translation\": \"остаются\",\n        \"dictionary_form\": \"rester\"\n      },\n      {\n        \"text\": \"à\",\n        \"label\": \"ADP\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"à\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"à\"\n      },\n      {\n        \"text\": \"l'\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"l'\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"intérieur\",\n        \"label\": \"NOUN\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"intérieur\"],\n        \"translation\": \"помещении\",\n        \"dictionary_form\": \"intérieur\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 13914
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Français (fr)\nNatural standard French: agreement, elision, negation scope (ne … pas), auxiliary choice. Use idiomatic compound forms where normal.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"}]\nAlready accepted development context: [{\"taskId\":\"task-1\",\"sentence\":\"Le chat chasse la souris.\"},{\"taskId\":\"task-2\",\"sentence\":\"Le petit chat chasse la souris.\"},{\"taskId\":\"task-3\",\"sentence\":\"Le petit chat chasse la petite souris grise.\"},{\"taskId\":\"task-4\",\"sentence\":\"Le petit chat chasse la petite souris grise dans le jardin.\"},{\"taskId\":\"task-5\",\"sentence\":\"Le chien ne mord pas le facteur.\"},{\"taskId\":\"task-6\",\"sentence\":\"Le professeur explique la leçon.\"},{\"taskId\":\"task-8\",\"sentence\":\"Quand il pleut, les enfants restent à l'intérieur.\"}]\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"effondrement\",\"translation\":\"крах\"},{\"lemma\":\"vol\",\"translation\":\"полет\"},{\"lemma\":\"interrompre\",\"translation\":\"прерывать\"},{\"lemma\":\"volume\",\"translation\":\"объем\"},{\"lemma\":\"dont\",\"translation\":\"чей\"},{\"lemma\":\"sélectionner\",\"translation\":\"выбирать\"},{\"lemma\":\"vertu\",\"translation\":\"достоинство\"},{\"lemma\":\"relatif\",\"translation\":\"родственник\"},{\"lemma\":\"cas\",\"translation\":\"случай\"},{\"lemma\":\"mendier\",\"translation\":\"просить\"},{\"lemma\":\"tribunal\",\"translation\":\"суд\"},{\"lemma\":\"violette violet\",\"translation\":\"фиолетовый\"},{\"lemma\":\"gare\",\"translation\":\"станция\"},{\"lemma\":\"miséricorde\",\"translation\":\"милосердие\"},{\"lemma\":\"gémir\",\"translation\":\"стон\"},{\"lemma\":\"exhorter\",\"translation\":\"побуждать\"},{\"lemma\":\"tic\",\"translation\":\"дергаться\"},{\"lemma\":\"acquérir\",\"translation\":\"приобретать\"},{\"lemma\":\"tracteur\",\"translation\":\"трактор\"},{\"lemma\":\"mile\",\"translation\":\"миля\"},{\"lemma\":\"vapeur\",\"translation\":\"пар\"},{\"lemma\":\"arriver\",\"translation\":\"случаться\"},{\"lemma\":\"pauvre\",\"translation\":\"бедный\"},{\"lemma\":\"rugueux\",\"translation\":\"грубый\"},{\"lemma\":\"éclabousser\",\"translation\":\"всплеск\"}]\n\nAvoid exact duplicates: [\"Le chat chasse la souris.\",\"Le petit chat chasse la souris.\",\"Le petit chat chasse la petite souris grise.\",\"Le petit chat chasse la petite souris grise dans le jardin.\",\"Le chien ne mord pas le facteur.\",\"Le professeur explique la leçon.\",\"Quand il pleut, les enfants restent à l'intérieur.\"]\nCorrect these problems from the previous attempt: [\"Предложение 7: токены не воспроизводят текст предложения.\",\"task-7: составьте новый естественный пример и надёжный разбор.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Le professeur explique-t-il la leçon ?\"\n  }\n]"
+      },
+      "elapsedMs": 2220
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Français (fr)\nNatural standard French: agreement, elision, negation scope (ne … pas), auxiliary choice. Use idiomatic compound forms where normal.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"}]\nDRAFTS: [{\"taskId\":\"task-7\",\"sentence\":\"Le professeur explique-t-il la leçon ?\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-1\",\"sentence\":\"Le chat chasse la souris.\"},{\"taskId\":\"task-2\",\"sentence\":\"Le petit chat chasse la souris.\"},{\"taskId\":\"task-3\",\"sentence\":\"Le petit chat chasse la petite souris grise.\"},{\"taskId\":\"task-4\",\"sentence\":\"Le petit chat chasse la petite souris grise dans le jardin.\"},{\"taskId\":\"task-5\",\"sentence\":\"Le chien ne mord pas le facteur.\"},{\"taskId\":\"task-6\",\"sentence\":\"Le professeur explique la leçon.\"},{\"taskId\":\"task-8\",\"sentence\":\"Quand il pleut, les enfants restent à l'intérieur.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. Elided clitics may be separated at the apostrophe: n’a → tokens n’ and a. n’ has parts [\"n’\"], dictionary_form ne. Keep du, au whole; explain their composition in the explanation, not by inventing letters in parts.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Le professeur explique-t-il la leçon ?\",\n    \"literalTranslation\": \"Учитель объясняет-ли он урок?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Le\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Le\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"professeur\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"professeur\"],\n        \"translation\": \"учитель\",\n        \"dictionary_form\": \"professeur\"\n      },\n      {\n        \"text\": \"explique-t-il\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"explique\", \"-t-\", \"il\"],\n        \"translation\": \"объясняет ли он\",\n        \"dictionary_form\": \"expliquer\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"le\"\n      },\n      {\n        \"text\": \"leçon\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"leçon\"],\n        \"translation\": \"урок\",\n        \"dictionary_form\": \"leçon\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 3647
+    }
+  ]
+}

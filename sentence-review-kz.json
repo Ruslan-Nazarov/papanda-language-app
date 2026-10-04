@@ -1,0 +1,505 @@
+{
+  "code": "kz",
+  "requested": 8,
+  "accepted": 8,
+  "elapsedMs": 12420,
+  "sentences": [
+    {
+      "language": "Қазақша",
+      "sentence": "Бала оқиды.",
+      "words": [
+        {
+          "text": "Бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқиды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок читает.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_kz_1790426375351_1",
+      "source": "generated",
+      "createdAt": 1790426375351
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Зерделі бала оқиды.",
+      "words": [
+        {
+          "text": "Зерделі",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Зерделі"
+          ],
+          "translation": "умный",
+          "dictionary_form": "зерделі",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқиды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок читает.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_kz_1790426375351_2",
+      "source": "generated",
+      "createdAt": 1790426375351
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Зерделі бала кітапты оқиды.",
+      "words": [
+        {
+          "text": "Зерделі",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Зерделі"
+          ],
+          "translation": "умный",
+          "dictionary_form": "зерделі",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітапты",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап",
+            "ты"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқиды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок книгу читает.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_kz_1790426375351_3",
+      "source": "generated",
+      "createdAt": 1790426375351
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Зерделі бала кітапты үйден оқиды.",
+      "words": [
+        {
+          "text": "Зерделі",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Зерделі"
+          ],
+          "translation": "умный",
+          "dictionary_form": "зерделі",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітапты",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап",
+            "ты"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "үйден",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "үй",
+            "ден"
+          ],
+          "translation": "из дома",
+          "dictionary_form": "үй",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқиды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок книгу из дома читает.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_kz_1790426375352_4",
+      "source": "generated",
+      "createdAt": 1790426375352
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Бала кітап оқымайды.",
+      "words": [
+        {
+          "text": "Бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқымайды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқы",
+            "май",
+            "ды"
+          ],
+          "translation": "не читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок книгу не читает.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_kz_1790426375352_5",
+      "source": "generated",
+      "createdAt": 1790426375352
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Студент мақаланы жазады.",
+      "words": [
+        {
+          "text": "Студент",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Студент"
+          ],
+          "translation": "студент",
+          "dictionary_form": "студент",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "мақаланы",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "мақала",
+            "ны"
+          ],
+          "translation": "статью",
+          "dictionary_form": "мақала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "жазады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жаз",
+            "а",
+            "ды"
+          ],
+          "translation": "пишет",
+          "dictionary_form": "жазу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Студент статью пишет.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_kz_1790426375352_6",
+      "source": "generated",
+      "createdAt": 1790426375352
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Бала кітап оқи ма?",
+      "words": [
+        {
+          "text": "Бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқи",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқи"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "ма",
+          "label": "particle",
+          "role": "Particle",
+          "parts": [
+            "ма"
+          ],
+          "translation": "ли",
+          "dictionary_form": "ма",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок книгу читает ли?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_kz_1790426375352_7",
+      "source": "generated",
+      "createdAt": 1790426375352
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Бала кітап оқыса, ол білім алады.",
+      "words": [
+        {
+          "text": "Бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "оқыса",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқы",
+            "са"
+          ],
+          "translation": "прочитает если",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "ол",
+          "label": "pronoun",
+          "role": "Subject",
+          "parts": [
+            "ол"
+          ],
+          "translation": "он",
+          "dictionary_form": "ол",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "білім",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "білім"
+          ],
+          "translation": "знания",
+          "dictionary_form": "білім",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "алады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ал",
+            "а",
+            "ды"
+          ],
+          "translation": "получает",
+          "dictionary_form": "алу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок если книгу прочитает, он знания получает.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_kz_1790426375352_8",
+      "source": "generated",
+      "createdAt": 1790426375352
+    }
+  ]
+}

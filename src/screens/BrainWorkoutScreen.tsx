@@ -421,6 +421,8 @@ export default function BrainWorkoutScreen() {
                   {targetTranslation && (
                     <TouchableOpacity
                       style={styles.workoutPronunciationBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel="Разбор произношения"
                       activeOpacity={0.7}
                       onPress={(e) => {
                         e.stopPropagation();
@@ -761,6 +763,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   nativeRu: {
+    flexShrink: 1,
     fontSize: 28,
     fontWeight: 'bold',
     color: '#1A202C',
@@ -772,11 +775,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    position: 'relative',
+    width: '100%',
+    gap: 12,
   },
   workoutPronunciationBtn: {
-    position: 'absolute',
-    right: 0,
+    flexShrink: 0,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 6,
     backgroundColor: '#F1F5F9',
     borderRadius: 20,

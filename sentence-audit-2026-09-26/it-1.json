@@ -1,0 +1,884 @@
+{
+  "scenario": {
+    "id": "it-1",
+    "code": "it",
+    "count": 8
+  },
+  "startedAt": "2026-09-26T12:58:38.006Z",
+  "elapsedMs": 57562,
+  "accepted": 7,
+  "sentences": [
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato cerca.",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Учёный ищет.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_it_1790427575539_74",
+      "source": "generated",
+      "createdAt": 1790427575539
+    },
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato straniero cerca.",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "straniero",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "straniero"
+          ],
+          "translation": "иностранный",
+          "dictionary_form": "straniero",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Иностранный учёный ищет.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_it_1790427575543_75",
+      "source": "generated",
+      "createdAt": 1790427575543
+    },
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato straniero cerca una chiave.",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "straniero",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "straniero"
+          ],
+          "translation": "иностранный",
+          "dictionary_form": "straniero",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        },
+        {
+          "text": "una",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "una"
+          ],
+          "translation": "один",
+          "dictionary_form": "uno",
+          "is_in_my_dict": true,
+          "dictionary_word": "una",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chiave",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "chiave"
+          ],
+          "translation": "ключ",
+          "dictionary_form": "chiave",
+          "is_in_my_dict": true,
+          "dictionary_word": "chiave",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Иностранный учёный ищет ключ.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_it_1790427575547_76",
+      "source": "generated",
+      "createdAt": 1790427575547
+    },
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato non cerca una chiave.",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "non",
+          "label": "Particle",
+          "role": "Particle",
+          "parts": [
+            "non"
+          ],
+          "translation": "не",
+          "dictionary_form": "non",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        },
+        {
+          "text": "una",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "una"
+          ],
+          "translation": "один",
+          "dictionary_form": "uno",
+          "is_in_my_dict": true,
+          "dictionary_word": "una",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chiave",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "chiave"
+          ],
+          "translation": "ключ",
+          "dictionary_form": "chiave",
+          "is_in_my_dict": true,
+          "dictionary_word": "chiave",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Иностранный учёный не ищет ключ.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_it_1790427575552_77",
+      "source": "generated",
+      "createdAt": 1790427575552
+    },
+    {
+      "language": "Italiano",
+      "sentence": "La persona ammira la lezione.",
+      "words": [
+        {
+          "text": "La",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "La"
+          ],
+          "translation": "эта",
+          "dictionary_form": "la",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "persona",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "persona"
+          ],
+          "translation": "человек",
+          "dictionary_form": "persona",
+          "is_in_my_dict": true,
+          "dictionary_word": "persona",
+          "clauseIndex": 0
+        },
+        {
+          "text": "ammira",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "ammira"
+          ],
+          "translation": "восхищается",
+          "dictionary_form": "ammirare",
+          "is_in_my_dict": true,
+          "dictionary_word": "ammirare",
+          "clauseIndex": 0
+        },
+        {
+          "text": "la",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "этот",
+          "dictionary_form": "la",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "lezione",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "lezione"
+          ],
+          "translation": "урок",
+          "dictionary_form": "lezione",
+          "is_in_my_dict": true,
+          "dictionary_word": "lezione",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Человек восхищается уроком.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_it_1790427575556_78",
+      "source": "generated",
+      "createdAt": 1790427575556
+    },
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato cerca una chiave?",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        },
+        {
+          "text": "una",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "una"
+          ],
+          "translation": "один",
+          "dictionary_form": "uno",
+          "is_in_my_dict": true,
+          "dictionary_word": "una",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chiave",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "chiave"
+          ],
+          "translation": "ключ",
+          "dictionary_form": "chiave",
+          "is_in_my_dict": true,
+          "dictionary_word": "chiave",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Иностранный учёный ищет ключ?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_it_1790427575560_79",
+      "source": "generated",
+      "createdAt": 1790427575560
+    },
+    {
+      "language": "Italiano",
+      "sentence": "Lo scienziato cerca una chiave perché la vendita continua.",
+      "words": [
+        {
+          "text": "Lo",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "Lo"
+          ],
+          "translation": "этот",
+          "dictionary_form": "il",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "scienziato",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "scienziato"
+          ],
+          "translation": "учёный",
+          "dictionary_form": "scienziato",
+          "is_in_my_dict": true,
+          "dictionary_word": "scienziato",
+          "clauseIndex": 0
+        },
+        {
+          "text": "cerca",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "cerca"
+          ],
+          "translation": "ищет",
+          "dictionary_form": "cercare",
+          "is_in_my_dict": true,
+          "dictionary_word": "cercare",
+          "clauseIndex": 0
+        },
+        {
+          "text": "una",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "una"
+          ],
+          "translation": "один",
+          "dictionary_form": "uno",
+          "is_in_my_dict": true,
+          "dictionary_word": "una",
+          "clauseIndex": 0
+        },
+        {
+          "text": "chiave",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "chiave"
+          ],
+          "translation": "ключ",
+          "dictionary_form": "chiave",
+          "is_in_my_dict": true,
+          "dictionary_word": "chiave",
+          "clauseIndex": 0
+        },
+        {
+          "text": "perché",
+          "label": "Conjunction",
+          "role": "Conjunction",
+          "parts": [
+            "perché"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "perché",
+          "is_in_my_dict": true,
+          "dictionary_word": "perché",
+          "clauseIndex": 1
+        },
+        {
+          "text": "la",
+          "label": "Article",
+          "role": "Article",
+          "parts": [
+            "la"
+          ],
+          "translation": "эта",
+          "dictionary_form": "la",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "vendita",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "vendita"
+          ],
+          "translation": "продажа",
+          "dictionary_form": "vendita",
+          "is_in_my_dict": true,
+          "dictionary_word": "vendita",
+          "clauseIndex": 1
+        },
+        {
+          "text": "continua",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "continua"
+          ],
+          "translation": "продолжается",
+          "dictionary_form": "continuare",
+          "is_in_my_dict": true,
+          "dictionary_word": "continuare",
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Иностранный учёный ищет ключ, потому что продажа продолжается.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_it_1790427575568_80",
+      "source": "generated",
+      "createdAt": 1790427575568
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Italiano (it)\nNatural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"inferenza\",\"translation\":\"вывод\"},{\"lemma\":\"avanti\",\"translation\":\"предстоящий\"},{\"lemma\":\"offensiva\",\"translation\":\"оскорбительный\"},{\"lemma\":\"acuto\",\"translation\":\"серьезный\"},{\"lemma\":\"autostrada\",\"translation\":\"шоссе\"},{\"lemma\":\"ricordare\",\"translation\":\"помнить\"},{\"lemma\":\"Potevo\",\"translation\":\"мог\"},{\"lemma\":\"cosa\",\"translation\":\"вещь\"},{\"lemma\":\"botto\",\"translation\":\"хлопнуть\"},{\"lemma\":\"contare\",\"translation\":\"считать\"},{\"lemma\":\"eleggere\",\"translation\":\"избрать\"},{\"lemma\":\"cielo\",\"translation\":\"небо\"},{\"lemma\":\"Godere\",\"translation\":\"наслаждаться\"},{\"lemma\":\"salario\",\"translation\":\"заработная плата\"},{\"lemma\":\"scoprire\",\"translation\":\"обнаружить\"},{\"lemma\":\"straccio\",\"translation\":\"тряпка\"},{\"lemma\":\"supplemento\",\"translation\":\"добавка\"},{\"lemma\":\"macchiare\",\"translation\":\"место\"},{\"lemma\":\"sole\",\"translation\":\"солнце\"},{\"lemma\":\"prestito\",\"translation\":\"заем\"},{\"lemma\":\"questi\",\"translation\":\"эти\"},{\"lemma\":\"rivale\",\"translation\":\"соперник\"},{\"lemma\":\"metodo\",\"translation\":\"метод\"},{\"lemma\":\"medico\",\"translation\":\"врач\"},{\"lemma\":\"ex\",\"translation\":\"бывший\"}]\n\nAvoid exact duplicates: []\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Il medico ricorda.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Il medico acuto ricorda.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Il medico acuto ricorda la cosa.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Il medico acuto ricorda la cosa avanti.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Il medico acuto non ricorda la cosa avanti.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Il medico ricorda.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Il medico acuto ricorda la cosa avanti?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Il medico ricorda mentre l'altro conta.\"\n  }\n]"
+      },
+      "elapsedMs": 5904
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Italiano (it)\nNatural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Il medico ricorda.\"},{\"taskId\":\"task-2\",\"sentence\":\"Il medico acuto ricorda.\"},{\"taskId\":\"task-3\",\"sentence\":\"Il medico acuto ricorda la cosa.\"},{\"taskId\":\"task-4\",\"sentence\":\"Il medico acuto ricorda la cosa avanti.\"},{\"taskId\":\"task-5\",\"sentence\":\"Il medico acuto non ricorda la cosa avanti.\"},{\"taskId\":\"task-6\",\"sentence\":\"Il medico ricorda.\"},{\"taskId\":\"task-7\",\"sentence\":\"Il medico acuto ricorda la cosa avanti?\"},{\"taskId\":\"task-8\",\"sentence\":\"Il medico ricorda mentre l'altro conta.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. parli → [\"parl\",\"i\"]. Keep articulated prepositions (nel, della) whole. dictionary_form is infinitive / singular.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Il medico ricorda.\",\n    \"literalTranslation\": \"Врач помнит.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Il\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Il\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"medico\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"medico\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"medico\"\n      },\n      {\n        \"text\": \"ricorda\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ricorda\"],\n        \"translation\": \"помнит\",\n        \"dictionary_form\": \"ricordare\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Il medico acuto ricorda.\",\n    \"literalTranslation\": \"Врач проницательный помнит.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Il\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Il\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"medico\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"medico\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"medico\"\n      },\n      {\n        \"text\": \"acuto\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"acuto\"],\n        \"translation\": \"проницательный\",\n        \"dictionary_form\": \"acuto\"\n      },\n      {\n        \"text\": \"ricorda\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ricorda\"],\n        \"translation\": \"помнит\",\n        \"dictionary_form\": \"ricordare\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Il medico acuto ricorda la cosa.\",\n    \"literalTranslation\": \"Врач проницательный помнит вещь.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Il\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Il\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"medico\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"medico\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"medico\"\n      },\n      {\n        \"text\": \"acuto\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"acuto\"],\n        \"translation\": \"проницательный\",\n        \"dictionary_form\": \"acuto\"\n      },\n      {\n        \"text\": \"ricorda\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ricorda\"],\n        \"translation\": \"помнит\",\n        \"dictionary_form\": \"ricordare\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"эту\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"cosa\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"cosa\"],\n        \"translation\": \"вещь\",\n        \"dictionary_form\": \"cosa\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Il medico acuto non ricorda la cosa.\",\n    \"literalTranslation\": \"Врач проницательный не помнит вещь.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Il\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Il\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"medico\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"medico\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"medico\"\n      },\n      {\n        \"text\": \"acuto\",\n        \"label\": \"ADJ\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"acuto\"],\n        \"translation\": \"проницательный\",\n        \"dictionary_form\": \"acuto\"\n      },\n      {\n        \"text\": \"non\",\n        \"label\": \"PART\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"non\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"non\"\n      },\n      {\n        \"text\": \"ricorda\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ricorda\"],\n        \"translation\": \"помнит\",\n        \"dictionary_form\": \"ricordare\"\n      },\n      {\n        \"text\": \"la\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"la\"],\n        \"translation\": \"эту\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"cosa\",\n        \"label\": \"NOUN\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"cosa\"],\n        \"translation\": \"вещь\",\n        \"dictionary_form\": \"cosa\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Il medico ricorda.\",\n    \"literalTranslation\": \"Врач помнит.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Il\",\n        \"label\": \"DET\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Il\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"il\"\n      },\n      {\n        \"text\": \"medico\",\n        \"label\": \"NOUN\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"medico\"],\n        \"translation\": \"врач\",\n        \"dictionary_form\": \"medico\"\n      },\n      {\n        \"text\": \"ricorda\",\n        \"label\": \"VERB\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ricorda\"],\n        \"translation\": \"помнит\",\n        \"dictionary_form\": \"ricordare\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 6502
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Italiano (it)\nNatural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"completare\",\"translation\":\"полный\"},{\"lemma\":\"equipaggio\",\"translation\":\"экипаж\"},{\"lemma\":\"vendita\",\"translation\":\"распродажа\"},{\"lemma\":\"valore\",\"translation\":\"ценность\"},{\"lemma\":\"necessità\",\"translation\":\"необходимость\"},{\"lemma\":\"meglio\",\"translation\":\"лучше\"},{\"lemma\":\"Infatti\",\"translation\":\"действительно\"},{\"lemma\":\"impegno\",\"translation\":\"приносить присягу\"},{\"lemma\":\"erba\",\"translation\":\"трава\"},{\"lemma\":\"ammirare\",\"translation\":\"восхищаться\"},{\"lemma\":\"scherzo\",\"translation\":\"шутить\"},{\"lemma\":\"nuvola\",\"translation\":\"облако\"},{\"lemma\":\"ambiguità\",\"translation\":\"двусмысленность\"},{\"lemma\":\"lezione\",\"translation\":\"урок\"},{\"lemma\":\"minacciare\",\"translation\":\"угрожать\"},{\"lemma\":\"scienziato\",\"translation\":\"ученый\"},{\"lemma\":\"persona\",\"translation\":\"человек\"},{\"lemma\":\"straniera\",\"translation\":\"иностранный\"},{\"lemma\":\"estendere\",\"translation\":\"продлевать\"},{\"lemma\":\"luogo inesistente\",\"translation\":\"нигде\"},{\"lemma\":\"pranzo\",\"translation\":\"обед\"},{\"lemma\":\"cercare\",\"translation\":\"искать\"},{\"lemma\":\"chiave\",\"translation\":\"ключ\"},{\"lemma\":\"segreto\",\"translation\":\"секрет\"},{\"lemma\":\"ammiccamento\",\"translation\":\"подмигивание\"}]\n\nAvoid exact duplicates: []\nCorrect these problems from the previous attempt: [\"Пересоставьте всю связанную серию вместе: выберите основу, которую можно естественно дополнить признаком, дополнением и обстоятельством.\",\"Предложение 4: разбор не соответствует исходному заданию или тексту.\",\"task-4: составьте новый естественный пример и надёжный разбор.\",\"task-5: составьте новый естественный пример и надёжный разбор.\",\"task-6: повтор предложения.\",\"task-7: составьте новый естественный пример и надёжный разбор.\",\"task-8: составьте новый естественный пример и надёжный разбор.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Lo scienziato cerca.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Lo scienziato straniero cerca.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Lo scienziato straniero cerca una chiave.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Lo scienziato straniero cerca una chiave in un luogo inesistente.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Lo scienziato non cerca una chiave.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"La persona ammira la lezione.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Lo scienziato cerca una chiave?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Lo scienziato cerca una chiave perché la vendita continua.\"\n  }\n]"
+      },
+      "elapsedMs": 2542
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Italiano (it)\nNatural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Lo scienziato cerca.\"},{\"taskId\":\"task-2\",\"sentence\":\"Lo scienziato straniero cerca.\"},{\"taskId\":\"task-3\",\"sentence\":\"Lo scienziato straniero cerca una chiave.\"},{\"taskId\":\"task-4\",\"sentence\":\"Lo scienziato straniero cerca una chiave in un luogo inesistente.\"},{\"taskId\":\"task-5\",\"sentence\":\"Lo scienziato non cerca una chiave.\"},{\"taskId\":\"task-6\",\"sentence\":\"La persona ammira la lezione.\"},{\"taskId\":\"task-7\",\"sentence\":\"Lo scienziato cerca una chiave?\"},{\"taskId\":\"task-8\",\"sentence\":\"Lo scienziato cerca una chiave perché la vendita continua.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. parli → [\"parl\",\"i\"]. Keep articulated prepositions (nel, della) whole. dictionary_form is infinitive / singular.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"Lo scienziato cerca.\",\"literalTranslation\":\"Учёный ищет.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"}]},{\"taskId\":\"task-2\",\"sentence\":\"Lo scienziato straniero cerca.\",\"literalTranslation\":\"Иностранный учёный ищет.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"straniero\",\"label\":\"Adjective\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"straniero\"],\"translation\":\"иностранный\",\"dictionary_form\":\"straniero\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"}]},{\"taskId\":\"task-3\",\"sentence\":\"Lo scienziato straniero cerca una chiave.\",\"literalTranslation\":\"Иностранный учёный ищет ключ.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"straniero\",\"label\":\"Adjective\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"straniero\"],\"translation\":\"иностранный\",\"dictionary_form\":\"straniero\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"},{\"text\":\"una\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"una\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"chiave\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"chiave\"],\"translation\":\"ключ\",\"dictionary_form\":\"chiave\"}]},{\"taskId\":\"task-4\",\"sentence\":\"Lo scienziato straniero cerca una chiave in un luogo inesistente.\",\"literalTranslation\":\"Иностранный учёный ищет ключ в несуществующем месте.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"straniero\",\"label\":\"Adjective\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"straniero\"],\"translation\":\"иностранный\",\"dictionary_form\":\"straniero\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"},{\"text\":\"una\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"una\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"chiave\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"chiave\"],\"translation\":\"ключ\",\"dictionary_form\":\"chiave\"},{\"text\":\"in\",\"label\":\"Preposition\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"in\"],\"translation\":\"в\",\"dictionary_form\":\"in\"},{\"text\":\"un\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"un\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"luogo\",\"label\":\"Noun\",\"role\":\"Other\",\"clauseIndex\":0,\"parts\":[\"luogo\"],\"translation\":\"место\",\"dictionary_form\":\"luogo\"},{\"text\":\"inesistente\",\"label\":\"Adjective\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"inesistente\"],\"translation\":\"несуществующий\",\"dictionary_form\":\"inesistente\"}]},{\"taskId\":\"task-5\",\"sentence\":\"Lo scienziato non cerca una chiave.\",\"literalTranslation\":\"Иностранный учёный не ищет ключ.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"non\",\"label\":\"Particle\",\"role\":\"Particle\",\"clauseIndex\":0,\"parts\":[\"non\"],\"translation\":\"не\",\"dictionary_form\":\"non\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"},{\"text\":\"una\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"una\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"chiave\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"chiave\"],\"translation\":\"ключ\",\"dictionary_form\":\"chiave\"}]},{\"taskId\":\"task-6\",\"sentence\":\"La persona ammira la lezione.\",\"literalTranslation\":\"Человек восхищается уроком.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"La\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"La\"],\"translation\":\"эта\",\"dictionary_form\":\"la\"},{\"text\":\"persona\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"persona\"],\"translation\":\"человек\",\"dictionary_form\":\"persona\"},{\"text\":\"ammira\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"ammira\"],\"translation\":\"восхищается\",\"dictionary_form\":\"ammirare\"},{\"text\":\"la\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"la\"],\"translation\":\"этот\",\"dictionary_form\":\"la\"},{\"text\":\"lezione\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"lezione\"],\"translation\":\"урок\",\"dictionary_form\":\"lezione\"}]},{\"taskId\":\"task-7\",\"sentence\":\"Lo scienziato cerca una chiave?\",\"literalTranslation\":\"Иностранный учёный ищет ключ?\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"},{\"text\":\"una\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"una\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"chiave\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"chiave\"],\"translation\":\"ключ\",\"dictionary_form\":\"chiave\"}]},{\"taskId\":\"task-8\",\"sentence\":\"Lo scienziato cerca una chiave perché la vendita continua.\",\"literalTranslation\":\"Иностранный учёный ищет ключ, потому что продажа продолжается.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Lo\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"Lo\"],\"translation\":\"этот\",\"dictionary_form\":\"il\"},{\"text\":\"scienziato\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"scienziato\"],\"translation\":\"учёный\",\"dictionary_form\":\"scienziato\"},{\"text\":\"cerca\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"cerca\"],\"translation\":\"ищет\",\"dictionary_form\":\"cercare\"},{\"text\":\"una\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"una\"],\"translation\":\"один\",\"dictionary_form\":\"uno\"},{\"text\":\"chiave\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"chiave\"],\"translation\":\"ключ\",\"dictionary_form\":\"chiave\"},{\"text\":\"perché\",\"label\":\"Conjunction\",\"role\":\"Conjunction\",\"clauseIndex\":1,\"parts\":[\"perché\"],\"translation\":\"потому что\",\"dictionary_form\":\"perché\"},{\"text\":\"la\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":1,\"parts\":[\"la\"],\"translation\":\"эта\",\"dictionary_form\":\"la\"},{\"text\":\"vendita\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":1,\"parts\":[\"vendita\"],\"translation\":\"продажа\",\"dictionary_form\":\"vendita\"},{\"text\":\"continua\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":1,\"parts\":[\"continua\"],\"translation\":\"продолжается\",\"dictionary_form\":\"continuare\"}]}]"
+      },
+      "elapsedMs": 42557
+    }
+  ]
+}

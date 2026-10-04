@@ -1,0 +1,1115 @@
+{
+  "scenario": {
+    "id": "kz-1",
+    "code": "kz",
+    "count": 10
+  },
+  "startedAt": "2026-09-26T12:54:53.065Z",
+  "elapsedMs": 91248,
+  "accepted": 10,
+  "sentences": [
+    {
+      "language": "Қазақша",
+      "sentence": "Бала кітап оқиды.",
+      "words": [
+        {
+          "text": "Бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": true,
+          "dictionary_word": "бала",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": true,
+          "dictionary_word": "кітап",
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқи",
+            "ды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": true,
+          "dictionary_word": "оқу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок книгу читает.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_kz_1790427384295_19",
+      "source": "generated",
+      "createdAt": 1790427384295
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай бала кітап оқиды.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": true,
+          "dictionary_word": "бала",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": true,
+          "dictionary_word": "кітап",
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқи",
+            "ды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": true,
+          "dictionary_word": "оқу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький ребёнок книгу читает.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_kz_1790427384300_20",
+      "source": "generated",
+      "createdAt": 1790427384300
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай бала көркем кітап оқиды.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": true,
+          "dictionary_word": "бала",
+          "clauseIndex": 0
+        },
+        {
+          "text": "көркем",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "көркем"
+          ],
+          "translation": "художественную",
+          "dictionary_form": "көркем",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": true,
+          "dictionary_word": "кітап",
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқи",
+            "ды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": true,
+          "dictionary_word": "оқу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький ребёнок художественную книгу читает.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_kz_1790427384306_21",
+      "source": "generated",
+      "createdAt": 1790427384306
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай бала көркем кітап мектепте оқиды.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленький",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "бала",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бала"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "бала",
+          "is_in_my_dict": true,
+          "dictionary_word": "бала",
+          "clauseIndex": 0
+        },
+        {
+          "text": "көркем",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "көркем"
+          ],
+          "translation": "художественную",
+          "dictionary_form": "көркем",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "кітап",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "кітап"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "кітап",
+          "is_in_my_dict": true,
+          "dictionary_word": "кітап",
+          "clauseIndex": 0
+        },
+        {
+          "text": "мектепте",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "мектеп",
+            "те"
+          ],
+          "translation": "в школе",
+          "dictionary_form": "мектеп",
+          "is_in_my_dict": true,
+          "dictionary_word": "мектеп",
+          "clauseIndex": 0
+        },
+        {
+          "text": "оқиды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "оқи",
+            "ды"
+          ],
+          "translation": "читает",
+          "dictionary_form": "оқу",
+          "is_in_my_dict": true,
+          "dictionary_word": "оқу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленький ребёнок художественную книгу в школе читает.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_kz_1790427384313_22",
+      "source": "generated",
+      "createdAt": 1790427384313
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Сатып алушы дүкеннен жаңа тауарлар алмады.",
+      "words": [
+        {
+          "text": "Сатып",
+          "label": "verb",
+          "role": "Object",
+          "parts": [
+            "Сатып"
+          ],
+          "translation": "покупая",
+          "dictionary_form": "сату",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алушы",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "ал",
+            "ушы"
+          ],
+          "translation": "покупатель",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "дүкеннен",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "дүкен",
+            "нен"
+          ],
+          "translation": "из магазина",
+          "dictionary_form": "дүкен",
+          "is_in_my_dict": true,
+          "dictionary_word": "дүкен",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жаңа",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "жаңа"
+          ],
+          "translation": "новые",
+          "dictionary_form": "жаңа",
+          "is_in_my_dict": true,
+          "dictionary_word": "жаңа",
+          "clauseIndex": 0
+        },
+        {
+          "text": "тауарлар",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "тауар",
+            "лар"
+          ],
+          "translation": "товары",
+          "dictionary_form": "тауар",
+          "is_in_my_dict": true,
+          "dictionary_word": "тауарлар",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алмады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ал",
+            "ма",
+            "ды"
+          ],
+          "translation": "не взял",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "алу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Покупатель из магазина новые товары не взял.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_kz_1790427337437_5",
+      "source": "generated",
+      "createdAt": 1790427337437
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Сатып алушы дүкеннен жаңа тауарлар алды.",
+      "words": [
+        {
+          "text": "Сатып",
+          "label": "verb",
+          "role": "Object",
+          "parts": [
+            "Сатып"
+          ],
+          "translation": "покупая",
+          "dictionary_form": "сату",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алушы",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "ал",
+            "ушы"
+          ],
+          "translation": "покупатель",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "дүкеннен",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "дүкен",
+            "нен"
+          ],
+          "translation": "из магазина",
+          "dictionary_form": "дүкен",
+          "is_in_my_dict": true,
+          "dictionary_word": "дүкен",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жаңа",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "жаңа"
+          ],
+          "translation": "новые",
+          "dictionary_form": "жаңа",
+          "is_in_my_dict": true,
+          "dictionary_word": "жаңа",
+          "clauseIndex": 0
+        },
+        {
+          "text": "тауарлар",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "тауар",
+            "лар"
+          ],
+          "translation": "товары",
+          "dictionary_form": "тауар",
+          "is_in_my_dict": true,
+          "dictionary_word": "тауарлар",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ал",
+            "ды"
+          ],
+          "translation": "взял",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "алу",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Покупатель из магазина новые товары взял.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_kz_1790427337468_6",
+      "source": "generated",
+      "createdAt": 1790427337468
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Сатып алушы дүкеннен жаңа тауарлар алды ма?",
+      "words": [
+        {
+          "text": "Сатып",
+          "label": "verb",
+          "role": "Object",
+          "parts": [
+            "Сатып"
+          ],
+          "translation": "покупая",
+          "dictionary_form": "сату",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алушы",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "ал",
+            "ушы"
+          ],
+          "translation": "покупатель",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "дүкеннен",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "дүкен",
+            "нен"
+          ],
+          "translation": "из магазина",
+          "dictionary_form": "дүкен",
+          "is_in_my_dict": true,
+          "dictionary_word": "дүкен",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жаңа",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "жаңа"
+          ],
+          "translation": "новые",
+          "dictionary_form": "жаңа",
+          "is_in_my_dict": true,
+          "dictionary_word": "жаңа",
+          "clauseIndex": 0
+        },
+        {
+          "text": "тауарлар",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "тауар",
+            "лар"
+          ],
+          "translation": "товары",
+          "dictionary_form": "тауар",
+          "is_in_my_dict": true,
+          "dictionary_word": "тауарлар",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ал",
+            "ды"
+          ],
+          "translation": "взял",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "ма",
+          "label": "particle",
+          "role": "Particle",
+          "parts": [
+            "ма"
+          ],
+          "translation": "ли",
+          "dictionary_form": "ма",
+          "is_in_my_dict": true,
+          "dictionary_word": "ма",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Покупатель из магазина новые товары взял ли?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_kz_1790427337502_7",
+      "source": "generated",
+      "createdAt": 1790427337502
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.",
+      "words": [
+        {
+          "text": "Сатып",
+          "label": "verb",
+          "role": "Object",
+          "parts": [
+            "Сатып"
+          ],
+          "translation": "покупая",
+          "dictionary_form": "сату",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алушы",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "ал",
+            "ушы"
+          ],
+          "translation": "покупатель",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "сатып алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "дүкеннен",
+          "label": "noun",
+          "role": "Circumstance",
+          "parts": [
+            "дүкен",
+            "нен"
+          ],
+          "translation": "из магазина",
+          "dictionary_form": "дүкен",
+          "is_in_my_dict": true,
+          "dictionary_word": "дүкен",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жаңа",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "жаңа"
+          ],
+          "translation": "новые",
+          "dictionary_form": "жаңа",
+          "is_in_my_dict": true,
+          "dictionary_word": "жаңа",
+          "clauseIndex": 0
+        },
+        {
+          "text": "тауарлар",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "тауар",
+            "лар"
+          ],
+          "translation": "товары",
+          "dictionary_form": "тауар",
+          "is_in_my_dict": true,
+          "dictionary_word": "тауарлар",
+          "clauseIndex": 0
+        },
+        {
+          "text": "алды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ал",
+            "ды"
+          ],
+          "translation": "взял",
+          "dictionary_form": "алу",
+          "is_in_my_dict": true,
+          "dictionary_word": "алу",
+          "clauseIndex": 0
+        },
+        {
+          "text": "өйткені",
+          "label": "conjunction",
+          "role": "Conjunction",
+          "parts": [
+            "өйткені"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "өйткені",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "төлем",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "төлем"
+          ],
+          "translation": "платеж",
+          "dictionary_form": "төлем",
+          "is_in_my_dict": true,
+          "dictionary_word": "төлем",
+          "clauseIndex": 1
+        },
+        {
+          "text": "жасалды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жас",
+            "ал",
+            "ды"
+          ],
+          "translation": "был сделан",
+          "dictionary_form": "жасалу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Покупатель из магазина новые товары взял, потому что платеж был сделан.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_kz_1790427337541_8",
+      "source": "generated",
+      "createdAt": 1790427337541
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Бұлт қалықтады.",
+      "words": [
+        {
+          "text": "Бұлт",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Бұлт"
+          ],
+          "translation": "облако",
+          "dictionary_form": "бұлт",
+          "is_in_my_dict": true,
+          "dictionary_word": "бұлт",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қалықтады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "қалықта",
+            "ды"
+          ],
+          "translation": "парил",
+          "dictionary_form": "қалықтау",
+          "is_in_my_dict": true,
+          "dictionary_word": "қалықтау",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Облако парил.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-9",
+      "id": "generated_kz_1790427337555_9",
+      "source": "generated",
+      "createdAt": 1790427337555
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Ақ бұлт қалықтады.",
+      "words": [
+        {
+          "text": "Ақ",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Ақ"
+          ],
+          "translation": "белое",
+          "dictionary_form": "ақ",
+          "is_in_my_dict": true,
+          "dictionary_word": "ақ",
+          "clauseIndex": 0
+        },
+        {
+          "text": "бұлт",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "бұлт"
+          ],
+          "translation": "облако",
+          "dictionary_form": "бұлт",
+          "is_in_my_dict": true,
+          "dictionary_word": "бұлт",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қалықтады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "қалықта",
+            "ды"
+          ],
+          "translation": "парил",
+          "dictionary_form": "қалықтау",
+          "is_in_my_dict": true,
+          "dictionary_word": "қалықтау",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Белое облако парил.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-10",
+      "id": "generated_kz_1790427337573_10",
+      "source": "generated",
+      "createdAt": 1790427337573
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"төлем\",\"translation\":\"оплата\"},{\"lemma\":\"келу\",\"translation\":\"прибытие\"},{\"lemma\":\"аралас\",\"translation\":\"смешанный\"},{\"lemma\":\"әлсіз\",\"translation\":\"хрупкий\"},{\"lemma\":\"ерікті\",\"translation\":\"добровольный\"},{\"lemma\":\"тиіс\",\"translation\":\"должен\"},{\"lemma\":\"тауарлар\",\"translation\":\"товары\"},{\"lemma\":\"таңғы ас\",\"translation\":\"завтрак\"},{\"lemma\":\"қол\",\"translation\":\"рука\"},{\"lemma\":\"көлеңке\",\"translation\":\"оттенок\"},{\"lemma\":\"кінәсіз\",\"translation\":\"невиновный\"},{\"lemma\":\"бұлт\",\"translation\":\"облако\"},{\"lemma\":\"бұл\",\"translation\":\"этот\"},{\"lemma\":\"тұтқа\",\"translation\":\"ручка\"},{\"lemma\":\"табыс\",\"translation\":\"успех\"},{\"lemma\":\"маңызды\",\"translation\":\"важный\"},{\"lemma\":\"қалықтау\",\"translation\":\"взлет\"},{\"lemma\":\"сорғы\",\"translation\":\"насос\"},{\"lemma\":\"қауымдастық\",\"translation\":\"ассоциация\"},{\"lemma\":\"қаңғыбас\",\"translation\":\"бродяга\"},{\"lemma\":\"бағам\",\"translation\":\"ставка\"},{\"lemma\":\"міндеттенген\",\"translation\":\"преданный идее\"},{\"lemma\":\"мінез-құлық\",\"translation\":\"руководить\"},{\"lemma\":\"қазір\",\"translation\":\"сейчас\"},{\"lemma\":\"осындай\",\"translation\":\"такой\"}]\n\nAvoid exact duplicates: [\"Кішкентай ұл жаңа кітап оқыды.\",\"Әке үлкен үй салды ма?\",\"Жақсы дос жаман хат жазбады.\",\"Қыз барды дүкенге.\",\"Кеше адам тамақ жеді.\",\"Қыз ит көрді және ұл кітап оқыды.\",\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Тауарлар келді.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Жаңа тауарлар келді.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Сатып алушы жаңа тауарлар алды.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алмады.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды ма?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\"\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"Бұлт қалықтады.\"\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"Ақ бұлт қалықтады.\"\n  }\n]"
+      },
+      "elapsedMs": 33150
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Тауарлар келді.\"},{\"taskId\":\"task-2\",\"sentence\":\"Жаңа тауарлар келді.\"},{\"taskId\":\"task-3\",\"sentence\":\"Сатып алушы жаңа тауарлар алды.\"},{\"taskId\":\"task-4\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды.\"},{\"taskId\":\"task-5\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алмады.\"},{\"taskId\":\"task-6\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\"},{\"taskId\":\"task-9\",\"sentence\":\"Бұлт қалықтады.\"},{\"taskId\":\"task-10\",\"sentence\":\"Ақ бұлт қалықтады.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. жазбады → [\"жаз\",\"ба\",\"ды\"], дүкенге → [\"дүкен\",\"ге\"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Тауарлар келді.\",\n    \"literalTranslation\": \"Товары прибыли.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"келді\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кел\", \"ді\"],\n        \"translation\": \"прибыли\",\n        \"dictionary_form\": \"келу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Жаңа тауарлар келді.\",\n    \"literalTranslation\": \"Новые товары прибыли.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"келді\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кел\", \"ді\"],\n        \"translation\": \"прибыли\",\n        \"dictionary_form\": \"келу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Сатып алушы жаңа тауарлар алды.\",\n    \"literalTranslation\": \"Покупатель новые товары взял.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ды\"],\n        \"translation\": \"взял\",\n        \"dictionary_form\": \"алу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды.\",\n    \"literalTranslation\": \"Покупатель из магазина новые товары взял.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"дүкеннен\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"дүкен\", \"нен\"],\n        \"translation\": \"из магазина\",\n        \"dictionary_form\": \"дүкен\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ды\"],\n        \"translation\": \"взял\",\n        \"dictionary_form\": \"алу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алмады.\",\n    \"literalTranslation\": \"Покупатель из магазина новые товары не взял.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"дүкеннен\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"дүкен\", \"нен\"],\n        \"translation\": \"из магазина\",\n        \"dictionary_form\": \"дүкен\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алмады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ма\", \"ды\"],\n        \"translation\": \"не взял\",\n        \"dictionary_form\": \"алу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды.\",\n    \"literalTranslation\": \"Покупатель из магазина новые товары взял.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"дүкеннен\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"дүкен\", \"нен\"],\n        \"translation\": \"из магазина\",\n        \"dictionary_form\": \"дүкен\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ды\"],\n        \"translation\": \"взял\",\n        \"dictionary_form\": \"алу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды ма?\",\n    \"literalTranslation\": \"Покупатель из магазина новые товары взял ли?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"дүкеннен\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"дүкен\", \"нен\"],\n        \"translation\": \"из магазина\",\n        \"dictionary_form\": \"дүкен\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ды\"],\n        \"translation\": \"взял\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"ма\",\n        \"label\": \"particle\",\n        \"role\": \"Particle\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ма\"],\n        \"translation\": \"ли\",\n        \"dictionary_form\": \"ма\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\",\n    \"literalTranslation\": \"Покупатель из магазина новые товары взял, потому что платеж был сделан.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Сатып\",\n        \"label\": \"verb\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"сат\", \"ып\"],\n        \"translation\": \"покупая\",\n        \"dictionary_form\": \"сату\"\n      },\n      {\n        \"text\": \"алушы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ушы\"],\n        \"translation\": \"покупатель\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"дүкеннен\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"дүкен\", \"нен\"],\n        \"translation\": \"из магазина\",\n        \"dictionary_form\": \"дүкен\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жаңа\"],\n        \"translation\": \"новые\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"тауарлар\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"тауар\", \"лар\"],\n        \"translation\": \"товары\",\n        \"dictionary_form\": \"тауар\"\n      },\n      {\n        \"text\": \"алды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ал\", \"ды\"],\n        \"translation\": \"взял\",\n        \"dictionary_form\": \"алу\"\n      },\n      {\n        \"text\": \"өйткені\",\n        \"label\": \"conjunction\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"өйткені\"],\n        \"translation\": \"потому что\",\n        \"dictionary_form\": \"өйткені\"\n      },\n      {\n        \"text\": \"төлем\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"төлем\"],\n        \"translation\": \"платеж\",\n        \"dictionary_form\": \"төлем\"\n      },\n      {\n        \"text\": \"жасалды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"жас\", \"ал\", \"ды\"],\n        \"translation\": \"был сделан\",\n        \"dictionary_form\": \"жасалу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"Бұлт қалықтады.\",\n    \"literalTranslation\": \"Облако парил.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Бұлт\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"бұлт\"],\n        \"translation\": \"облако\",\n        \"dictionary_form\": \"бұлт\"\n      },\n      {\n        \"text\": \"қалықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қалықта\", \"ды\"],\n        \"translation\": \"парил\",\n        \"dictionary_form\": \"қалықтау\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"Ақ бұлт қалықтады.\",\n    \"literalTranslation\": \"Белое облако парил.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Ақ\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ақ\"],\n        \"translation\": \"белое\",\n        \"dictionary_form\": \"ақ\"\n      },\n      {\n        \"text\": \"бұлт\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"бұлт\"],\n        \"translation\": \"облако\",\n        \"dictionary_form\": \"бұлт\"\n      },\n      {\n        \"text\": \"қалықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қалықта\", \"ды\"],\n        \"translation\": \"парил\",\n        \"dictionary_form\": \"қалықтау\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 11054
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nAlready accepted development context: [{\"taskId\":\"task-5\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алмады.\"},{\"taskId\":\"task-6\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\"},{\"taskId\":\"task-9\",\"sentence\":\"Бұлт қалықтады.\"},{\"taskId\":\"task-10\",\"sentence\":\"Ақ бұлт қалықтады.\"}]\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"ұя\",\"translation\":\"гнездо\"},{\"lemma\":\"жеу\",\"translation\":\"есть\"},{\"lemma\":\"жеңіліс\",\"translation\":\"поражение\"},{\"lemma\":\"карта\",\"translation\":\"карта\"},{\"lemma\":\"ұсыныс\",\"translation\":\"предложение\"},{\"lemma\":\"тиісті\",\"translation\":\"правильный\"},{\"lemma\":\"баяндауыш\",\"translation\":\"предикат\"},{\"lemma\":\"мүмкіндіктер\",\"translation\":\"шансы\"},{\"lemma\":\"кеңістік\",\"translation\":\"космос\"},{\"lemma\":\"азшылық\",\"translation\":\"меньшинство\"},{\"lemma\":\"кешкі ас\",\"translation\":\"ужин\"},{\"lemma\":\"БАСТА\",\"translation\":\"начинать\"},{\"lemma\":\"одан да жаман\",\"translation\":\"худший\"},{\"lemma\":\"жас\",\"translation\":\"возраст\"},{\"lemma\":\"әлеуметтік\",\"translation\":\"социальный\"},{\"lemma\":\"тырысу\",\"translation\":\"стремиться\"},{\"lemma\":\"шүберек\",\"translation\":\"тряпка\"},{\"lemma\":\"қосу\",\"translation\":\"включить\"},{\"lemma\":\"тапсырыс бойынша\",\"translation\":\"обычай\"},{\"lemma\":\"сынақ\",\"translation\":\"испытание\"},{\"lemma\":\"аяушылық\",\"translation\":\"жалость\"},{\"lemma\":\"қызықты\",\"translation\":\"захватывающий\"},{\"lemma\":\"ұн\",\"translation\":\"мука\"},{\"lemma\":\"араластыру\",\"translation\":\"помешивать\"},{\"lemma\":\"қар\",\"translation\":\"снег\"}]\n\nAvoid exact duplicates: [\"Кішкентай ұл жаңа кітап оқыды.\",\"Әке үлкен үй салды ма?\",\"Жақсы дос жаман хат жазбады.\",\"Қыз барды дүкенге.\",\"Кеше адам тамақ жеді.\",\"Қыз ит көрді және ұл кітап оқыды.\",\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\",\"Сатып алушы дүкеннен жаңа тауарлар алмады.\",\"Сатып алушы дүкеннен жаңа тауарлар алды.\",\"Сатып алушы дүкеннен жаңа тауарлар алды ма?\",\"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\",\"Бұлт қалықтады.\",\"Ақ бұлт қалықтады.\"]\nCorrect these problems from the previous attempt: [\"Пересоставьте всю связанную серию вместе: выберите основу, которую можно естественно дополнить признаком, дополнением и обстоятельством.\",\"task-3: сохраните подлежащее, форму сказуемого и уже добавленные детали из task-2; добавьте только требуемую деталь.\",\"task-4: сначала нужна принятая основа task-3.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"Бала кітап оқиды.\"},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай бала кітап оқиды.\"},{\"taskId\":\"task-3\",\"sentence\":\"Кішкентай бала көркем кітап оқиды.\"},{\"taskId\":\"task-4\",\"sentence\":\"Кішкентай бала көркем кітап мектепте оқиды.\"}]"
+      },
+      "elapsedMs": 41397
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Бала кітап оқиды.\"},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай бала кітап оқиды.\"},{\"taskId\":\"task-3\",\"sentence\":\"Кішкентай бала көркем кітап оқиды.\"},{\"taskId\":\"task-4\",\"sentence\":\"Кішкентай бала көркем кітап мектепте оқиды.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-5\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алмады.\"},{\"taskId\":\"task-6\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Сатып алушы дүкеннен жаңа тауарлар алды, өйткені төлем жасалды.\"},{\"taskId\":\"task-9\",\"sentence\":\"Бұлт қалықтады.\"},{\"taskId\":\"task-10\",\"sentence\":\"Ақ бұлт қалықтады.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. жазбады → [\"жаз\",\"ба\",\"ды\"], дүкенге → [\"дүкен\",\"ге\"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Бала кітап оқиды.\",\n    \"literalTranslation\": \"Ребёнок книгу читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Бала\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Бала\"\n        ],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"бала\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"оқиды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқи\",\n          \"ды\"\n        ],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Кішкентай бала кітап оқиды.\",\n    \"literalTranslation\": \"Маленький ребёнок книгу читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Кішкентай\"\n        ],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"бала\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"бала\"\n        ],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"бала\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"оқиды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқи\",\n          \"ды\"\n        ],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Кішкентай бала көркем кітап оқиды.\",\n    \"literalTranslation\": \"Маленький ребёнок художественную книгу читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Кішкентай\"\n        ],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"бала\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"бала\"\n        ],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"бала\"\n      },\n      {\n        \"text\": \"көркем\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"көркем\"\n        ],\n        \"translation\": \"художественную\",\n        \"dictionary_form\": \"көркем\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"оқиды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқи\",\n          \"ды\"\n        ],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Кішкентай бала көркем кітап мектепте оқиды.\",\n    \"literalTranslation\": \"Маленький ребёнок художественную книгу в школе читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Кішкентай\"\n        ],\n        \"translation\": \"маленький\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"бала\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"бала\"\n        ],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"бала\"\n      },\n      {\n        \"text\": \"көркем\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"көркем\"\n        ],\n        \"translation\": \"художественную\",\n        \"dictionary_form\": \"көркем\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"мектепте\",\n        \"label\": \"noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"мектеп\",\n          \"те\"\n        ],\n        \"translation\": \"в школе\",\n        \"dictionary_form\": \"мектеп\"\n      },\n      {\n        \"text\": \"оқиды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқи\",\n          \"ды\"\n        ],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 5309
+    }
+  ]
+}

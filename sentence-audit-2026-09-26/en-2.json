@@ -1,0 +1,1242 @@
+{
+  "scenario": {
+    "id": "en-2",
+    "code": "en",
+    "count": 10
+  },
+  "startedAt": "2026-09-26T12:56:30.396Z",
+  "elapsedMs": 31148,
+  "accepted": 10,
+  "sentences": [
+    {
+      "language": "English",
+      "sentence": "The manager submits.",
+      "words": [
+        {
+          "text": "The",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "manager",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "manager"
+          ],
+          "translation": "менеджер",
+          "dictionary_form": "manager",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "submits",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "submit",
+            "s"
+          ],
+          "translation": "подчиняется",
+          "dictionary_form": "submit",
+          "is_in_my_dict": true,
+          "dictionary_word": "submit",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Менеджер подчиняется.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_en_1790427421530_39",
+      "source": "generated",
+      "createdAt": 1790427421530
+    },
+    {
+      "language": "English",
+      "sentence": "The proper manager submits.",
+      "words": [
+        {
+          "text": "The",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "proper",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "proper"
+          ],
+          "translation": "надлежащий",
+          "dictionary_form": "proper",
+          "is_in_my_dict": true,
+          "dictionary_word": "proper",
+          "clauseIndex": 0
+        },
+        {
+          "text": "manager",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "manager"
+          ],
+          "translation": "менеджер",
+          "dictionary_form": "manager",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "submits",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "submit",
+            "s"
+          ],
+          "translation": "подчиняется",
+          "dictionary_form": "submit",
+          "is_in_my_dict": true,
+          "dictionary_word": "submit",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Надлежащий менеджер подчиняется.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_en_1790427421533_40",
+      "source": "generated",
+      "createdAt": 1790427421533
+    },
+    {
+      "language": "English",
+      "sentence": "The proper manager submits the operation.",
+      "words": [
+        {
+          "text": "The",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "proper",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "proper"
+          ],
+          "translation": "надлежащий",
+          "dictionary_form": "proper",
+          "is_in_my_dict": true,
+          "dictionary_word": "proper",
+          "clauseIndex": 0
+        },
+        {
+          "text": "manager",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "manager"
+          ],
+          "translation": "менеджер",
+          "dictionary_form": "manager",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "submits",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "submit",
+            "s"
+          ],
+          "translation": "представляет",
+          "dictionary_form": "submit",
+          "is_in_my_dict": true,
+          "dictionary_word": "submit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "operation",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "operation"
+          ],
+          "translation": "операцию",
+          "dictionary_form": "operation",
+          "is_in_my_dict": true,
+          "dictionary_word": "operation",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Надлежащий менеджер представляет операцию.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_en_1790427421538_41",
+      "source": "generated",
+      "createdAt": 1790427421538
+    },
+    {
+      "language": "English",
+      "sentence": "The proper manager submits the operation afterwards.",
+      "words": [
+        {
+          "text": "The",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "proper",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "proper"
+          ],
+          "translation": "надлежащий",
+          "dictionary_form": "proper",
+          "is_in_my_dict": true,
+          "dictionary_word": "proper",
+          "clauseIndex": 0
+        },
+        {
+          "text": "manager",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "manager"
+          ],
+          "translation": "менеджер",
+          "dictionary_form": "manager",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "submits",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "submit",
+            "s"
+          ],
+          "translation": "представляет",
+          "dictionary_form": "submit",
+          "is_in_my_dict": true,
+          "dictionary_word": "submit",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "determiner",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определенный артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "operation",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "operation"
+          ],
+          "translation": "операцию",
+          "dictionary_form": "operation",
+          "is_in_my_dict": true,
+          "dictionary_word": "operation",
+          "clauseIndex": 0
+        },
+        {
+          "text": "afterwards",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "afterwards"
+          ],
+          "translation": "впоследствии",
+          "dictionary_form": "afterwards",
+          "is_in_my_dict": true,
+          "dictionary_word": "afterwards",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Надлежащий менеджер представляет операцию впоследствии.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_en_1790427421543_42",
+      "source": "generated",
+      "createdAt": 1790427421543
+    },
+    {
+      "language": "English",
+      "sentence": "The bold child does not draw the object below.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "bold",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "bold"
+          ],
+          "translation": "смелый",
+          "dictionary_form": "bold",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "does",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "does"
+          ],
+          "translation": "вспомогательный глагол",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "not",
+          "label": "particle",
+          "role": "Predicate",
+          "parts": [
+            "not"
+          ],
+          "translation": "не",
+          "dictionary_form": "not",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "draw",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "draw"
+          ],
+          "translation": "чертить",
+          "dictionary_form": "draw",
+          "is_in_my_dict": true,
+          "dictionary_word": "draw",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "object",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "object"
+          ],
+          "translation": "объект",
+          "dictionary_form": "object",
+          "is_in_my_dict": true,
+          "dictionary_word": "object",
+          "clauseIndex": 0
+        },
+        {
+          "text": "below",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "below"
+          ],
+          "translation": "внизу",
+          "dictionary_form": "below",
+          "is_in_my_dict": true,
+          "dictionary_word": "below",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Смелый ребёнок не чертит объект внизу.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_en_1790427406389_33",
+      "source": "generated",
+      "createdAt": 1790427406389
+    },
+    {
+      "language": "English",
+      "sentence": "The bold child draws the object below.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "bold",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "bold"
+          ],
+          "translation": "смелый",
+          "dictionary_form": "bold",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "draws",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "draw",
+            "s"
+          ],
+          "translation": "чертит",
+          "dictionary_form": "draw",
+          "is_in_my_dict": true,
+          "dictionary_word": "draw",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "object",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "object"
+          ],
+          "translation": "объект",
+          "dictionary_form": "object",
+          "is_in_my_dict": true,
+          "dictionary_word": "object",
+          "clauseIndex": 0
+        },
+        {
+          "text": "below",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "below"
+          ],
+          "translation": "внизу",
+          "dictionary_form": "below",
+          "is_in_my_dict": true,
+          "dictionary_word": "below",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Смелый ребёнок чертит объект внизу.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_en_1790427406394_34",
+      "source": "generated",
+      "createdAt": 1790427406394
+    },
+    {
+      "language": "English",
+      "sentence": "Does the bold child draw the object below?",
+      "words": [
+        {
+          "text": "Does",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "Doe",
+            "s"
+          ],
+          "translation": "вспомогательный глагол",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "bold",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "bold"
+          ],
+          "translation": "смелый",
+          "dictionary_form": "bold",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "draw",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "draw"
+          ],
+          "translation": "чертить",
+          "dictionary_form": "draw",
+          "is_in_my_dict": true,
+          "dictionary_word": "draw",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "object",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "object"
+          ],
+          "translation": "объект",
+          "dictionary_form": "object",
+          "is_in_my_dict": true,
+          "dictionary_word": "object",
+          "clauseIndex": 0
+        },
+        {
+          "text": "below",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "below"
+          ],
+          "translation": "внизу",
+          "dictionary_form": "below",
+          "is_in_my_dict": true,
+          "dictionary_word": "below",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Чертит ли смелый ребёнок объект внизу?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_en_1790427406399_35",
+      "source": "generated",
+      "createdAt": 1790427406399
+    },
+    {
+      "language": "English",
+      "sentence": "The bold child draws the object below because the lesson ends.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "bold",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "bold"
+          ],
+          "translation": "смелый",
+          "dictionary_form": "bold",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "draws",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "draw",
+            "s"
+          ],
+          "translation": "чертит",
+          "dictionary_form": "draw",
+          "is_in_my_dict": true,
+          "dictionary_word": "draw",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "object",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "object"
+          ],
+          "translation": "объект",
+          "dictionary_form": "object",
+          "is_in_my_dict": true,
+          "dictionary_word": "object",
+          "clauseIndex": 0
+        },
+        {
+          "text": "below",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "below"
+          ],
+          "translation": "внизу",
+          "dictionary_form": "below",
+          "is_in_my_dict": true,
+          "dictionary_word": "below",
+          "clauseIndex": 0
+        },
+        {
+          "text": "because",
+          "label": "conjunction",
+          "role": "Conjunction",
+          "parts": [
+            "because"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "because",
+          "is_in_my_dict": true,
+          "dictionary_word": "because",
+          "clauseIndex": 1
+        },
+        {
+          "text": "the",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "lesson",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "lesson"
+          ],
+          "translation": "урок",
+          "dictionary_form": "lesson",
+          "is_in_my_dict": true,
+          "dictionary_word": "lesson",
+          "clauseIndex": 1
+        },
+        {
+          "text": "ends",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "end",
+            "s"
+          ],
+          "translation": "заканчивается",
+          "dictionary_form": "end",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Смелый ребёнок чертит объект внизу, потому что урок заканчивается.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_en_1790427406406_36",
+      "source": "generated",
+      "createdAt": 1790427406406
+    },
+    {
+      "language": "English",
+      "sentence": "The student invests.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "student",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "student"
+          ],
+          "translation": "студент",
+          "dictionary_form": "student",
+          "is_in_my_dict": true,
+          "dictionary_word": "student",
+          "clauseIndex": 0
+        },
+        {
+          "text": "invests",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "invest",
+            "s"
+          ],
+          "translation": "инвестирует",
+          "dictionary_form": "invest",
+          "is_in_my_dict": true,
+          "dictionary_word": "invest",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Студент инвестирует.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-9",
+      "id": "generated_en_1790427406409_37",
+      "source": "generated",
+      "createdAt": 1790427406409
+    },
+    {
+      "language": "English",
+      "sentence": "The wise student invests.",
+      "words": [
+        {
+          "text": "The",
+          "label": "article",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "определённый артикль",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "wise",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "wise"
+          ],
+          "translation": "мудрый",
+          "dictionary_form": "wise",
+          "is_in_my_dict": true,
+          "dictionary_word": "wise",
+          "clauseIndex": 0
+        },
+        {
+          "text": "student",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "student"
+          ],
+          "translation": "студент",
+          "dictionary_form": "student",
+          "is_in_my_dict": true,
+          "dictionary_word": "student",
+          "clauseIndex": 0
+        },
+        {
+          "text": "invests",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "invest",
+            "s"
+          ],
+          "translation": "инвестирует",
+          "dictionary_form": "invest",
+          "is_in_my_dict": true,
+          "dictionary_word": "invest",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Мудрый студент инвестирует.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-10",
+      "id": "generated_en_1790427406412_38",
+      "source": "generated",
+      "createdAt": 1790427406412
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nAlready accepted development context: []\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"edge\",\"translation\":\"край\"},{\"lemma\":\"missing\",\"translation\":\"отсутствующий\"},{\"lemma\":\"perfect\",\"translation\":\"идеальный\"},{\"lemma\":\"below\",\"translation\":\"ниже\"},{\"lemma\":\"prison\",\"translation\":\"тюрьма\"},{\"lemma\":\"wheel\",\"translation\":\"колесо\"},{\"lemma\":\"swim\",\"translation\":\"плавать\"},{\"lemma\":\"object\",\"translation\":\"объект\"},{\"lemma\":\"invest\",\"translation\":\"инвестировать\"},{\"lemma\":\"sharp\",\"translation\":\"острый\"},{\"lemma\":\"large\",\"translation\":\"большой\"},{\"lemma\":\"refer\",\"translation\":\"ссылаться\"},{\"lemma\":\"noise\",\"translation\":\"шум\"},{\"lemma\":\"admit\",\"translation\":\"признавать\"},{\"lemma\":\"incline\",\"translation\":\"наклон\"},{\"lemma\":\"issue\",\"translation\":\"проблема\"},{\"lemma\":\"lesson\",\"translation\":\"урок\"},{\"lemma\":\"pencil\",\"translation\":\"карандаш\"},{\"lemma\":\"adjust\",\"translation\":\"регулировать\"},{\"lemma\":\"part\",\"translation\":\"часть\"},{\"lemma\":\"though\",\"translation\":\"хотя\"},{\"lemma\":\"eternal\",\"translation\":\"вечный\"},{\"lemma\":\"frost\",\"translation\":\"мороз\"},{\"lemma\":\"middle\",\"translation\":\"середина\"},{\"lemma\":\"may\",\"translation\":\"может\"}]\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The artist paints a canvas.\",\"The talented artist paints a canvas.\",\"The talented artist paints a large canvas.\",\"The talented artist paints a large canvas in the studio.\",\"The chef does not cook the soup.\",\"The culture defines the future.\",\"Does the gardener water the plants?\",\"The wall falls because the rust spreads.\",\"The mountain rises.\",\"The high mountain rises.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The child swims.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The bold child swims.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The bold child draws the object.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The bold child draws the object below.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The bold child does not draw the object below.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"The bold child draws the object below.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the bold child draw the object below?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The bold child draws the object below because the lesson ends.\"\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"The student invests.\"\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"The wise student invests.\"\n  }\n]"
+      },
+      "elapsedMs": 2318
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"},{\"id\":\"task-9\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-10\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The child swims.\"},{\"taskId\":\"task-2\",\"sentence\":\"The bold child swims.\"},{\"taskId\":\"task-3\",\"sentence\":\"The bold child draws the object.\"},{\"taskId\":\"task-4\",\"sentence\":\"The bold child draws the object below.\"},{\"taskId\":\"task-5\",\"sentence\":\"The bold child does not draw the object below.\"},{\"taskId\":\"task-6\",\"sentence\":\"The bold child draws the object below.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the bold child draw the object below?\"},{\"taskId\":\"task-8\",\"sentence\":\"The bold child draws the object below because the lesson ends.\"},{\"taskId\":\"task-9\",\"sentence\":\"The student invests.\"},{\"taskId\":\"task-10\",\"sentence\":\"The wise student invests.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The child swims.\",\n    \"literalTranslation\": \"Ребёнок плывёт.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"swims\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"swim\", \"s\"],\n        \"translation\": \"плывёт\",\n        \"dictionary_form\": \"swim\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The bold child swims.\",\n    \"literalTranslation\": \"Смелый ребёнок плывёт.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"swims\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"swim\", \"s\"],\n        \"translation\": \"плывёт\",\n        \"dictionary_form\": \"swim\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The bold child draws the object.\",\n    \"literalTranslation\": \"Смелый ребёнок чертит объект.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"draws\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\", \"s\"],\n        \"translation\": \"чертит\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The bold child draws the object below.\",\n    \"literalTranslation\": \"Смелый ребёнок чертит объект внизу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"draws\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\", \"s\"],\n        \"translation\": \"чертит\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      },\n      {\n        \"text\": \"below\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"below\"],\n        \"translation\": \"внизу\",\n        \"dictionary_form\": \"below\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The bold child does not draw the object below.\",\n    \"literalTranslation\": \"Смелый ребёнок не чертит объект внизу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"does\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"does\"],\n        \"translation\": \"вспомогательный глагол\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"not\",\n        \"label\": \"particle\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"not\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"not\"\n      },\n      {\n        \"text\": \"draw\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\"],\n        \"translation\": \"чертить\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      },\n      {\n        \"text\": \"below\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"below\"],\n        \"translation\": \"внизу\",\n        \"dictionary_form\": \"below\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"The bold child draws the object below.\",\n    \"literalTranslation\": \"Смелый ребёнок чертит объект внизу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"draws\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\", \"s\"],\n        \"translation\": \"чертит\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      },\n      {\n        \"text\": \"below\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"below\"],\n        \"translation\": \"внизу\",\n        \"dictionary_form\": \"below\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the bold child draw the object below?\",\n    \"literalTranslation\": \"Чертит ли смелый ребёнок объект внизу?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Does\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Doe\", \"s\"],\n        \"translation\": \"вспомогательный глагол\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"draw\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\"],\n        \"translation\": \"чертить\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      },\n      {\n        \"text\": \"below\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"below\"],\n        \"translation\": \"внизу\",\n        \"dictionary_form\": \"below\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The bold child draws the object below because the lesson ends.\",\n    \"literalTranslation\": \"Смелый ребёнок чертит объект внизу, потому что урок заканчивается.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"bold\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"bold\"],\n        \"translation\": \"смелый\",\n        \"dictionary_form\": \"bold\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"draws\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"draw\", \"s\"],\n        \"translation\": \"чертит\",\n        \"dictionary_form\": \"draw\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"object\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"object\"],\n        \"translation\": \"объект\",\n        \"dictionary_form\": \"object\"\n      },\n      {\n        \"text\": \"below\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"below\"],\n        \"translation\": \"внизу\",\n        \"dictionary_form\": \"below\"\n      },\n      {\n        \"text\": \"because\",\n        \"label\": \"conjunction\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"because\"],\n        \"translation\": \"потому что\",\n        \"dictionary_form\": \"because\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"the\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"lesson\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"lesson\"],\n        \"translation\": \"урок\",\n        \"dictionary_form\": \"lesson\"\n      },\n      {\n        \"text\": \"ends\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"end\", \"s\"],\n        \"translation\": \"заканчивается\",\n        \"dictionary_form\": \"end\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-9\",\n    \"sentence\": \"The student invests.\",\n    \"literalTranslation\": \"Студент инвестирует.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"student\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"student\"],\n        \"translation\": \"студент\",\n        \"dictionary_form\": \"student\"\n      },\n      {\n        \"text\": \"invests\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"invest\", \"s\"],\n        \"translation\": \"инвестирует\",\n        \"dictionary_form\": \"invest\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-10\",\n    \"sentence\": \"The wise student invests.\",\n    \"literalTranslation\": \"Мудрый студент инвестирует.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определённый артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"wise\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"wise\"],\n        \"translation\": \"мудрый\",\n        \"dictionary_form\": \"wise\"\n      },\n      {\n        \"text\": \"student\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"student\"],\n        \"translation\": \"студент\",\n        \"dictionary_form\": \"student\"\n      },\n      {\n        \"text\": \"invests\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"invest\", \"s\"],\n        \"translation\": \"инвестирует\",\n        \"dictionary_form\": \"invest\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 13649
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nAlready accepted development context: [{\"taskId\":\"task-5\",\"sentence\":\"The bold child does not draw the object below.\"},{\"taskId\":\"task-6\",\"sentence\":\"The bold child draws the object below.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the bold child draw the object below?\"},{\"taskId\":\"task-8\",\"sentence\":\"The bold child draws the object below because the lesson ends.\"},{\"taskId\":\"task-9\",\"sentence\":\"The student invests.\"},{\"taskId\":\"task-10\",\"sentence\":\"The wise student invests.\"}]\nOptional vocabulary hints (not a quota; multiword expressions are allowed; never force unrelated words together): [{\"lemma\":\"fatal\",\"translation\":\"смертельный\"},{\"lemma\":\"proper\",\"translation\":\"правильный\"},{\"lemma\":\"additional\",\"translation\":\"\"},{\"lemma\":\"submit\",\"translation\":\"представлять на рассмотрение\"},{\"lemma\":\"afterwards\",\"translation\":\"впоследствии\"},{\"lemma\":\"suitable\",\"translation\":\"подходящий\"},{\"lemma\":\"swindle\",\"translation\":\"мошенничество\"},{\"lemma\":\"do\",\"translation\":\"делать\"},{\"lemma\":\"come\",\"translation\":\"приходить\"},{\"lemma\":\"required\",\"translation\":\"необходимый\"},{\"lemma\":\"operation\",\"translation\":\"операция\"},{\"lemma\":\"event\",\"translation\":\"событие\"},{\"lemma\":\"solitary\",\"translation\":\"одиночный\"},{\"lemma\":\"exception\",\"translation\":\"исключение\"},{\"lemma\":\"capable\",\"translation\":\"способный\"},{\"lemma\":\"public\",\"translation\":\"публичный\"},{\"lemma\":\"sigh\",\"translation\":\"вздох\"},{\"lemma\":\"approve\",\"translation\":\"утвердить\"},{\"lemma\":\"tramp\",\"translation\":\"бродяга\"},{\"lemma\":\"any\",\"translation\":\"любой\"},{\"lemma\":\"each\",\"translation\":\"каждый\"},{\"lemma\":\"thunder\",\"translation\":\"гром\"},{\"lemma\":\"narration\",\"translation\":\"повествование\"},{\"lemma\":\"odds\",\"translation\":\"шансы\"},{\"lemma\":\"get\",\"translation\":\"получать\"}]\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The artist paints a canvas.\",\"The talented artist paints a canvas.\",\"The talented artist paints a large canvas.\",\"The talented artist paints a large canvas in the studio.\",\"The chef does not cook the soup.\",\"The culture defines the future.\",\"Does the gardener water the plants?\",\"The wall falls because the rust spreads.\",\"The mountain rises.\",\"The high mountain rises.\",\"The bold child does not draw the object below.\",\"The bold child draws the object below.\",\"Does the bold child draw the object below?\",\"The bold child draws the object below because the lesson ends.\",\"The student invests.\",\"The wise student invests.\"]\nCorrect these problems from the previous attempt: [\"Пересоставьте всю связанную серию вместе: выберите основу, которую можно естественно дополнить признаком, дополнением и обстоятельством.\",\"task-3: сохраните подлежащее, форму сказуемого и уже добавленные детали из task-2; добавьте только требуемую деталь.\",\"task-4: сначала нужна принятая основа task-3.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The manager submits.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The proper manager submits.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The proper manager submits the operation.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The proper manager submits the operation afterwards.\"\n  }\n]"
+      },
+      "elapsedMs": 2883
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The manager submits.\"},{\"taskId\":\"task-2\",\"sentence\":\"The proper manager submits.\"},{\"taskId\":\"task-3\",\"sentence\":\"The proper manager submits the operation.\"},{\"taskId\":\"task-4\",\"sentence\":\"The proper manager submits the operation afterwards.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-5\",\"sentence\":\"The bold child does not draw the object below.\"},{\"taskId\":\"task-6\",\"sentence\":\"The bold child draws the object below.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the bold child draw the object below?\"},{\"taskId\":\"task-8\",\"sentence\":\"The bold child draws the object below because the lesson ends.\"},{\"taskId\":\"task-9\",\"sentence\":\"The student invests.\"},{\"taskId\":\"task-10\",\"sentence\":\"The wise student invests.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The manager submits.\",\n    \"literalTranslation\": \"Менеджер подчиняется.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"manager\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"manager\"],\n        \"translation\": \"менеджер\",\n        \"dictionary_form\": \"manager\"\n      },\n      {\n        \"text\": \"submits\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"submit\", \"s\"],\n        \"translation\": \"подчиняется\",\n        \"dictionary_form\": \"submit\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The proper manager submits.\",\n    \"literalTranslation\": \"Надлежащий менеджер подчиняется.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"proper\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"proper\"],\n        \"translation\": \"надлежащий\",\n        \"dictionary_form\": \"proper\"\n      },\n      {\n        \"text\": \"manager\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"manager\"],\n        \"translation\": \"менеджер\",\n        \"dictionary_form\": \"manager\"\n      },\n      {\n        \"text\": \"submits\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"submit\", \"s\"],\n        \"translation\": \"подчиняется\",\n        \"dictionary_form\": \"submit\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The proper manager submits the operation.\",\n    \"literalTranslation\": \"Надлежащий менеджер представляет операцию.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"proper\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"proper\"],\n        \"translation\": \"надлежащий\",\n        \"dictionary_form\": \"proper\"\n      },\n      {\n        \"text\": \"manager\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"manager\"],\n        \"translation\": \"менеджер\",\n        \"dictionary_form\": \"manager\"\n      },\n      {\n        \"text\": \"submits\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"submit\", \"s\"],\n        \"translation\": \"представляет\",\n        \"dictionary_form\": \"submit\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"operation\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"operation\"],\n        \"translation\": \"операцию\",\n        \"dictionary_form\": \"operation\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The proper manager submits the operation afterwards.\",\n    \"literalTranslation\": \"Надлежащий менеджер представляет операцию впоследствии.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"proper\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"proper\"],\n        \"translation\": \"надлежащий\",\n        \"dictionary_form\": \"proper\"\n      },\n      {\n        \"text\": \"manager\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"manager\"],\n        \"translation\": \"менеджер\",\n        \"dictionary_form\": \"manager\"\n      },\n      {\n        \"text\": \"submits\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"submit\", \"s\"],\n        \"translation\": \"представляет\",\n        \"dictionary_form\": \"submit\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"operation\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"operation\"],\n        \"translation\": \"операцию\",\n        \"dictionary_form\": \"operation\"\n      },\n      {\n        \"text\": \"afterwards\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"afterwards\"],\n        \"translation\": \"впоследствии\",\n        \"dictionary_form\": \"afterwards\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 12231
+    }
+  ]
+}

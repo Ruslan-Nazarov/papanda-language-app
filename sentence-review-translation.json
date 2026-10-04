@@ -1,0 +1,131 @@
+[
+  {
+    "taskId": "task-4",
+    "sentence": "Кішкентай бала үстел басында хат жазады.",
+    "literalTranslation": "Маленький ребёнок за столом письмо пишет.",
+    "review": {
+      "natural": true,
+      "taskFit": true,
+      "analysisReliable": true
+    },
+    "words": [
+      {
+        "text": "Кішкентай",
+        "label": "Adjective",
+        "role": "Attribute_Subject",
+        "clauseIndex": 0,
+        "parts": [
+          "Кішкентай"
+        ],
+        "translation": "маленький",
+        "dictionary_form": "кішкентай"
+      },
+      {
+        "text": "бала",
+        "label": "Noun",
+        "role": "Subject",
+        "clauseIndex": 0,
+        "parts": [
+          "бала"
+        ],
+        "translation": "ребёнок",
+        "dictionary_form": "бала"
+      },
+      {
+        "text": "үстел",
+        "label": "Noun",
+        "role": "Attribute_Object",
+        "clauseIndex": 0,
+        "parts": [
+          "үстел"
+        ],
+        "translation": "стол",
+        "dictionary_form": "үстел"
+      },
+      {
+        "text": "басында",
+        "label": "Noun",
+        "role": "Circumstance",
+        "clauseIndex": 0,
+        "parts": [
+          "бас",
+          "ын",
+          "да"
+        ],
+        "translation": "в главе, у",
+        "dictionary_form": "бас"
+      },
+      {
+        "text": "хат",
+        "label": "Noun",
+        "role": "Object",
+        "clauseIndex": 0,
+        "parts": [
+          "хат"
+        ],
+        "translation": "письмо",
+        "dictionary_form": "хат"
+      },
+      {
+        "text": "жазады",
+        "label": "Verb",
+        "role": "Predicate",
+        "clauseIndex": 0,
+        "parts": [
+          "жаз",
+          "а",
+          "ды"
+        ],
+        "translation": "пишет",
+        "dictionary_form": "жазу"
+      }
+    ]
+  },
+  {
+    "taskId": "task-5",
+    "sentence": "Қыз ұйықтаған жоқ.",
+    "literalTranslation": "Девочка не спала.",
+    "review": {
+      "natural": true,
+      "taskFit": true,
+      "analysisReliable": true
+    },
+    "words": [
+      {
+        "text": "Қыз",
+        "label": "Noun",
+        "role": "Subject",
+        "clauseIndex": 0,
+        "parts": [
+          "Қыз"
+        ],
+        "translation": "девочка",
+        "dictionary_form": "қыз"
+      },
+      {
+        "text": "ұйықтаған",
+        "label": "Verb",
+        "role": "Predicate",
+        "clauseIndex": 0,
+        "parts": [
+          "ұйықт",
+          "а",
+          "ған"
+        ],
+        "translation": "спавший",
+        "dictionary_form": "ұйықтау"
+      },
+      {
+        "text": "жоқ",
+        "label": "Particle",
+        "role": "Predicate",
+        "clauseIndex": 0,
+        "parts": [
+          "жоқ"
+        ],
+        "translation": "нет",
+        "dictionary_form": "жоқ"
+      }
+    ]
+  }
+]

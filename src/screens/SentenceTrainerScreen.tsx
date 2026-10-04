@@ -13,6 +13,7 @@ import EditWordModal from '../components/EditWordModal';
 import { cleanDictionaryForm, getWordTranslation } from '../utils/words';
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 import { computeSentenceGroups } from '../utils/sentenceGroups';
+import { sentenceFingerprint } from '../utils/sentenceValidation';
 import { ACCENT, ACCENT_DARK } from '../constants/theme';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,7 +30,7 @@ const STRICT_ORDER: SyntaxRole[] = [
 
 const AFFIX_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']; // Palette for multiple suffixes
 const GENERATION_RESERVE = 5; // top up when this few unlearned generated sentences remain
-const GENERATION_BATCH = 10;
+const GENERATION_BATCH = 8; // one complete curriculum cycle per top-up
 const FULLY_REVEALED = 9999; // sentinel: more than any sentence has role-groups
 
 const ROLE_TRANSLATIONS: Record<SyntaxRole, string> = {
@@ -104,11 +105,8 @@ export default function SentenceTrainerScreen() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationErrors, setGenerationErrors] = useState<Record<string, string>>({});
   const [addedTokenKeys, setAddedTokenKeys] = useState<Set<string>>(new Set());
-  // Set while chasing a word tapped elsewhere (e.g. Word Triples) into a freshly
-  // generated sentence — cleared once a matching sentence is found or generation
-  // gives up.
-  const [pendingHighlightWord, setPendingHighlightWord] = useState<string | null>(null);
-  const generatingLanguages = useRef(new Set<string>());
+  const generatingLanguages = useRef(new Map<string, Promise<void>>());
+  const targetGenerationRequest = useRef(0);
   const swipeCallbacks = useRef({ next: () => {}, prev: () => {} });
   const cardTranslateX = useRef(new Animated.Value(0)).current;
   const isSwipeAnimating = useRef(false);
@@ -179,6 +177,8 @@ export default function SentenceTrainerScreen() {
   ).current;
 
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(activeLanguages[0] || 'it');
+  const selectedLanguageRef = useRef(selectedLanguageCode);
+  selectedLanguageRef.current = selectedLanguageCode;
   useEffect(() => { setTargetSentenceId(null); }, [selectedLanguageCode]);
 
   // If the learner drops the currently-selected language in Settings, the old
@@ -214,9 +214,16 @@ export default function SentenceTrainerScreen() {
 
   const generateSentences = async (languageCode = selectedLanguageCode, count = GENERATION_BATCH, requiredWord?: RequiredWord) => {
     const language = LANGUAGES.find(item => item.code === languageCode);
-    if (!language || generatingLanguages.current.has(languageCode)) return;
+    if (!language) return;
+    const targetRequest = requiredWord ? ++targetGenerationRequest.current : undefined;
+    // A word-specific request must survive an in-flight background top-up.
+    // Recheck after waiting because another targeted request may have queued.
+    while (generatingLanguages.current.has(languageCode)) {
+      if (!requiredWord) return;
+      await generatingLanguages.current.get(languageCode);
+    }
+    if (requiredWord && (targetRequest !== targetGenerationRequest.current || selectedLanguageRef.current !== languageCode)) return;
 
-    generatingLanguages.current.add(languageCode);
     setIsGenerating(true);
     setGenerationErrors(previous => {
       if (!previous[languageCode]) return previous;
@@ -225,20 +232,30 @@ export default function SentenceTrainerScreen() {
       return updated;
     });
 
-    try {
-      const generated = await generateSentenceBatch(languageCode, words, count, requiredWord);
+    const request = (async () => { try {
+      const state = useStore.getState();
+      const previous = state.sentences.filter(sentence => sentence.language === language.label).map(sentence => sentence.sentence);
+      const generated = await generateSentenceBatch(languageCode, state.words, count, requiredWord, previous);
       addGeneratedSentences(generated);
-      if (languageCode === selectedLanguageCode && generatedSentences.length === 0) {
+      if (requiredWord && targetRequest === targetGenerationRequest.current && languageCode === selectedLanguageRef.current) {
+        const first = generated.find(sentence => sentence.generationTaskId === 'task-1')!;
+        const fingerprint = sentenceFingerprint(first.language, first.sentence);
+        const stored = useStore.getState().sentences.find(sentence => sentenceFingerprint(sentence.language, sentence.sentence) === fingerprint);
+        setTargetSentenceId(stored?.id ?? first.id);
+        setRevealedSteps(FULLY_REVEALED);
+        setShowTranslations(true);
+      } else if (languageCode === selectedLanguageRef.current && generatedSentences.length === 0) {
         setCurrentFilteredIndex(0);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Не удалось сгенерировать предложения.';
       setGenerationErrors(previous => ({ ...previous, [languageCode]: message }));
-      if (requiredWord) {
-        setPendingHighlightWord(null);
+      if (requiredWord && targetRequest === targetGenerationRequest.current && languageCode === selectedLanguageRef.current) {
         Alert.alert('Не удалось создать предложение', `Не получилось составить предложение со словом «${requiredWord.lemma}». Попробуйте ещё раз.`);
       }
-    } finally {
+    } })();
+    generatingLanguages.current.set(languageCode, request);
+    try { await request; } finally {
       generatingLanguages.current.delete(languageCode);
       setIsGenerating(generatingLanguages.current.size > 0);
     }
@@ -294,46 +311,15 @@ export default function SentenceTrainerScreen() {
     }
 
     if (highlightWord) {
-      // Tapped a word elsewhere: chase a sentence containing it. The matching
-      // effect below watches filteredSentences and jumps once one shows up;
-      // trigger a targeted generation to produce one.
-      setPendingHighlightWord(highlightWord);
       setTargetSentenceInfo(null);
       const wordEntry = words.find(w => getWordTranslation(w, langCode) === highlightWord);
-      void generateSentences(langCode, GENERATION_BATCH, { lemma: highlightWord, translation: wordEntry?.ru });
+      void generateSentences(langCode, 1, { lemma: highlightWord, translation: wordEntry?.ru });
       return;
     }
 
     setTargetSentenceInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetSentenceInfo, sentences, selectedLanguageCode]);
-
-  // Once the required word shows up in a freshly generated sentence, jump to it.
-  useEffect(() => {
-    if (!pendingHighlightWord) return;
-    const normalized = pendingHighlightWord.trim().toLocaleLowerCase();
-    const idx = filteredSentences.findIndex(s => s.words.some(t => {
-      const forms = [t.dictionary_form, t.dictionary_word, t.text].filter(Boolean) as string[];
-      return forms.some(f => f.trim().toLocaleLowerCase() === normalized);
-    }));
-    if (idx !== -1) {
-      setCurrentFilteredIndex(idx);
-      setRevealedSteps(FULLY_REVEALED);
-      setShowTranslations(true);
-      setPendingHighlightWord(null);
-    }
-  }, [filteredSentences, pendingHighlightWord]);
-
-  // Generation finished (successfully) but the word still isn't in any sentence —
-  // give up chasing it rather than leaving the screen silently stuck.
-  useEffect(() => {
-    if (!isGenerating && pendingHighlightWord && !generationErrors[selectedLanguageCode]) {
-      const word = pendingHighlightWord;
-      setPendingHighlightWord(null);
-      Alert.alert('Не удалось создать предложение', `ИИ не включил слово «${word}» ни в одно из предложений. Попробуйте ещё раз позже.`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGenerating]);
 
   // When a fresh session batch replaces the cached view (or on any set change
   // that leaves the index out of range), jump back to the first sentence.
@@ -354,7 +340,7 @@ export default function SentenceTrainerScreen() {
     setAiExplanation(null);
     setIsAiLoading(false);
     setShowAiModal(false);
-    setRevealedSteps(0);
+    setRevealedSteps(targetSentenceId ? FULLY_REVEALED : 0);
   }, [currentSentence?.id]);
 
   const moveToNextSentence = () => {
@@ -786,8 +772,8 @@ export default function SentenceTrainerScreen() {
       <Text style={styles.header}>Разбор предложений</Text>
 
       {/* Language Selector */}
-      <View style={{height: 50, marginBottom: 10}}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{alignItems: 'center'}}>
+      <View style={styles.languageToolbar}>
+        <ScrollView style={{ flex: 1 }} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{alignItems: 'center'}}>
           {LANGUAGES.filter(lang => activeLanguages.includes(lang.code)).map(lang => (
             <TouchableOpacity
               key={lang.code}
@@ -1155,6 +1141,7 @@ export default function SentenceTrainerScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#F5F5F5' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  languageToolbar: { height: 50, marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 8 },
   sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 },
   tokenContainer: { margin: 4 },
   wordCard: { backgroundColor: '#FFFFFF', padding: 10, borderRadius: 8, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, alignItems: 'center', minWidth: 80 },
