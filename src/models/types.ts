@@ -1,3 +1,4 @@
+import type { MarkerHint } from './study';
 export interface Word {
   id?: string;
   word?: string; // from mock
@@ -19,7 +20,7 @@ export interface Word {
   snoozed_until_by_lang?: Record<string, string>; // ISO date string per language code
   personal_association?: string; // user's personal context/meaning
   is_favorite?: boolean;
-  /** Language of a word added from a sentence; the internal `eng` field remains its stable key. */
+  /** Source language of a custom word; the internal `eng` field remains its stable key. */
   source_language?: string;
 }
 
@@ -54,6 +55,7 @@ export interface Token {
 }
 
 export interface Sentence {
+  markerHints?: MarkerHint[];
   id: string;
   language: string;
   sentence: string; // The original text is now in 'sentence' property
@@ -65,4 +67,8 @@ export interface Sentence {
   learningGoal?: string;
   /** Local task key used to preserve batch order through validation/retries. */
   generationTaskId?: string;
+  /** Shared by every sentence generated in one batch; used to reassemble growing series. */
+  generationBatchId?: string;
+  /** 0-based position inside a growing series (base, +attribute, +object, +circumstance). Absent for stand-alone cards. */
+  chainStep?: number;
 }

@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { findLemmaSpan, sentenceFingerprint, tokensMatchSentence, validateGeneratedSentences } from '../src/utils/sentenceValidation';
+import { findLemmaSpan, sentenceFingerprint, tokensMatchSentence, validateGeneratedSentences, validateGeneratedSentencesAsync } from '../src/utils/sentenceValidation';
+import { isAbortError } from '../src/services/generationControl';
 import { planSentenceBatch } from '../src/services/sentenceCurriculum';
 import { Token } from '../src/models/types';
 
@@ -57,6 +58,44 @@ export const reviewedTrain = () => ({ ...train, taskId: 'task-1', literalTransla
     const words = [tok('Dogs', 'Subject', 'dog'), tok('see', 'Predicate'), tok('dogs', 'Object', 'dog')];
     const result = validateGeneratedSentences([{ sentence: 'Dogs see dogs.', words }], 'en', 'English', [{ lemma: 'dog', translation: 'собака' }]);
     assert.deepEqual(result.sentences[0].words.map(word => word.is_in_my_dict), [true, false, true]);
+  });
+  it('preserves longest-expression and dictionary-order priority with overlapping inflected matches', () => {
+    const words = [tok('He', 'Subject'), tok('took', 'Predicate', 'take'), tok('care', 'Object'),
+      tok('of', 'Preposition'), tok('her', 'Object'), tok('and', 'Conjunction'), tok('took', 'Predicate', 'take'), tok('care', 'Object')];
+    const dictionary = ['take', 'care of', 'take care of', 'take care', 'TAKE CARE OF', 'unrelated']
+      .map(lemma => ({ lemma, translation: '' }));
+    const result = validateGeneratedSentences([{ sentence: 'He took care of her and took care.', words }], 'en', 'English', dictionary);
+    assert.deepEqual(result.sentences[0].words.map(word => word.dictionary_word),
+      [null, 'take care of', 'take care of', 'take care of', null, null, 'take care', 'take care']);
+  });
+  it('matches Unicode-normalized forms and expressions mixing surface words with lemmas', () => {
+    const words = [tok('Éva', 'Subject'), tok('took', 'Predicate', 'take'), tok('care', 'Object'), tok('of', 'Preposition'),
+      tok('l’enfant', 'Object', "l'enfant")];
+    const dictionary = ['E\u0301va', 'take care of', "L'ENFANT"].map(lemma => ({ lemma, translation: '' }));
+    const result = validateGeneratedSentences([{ sentence: 'Éva took care of l’enfant.', words }], 'en', 'English', dictionary);
+    assert.deepEqual(result.sentences[0].words.map(word => word.dictionary_word),
+      ['E\u0301va', 'take care of', 'take care of', 'take care of', "L'ENFANT"]);
+  });
+  it('validates asynchronously with the same errors, task uniqueness and dictionary matches', async () => {
+    const cards = [reviewedTrain(), null, reviewedTrain()];
+    const context = { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: train.sentence }] };
+    const dictionary = [{ lemma: 'stop', translation: '' }];
+    const sync = validateGeneratedSentences(cards, 'en', 'English', dictionary, context);
+    const asyncResult = await validateGeneratedSentencesAsync(cards, 'en', 'English', dictionary, context);
+    assert.deepEqual(asyncResult.errors, sync.errors);
+    assert.equal(asyncResult.sentences.length, sync.sentences.length);
+    assert.deepEqual(asyncResult.sentences[0].words, sync.sentences[0].words);
+  });
+  it('processes cancellation between cards instead of monopolizing the event loop', async () => {
+    const controller = new AbortController();
+    let inspectedSecond = false;
+    const first = { ...train, get sentence() {
+      setTimeout(() => controller.abort(), 0);
+      return train.sentence;
+    } };
+    const second = { ...train, get sentence() { inspectedSecond = true; return train.sentence; } };
+    await assert.rejects(validateGeneratedSentencesAsync([first, second], 'en', 'English', [], undefined, controller.signal), isAbortError);
+    assert.equal(inspectedSecond, false);
   });
   it('distinguishes intonation questions from affirmative sentences when deduplicating', () => {
     assert.notEqual(sentenceFingerprint('Français', 'Tu viens.'), sentenceFingerprint('Français', 'Tu viens ?'));

@@ -44234,23 +44234,6 @@
     "show_stats": "{\"en\": 5, \"it\": 6, \"de\": 5, \"ru\": 2, \"kz\": 2}"
   },
   {
-    "word": "",
-    "count": 3,
-    "last_shown": "2026-08-20 04:26:27.701533",
-    "eng": "",
-    "de": "blind",
-    "it": "cieco",
-    "ru": "",
-    "meaning": "",
-    "is_known_en": 0,
-    "is_known_it": 0,
-    "is_known_de": 0,
-    "is_learned": 0,
-    "translations": "{\"kz\": \"\\u0441\\u043e\\u049b\\u044b\\u0440\", \"it\": \"cieco\", \"de\": \"blind\", \"ru\": \"\", \"en\": \"\"}",
-    "knowledge_stats": "{\"kz\": false, \"it\": false, \"de\": false, \"ru\": false, \"en\": false}",
-    "show_stats": "{\"kz\": 2, \"it\": 3, \"de\": 2, \"en\": 1, \"ru\": 1}"
-  },
-  {
     "word": "Affare",
     "count": 2,
     "last_shown": "2026-07-14 21:30:01.542880",

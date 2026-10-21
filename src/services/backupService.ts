@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+import { previewBackup, MAX_BACKUP_BYTES, type BackupPreview } from './backupFormat';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
@@ -33,6 +35,12 @@ export async function exportProgressToFile(): Promise<{ ok: boolean; error?: str
       data,
     };
 
+    if (Platform.OS === 'web') {
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+      const link = document.createElement('a'); link.href = url; link.download = backupFileName(); link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return { ok: true };
+    }
     const dir = FileSystem.cacheDirectory;
     if (!dir) return { ok: false, error: 'Нет доступа к файловой системе на этом устройстве.' };
 
@@ -53,39 +61,12 @@ export async function exportProgressToFile(): Promise<{ ok: boolean; error?: str
   }
 }
 
-/**
- * Lets the user pick a previously exported JSON file and restores it,
- * REPLACING all current progress, custom words/sentences and settings.
- */
-export async function importProgressFromFile(): Promise<{ ok: boolean; error?: string; canceled?: boolean }> {
-  try {
-    const picked = await DocumentPicker.getDocumentAsync({
-      type: ['application/json', 'text/plain', '*/*'],
-      copyToCacheDirectory: true,
-    });
-    if (picked.canceled || !picked.assets || picked.assets.length === 0) {
-      return { ok: false, canceled: true };
-    }
-
-    const raw = await FileSystem.readAsStringAsync(picked.assets[0].uri);
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      return { ok: false, error: 'Файл не является корректным JSON.' };
-    }
-
-    const backup = parsed as Partial<BackupFile>;
-    if (!backup || backup.app !== 'papanda' || !backup.data || typeof backup.data !== 'object') {
-      return { ok: false, error: 'Это не похоже на резервную копию Papanda.' };
-    }
-    if (backup.version !== BACKUP_VERSION) {
-      return { ok: false, error: 'Эта версия резервной копии не поддерживается.' };
-    }
-
-    const result = useStore.getState().importProgress(backup.data);
-    return result;
-  } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Не удалось прочитать файл.' };
-  }
+/** Picking and validating a file never mutates the current progress. */
+export async function previewProgressFromFile(): Promise<BackupPreview | null> {
+  const picked = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true });
+  if (picked.canceled || !picked.assets?.length) return null;
+  const asset = picked.assets[0];
+  if ((asset.size ?? 0) > MAX_BACKUP_BYTES) throw new Error('Файл больше 10 МБ.');
+  const raw = Platform.OS === 'web' && asset.file ? await asset.file.text() : await FileSystem.readAsStringAsync(asset.uri);
+  return previewBackup(raw);
 }

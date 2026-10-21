@@ -1,3 +1,4 @@
+import type { MainTabParamList, RootStackParamList } from './src/navigation/types';
 import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,18 +11,19 @@ import { ACCENT } from './src/constants/theme';
 
 import WordTriplesScreen from './src/screens/WordTriplesScreen';
 import SentenceTrainerScreen from './src/screens/SentenceTrainerScreen';
+import SentenceWorkshopScreen from './src/screens/SentenceWorkshopScreen';
+import BookScreen from './src/screens/BookScreen';
 import DictionaryScreen from './src/screens/DictionaryScreen';
 import BrainWorkoutScreen from './src/screens/BrainWorkoutScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import { prefetchSentencesInBackground } from './src/services/sentencePrefetch';
 import { useStore, useHydrationState } from './src/store/useStore';
 
 const ONBOARDING_KEY = 'papanda-onboarded';
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const TAB_EMOJI: Record<string, string> = {
   Statistics: '📊',
@@ -77,11 +79,11 @@ class ErrorBoundary extends React.Component<
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  const progressRevision = useStore(state => state.progressRevision);
   const bottomInset = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 12 : 8);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      void prefetchSentencesInBackground();
       // One iMW data point per day the app is opened.
       useStore.getState().recordImwSnapshot();
     }, 2000);
@@ -104,15 +106,16 @@ function MainTabs() {
                   { backgroundColor: focused ? ACCENT : '#334155' },
                 ]}
               >
-                <Text style={tabStyles.centerEmoji}>{TAB_EMOJI[route.name]}</Text>
+                <Text allowFontScaling={false} style={tabStyles.centerEmoji}>{TAB_EMOJI[route.name]}</Text>
               </View>
             ) : (
-              <Text style={{ fontSize: focused ? 24 : 20, opacity: focused ? 1 : 0.5 }}>
+              <Text allowFontScaling={false} style={[tabStyles.emoji, { opacity: focused ? 1 : 0.5 }]}>
                 {TAB_EMOJI[route.name] ?? '📌'}
               </Text>
             ),
           tabBarActiveTintColor: ACCENT,
           tabBarInactiveTintColor: '#8E8E93',
+          tabBarIconStyle: isCenter ? tabStyles.centerIcon : tabStyles.icon,
           headerShown: false,
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
@@ -120,7 +123,7 @@ function MainTabs() {
             borderTopWidth: 1,
             paddingTop: 6,
             paddingBottom: bottomInset,
-            height: 58 + bottomInset,
+            height: 64 + bottomInset,
             elevation: 8,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: -2 },
@@ -135,9 +138,15 @@ function MainTabs() {
       }}
     >
       <Tab.Screen name="Statistics" component={StatisticsScreen} />
-      <Tab.Screen name="Word Triples" component={WordTriplesScreen} />
-      <Tab.Screen name="Sentence Trainer" component={SentenceTrainerScreen} />
-      <Tab.Screen name="Brain Workout" component={BrainWorkoutScreen} />
+      <Tab.Screen name="Word Triples">
+        {props => <WordTriplesScreen key={progressRevision} {...props} />}
+      </Tab.Screen>
+      <Tab.Screen name="Sentence Trainer">
+        {() => <SentenceTrainerScreen key={progressRevision} />}
+      </Tab.Screen>
+      <Tab.Screen name="Brain Workout">
+        {() => <BrainWorkoutScreen key={progressRevision} />}
+      </Tab.Screen>
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
@@ -145,6 +154,7 @@ function MainTabs() {
 
 export default function App() {
   const hydration = useHydrationState();
+  const progressRevision = useStore(state => state.progressRevision);
   // Store hydration (and the derived `words`/`sentences` rebuild) is handled by
   // the persist `onRehydrateStorage` hook in the store itself.
   // `null` = still reading the flag, `false` = show onboarding, `true` = go to the app.
@@ -180,7 +190,13 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="MainTabs" component={MainTabs} />
-              <Stack.Screen name="Dictionary" component={DictionaryScreen} />
+              <Stack.Screen name="Book" component={BookScreen} />
+              <Stack.Screen name="Dictionary">
+                {props => <DictionaryScreen key={progressRevision} {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="SentenceWorkshop">
+                {props => <SentenceWorkshopScreen key={progressRevision} {...props} />}
+              </Stack.Screen>
             </Stack.Navigator>
           </NavigationContainer>
         )}
@@ -190,6 +206,9 @@ export default function App() {
 }
 
 const tabStyles = StyleSheet.create({
+  icon: { width: 40, height: 40 },
+  centerIcon: { width: 56, height: 56 },
+  emoji: { fontSize: 24, lineHeight: 32, includeFontPadding: false, textAlign: 'center' },
   centerButton: {
     width: 56,
     height: 56,
@@ -205,7 +224,7 @@ const tabStyles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 6,
   },
-  centerEmoji: { fontSize: 26 },
+  centerEmoji: { fontSize: 26, lineHeight: 34, includeFontPadding: false, textAlign: 'center' },
 });
 
 const boundaryStyles = StyleSheet.create({

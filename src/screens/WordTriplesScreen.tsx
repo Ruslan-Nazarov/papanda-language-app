@@ -1,18 +1,20 @@
 import { useShallow } from 'zustand/react/shallow';
+import { useIsFocused } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, PanResponder, Modal, Animated, Easing, ActivityIndicator, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated, Easing } from 'react-native';
+import type { WordTriplesScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useStore, UserWordProgress } from '../store/useStore';
+import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
-import { wordMemoryWeight, readWordStats } from '../utils/statistics';
+import { readWordStats } from '../utils/statistics';
+import { pickWordCard } from '../utils/wordCards';
+import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
 import { auditNextWordInBackground } from '../services/wordAuditService';
-import { prefetchSentencesInBackground } from '../services/sentencePrefetch';
 import { usePronunciation } from '../hooks/usePronunciation';
-import Markdown from 'react-native-markdown-display';
+import PronunciationModal from '../components/PronunciationModal';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 
@@ -21,16 +23,17 @@ const SWIPE_EXIT_DISTANCE = 520;
 const SWIPE_ENTRY_OFFSET = 56;
 
 
-export default function WordTriplesScreen() {
+export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
+  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<any>();
-  const { words, activeLanguages, markTripleKnown, recordTripleCardShow, saveWordAssociation, restoreWordProgress, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
+  const { words, activeLanguages, wordTourSize, markTripleKnown, recordTripleCardShow, saveWordAssociation, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
+    wordTourSize: state.wordTourSize,
     markTripleKnown: state.markTripleKnown,
     recordTripleCardShow: state.recordTripleCardShow,
     saveWordAssociation: state.saveWordAssociation,
-    restoreWordProgress: state.restoreWordProgress,
+    undoWordKnowledge: state.undoWordKnowledge,
     toggleWordFavorite: state.toggleWordFavorite,
     userWordProgress: state.userWordProgress,
     setTargetSentenceInfo: state.setTargetSentenceInfo,
@@ -41,9 +44,11 @@ export default function WordTriplesScreen() {
   const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
-  const [history, setHistory] = useState<{word: Word, markedLearned: boolean, previousProgress: UserWordProgress | null}[]>([]);
+  const [history, setHistory] = useState<{word: Word, undo?: KnowledgeUndo}[]>([]);
+  const isTourComplete = sessionCount >= wordTourSize || (sessionCount > 0 && !currentWord);
   const { isPronunciationModalVisible, setIsPronunciationModalVisible, pronunciationExplanation,
-    setPronunciationExplanation, isPronunciationLoading, handlePronunciation } = usePronunciation();
+    setPronunciationExplanation, isPronunciationLoading, handlePronunciation,
+    pronunciationMode, changePronunciationMode, pronunciationError, retryPronunciation } = usePronunciation();
 
   // Avoid stale closures in PanResponder
   const callbacks = React.useRef({
@@ -79,35 +84,10 @@ export default function WordTriplesScreen() {
 
   const pickRandomWord = () => {
     const { words, activeLanguages } = useStore.getState();
-    const pending = words.filter(w => {
-      const hasAllTranslations = activeLanguages.every(lang =>
-        Boolean(getWordTranslation(w, lang))
-      );
-      if (!hasAllTranslations) return false;
-
-      const stats = readWordStats(w.knowledge_stats);
-      const isKnownInAll = activeLanguages.every(lang => stats[lang] === true);
-      return !isKnownInAll;
-    });
-
-    if (pending.length === 0) {
+    const chosen = pickWordCard(words, activeLanguages, currentWord?.eng || currentWord?.word);
+    if (!chosen) {
       setCurrentWord(null);
       return;
-    }
-
-    // Weighted pick: the weaker a word's memory weight (new or decayed), the more
-    // likely it comes up. The 0.15 floor keeps solid words in rotation too.
-    const now = Date.now();
-    const weights = pending.map(w => {
-      const avgW = activeLanguages.reduce((s, lang) => s + wordMemoryWeight(w, lang, now), 0) / activeLanguages.length;
-      return 0.15 + (1 - avgW);
-    });
-    const total = weights.reduce((s, x) => s + x, 0);
-    let r = Math.random() * total;
-    let chosen = pending[pending.length - 1];
-    for (let i = 0; i < pending.length; i++) {
-      r -= weights[i];
-      if (r <= 0) { chosen = pending[i]; break; }
     }
 
     setCurrentWord(chosen);
@@ -116,77 +96,103 @@ export default function WordTriplesScreen() {
     setPronunciationExplanation(null);
   };
 
-  useEffect(() => {
-    if (!currentWord && activeLanguages.length > 0) {
-      pickRandomWord();
-    }
-  }, [words, activeLanguages]);
-
   // Sync currentWord with any edits made in the modal/store. The store replaces
   // word objects on every change, so a reference check is enough — no deep compare.
+  const previousLanguages = React.useRef(activeLanguages);
+  const previousTourSize = React.useRef(wordTourSize);
   useEffect(() => {
-    if (!currentWord) return;
+    if (previousLanguages.current !== activeLanguages || previousTourSize.current !== wordTourSize) {
+      previousLanguages.current = activeLanguages;
+      previousTourSize.current = wordTourSize;
+      setHistory([]);
+      setSessionCount(0);
+      if (isFocused) pickRandomWord();
+      else setCurrentWord(null);
+      return;
+    }
+    if (!isFocused || isTourComplete) return;
+    if (!currentWord) {
+      pickRandomWord();
+      return;
+    }
     const wordKey = currentWord.eng || currentWord.word;
     const latestWord = words.find(w => (w.eng || w.word) === wordKey);
     if (!latestWord || !activeLanguages.every(lang => getWordTranslation(latestWord, lang))) {
       pickRandomWord();
     } else if (latestWord !== currentWord) {
       setCurrentWord(latestWord);
-      setAssociationText(latestWord.personal_association || '');
+      if (latestWord.personal_association !== currentWord.personal_association) {
+        setAssociationText(latestWord.personal_association || '');
+      }
     }
-  }, [words, currentWord, activeLanguages]);
+  }, [words, currentWord, activeLanguages, wordTourSize, isFocused, isTourComplete]);
+
+  const advanceTour = () => {
+    const nextCount = sessionCount + 1;
+    setSessionCount(nextCount);
+    if (nextCount >= wordTourSize) {
+      setCurrentWord(null);
+      setPronunciationExplanation(null);
+    } else {
+      pickRandomWord();
+    }
+  };
+
+  const startNewTour = () => {
+    setSessionCount(0);
+    setHistory([]);
+    cardTranslateX.setValue(0);
+    pickRandomWord();
+  };
 
   const handleNext = () => {
+    if (!currentWord || isTourComplete) return;
     if (currentWord && associationText !== currentWord.personal_association) {
       saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
     }
 
     if (currentWord) {
-      const wordKey = currentWord.eng || currentWord.word || '';
-      const previousProgress = useStore.getState().userWordProgress[wordKey];
-      setHistory(prev => [...prev, {
-        word: currentWord,
-        markedLearned: false,
-        previousProgress: previousProgress ?? null
-      }]);
+      setHistory(prev => [...prev, { word: currentWord }].slice(-100));
     }
 
-    setSessionCount(prev => prev + 1);
-    pickRandomWord();
+    advanceTour();
   };
 
   const handleMarkLearned = () => {
-    if (currentWord) {
+    if (currentWord && !isTourComplete) {
       if (associationText !== currentWord.personal_association) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
       }
 
       const wordKey = currentWord.eng || currentWord.word || '';
-      const previousProgress = useStore.getState().userWordProgress[wordKey];
       setHistory(prev => [...prev, {
         word: currentWord,
-        markedLearned: true,
-        previousProgress: previousProgress ?? null
-      }]);
+        undo: captureKnowledgeUndo(currentWord, activeLanguages, true),
+      }].slice(-100));
 
       markTripleKnown(wordKey);
-      setSessionCount(prev => prev + 1);
-      pickRandomWord();
+      advanceTour();
     }
   };
 
   const handlePrev = () => {
     if (history.length > 0) {
+      if (currentWord && associationText !== (currentWord.personal_association || '')) {
+        saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
+      }
       const lastAction = history[history.length - 1];
       const wordKey = lastAction.word.eng || lastAction.word.word || '';
 
-      restoreWordProgress(wordKey, lastAction.previousProgress);
+      if (lastAction.undo) undoWordKnowledge(wordKey, lastAction.undo);
+      recordTripleCardShow(wordKey);
 
       setSessionCount(prev => Math.max(0, prev - 1));
       setHistory(prev => prev.slice(0, -1));
 
-      setCurrentWord(lastAction.word);
-      setAssociationText(lastAction.word.personal_association || '');
+      const latestWord = useStore.getState().words.find(word => (word.eng || word.word) === wordKey);
+      setCurrentWord(latestWord ?? null);
+      setAssociationText(latestWord?.personal_association || '');
+      setPronunciationExplanation(null);
     }
   };
 
@@ -241,14 +247,14 @@ export default function WordTriplesScreen() {
     });
   };
 
-  // Background periodic AI check and sentence prefetching
+  // Only the visible word screen audits words. The trainer owns sentence top-ups.
   useEffect(() => {
+    if (!isFocused || isTourComplete) return;
     const timer = setTimeout(() => {
       void auditNextWordInBackground();
-      void prefetchSentencesInBackground();
     }, 1500);
     return () => clearTimeout(timer);
-  }, [currentWord?.eng, currentWord?.word, sessionCount, activeLanguages.length]);
+  }, [isFocused, currentWord?.eng, currentWord?.word, sessionCount, activeLanguages.length, isTourComplete]);
 
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
 
@@ -262,7 +268,7 @@ export default function WordTriplesScreen() {
     ...readWordStats(currentWord?.show_stats),
     ...(currentProgress?.show_stats || {}),
   } as Record<string, number>;
-  const totalShows = activeLanguages.reduce((total, lang) => total + (showStats[lang] || 0), 0);
+  const totalShows = currentProgress?.count ?? currentWord?.count ?? 0;
   const lastShown = currentProgress?.last_shown ?? currentWord?.last_shown;
 
   callbacks.current.handleSwipe = handleSwipe;
@@ -287,10 +293,32 @@ export default function WordTriplesScreen() {
     );
   }
 
+  if (isTourComplete) {
+    return (
+      <View style={[styles.centerContainer, { paddingTop: topPadding }]} testID="word-tour-complete">
+        <Text style={styles.headerTitle}>Тур завершён</Text>
+        <Text style={styles.info}>Пройдено карточек: {sessionCount}</Text>
+        <TouchableOpacity style={[styles.button, styles.btnKnown, styles.tourStartButton]} onPress={startNewTour} accessibilityRole="button">
+          <Text style={styles.buttonText}>Следующий тур</Text>
+        </TouchableOpacity>
+        {history.length > 0 && (
+          <TouchableOpacity onPress={handlePrev} accessibilityRole="button" style={{ marginTop: 16 }}>
+            <Text style={styles.statsCardBtnText}>Вернуть предыдущее слово</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+
   if (!currentWord) {
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
         <Text style={styles.info}>Нет доступных слов для выбранной комбинации языков!</Text>
+        {history.length > 0 && (
+          <TouchableOpacity onPress={handlePrev} accessibilityRole="button">
+            <Text style={styles.statsCardBtnText}>Вернуть предыдущее слово</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -301,17 +329,15 @@ export default function WordTriplesScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       {...panResponder.panHandlers}
     >
-      <View style={[styles.innerWrapper, { paddingTop: topPadding }]}>
+      <ScrollView testID="words-scroll" keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.innerWrapper, { paddingTop: topPadding }]}>
         {/* Header with comfortable breathing space */}
         <View style={[styles.topHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
           <View>
             <Text style={styles.headerTitle}>Слова</Text>
-            {sessionCount > 0 && (
-              <Text style={styles.sessionCountText}>Пройдено за заход: {sessionCount}</Text>
-            )}
+            <Text testID="word-tour-progress" style={styles.sessionCountText}>Пройдено: {sessionCount} / {wordTourSize}</Text>
           </View>
           <TouchableOpacity
-            style={styles.dictionaryBtn}
+            style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
             onPress={() => navigation.navigate('Dictionary')}
           >
             <Text style={{fontSize: 24}}>📖</Text>
@@ -327,7 +353,7 @@ export default function WordTriplesScreen() {
         >
           <View style={styles.cardActions}>
             <TouchableOpacity
-              style={styles.favCardBtn}
+              accessibilityRole="button" accessibilityLabel="Изменить отметку избранного" style={styles.favCardBtn}
               onPress={() => {
                 const wordKey = currentWord.eng || currentWord.word || '';
                 toggleWordFavorite(wordKey);
@@ -348,7 +374,7 @@ export default function WordTriplesScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.editCardBtn}
+              accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editCardBtn}
               onPress={() => {
                 setEditingWord(currentWord);
                 setIsModalVisible(true);
@@ -360,6 +386,9 @@ export default function WordTriplesScreen() {
           </View>
 
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
+          <Text testID="word-show-count" style={styles.showCount}>
+            Показов слова: {totalShows}
+          </Text>
 
           {currentProgress?.ai_verification?.status === 'flagged' && (
             <TouchableOpacity
@@ -392,7 +421,8 @@ export default function WordTriplesScreen() {
               const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
 
               return (
-                <View key={lang} style={styles.langBlock}>
+                <View key={lang}>
+                <View style={styles.langBlock}>
                   {/* Subtle Language Indicator on the Left Side */}
                   <View style={styles.sideBadge}>
                     <Text style={styles.sideFlag}>{langFlag}</Text>
@@ -401,6 +431,9 @@ export default function WordTriplesScreen() {
 
                   {/* Prominent Centered Translation — tap to practise it in a generated sentence */}
                   <TouchableOpacity
+                    testID={`word-sentence-${lang}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Предложение со словом ${translation}`}
                     style={styles.wordCenterContainer}
                     activeOpacity={translation ? 0.6 : 1}
                     disabled={!translation}
@@ -409,12 +442,13 @@ export default function WordTriplesScreen() {
                       navigation.navigate('Sentence Trainer');
                     }}
                   >
-                    <Text style={styles.langTranslation} numberOfLines={2}>{translation || '—'}</Text>
+                    <Text style={styles.langTranslation}>{translation || '—'}</Text>
                   </TouchableOpacity>
 
                   {/* Pronunciation Button */}
                   {translation && (
                     <TouchableOpacity
+                      accessibilityLabel="Разбор произношения" accessibilityRole="button"
                       style={styles.pronunciationBtn}
                       activeOpacity={0.7}
                       onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
@@ -423,6 +457,7 @@ export default function WordTriplesScreen() {
                       <Text style={styles.pronunciationBtnText}>📢</Text>
                     </TouchableOpacity>
                   )}
+                </View>
                 </View>
               );
             })}
@@ -440,7 +475,8 @@ export default function WordTriplesScreen() {
           <TextInput
             style={[styles.input, !!associationText.trim() && styles.inputWithContent]}
             multiline
-            placeholder="Добавьте свою ассоциацию или смысл для запоминания..."
+            placeholder="Что поможет вам запомнить это слово?"
+            testID="word-association"
             placeholderTextColor="#A0AEC0"
             value={associationText}
             onChangeText={setAssociationText}
@@ -453,7 +489,7 @@ export default function WordTriplesScreen() {
             <Text style={styles.buttonText}>✓ Выучено</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
 
       <EditWordModal
         visible={isModalVisible}
@@ -507,43 +543,16 @@ export default function WordTriplesScreen() {
           </View>
         </View>
       </Modal>
-      <Modal
+      <PronunciationModal
         visible={isPronunciationModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setIsPronunciationModalVisible(false)}
-      >
-        <View style={styles.pronunciationModalOverlay}>
-          <View style={styles.pronunciationModalContent}>
-            <View style={styles.pronunciationModalHeader}>
-              <Text style={styles.pronunciationModalTitle}>🗣 Разбор произношения</Text>
-              <TouchableOpacity onPress={() => setIsPronunciationModalVisible(false)} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-                <Text style={styles.pronunciationModalCloseText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.pronunciationModalScroll}>
-              {isPronunciationLoading ? (
-                <View style={styles.pronunciationLoadingContainer}>
-                  <ActivityIndicator size="large" color={ACCENT} />
-                  <Text style={styles.pronunciationLoadingText}>Анализируем правила произношения...</Text>
-                </View>
-              ) : (
-                <Markdown
-                  style={{
-                    body: { fontSize: 16, lineHeight: 24, color: '#334155' },
-                    strong: { fontWeight: '700', color: '#0F172A' },
-                    bullet_list: { marginTop: 10, marginBottom: 10 },
-                    list_item: { marginBottom: 6 },
-                  }}
-                >
-                  {pronunciationExplanation || ''}
-                </Markdown>
-              )}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setIsPronunciationModalVisible(false)}
+        loading={isPronunciationLoading}
+        explanation={pronunciationExplanation}
+        mode={pronunciationMode}
+        onModeChange={changePronunciationMode}
+        error={pronunciationError}
+        onRetry={retryPronunciation}
+      />
 
     </KeyboardAvoidingView>
   );
@@ -555,7 +564,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA'
   },
   innerWrapper: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 16,
     paddingBottom: 14,
     justifyContent: 'space-between',
@@ -566,6 +575,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#F8F9FA'
+  },
+  tourStartButton: {
+    flex: 0,
+    paddingHorizontal: 24,
+    marginTop: 16,
   },
   topHeader: {
     alignItems: 'center',
@@ -644,11 +658,18 @@ const styles = StyleSheet.create({
     color: '#1A202C',
     marginVertical: 4,
   },
+  showCount: {
+    fontSize: 12,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 2,
+  },
   wordCenterContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 58,
+    paddingLeft: 48,
+    paddingRight: 0,
   },
   pronunciationBtn: {
     marginLeft: 8,
@@ -922,45 +943,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  pronunciationModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  pronunciationModalContent: {
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    height: '80%',
-    padding: 20,
-  },
-  pronunciationModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  pronunciationModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1E293B',
-  },
-  pronunciationModalCloseText: {
-    fontSize: 24,
-    color: '#64748B',
-    fontWeight: '300',
-  },
-  pronunciationModalScroll: {
-    flex: 1,
-  },
-  pronunciationLoadingContainer: {
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pronunciationLoadingText: {
-    marginTop: 16,
-    color: '#64748B',
-    fontSize: 15,
-  }
 });

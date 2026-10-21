@@ -1,3 +1,4 @@
+import { generationContext, checkAborted, isAbortError, abortableDelay } from './generationControl';
 import { useStore } from '../store/useStore';
 import { generateSentenceBatch, isSentenceGenerationConfigured } from './sentenceGeneration';
 import { LANGUAGES } from '../constants/languages';
@@ -36,15 +37,18 @@ export async function prefetchSentencesInBackground(): Promise<void> {
 
       if (cachedCount < PREFETCH_THRESHOLD) {
         try {
+          const context = generationContext(langCode);
           const freshWords = useStore.getState().words;
           const previous = useStore.getState().sentences.filter(sentence => sentence.language === langObj.label).map(sentence => sentence.sentence);
           const batch = await generateSentenceBatch(langCode, freshWords, PREFETCH_BATCH_SIZE, undefined, previous);
+          checkAborted(context.signal);
           if (batch && batch.length > 0) {
             addGeneratedSentences(batch);
           }
           // Brief breath between languages
-          await new Promise(r => setTimeout(r, 2000));
+          await abortableDelay(2000, context.signal);
         } catch (err) {
+          if (isAbortError(err)) break;
           console.warn(`[SentencePrefetch] error for ${langCode}:`, err);
         }
       }

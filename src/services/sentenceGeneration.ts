@@ -1,9 +1,10 @@
+import { generationContext, generationPhase, checkAborted, isAbortError, abortableDelay } from './generationControl';
 import { Sentence, Word } from '../models/types';
 import { generateGeminiText, isGeminiConfigured } from './geminiClient';
-import { buildSentenceGenerationPrompt, buildSentenceAnnotationPrompt, getAllDictionaryCandidates, getLanguagePrompt, SENTENCE_ARRAY_SCHEMA, DRAFT_ARRAY_SCHEMA } from './sentencePrompts';
+import { buildSentenceGenerationPrompt, buildSentenceAnnotationPrompt, getAllDictionaryCandidates, getLanguagePrompt, SENTENCE_ARRAY_SCHEMA, DRAFT_ARRAY_SCHEMA, DictionaryCandidate } from './sentencePrompts';
 import { parseSentenceDrafts, planSentenceBatch, SentenceDraft } from './sentenceCurriculum';
 import { buildSentenceQualityPrompt, parseQualityVerdicts, QUALITY_VERDICT_SCHEMA } from './sentenceQuality';
-import { preservesSentenceBasis, sentenceFingerprint, validateGeneratedSentences } from '../utils/sentenceValidation';
+import { preservesSentenceBasis, sentenceFingerprint, validateGeneratedSentencesAsync } from '../utils/sentenceValidation';
 
 const DEFAULT_BATCH_SIZE = 8;
 // Composition, annotation, independent card audit; one bounded repair round.
@@ -15,9 +16,10 @@ const parseJSON = (text: string): unknown => {
   try { return JSON.parse(text); } catch { return null; }
 };
 
-const generateBatch = async (code: string, words: Word[], count: number, required: RequiredWord | undefined, avoid: string[]): Promise<Sentence[]> => {
+const generateBatch = async (code: string, candidates: DictionaryCandidate[], count: number, required: RequiredWord | undefined, avoid: string[], signal: AbortSignal,
+  phase = (text: string) => generationPhase(code, signal, text)): Promise<Sentence[]> => {
   const language = getLanguagePrompt(code);
-  const dictionary = getAllDictionaryCandidates(words, code);
+  const dictionary = [...candidates];
   if (required?.lemma && !dictionary.some(entry => entry.lemma.toLocaleLowerCase() === required.lemma.trim().toLocaleLowerCase())) {
     dictionary.push({ lemma: required.lemma.trim(), translation: required.translation || '' });
   }
@@ -51,19 +53,22 @@ const generateBatch = async (code: string, words: Word[], count: number, require
     const seeds: { lemma: string; translation: string }[] = [];
     if (required?.lemma) seeds.unshift({ lemma: required.lemma.trim(), translation: required.translation || '' });
     try {
+      checkAborted(signal);
+      phase(round ? 'Исправляем примеры…' : 'Составляем примеры…');
       const draftText = await generateGeminiText(buildSentenceGenerationPrompt(code, seeds, pending.length,
         [...avoid, ...context.map(item => item.sentence)], required?.lemma, pending, errors, context), {
         temperature: 0.8, topP: 0.92, maxOutputTokens: 4096,
         responseMimeType: 'application/json', responseJsonSchema: DRAFT_ARRAY_SCHEMA,
-      });
+      }, undefined, signal);
       const drafts = parseSentenceDrafts(parseJSON(draftText), pending);
       if (!drafts.length) { errors = ['Не получены тексты для заданий.']; continue; }
+      phase('Разбираем структуру…');
       const annotationText = await generateGeminiText(buildSentenceAnnotationPrompt(code, pending, drafts, context), {
         temperature: 0.2, maxOutputTokens: 16384,
         responseMimeType: 'application/json', responseJsonSchema: SENTENCE_ARRAY_SCHEMA,
-      });
-      const result = validateGeneratedSentences(parseJSON(annotationText), code, language.label, dictionary,
-        { tasks: pending, drafts, requiredWord: required?.lemma });
+      }, undefined, signal);
+      const result = await validateGeneratedSentencesAsync(parseJSON(annotationText), code, language.label, dictionary,
+        { tasks: pending, drafts, requiredWord: required?.lemma }, signal);
       errors = result.errors;
       const proposed = new Map<string, Sentence>();
       // Task order is authoritative even if the model reverses its response.
@@ -87,10 +92,11 @@ const generateBatch = async (code: string, words: Word[], count: number, require
       }
       if (proposed.size) {
         const candidates = tasks.flatMap(task => proposed.has(task.id) ? [proposed.get(task.id)!] : []);
+        phase('Проверяем перевод и разбор…');
         const auditText = await generateGeminiText(buildSentenceQualityPrompt(code, pending, candidates, [...accepted.values()]), {
           temperature: 0.1, maxOutputTokens: 4096,
           responseMimeType: 'application/json', responseJsonSchema: QUALITY_VERDICT_SCHEMA,
-        });
+        }, undefined, signal);
         const verdicts = parseQualityVerdicts(parseJSON(auditText), pending);
         for (const task of pending) {
           const sentence = proposed.get(task.id);
@@ -105,6 +111,7 @@ const generateBatch = async (code: string, words: Word[], count: number, require
         }
       }
     } catch (error) {
+      if (isAbortError(error)) throw error;
       // Partial background batches are useful, but targeted generation must never
       // succeed without its requested lexeme.
       if ((accepted.size || previousChain.size) && (!required?.lemma || accepted.has('task-1'))) break;
@@ -125,18 +132,42 @@ const generateBatch = async (code: string, words: Word[], count: number, require
   if (!accepted.size || (required?.lemma && !accepted.has('task-1'))) {
     throw new Error(errors[0] || 'ИИ вернул предложения, не прошедшие проверку.');
   }
-  return tasks.flatMap(task => accepted.has(task.id) ? [accepted.get(task.id)!] : []);
+  checkAborted(signal);
+  const batchId = `batch_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const chainOrder = tasks.filter(task => chainIds.has(task.id)).map(task => task.id);
+  return tasks.flatMap(task => accepted.has(task.id) ? [{
+    ...accepted.get(task.id)!,
+    generationBatchId: batchId,
+    ...(chainIds.has(task.id) ? { chainStep: chainOrder.indexOf(task.id) } : {}),
+  }] : []);
 };
 
-// Coalesce only genuinely identical work, including dictionary projection.
+// Share identical work, including its dictionary projection and sentence history.
 const pendingBatches = new Map<string, Promise<Sentence[]>>();
-export const generateSentenceBatch = (code: string, words: Word[], count = DEFAULT_BATCH_SIZE, required?: RequiredWord, previousSentences: string[] = []): Promise<Sentence[]> => {
+export const generateSentenceBatch = (code: string, words: Word[], count = DEFAULT_BATCH_SIZE, required?: RequiredWord, previousSentences: string[] = [],
+  task?: { signal: AbortSignal; phase: (text: string) => void }): Promise<Sentence[]> => {
   if (!Number.isSafeInteger(count) || count < 1 || count > 20) return Promise.reject(new Error('Размер набора должен быть от 1 до 20.'));
+  const context = generationContext(code);
   const avoid = [...new Set(previousSentences)].slice(-100);
-  const key = JSON.stringify([code, count, required?.lemma?.trim().toLowerCase(), required?.translation, getAllDictionaryCandidates(words, code), avoid]);
+  const dictionary = getAllDictionaryCandidates(words, code);
+  // Explicit screen tasks own their transport. Cancelling one must not cancel
+  // a coalesced trainer request in the same language.
+  if (task) {
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    const signals = [context.signal, task.signal];
+    signals.forEach(signal => signal.addEventListener('abort', abort, { once: true }));
+    if (signals.some(signal => signal.aborted)) abort();
+    return Promise.resolve()
+      .then(() => { checkAborted(controller.signal); return generateBatch(code, dictionary, count, required, avoid, controller.signal, task.phase); })
+      .finally(() => signals.forEach(signal => signal.removeEventListener('abort', abort)));
+  }
+  const key = JSON.stringify([context.version, code, count, required?.lemma?.trim().toLowerCase(), required?.translation, dictionary, avoid]);
   const pending = pendingBatches.get(key);
   if (pending) return pending;
-  const task = generateBatch(code, words, count, required, avoid).finally(() => pendingBatches.delete(key));
-  pendingBatches.set(key, task);
-  return task;
+  const batch = abortableDelay(0, context.signal)
+    .then(() => generateBatch(code, dictionary, count, required, avoid, context.signal))
+    .finally(() => { pendingBatches.delete(key); if (!context.signal.aborted) generationPhase(code, context.signal, ''); });
+  pendingBatches.set(key, batch);
+  return batch;
 };

@@ -1,3 +1,4 @@
+import offlineSentences from '../data/offlineSentences.json';
 import type { Sentence, Word } from '../models/types';
 import type { PersistedProgress, UserWordProgress } from './progressTypes';
 import wordsData from '../data/words.json';
@@ -21,7 +22,7 @@ export const baseStaticWords: Word[] = wordsData.map((word, index) => {
   };
 });
 
-export const baseStaticSentences = sentencesData as Sentence[];
+export const baseStaticSentences = [...sentencesData, ...offlineSentences] as Sentence[];
 
 /** `eng` is the legacy persistence key. Display edits must never change it. */
 export const applyWordProgress = (word: Word, progress?: UserWordProgress): Word => {
@@ -52,7 +53,10 @@ export const applyWordProgress = (word: Word, progress?: UserWordProgress): Word
 export const mergeSentences = (custom: Sentence[], generated: Sentence[]): Sentence[] =>
   [...new Map([...baseStaticSentences, ...generated, ...custom].map(sentence => [sentence.id, sentence])).values()];
 
-export const deriveCatalog = (state: PersistedProgress) => ({
-  words: [...state.customWords, ...baseStaticWords].map(word => applyWordProgress(word, state.userWordProgress[getWordKey(word)])),
-  sentences: mergeSentences(state.customSentences, state.generatedSentences),
-});
+export const deriveCatalog = (state: PersistedProgress) => {
+  const customKeys = new Set(state.customWords.map(getWordKey));
+  return {
+    words: [...state.customWords, ...baseStaticWords.filter(base => !customKeys.has(getWordKey(base)))].map(word => applyWordProgress(word, state.userWordProgress[getWordKey(word)])),
+    sentences: mergeSentences(state.customSentences, state.generatedSentences),
+  };
+};

@@ -2,7 +2,7 @@ import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import type { DictionaryScreenProps } from '../navigation/types';
 import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
@@ -10,9 +10,8 @@ import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
-export default function DictionaryScreen() {
+export default function DictionaryScreen({ navigation }: DictionaryScreenProps) {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<any>();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, activeLanguages, userWordProgress, toggleWordFavorite } = useStore(useShallow(state => ({
     words: state.words,
@@ -32,7 +31,7 @@ export default function DictionaryScreen() {
 
     return words.filter(w => {
       const ruMatch = w.ru?.toLowerCase().includes(query);
-      const engMatch = (w.eng || w.word)?.toLowerCase().includes(query);
+      const originalMatch = (w.source_language ? getWordTranslation(w, w.source_language) : getWordTranslation(w, 'en')).toLowerCase().includes(query);
       const assocMatch = w.personal_association?.toLowerCase().includes(query);
 
       // Check active languages translations
@@ -41,7 +40,7 @@ export default function DictionaryScreen() {
         return trans.toLowerCase().includes(query);
       });
 
-      return ruMatch || engMatch || assocMatch || transMatch;
+      return ruMatch || originalMatch || assocMatch || transMatch;
     });
   }, [words, searchQuery, activeLanguages]);
 
@@ -53,7 +52,8 @@ export default function DictionaryScreen() {
   const renderItem = ({ item }: { item: Word }) => {
     const wordKey = item.eng || item.word || '';
     const sourceLanguage = item.source_language ? LANGUAGES.find(lang => lang.code === item.source_language) : undefined;
-    const displayOriginal = sourceLanguage ? `${sourceLanguage.flag} ${item.word || ''}` : getWordTranslation(item, 'en');
+    const original = getWordTranslation(item, item.source_language || 'en');
+    const displayOriginal = sourceLanguage && original ? `${sourceLanguage.flag} ${original}` : original;
     const progress = userWordProgress[wordKey];
     const aiVerification = progress?.ai_verification;
     const isAiFlagged = aiVerification?.status === 'flagged';
@@ -62,19 +62,19 @@ export default function DictionaryScreen() {
       <View style={styles.card}>
         <View style={styles.headerRow}>
           <View style={{flex: 1}}>
-            <Text style={styles.baseWord}>{item.ru || wordKey}</Text>
+            <Text style={styles.baseWord}>{item.ru || original || activeLanguages.map(lang => getWordTranslation(item, lang)).find(Boolean)}</Text>
             {!!displayOriginal && item.ru && (
               <Text style={styles.subEng}>{displayOriginal}</Text>
             )}
           </View>
 
           <View style={styles.badges}>
-            <TouchableOpacity style={styles.editBtn} onPress={() => toggleWordFavorite(wordKey)}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Изменить отметку избранного" style={styles.editBtn} onPress={() => toggleWordFavorite(wordKey)}>
               <Text style={[styles.editBtnText, item.is_favorite ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
                 {item.is_favorite ? '★' : '☆'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.editBtn} onPress={() => openEditor(item)}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editBtn} onPress={() => openEditor(item)}>
               <Text style={styles.editBtnText}>✏️</Text>
             </TouchableOpacity>
             {!!item.is_learned && <Text style={styles.badgeLearned}>Выучено</Text>}
@@ -131,7 +131,7 @@ export default function DictionaryScreen() {
     <View style={[styles.container, { paddingTop: topPadding }]}>
       <View style={styles.headerTitleRow}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={{marginRight: 10, padding: 5}}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Назад" onPress={() => navigation.goBack()} style={{marginRight: 10, padding: 5}}>
             <Text style={{fontSize: 24, color: '#333'}}>←</Text>
           </TouchableOpacity>
           <Text style={styles.header}>Словарь ({filteredWords.length})</Text>
@@ -152,7 +152,7 @@ export default function DictionaryScreen() {
           clearButtonMode="while-editing"
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Очистить поиск" onPress={() => setSearchQuery('')} style={styles.clearBtn}>
             <Text style={styles.clearBtnText}>✕</Text>
           </TouchableOpacity>
         )}

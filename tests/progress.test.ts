@@ -11,7 +11,8 @@ it('rejects malformed imports atomically, including nested values', () => {
   const initial = useStore.getState();
   for (const value of [null, {}, [], { userWordProgress: [] }, { userWordProgress: { towel: { count: -1 } } },
     { userWordProgress: {}, customWords: [null] }, { userWordProgress: {}, customSentences: [{ words: [] }] },
-    { userWordProgress: {}, activeLanguages: [5] }, { userWordProgress: {}, workoutWordCount: NaN }]) {
+    { userWordProgress: {}, activeLanguages: [5] }, { userWordProgress: {}, workoutWordCount: NaN },
+    ...[0, -1, 101, 2.5, NaN, '10'].map(wordTourSize => ({ userWordProgress: {}, wordTourSize }))]) {
     assert.equal(useStore.getState().importProgress(value).ok, false);
     assert.equal(useStore.getState(), initial);
   }
@@ -81,6 +82,30 @@ it('clamps learned slots when total workout size decreases', () => {
   useStore.getState().setWorkoutLearnedWordCount(10);
   useStore.getState().setWorkoutWordCount(5);
   assert.equal(useStore.getState().workoutLearnedWordCount, 5);
+});
+
+it('defaults old profiles to ten word cards and preserves a chosen tour size in backups', () => {
+  const store = useStore.getState();
+  assert.equal(store.importProgress({ userWordProgress: {} }).ok, true);
+  assert.equal(useStore.getState().wordTourSize, 10);
+  store.setWordTourSize(20);
+  const backup = store.exportProgress();
+  assert.equal(backup.wordTourSize, 20);
+  store.setWordTourSize(5);
+  assert.equal(store.importProgress(backup).ok, true);
+  assert.equal(useStore.getState().wordTourSize, 20);
+  assert.equal(useStore.getState().workoutWordCount, 10);
+  store.resetStatistics();
+  assert.equal(useStore.getState().wordTourSize, 20);
+});
+
+it('rejects invalid tour sizes without changing the stored preference', () => {
+  const store = useStore.getState();
+  store.setWordTourSize(15);
+  for (const value of [0, -1, 101, 1.5, NaN, Infinity]) {
+    store.setWordTourSize(value);
+    assert.equal(useStore.getState().wordTourSize, 15);
+  }
 });
 
 it('export and import do not retain caller-owned references', () => {

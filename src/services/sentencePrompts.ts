@@ -1,6 +1,7 @@
 import { SyntaxRole, Word } from '../models/types';
 import { getWordTranslation } from '../utils/words';
 import { planSentenceBatch, SentenceDraft, SentenceTask } from './sentenceCurriculum';
+import { bookContextPrompt } from './bookService';
 
 export interface DictionaryCandidate { lemma: string; translation: string }
 interface LanguagePrompt { label: string; grammar: string; morphology: string }
@@ -106,6 +107,7 @@ Correct these problems from the previous attempt: ${JSON.stringify(feedback.slic
 
 export const buildSentenceAnnotationPrompt = (code: string, tasks: SentenceTask[], drafts: SentenceDraft[], context: SentenceDraft[] = []): string => `REVIEW_AND_ANNOTATE
 ${METHOD}
+${bookContextPrompt(code, drafts.map(d => d.sentence).join('\n'), [], false)}
 LANGUAGE: ${getLanguagePrompt(code).label} (${code})
 ${getLanguagePrompt(code).grammar}
 Review drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).

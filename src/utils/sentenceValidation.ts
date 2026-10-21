@@ -2,6 +2,7 @@ import { Sentence, SyntaxRole, Token } from '../models/types';
 import type { DictionaryCandidate } from '../services/sentencePrompts';
 import type { SentenceDraft, SentenceTask } from '../services/sentenceCurriculum';
 import { makeGeneratedSentence } from './sentences';
+import { abortableDelay } from '../services/generationControl';
 
 const VALID_ROLES = new Set<SyntaxRole>(['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
   'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction', 'Preposition', 'Particle', 'Article', 'Other']);
@@ -79,15 +80,54 @@ export const preservesSentenceBasis = (base: Sentence, developed: Sentence): boo
 export interface ValidationResult { sentences: Sentence[]; errors: string[] }
 export interface GenerationValidationContext { tasks: SentenceTask[]; drafts: SentenceDraft[]; requiredWord?: string }
 
-export const validateGeneratedSentences = (
-  value: unknown, code: string, label: string, dictionary: DictionaryCandidate[], context?: GenerationValidationContext,
+interface IndexedHeadword { lemma: string; parts: string[]; order: number }
+type DictionaryIndex = Map<string, IndexedHeadword[]>;
+
+const indexDictionary = (dictionary: DictionaryCandidate[]): DictionaryIndex => {
+  const index: DictionaryIndex = new Map();
+  dictionary.forEach((entry, order) => {
+    const parts = normalize(entry.lemma).split(' ');
+    if (!parts[0]) return;
+    const headwords = index.get(parts[0]) ?? [];
+    headwords.push({ lemma: entry.lemma, parts, order });
+    index.set(parts[0], headwords);
+  });
+  return index;
+};
+
+// Normalize each token once and inspect only headwords beginning with its form
+// or lemma. Sorting the actual matches preserves longest-expression priority,
+// dictionary order for ties, and every occurrence of an inflected expression.
+const markDictionaryWords = (tokens: Token[], dictionary: DictionaryIndex) => {
+  const forms = tokens.map(token => new Set([normalize(token.text), normalize(token.dictionary_form || '')]));
+  const matches: { entry: IndexedHeadword; start: number }[] = [];
+  forms.forEach((alternatives, start) => {
+    for (const form of alternatives) {
+      for (const entry of dictionary.get(form) ?? []) {
+        if (start + entry.parts.length <= tokens.length && entry.parts.every((part, offset) => forms[start + offset].has(part))) {
+          matches.push({ entry, start });
+        }
+      }
+    }
+  });
+  matches.sort((a, b) => b.entry.parts.length - a.entry.parts.length || a.entry.order - b.entry.order || a.start - b.start);
+  for (const { entry, start } of matches) {
+    for (let offset = 0; offset < entry.parts.length; offset++) {
+      const token = tokens[start + offset];
+      if (!token.is_in_my_dict) { token.is_in_my_dict = true; token.dictionary_word = entry.lemma; }
+    }
+  }
+};
+
+const validateWithDictionaryIndex = (
+  value: unknown, code: string, label: string, dictionary: DictionaryIndex, context?: GenerationValidationContext,
+  acceptedTasks = new Set<string>(), indexOffset = 0,
 ): ValidationResult => {
   if (!Array.isArray(value)) return { sentences: [], errors: ['ИИ вернул данные не в виде массива.'] };
   const sentences: Sentence[] = [];
   const errors: string[] = [];
-  const acceptedTasks = new Set<string>();
   for (const [index, candidate] of value.entries()) {
-    const fail = (reason: string) => errors.push(`Предложение ${index + 1}: ${reason}`);
+    const fail = (reason: string) => errors.push(`Предложение ${indexOffset + index + 1}: ${reason}`);
     if (!candidate || typeof candidate !== 'object' || typeof candidate.sentence !== 'string' ||
       !candidate.sentence.trim() || !Array.isArray(candidate.words) || !candidate.words.length) {
       fail('отсутствуют sentence или words.'); continue;
@@ -192,16 +232,34 @@ export const validateGeneratedSentences = (
         }
       }
     }
-    // Prefer a whole expression over overlapping single headwords.
-    for (const entry of [...dictionary].sort((a, b) => b.lemma.split(' ').length - a.lemma.split(' ').length)) {
-      for (const i of findLemmaSpans(tokens, entry.lemma).flat()) {
-        if (!tokens[i].is_in_my_dict) { tokens[i].is_in_my_dict = true; tokens[i].dictionary_word = entry.lemma; }
-      }
-    }
+    markDictionaryWords(tokens, dictionary);
     sentences.push(makeGeneratedSentence({ language: label, sentence: candidate.sentence.trim(), words: tokens,
       ...(context && task ? { literalTranslation: candidate.literalTranslation.trim(), learningGoal: task.goal, generationTaskId: task.id } : {}),
     }, code));
     if (task) acceptedTasks.add(task.id);
   }
   return { sentences, errors };
+};
+
+export const validateGeneratedSentences = (
+  value: unknown, code: string, label: string, dictionary: DictionaryCandidate[], context?: GenerationValidationContext,
+): ValidationResult => validateWithDictionaryIndex(value, code, label, indexDictionary(dictionary), context);
+
+/** Let input, navigation and cancellation run between cards on the native JS thread. */
+export const validateGeneratedSentencesAsync = async (
+  value: unknown, code: string, label: string, dictionary: DictionaryCandidate[], context?: GenerationValidationContext,
+  signal?: AbortSignal,
+): Promise<ValidationResult> => {
+  await abortableDelay(0, signal);
+  const index = indexDictionary(dictionary);
+  if (!Array.isArray(value)) return validateWithDictionaryIndex(value, code, label, index, context);
+  const result: ValidationResult = { sentences: [], errors: [] };
+  const acceptedTasks = new Set<string>();
+  for (const [offset, candidate] of value.entries()) {
+    await abortableDelay(0, signal);
+    const checked = validateWithDictionaryIndex([candidate], code, label, index, context, acceptedTasks, offset);
+    result.sentences.push(...checked.sentences);
+    result.errors.push(...checked.errors);
+  }
+  return result;
 };

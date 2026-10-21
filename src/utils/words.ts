@@ -39,3 +39,13 @@ export const getWordTranslation = (word: Word | undefined | null, langCode: stri
 
   return '';
 };
+
+/** Match forms only in the language being studied, never by a persistence key. */
+export const buildWordLookup = (words: Word[], language: string): Map<string, Word> => {
+  const lookup = new Map<string, Word>();
+  for (const word of words) {
+    const form = cleanDictionaryForm(getWordTranslation(word, language)).toLowerCase();
+    if (form && !lookup.has(form)) lookup.set(form, word);
+  }
+  return lookup;
+};

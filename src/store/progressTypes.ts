@@ -1,3 +1,4 @@
+import type { StructureAttempt, ReadingText } from '../models/study';
 import type { Sentence, Word } from '../models/types';
 import type { DailyShows, ImwSnapshot, WorkoutSnapshot } from '../utils/statistics';
 
@@ -30,6 +31,8 @@ export interface UserWordProgress {
 }
 
 export interface PersistedProgress {
+  structureAttempts: StructureAttempt[];
+  readingTexts: ReadingText[];
   userWordProgress: Record<string, UserWordProgress>;
   customSentences: Sentence[];
   generatedSentences: Sentence[];
@@ -38,6 +41,7 @@ export interface PersistedProgress {
   dailyShows: DailyShows;
   workoutSnapshots: WorkoutSnapshot[];
   imwSnapshots: ImwSnapshot[];
+  wordTourSize: number;
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
@@ -45,13 +49,15 @@ export interface PersistedProgress {
 }
 
 export const createDefaultProgress = (): PersistedProgress => ({
+  structureAttempts: [], readingTexts: [],
   userWordProgress: {}, customSentences: [], generatedSentences: [], customWords: [],
   activeLanguages: ['en', 'kz', 'it'], dailyShows: {}, workoutSnapshots: [], imwSnapshots: [],
-  workoutWordCount: 10, workoutLearnedWordCount: 5,
+  wordTourSize: 10, workoutWordCount: 10, workoutLearnedWordCount: 5,
   workoutFavoritesOnly: false, hasSeenSnoozeHint: false,
 });
 
 export const pickPersistedFields = (state: PersistedProgress): PersistedProgress => ({
+  structureAttempts: state.structureAttempts, readingTexts: state.readingTexts,
   userWordProgress: state.userWordProgress,
   customSentences: state.customSentences,
   generatedSentences: state.generatedSentences,
@@ -60,6 +66,7 @@ export const pickPersistedFields = (state: PersistedProgress): PersistedProgress
   dailyShows: state.dailyShows,
   workoutSnapshots: state.workoutSnapshots,
   imwSnapshots: state.imwSnapshots,
+  wordTourSize: state.wordTourSize,
   workoutWordCount: state.workoutWordCount,
   workoutLearnedWordCount: state.workoutLearnedWordCount,
   workoutFavoritesOnly: state.workoutFavoritesOnly,

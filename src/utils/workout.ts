@@ -1,3 +1,4 @@
+import { isDueForReview } from './reviewPlan';
 import type { Word } from '../models/types';
 import { getWordKey, getWordTranslation } from './words';
 import { readWordStats, wordMemoryWeight } from './statistics';
@@ -9,6 +10,7 @@ interface WorkoutOptions {
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
+  workoutReviewOnly?: boolean;
 }
 
 export const shuffle = <T,>(items: T[], random = Math.random): T[] => {
@@ -28,8 +30,9 @@ export const buildWorkoutQueue = (options: WorkoutOptions, now = Date.now(), ran
   for (const word of options.words) {
     const stats = readWordStats(word.knowledge_stats);
     for (const langCode of options.activeLanguages) {
+      if (options.workoutReviewOnly && !isDueForReview(word, langCode, now)) continue;
       const key = `${getWordKey(word)}:${langCode}`;
-      if (seen.has(key) || !getWordTranslation(word, langCode) || (options.workoutFavoritesOnly && !word.is_favorite)) continue;
+      if (seen.has(key) || !getWordTranslation(word, langCode) || (options.workoutFavoritesOnly && !options.workoutReviewOnly && !word.is_favorite)) continue;
       const snoozed = word.snoozed_until_by_lang?.[langCode];
       if (snoozed && Date.parse(snoozed) > now) continue;
       seen.add(key);

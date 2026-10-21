@@ -265,3 +265,85 @@ it('does not spend a second full pipeline to fill an optional card after the cur
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1', 'task-2', 'task-3', 'task-4']);
   assert.equal(calls, 3);
 });
+import { cancelGenerations, generationContext, useGenerationStatus, abortableDelay, isAbortError } from '../src/services/generationControl';
+
+it('external cancellation aborts the network request without retrying', async () => {
+  configure();
+  const controller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async (_, init) => {
+    calls++;
+    return new Promise<Response>((_, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+      controller.abort();
+    });
+  };
+  await assert.rejects(generateGeminiText('test', {}, undefined, controller.signal), isAbortError);
+  assert.equal(calls, 1);
+});
+
+it('cancellation interrupts backoff promptly', async () => {
+  const controller = new AbortController();
+  const delay = abortableDelay(60000, controller.signal);
+  controller.abort();
+  await assert.rejects(delay, isAbortError);
+});
+
+it('cancelled batches reject even if the provider returns late and new work gets a fresh context', async () => {
+  configure();
+  cancelGenerations();
+  let release!: (response: Response) => void;
+  let entered!: () => void;
+  const started = new Promise<void>(resolve => { entered = resolve; });
+  globalThis.fetch = async () => { entered(); return new Promise<Response>(resolve => { release = resolve; }); };
+  const old = generationContext('en');
+  const pending = generateSentenceBatch('en', [], 1);
+  await started;
+  assert.ok(useGenerationStatus.getState().phases.en);
+  cancelGenerations('en');
+  release(reply([draft]));
+  await assert.rejects(pending, isAbortError);
+  assert.equal(useGenerationStatus.getState().phases.en, '');
+  assert.ok(old.signal.aborted);
+  assert.notEqual(generationContext('en').version, old.version);
+  globalThis.fetch = async (_, init) => reply(stageOf(init) === 'COMPOSE_SENTENCES' ? [draft] : stageOf(init) === 'REVIEW_AND_ANNOTATE' ? [annotation] : audit([annotation]));
+  assert.equal((await generateSentenceBatch('en', [], 1)).length, 1);
+  assert.equal(useGenerationStatus.getState().phases.en, '');
+});
+
+it('workshop cancellation reaches transport without cancelling shared language work', async () => {
+  configure();
+  const controller = new AbortController();
+  const context = generationContext('en');
+  let calls = 0;
+  globalThis.fetch = async (_, init) => {
+    calls++;
+    return new Promise<Response>((_, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+      controller.abort();
+    });
+  };
+  await assert.rejects(generateSentenceBatch('en', [], 1, undefined, [], { signal: controller.signal, phase: () => {} }), isAbortError);
+  assert.equal(calls, 1);
+  assert.equal(context.signal.aborted, false);
+});
+
+it('already cancelled workshop tasks make no network request', async () => {
+  configure();
+  const controller = new AbortController();
+  controller.abort();
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return reply([]); };
+  await assert.rejects(generateSentenceBatch('en', [], 1, undefined, [], { signal: controller.signal, phase: () => {} }), isAbortError);
+  assert.equal(calls, 0);
+});
+
+it('global cancellation also stops an independently owned workshop batch', async () => {
+  configure();
+  const controller = new AbortController();
+  globalThis.fetch = async (_, init) => new Promise<Response>((_, reject) => {
+    init!.signal!.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+    cancelGenerations();
+  });
+  await assert.rejects(generateSentenceBatch('en', [], 1, undefined, [], { signal: controller.signal, phase: () => {} }), isAbortError);
+});

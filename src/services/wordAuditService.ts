@@ -1,3 +1,4 @@
+import { generationContext } from './generationControl';
 import { parseWordAudit } from '../utils/wordAudit';
 import { Word } from '../models/types';
 import { useStore, WordAiVerification } from '../store/useStore';
@@ -15,7 +16,8 @@ const MIN_AUDIT_INTERVAL_MS = 12000; // at least 12 seconds between background a
  */
 export async function auditWordTranslations(
   word: Word,
-  activeLanguages: string[]
+  activeLanguages: string[],
+  signal?: AbortSignal
 ): Promise<WordAiVerification | null> {
   if (!isGeminiConfigured()) return null;
 
@@ -66,7 +68,7 @@ ${validActiveTranslations.map(t => `- ${t.langName} (код: ${t.langCode}): "${
       temperature: 0.1,
       responseMimeType: 'application/json',
       thinkingConfig: { thinkingBudget: 256 }
-    });
+    }, undefined, signal);
 
     return parseWordAudit(JSON.parse(text));
   } catch (err) {
@@ -107,7 +109,9 @@ export async function auditNextWordInBackground(): Promise<void> {
   lastAuditTime = now;
 
   try {
-    const verification = await auditWordTranslations(candidate, activeLanguages);
+    const context = generationContext('word-audit');
+    const verification = await auditWordTranslations(candidate, activeLanguages, context.signal);
+    if (context.signal.aborted) return;
     const current = useStore.getState().words.find(word => (word.eng || word.word) === (candidate.eng || candidate.word));
     if (verification && current && current.ru === candidate.ru && activeLanguages.every(lang => getWordTranslation(current, lang) === getWordTranslation(candidate, lang))) {
       const key = candidate.eng || candidate.word || '';
