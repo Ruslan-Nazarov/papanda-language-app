@@ -1,8 +1,10 @@
+import { useIsFocused } from '@react-navigation/native';
+import { useCardTransition } from '../hooks/useCardTransition';
 import { useShallow } from 'zustand/react/shallow';
 import { buildWorkoutQueue, QueueItem } from '../utils/workout';
 import { localDateKey } from '../utils/date';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Easing, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
@@ -23,6 +25,7 @@ const SWIPE_ENTRY_OFFSET = 56;
 
 
 export default function BrainWorkoutScreen() {
+  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, undoWordKnowledge, userWordProgress, snoozeWord, hasSeenSnoozeHint, setHasSeenSnoozeHint } = useStore(useShallow(state => ({
@@ -65,8 +68,15 @@ export default function BrainWorkoutScreen() {
     setRegenNonce(n => n + 1);
   };
   const [isStatsVisible, setIsStatsVisible] = useState(false);
-  const cardTranslateX = React.useRef(new Animated.Value(0)).current;
-  const isSwipeAnimating = React.useRef(false);
+  const transition = useCardTransition({
+    enabled: isFocused && !resultModalVisible && !isModalVisible && !isStatsVisible && !isPronunciationModalVisible,
+    scope: JSON.stringify([activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount, regenNonce, workoutReviewOnly]),
+    cardKey: JSON.stringify([queue[currentIndex]?.word.eng || queue[currentIndex]?.word.word, queue[currentIndex]?.langCode, currentIndex]),
+    onSwipe: direction => handleAnswer(direction === 'right'),
+    distance: SWIPE_EXIT_DISTANCE, entryOffset: SWIPE_ENTRY_OFFSET, duration: 220,
+  });
+  const cardTranslateX = transition.translateX;
+  const isSwipeAnimating = transition.busy;
 
   const callbacks = React.useRef({
     handleSwipe: (_direction: 'left' | 'right') => {},
@@ -130,7 +140,7 @@ export default function BrainWorkoutScreen() {
   const lastShown = currentProgress?.last_shown ?? currentWord?.last_shown;
 
   const handleAnswer = (knew: boolean) => {
-    if (!currentWord || !currentLang || resultModalVisible) return;
+    if (!transition.beginAction() || !currentWord || !currentLang || resultModalVisible) return;
 
     const wordKey = currentWord.eng || currentWord.word || '';
     setHistory(prev => [...prev, {
@@ -173,7 +183,7 @@ export default function BrainWorkoutScreen() {
   };
 
   const executeSnooze = React.useCallback(() => {
-    if (!currentWord || !currentLang) return;
+    if (!transition.beginAction() || !currentWord || !currentLang) return;
     const wordKey = currentWord.eng || currentWord.word || '';
 
     // Snooze for 7 days
@@ -202,6 +212,7 @@ export default function BrainWorkoutScreen() {
   }, [currentWord, currentLang, currentIndex, queue.length, score, snoozeWord, addWorkoutSnapshot, recordImwSnapshot]);
 
   const handleSnooze = React.useCallback(() => {
+    if (!transition.beginAction()) return;
     if (!hasSeenSnoozeHint) {
       Alert.alert(
         'Отложить слово',
@@ -223,6 +234,7 @@ export default function BrainWorkoutScreen() {
   }, [hasSeenSnoozeHint, executeSnooze, setHasSeenSnoozeHint]);
 
   const handlePrevStep = () => {
+    if (!transition.beginAction()) return;
     if (history.length > 0) {
       const lastAction = history[history.length - 1];
       const wordKey = queue[lastAction.index].word.eng || queue[lastAction.index].word.word || '';
@@ -242,55 +254,8 @@ export default function BrainWorkoutScreen() {
     }
   };
 
-  const resetCardPosition = () => {
-    if (isSwipeAnimating.current) return;
-
-    Animated.spring(cardTranslateX, {
-      toValue: 0,
-      useNativeDriver: true,
-      speed: 18,
-      bounciness: 5,
-    }).start();
-  };
-
-  const handleSwipe = (direction: 'left' | 'right') => {
-    if (isSwipeAnimating.current) return;
-    isSwipeAnimating.current = true;
-
-    const exitDirection = direction === 'left' ? -1 : 1;
-    Animated.timing(cardTranslateX, {
-      toValue: exitDirection * SWIPE_EXIT_DISTANCE,
-      duration: 220,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (!finished) {
-        isSwipeAnimating.current = false;
-        return;
-      }
-
-      // Place the next card just beyond the opposite edge before React renders
-      // it, then spring it into place for a continuous deck-like transition.
-      cardTranslateX.setValue(-exitDirection * SWIPE_ENTRY_OFFSET);
-      if (direction === 'left') {
-        handleAnswer(false);
-      } else {
-        handleAnswer(true);
-      }
-
-      requestAnimationFrame(() => {
-        Animated.spring(cardTranslateX, {
-          toValue: 0,
-          useNativeDriver: true,
-          speed: 18,
-          bounciness: 4,
-        }).start(() => {
-          isSwipeAnimating.current = false;
-        });
-      });
-    });
-  };
-
+  const resetCardPosition = transition.reset;
+  const handleSwipe = transition.animate;
 
   if (queue.length === 0 || !currentWord || !currentLang) {
     return (

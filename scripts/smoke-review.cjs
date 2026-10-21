@@ -104,8 +104,48 @@ async function main() {
     await page.screenshot({ path: path.join(root, 'review-workout-result.png') });
     await clickText('Отлично!');
     await page.waitForFunction(() => document.body.innerText.includes('Повторение на сегодня завершено'));
+
+    // A delayed swipe must not answer on a hidden screen. A second action
+    // during the transition must not snooze/advance the same card as well.
+    const workoutFixture = { userWordProgress: {}, activeLanguages: ['en'], workoutWordCount: 1,
+      workoutLearnedWordCount: 0, workoutFavoritesOnly: true, hasSeenSnoozeHint: true,
+      customWords: [{ ...custom, count: 0, show_stats: {}, is_favorite: true }] };
+    await seed(workoutFixture);
+    await tab('Brain Workout');
+    await page.waitForSelector('[data-testid="workout-show-count"]');
+    await page.evaluate(() => {
+      [...document.querySelectorAll('div')].filter(el => el.textContent === 'Знаю' && el.getBoundingClientRect().height > 0).at(-1).click();
+      document.querySelector('[role="tab"][aria-label="Settings"]').click();
+    });
+    await new Promise(resolve => setTimeout(resolve, 600));
+    let state = await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);
+    assert.equal(state.userWordProgress['review-fixture']?.knowledge_stats?.en, undefined, 'Hidden animation must not record an answer');
+    assert.equal(state.workoutSnapshots.length, 0);
+    await tab('Brain Workout');
+    await page.evaluate(() => {
+      const click = text => [...document.querySelectorAll('div')].filter(el => el.textContent === text && el.getBoundingClientRect().height > 0).at(-1).click();
+      click('Знаю'); click('Реже');
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Тренировка завершена!'));
+    state = await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);
+    assert.equal(state.workoutSnapshots.length, 1);
+    assert.equal(state.workoutSnapshots[0].correct, 1);
+    assert.equal(state.userWordProgress['review-fixture'].snoozed_until_by_lang, undefined);
+
+    // Saving an association cannot certify a translation flagged by the AI.
+    const flagged = { status: 'flagged', checkedAt: new Date().toISOString(), issues: [{ lang: 'en', issue: 'Неверный перевод' }] };
+    await seed({ ...fixture, userWordProgress: { ...learned, 'review-fixture': { ai_verification: flagged } } });
+    await tab('Word Triples');
+    await page.click('[aria-label="Редактировать слово"]');
+    await page.waitForFunction(() => document.body.innerText.includes('Редактировать слово'));
+    const fields = await page.$$('textarea[placeholder="Что поможет вам запомнить это слово?"]');
+    for (const field of fields) if (await field.isVisible()) await field.type('новая ассоциация');
+    await clickText('Сохранить');
+    state = await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);
+    assert.equal(state.userWordProgress['review-fixture'].personal_association, 'новая ассоциация');
+    assert.deepEqual(state.userWordProgress['review-fixture'].ai_verification, flagged);
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('PASS: counts, association draft, undo, import session reset, last review result, 320/430px layout.');
+    console.log('PASS: counts, drafts, undo, import, last review, animation cancellation, overlapping answers, AI verdict preservation, 320/430px.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

@@ -130,8 +130,46 @@ async function main() {
       body: JSON.stringify({ text: JSON.stringify(cards) }) }).catch(() => {});
     await page.waitForFunction(() => document.body.innerText.includes('Генерация отменена'));
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state.generatedSentences.length), 8);
+
+    // Filling an 80-card cache evicts its oldest entries. The current card must
+    // stay selected by identity even when its numerical position changes.
+    await page.emulateCPUThrottling(1);
+    await page.evaluate(() => {
+      const generatedSentences = Array.from({ length: 80 }, (_, i) => ({
+        id: `eviction-${i}`, language: 'English', source: 'generated', createdAt: Date.now() + 60000,
+        sentence: `Reader${i} reads.`, words: [
+          { text: `Reader${i}`, role: 'Subject', label: 'Noun', translation: 'читатель', is_in_my_dict: false },
+          { text: 'reads', role: 'Predicate', label: 'Verb', translation: 'читает', is_in_my_dict: false },
+        ],
+      }));
+      localStorage.setItem('papanda-storage', JSON.stringify({ version: 0, state: {
+        userWordProgress: {}, activeLanguages: ['en'], generatedSentences,
+      } }));
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitStage('COMPOSE_SENTENCES');
+    await page.waitForSelector('[data-testid="trainer-next"]');
+    for (let position = 2; position <= 80; position++) {
+      await page.click('[data-testid="trainer-next"]');
+      await page.waitForFunction(position => document.querySelector('[data-testid="trainer-position"]').textContent === `${position} / 80`, {}, position);
+    }
+    let selected = await page.$eval('[data-testid="trainer-sentence-text"]', el => el.textContent);
+    while (Number(selected.match(/Reader(\d+)/)[1]) < 8) {
+      await page.click('[data-testid="trainer-previous"]');
+      await page.waitForFunction(previous => document.querySelector('[data-testid="trainer-sentence-text"]').textContent !== previous, {}, selected);
+      selected = await page.$eval('[data-testid="trainer-sentence-text"]', el => el.textContent);
+    }
+    const positionBefore = await page.$eval('[data-testid="trainer-position"]', el => el.textContent);
+    await respond('COMPOSE_SENTENCES', cards.map(({ taskId, sentence }) => ({ taskId, sentence })));
+    await waitStage('REVIEW_AND_ANNOTATE');
+    await respond('REVIEW_AND_ANNOTATE', cards);
+    await waitStage('AUDIT_SENTENCE_CARDS');
+    await respond('AUDIT_SENTENCE_CARDS', verdicts);
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.generatedSentences.filter(s => s.id.startsWith('eviction-')).length === 72);
+    assert.equal(await page.$eval('[data-testid="trainer-sentence-text"]', el => el.textContent), selected);
+    assert.notEqual(await page.$eval('[data-testid="trainer-position"]', el => el.textContent), positionBefore);
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('Validated batch saved; no extra language batches; word request takes priority; late cancelled replies ignored.');
+    console.log('Validated batch saved; no extra language batches; word request takes priority; late cancelled replies ignored; cache eviction preserves the selected card.');
   } catch (error) {
     if (page) {
       console.error((await page.$eval('body', el => el.innerText)).slice(-3000));

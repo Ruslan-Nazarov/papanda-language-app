@@ -4,9 +4,11 @@ import assert from 'node:assert/strict';
 import { useStore } from '../src/store/useStore';
 import { createDefaultProgress } from '../src/store/progressTypes';
 import { captureKnowledgeUndo } from '../src/utils/wordProgress';
-import { buildWordLookup } from '../src/utils/words';
+import { buildWordLookup, cleanDictionaryForm, getWordTranslation } from '../src/utils/words';
 import { pickWordCard } from '../src/utils/wordCards';
 import type { Word } from '../src/models/types';
+import { tokensMatchSentence } from '../src/utils/sentenceValidation';
+import { isWordLearned } from '../src/utils/statistics';
 
 beforeEach(() => { useStore.getState().importProgress(createDefaultProgress()); });
 const sample: Word = { eng: 'test-card', ru: 'пример', translations: { en: 'example', it: 'esempio' },
@@ -93,4 +95,53 @@ it('word cards avoid immediate repeats while allowing the last eligible word', (
   assert.equal(pickWordCard([sample], ['en'], sample.eng), sample);
   assert.equal(pickWordCard([sample], []), null);
   assert.equal(pickWordCard([{ ...sample, knowledge_stats: { en: true } }], ['en']), null);
+});
+
+it('manual tokens accept opening punctuation without erasing real word boundaries', () => {
+  for (const text of ['¿Cómo estás?', '«Она читает».', '"He reads."', '(He reads.)']) {
+    assert.equal(tokensMatchSentence(text, text.split(/\s+/).map(text => ({ text }))), true, text);
+  }
+  assert.equal(tokensMatchSentence('¿Cómo estás?', [{ text: 'Cómo' }, { text: 'estás' }]), true);
+  assert.equal(tokensMatchSentence('a part', [{ text: 'apart' }]), false);
+  assert.equal(tokensMatchSentence('apart', [{ text: 'a' }, { text: 'part' }]), false);
+});
+
+it('manual edits detach generated chains and discard explanations of replaced text', () => {
+  const store = useStore.getState();
+  const original = { ...store.sentences[0], id: 'review-chain', source: 'generated' as const,
+    sentence: 'A unique review sentence.', generationBatchId: 'review-batch', generationTaskId: 'task-1', chainStep: 0,
+    literalTranslation: 'Прежний перевод', learningGoal: 'Прежнее задание' };
+  store.addGeneratedSentences([original]);
+  store.updateSentence(original.id, { ...original, sentence: 'Changed review sentence.' });
+  const edited = useStore.getState().sentences.find(s => s.id === original.id)!;
+  assert.equal(edited.source, 'manual');
+  for (const key of ['generationBatchId', 'generationTaskId', 'chainStep', 'literalTranslation', 'learningGoal', 'markerHints'] as const) {
+    assert.equal(edited[key], undefined, key);
+  }
+  assert.equal(store.exportProgress().generatedSentences.some(s => s.id === original.id), false);
+  assert.equal(store.importProgress(store.exportProgress()).ok, true);
+  assert.deepEqual(useStore.getState().sentences.find(s => s.id === original.id), JSON.parse(JSON.stringify(edited)));
+});
+
+it('learned badges follow the selected languages instead of the legacy summary flag', () => {
+  const word = { ...sample, is_learned: 1, knowledge_stats: { en: true, it: false } };
+  assert.equal(isWordLearned(word, ['en']), true);
+  assert.equal(isWordLearned(word, ['en', 'it']), false);
+  assert.equal(isWordLearned({ ...word, is_learned: 0 }, ['en']), true);
+  assert.equal(isWordLearned(word, []), false);
+});
+
+it('later translation edits override legacy renames and an empty field survives reload', () => {
+  const store = useStore.getState();
+  const key = store.words[0].eng!;
+  store.updateWordDetails(key, { word: 'old rename' });
+  store.updateWordDetails(key, { translations: { en: 'latest rename' } });
+  const current = () => useStore.getState().words.find(word => word.eng === key)!;
+  assert.equal(getWordTranslation(current(), 'en'), 'latest rename');
+  store.updateWordDetails(key, { translations: { en: '' } });
+  assert.equal(getWordTranslation(current(), 'en'), '');
+  assert.equal(current().eng, key);
+  store.importProgress(store.exportProgress());
+  assert.equal(getWordTranslation(current(), 'en'), '');
+  assert.equal(cleanDictionaryForm('¿Cómo?'), 'Cómo');
 });

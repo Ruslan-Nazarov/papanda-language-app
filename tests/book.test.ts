@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import vm from 'node:vm';
+import { createRequire } from 'node:module';
 import { bookChapters, bookLanguages, bookLanguageCode, chaptersForLanguage, bookTopics, searchBook, bookSnippet,
   getBookChapter, isBookLocation, bookURL, parseBookURL, selectBookPassages, bookContextPrompt, stripUnsupportedBookLinks } from '../src/services/bookService';
 import { buildSentenceAnnotationPrompt } from '../src/services/sentencePrompts';
@@ -16,6 +18,20 @@ const tokens: Token[] = [
   { text: 'not', label: 'частица', role: 'Predicate', translation: 'не', is_in_my_dict: false },
   { text: 'come', label: 'глагол', role: 'Predicate', translation: 'пришла', is_in_my_dict: false },
 ];
+it('book freshness checking accepts Windows checkouts but rejects changed content', () => {
+  const script = path.resolve('scripts/build-book.cjs');
+  const source = fs.readFileSync(script, 'utf8');
+  const requireFromScript = createRequire(script);
+  const run = (corrupt: boolean) => vm.runInNewContext(source, {
+    __dirname: path.dirname(script), Buffer, console: { log() {} }, process: { argv: ['node', script, '--check'] },
+    require: (name: string) => name === 'node:fs' ? { ...fs, readFileSync: (file: string, encoding: BufferEncoding) => {
+      const text = fs.readFileSync(file, encoding);
+      return file.endsWith('book.generated.json') ? text.replace(/\r?\n/g, '\r\n') + (corrupt ? 'changed' : '') : text;
+    } } : requireFromScript(name),
+  });
+  assert.doesNotThrow(() => run(false));
+  assert.throws(() => run(true), /Book data is stale/);
+});
 it('includes all 66 source documents, all seven languages, the scheme and introduction without changing source files', () => {
   assert.equal(bookChapters.length, 66);
   assert.equal(new Set(bookChapters.map(c => c.id)).size, 66);

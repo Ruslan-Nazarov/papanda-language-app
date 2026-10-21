@@ -14,13 +14,12 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
-  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore(useShallow(state => ({
+  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
     updateWordDetails: state.updateWordDetails,
     addCustomWord: state.addCustomWord,
     userWordProgress: state.userWordProgress,
-    setWordAiVerification: state.setWordAiVerification,
   })));
   const [tempWord, setTempWord] = useState<{
     ru: string;
@@ -149,9 +148,8 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
         updateWordDetails(wordKey, details);
       }
 
-      if (aiVerification?.status === 'flagged') {
-        setWordAiVerification(wordKey, { status: 'verified', checkedAt: new Date().toISOString() });
-      }
+      // Translation edits invalidate the old verdict in the store. Saving an
+      // association or an unchanged form is not a linguistic verification.
     }
     onClose();
   };
@@ -171,13 +169,15 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
                     <Text style={styles.aiIssueText}>
                       • {iss.lang.toUpperCase()}: {iss.issue}
                     </Text>
-                    {!!iss.suggestion && (
+                    {!!iss.suggestion && (iss.lang === 'ru' || editableLanguages.includes(iss.lang)) && (
                       <TouchableOpacity
                         style={styles.applySuggestionBtn}
                         onPress={() => {
                           setTempWord(prev => ({
                             ...prev,
-                            translations: { ...prev.translations, [iss.lang]: iss.suggestion! }
+                            ...(iss.lang === 'ru' ? { ru: iss.suggestion! } : {
+                              translations: { ...prev.translations, [iss.lang]: iss.suggestion! }
+                            })
                           }));
                         }}
                       >

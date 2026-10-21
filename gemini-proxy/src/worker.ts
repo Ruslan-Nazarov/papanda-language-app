@@ -116,8 +116,10 @@ async function callGemini(
     return { ok: false, status: res.status, message: data?.error?.message || `Gemini error ${res.status}.` };
   }
 
-  const text: string = (data?.candidates?.[0]?.content?.parts || [])
-    .map((p: any) => p?.text || '')
+  const parts: unknown = data?.candidates?.[0]?.content?.parts;
+  const text = (Array.isArray(parts) ? parts : [])
+    .filter(p => p && p.thought !== true && typeof p.text === 'string')
+    .map(p => p.text)
     .join('')
     .trim();
   const finishReason: string | undefined = data?.candidates?.[0]?.finishReason;
@@ -184,7 +186,8 @@ async function callOpenAiCompatible(
     return { ok: false, status: res.status, message: data?.error?.message || `Upstream error ${res.status}.` };
   }
 
-  let text: string = (data?.choices?.[0]?.message?.content || '').trim();
+  const contentText: unknown = data?.choices?.[0]?.message?.content;
+  let text = typeof contentText === 'string' ? contentText.trim() : '';
   const finishReason: string | undefined = data?.choices?.[0]?.finish_reason;
 
   if (isArraySchema && text) {
@@ -268,7 +271,7 @@ export default {
 
     const apiKey = apiKeyFor(provider, env);
     if (!apiKey) {
-      return json({ error: `Proxy is not configured for provider "${provider}".` }, 500);
+      return json({ error: `Proxy is not configured for provider "${provider}".`, retryable: false }, 500);
     }
 
     // Reserve all budgets atomically; rejected requests consume no shared quota.
@@ -310,7 +313,7 @@ export default {
         result = { ok: false, status: 502, message: 'Не удалось связаться с сервисом генерации.' };
       }
 
-      const succeeded = result.ok && Boolean(result.text);
+      const succeeded = result.ok && Boolean(result.text) && result.finishReason !== 'MAX_TOKENS';
       const isLastAttempt = attemptProvider === attempts[attempts.length - 1];
       if (succeeded || isLastAttempt) break;
       // Otherwise: this attempt failed or came back empty — fall through to the next provider.
@@ -337,7 +340,7 @@ export default {
       );
     }
 
-    if (!result.text) {
+    if (!result.text || result.finishReason === 'MAX_TOKENS') {
       return json(
         {
           error: result.finishReason === 'MAX_TOKENS' ? 'Ответ не поместился в лимит.' : 'Пустой ответ от сервиса генерации.',

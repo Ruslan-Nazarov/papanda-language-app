@@ -76,11 +76,9 @@ export function useSentenceEditor(language: string, setTargetSentenceId: (id: st
     if (editingSentenceId) {
       updateSentence(editingSentenceId, {
         ...originalSentence!,
-        ...(originalSentence?.sentence.trim() !== newSentenceText.trim() ? { literalTranslation: undefined, learningGoal: undefined, generationTaskId: undefined, markerHints: undefined } : {}),
         id: editingSentenceId,
         language,
         sentence: newSentenceText.trim(),
-        markerHints: undefined,
         words: parsedTokens
       });
       setTargetSentenceId(editingSentenceId);

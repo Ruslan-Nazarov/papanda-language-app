@@ -22,8 +22,10 @@ export const tokensMatchSentence = (sentence: string, tokens: Pick<Token, 'text'
   const source = surface(sentence);
   let cursor = 0;
   for (const token of tokens) {
-    while (cursor < source.length && separator.test(source[cursor])) cursor++;
     const text = surface(token.text);
+    // Manual tokens retain punctuation; AI tokens normally omit it. Do not
+    // skip an opening quote or ¿ when it is already part of the next token.
+    while (cursor < source.length && separator.test(source[cursor]) && !source.startsWith(text, cursor)) cursor++;
     if (!text || /\s/u.test(text) || !source.startsWith(text, cursor)) return false;
     cursor += text.length;
     if (cursor < source.length && !separator.test(source[cursor]) && !text.endsWith("'")) return false;

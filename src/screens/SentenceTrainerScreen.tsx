@@ -4,7 +4,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { generationContext, checkAborted, isAbortError, cancelGenerations, useGenerationStatus } from '../services/generationControl';
 import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Platform, ActivityIndicator, Alert, PanResponder, Animated, Easing, LayoutAnimation, UIManager, InteractionManager } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Platform, ActivityIndicator, Alert, PanResponder, Animated, LayoutAnimation, UIManager, InteractionManager } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { Token, Word } from '../models/types';
@@ -14,6 +14,7 @@ import SentenceExplanation from '../components/SentenceExplanation';
 import { explainSentenceWithAI } from '../services/aiService';
 import { generateSentenceBatch, isSentenceGenerationConfigured, RequiredWord } from '../services/sentenceGeneration';
 import SentenceEditorModal from '../components/SentenceEditorModal';
+import { useCardTransition } from '../hooks/useCardTransition';
 import { useSentenceEditor } from '../hooks/useSentenceEditor';
 import { ROLE_TRANSLATIONS, getRoleColor } from '../constants/sentencePresentation';
 import EditWordModal from '../components/EditWordModal';
@@ -56,7 +57,7 @@ export default function SentenceTrainerScreen() {
     setTargetSentenceInfo: state.setTargetSentenceInfo,
     incrementShowCounts: state.incrementShowCounts,
   })));
-  const [currentFilteredIndex, setCurrentFilteredIndex] = useState(0);
+  const [queuedSentenceId, setQueuedSentenceId] = useState<string | null>(null);
   const [targetSentenceId, setTargetSentenceId] = useState<string | null>(null);
   // null means fully revealed; otherwise each block can be opened independently.
   const [revealedTokens, setRevealedTokens] = useState<Set<number> | null>(new Set());
@@ -95,52 +96,14 @@ export default function SentenceTrainerScreen() {
   const generatingLanguages = useRef(new Map<string, Promise<void>>());
   const targetGenerationRequest = useRef(0);
   const queueOrder = useRef(createQueueOrder());
-  const swipeCallbacks = useRef({ next: () => {}, prev: () => {} });
-  const cardTranslateX = useRef(new Animated.Value(0)).current;
-  const isSwipeAnimating = useRef(false);
   const SWIPE_THRESHOLD = 60;
   const SWIPE_EXIT_DISTANCE = 420;
   const SWIPE_ENTRY_OFFSET = 48;
-
   const isMounted = useRef(true);
   useEffect(() => {
     isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-      cardTranslateX.stopAnimation();
-    };
-  }, [cardTranslateX]);
-
-  const resetCardPosition = () => {
-    if (isSwipeAnimating.current || !isMounted.current) return;
-    Animated.spring(cardTranslateX, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 5 }).start();
-  };
-
-  const animateSwipe = (direction: 'left' | 'right') => {
-    if (isSwipeAnimating.current || !isMounted.current) return;
-    isSwipeAnimating.current = true;
-    const exitDirection = direction === 'left' ? -1 : 1;
-    Animated.timing(cardTranslateX, {
-      toValue: exitDirection * SWIPE_EXIT_DISTANCE,
-      duration: 200,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (!finished || !isMounted.current) {
-        isSwipeAnimating.current = false;
-        return;
-      }
-      cardTranslateX.setValue(-exitDirection * SWIPE_ENTRY_OFFSET);
-      if (direction === 'left') swipeCallbacks.current.next();
-      else swipeCallbacks.current.prev();
-      requestAnimationFrame(() => {
-        if (!isMounted.current) return;
-        Animated.spring(cardTranslateX, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 4 }).start(() => {
-          if (isMounted.current) isSwipeAnimating.current = false;
-        });
-      });
-    });
-  };
+    return () => { isMounted.current = false; };
+  }, []);
 
   // A 1:1 dx>dy ratio effectively demanded a near-perfectly horizontal drag —
   // any natural diagonal wobble (very common on a touchscreen) failed to
@@ -216,6 +179,15 @@ export default function SentenceTrainerScreen() {
       showingGenerated: active.length > 0,
     };
   }, [allSentencesForLanguage]);
+
+  // Keep the visible card by ID when cache eviction removes earlier entries.
+  const currentFilteredIndex = Math.max(0, filteredSentences.findIndex(sentence => sentence.id === queuedSentenceId));
+  const setCurrentFilteredIndex = (index: number) => setQueuedSentenceId(filteredSentences[index]?.id ?? null);
+  useEffect(() => {
+    if (filteredSentences[currentFilteredIndex]?.id !== queuedSentenceId) {
+      setQueuedSentenceId(filteredSentences[currentFilteredIndex]?.id ?? null);
+    }
+  }, [filteredSentences, currentFilteredIndex, queuedSentenceId]);
 
   const generationError = generationErrors[selectedLanguageCode];
   const generatedCacheCount = generatedSentences.length;
@@ -369,6 +341,17 @@ export default function SentenceTrainerScreen() {
   const safeIndex = currentFilteredIndex < filteredSentences.length ? currentFilteredIndex : 0;
   const currentSentence = (targetSentenceId ? allSentencesForLanguage.find(sentence => sentence.id === targetSentenceId) : undefined) ?? filteredSentences[safeIndex];
 
+  const transition = useCardTransition({
+    enabled: isFocused && !showAiModal && !editor.isModalVisible && !isWordModalVisible && !isMenuVisible,
+    scope: selectedLanguageCode, cardKey: currentSentence?.id || '',
+    onSwipe: direction => direction === 'left' ? moveToNextSentence() : moveToPrevSentence(),
+    distance: SWIPE_EXIT_DISTANCE, entryOffset: SWIPE_ENTRY_OFFSET, duration: 200,
+  });
+  const cardTranslateX = transition.translateX;
+  const isSwipeAnimating = transition.busy;
+  const animateSwipe = transition.animate;
+  const resetCardPosition = transition.reset;
+
   // Edits keep the ID, but invalidate cached explanations and revealed answers too.
   useEffect(() => {
     explanationController.current?.abort();
@@ -380,6 +363,7 @@ export default function SentenceTrainerScreen() {
   }, [currentSentence, targetSentenceId]);
 
   const moveToNextSentence = () => {
+    if (!transition.beginAction()) return;
     setTargetSentenceId(null);
     if (filteredSentences.length <= 1) {
       setRevealedTokens(new Set());
@@ -397,6 +381,7 @@ export default function SentenceTrainerScreen() {
   };
 
   const moveToPrevSentence = () => {
+    if (!transition.beginAction()) return;
     setTargetSentenceId(null);
     if (filteredSentences.length <= 1) {
       setRevealedTokens(new Set());
@@ -413,8 +398,6 @@ export default function SentenceTrainerScreen() {
     setAiExplanation(null);
   };
 
-  swipeCallbacks.current.next = moveToNextSentence;
-  swipeCallbacks.current.prev = moveToPrevSentence;
 
   // Memoized O(1) word lookup map by normalized dictionary forms.
   // Replaces linear O(N) full-dictionary scanning on every token render.

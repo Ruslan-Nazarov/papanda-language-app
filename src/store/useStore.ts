@@ -8,6 +8,7 @@ import { WorkoutSnapshot, calculateIMWIndex } from '../utils/statistics';
 import { cleanDictionaryForm, getWordKey, getWordTranslation } from '../utils/words';
 import { localDateKey } from '../utils/date';
 import { sentenceFingerprint } from '../utils/sentenceValidation';
+import { prepareSentenceEdit } from '../utils/sentences';
 import { trimGeneratedCache } from '../utils/sentenceQueue';
 import { LANGUAGES } from '../constants/languages';
 import { applyWordProgress, baseStaticWords, deriveCatalog, mergeSentences } from './catalog';
@@ -181,8 +182,8 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     setWordAiVerification: (key, verification) => updateProgress(key, progress => ({ ...progress, ai_verification: verification })),
     updateWordDetails: (key, details) => updateProgress(key, progress => ({
       ...progress,
-      ...(details.word !== undefined ? { custom_word: details.word } : {}),
-      ...(details.ru !== undefined ? { custom_ru: details.ru } : {}),
+      custom_word: details.word ?? details.translations?.[baseFor(key)?.source_language || 'en'] ?? progress.custom_word,
+      custom_ru: details.ru ?? details.translations?.ru ?? progress.custom_ru,
       ...(details.personal_association !== undefined ? { personal_association: details.personal_association } : {}),
       custom_translations: { ...progress.custom_translations, ...details.translations, ...(details.ru !== undefined ? { ru: details.ru } : {}) },
       // A changed translation invalidates a previous AI verdict.
@@ -223,7 +224,8 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       return { customSentences, sentences: mergeSentences(customSentences, state.generatedSentences) };
     }),
     updateSentence: (id, sentence) => set(state => {
-      const customSentences = [...state.customSentences.filter(item => item.id !== id), { ...sentence, id, source: 'manual' as const }];
+      const edited = prepareSentenceEdit(state.sentences.find(item => item.id === id), sentence, id);
+      const customSentences = [...state.customSentences.filter(item => item.id !== id), edited];
       const generatedSentences = state.generatedSentences.filter(item => item.id !== id);
       return { customSentences, generatedSentences, sentences: mergeSentences(customSentences, generatedSentences) };
     }),

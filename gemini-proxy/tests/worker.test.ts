@@ -69,6 +69,52 @@ it('rejects unsupported providers and non-finite configuration', () => {
     assert.throws(() => parseGenerationRequest({ prompt: 'test', generationConfig: config }));
   }
   assert.throws(() => parseGenerationRequest({ prompt: 'test', provider: 'unknown' }));
+  assert.throws(() => parseGenerationRequest({ prompt: 'test', provider: ['gemini'] }));
+});
+
+it('never returns truncated prose or JSON as a successful completion', async () => {
+  for (const provider of ['gemini', 'cerebras', 'groq']) {
+    globalThis.fetch = async () => Response.json(provider === 'gemini'
+      ? { candidates: [{ content: { parts: [{ text: 'unfinished' }] }, finishReason: 'MAX_TOKENS' }] }
+      : { choices: [{ message: { content: 'unfinished' }, finish_reason: 'length' }] });
+    const response = await worker.fetch(request({ prompt: 'test' }), {
+      ...env(), DEFAULT_PROVIDER: provider, FALLBACK_PROVIDER: provider, CEREBRAS_API_KEY: 'test', GROQ_API_KEY: 'test',
+    });
+    assert.equal(response.status, 502, provider);
+    assert.deepEqual(await response.json(), { error: 'Ответ не поместился в лимит.', code: 'MAX_TOKENS', retryable: false });
+  }
+});
+
+it('tries the fallback after a nonempty truncated answer', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => ++calls === 1
+    ? Response.json({ candidates: [{ content: { parts: [{ text: 'partial' }] }, finishReason: 'MAX_TOKENS' }] })
+    : Response.json({ choices: [{ message: { content: 'complete' }, finish_reason: 'stop' }] });
+  const response = await worker.fetch(request({ prompt: 'test' }), { ...env(), CEREBRAS_API_KEY: 'test' });
+  assert.equal(calls, 2);
+  assert.deepEqual(await response.json(), { text: 'complete' });
+});
+
+it('only exposes final Gemini text, never thought parts or objects', async () => {
+  globalThis.fetch = async () => Response.json({ candidates: [{ content: { parts: [
+    { thought: true, text: 'internal reasoning' }, { text: { invalid: true } }, { text: 'final answer' },
+  ] }, finishReason: 'STOP' }] });
+  const response = await worker.fetch(request({ prompt: 'test' }), env());
+  assert.deepEqual(await response.json(), { text: 'final answer' });
+});
+
+it('malformed successful upstream payloads produce an empty-response error', async () => {
+  for (const parts of [null, {}, 'invalid']) {
+    globalThis.fetch = async () => Response.json({ candidates: [{ content: { parts } }] });
+    const response = await worker.fetch(request({ prompt: 'test' }), env());
+    assert.equal((await response.json() as { code: string }).code, 'EMPTY');
+  }
+});
+
+it('missing provider configuration is permanent and does not reserve quota', async () => {
+  const response = await worker.fetch(request({ prompt: 'test' }), { ...env(), GEMINI_API_KEY: undefined });
+  assert.equal(response.status, 500);
+  assert.equal((await response.json() as { retryable: boolean }).retryable, false);
 });
 
 it('refused requests do not drain global budget and quotas reset by UTC bucket', () => {

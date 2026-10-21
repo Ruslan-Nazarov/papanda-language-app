@@ -4,7 +4,7 @@ export const getWordKey = (word: Word): string => word.eng || word.word || '';
 
 /** Strip sentence punctuation at the edges without corrupting hyphens/apostrophes. */
 export const cleanDictionaryForm = (value: string): string =>
-  value.trim().replace(/^[.,;:!?"«»„“”()]+|[.,;:!?"«»„“”()]+$/gu, '').trim();
+  value.trim().replace(/^[.,;:!?¿¡"«»„“”()…—–]+|[.,;:!?¿¡"«»„“”()…—–]+$/gu, '').trim();
 
 /**
  * Returns the translation of a word for a given language code.
@@ -14,22 +14,18 @@ export const cleanDictionaryForm = (value: string): string =>
 export const getWordTranslation = (word: Word | undefined | null, langCode: string): string => {
   if (!word) return '';
 
+  // An explicitly cleared translation must stay empty. In particular, never
+  // resurrect the stable `eng` persistence key after an English field is cleared.
+  const translation = word.translations?.[langCode];
+  if (typeof translation === 'string') return translation.trim();
+
   if (langCode === 'ru') {
-    const customRu = word.translations?.ru;
-    if (typeof customRu === 'string' && customRu.trim()) return customRu.trim();
     return (word.ru || '').trim();
   }
 
   if (langCode === 'en') {
-    const customEn = word.translations?.en;
-    if (typeof customEn === 'string' && customEn.trim()) return customEn.trim();
     if (word.source_language) return word.source_language === 'en' ? (word.word || '').trim() : '';
     return (word.eng || word.word || '').trim();
-  }
-
-  const customTrans = word.translations?.[langCode];
-  if (typeof customTrans === 'string' && customTrans.trim()) {
-    return customTrans.trim();
   }
 
   const direct = word[langCode as keyof Word];

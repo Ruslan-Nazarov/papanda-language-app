@@ -1,7 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useIsFocused } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated } from 'react-native';
 import type { WordTriplesScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
@@ -13,6 +13,7 @@ import { readWordStats } from '../utils/statistics';
 import { pickWordCard } from '../utils/wordCards';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
 import { auditNextWordInBackground } from '../services/wordAuditService';
+import { useCardTransition } from '../hooks/useCardTransition';
 import { usePronunciation } from '../hooks/usePronunciation';
 import PronunciationModal from '../components/PronunciationModal';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
@@ -55,8 +56,15 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     handleSwipe: (_direction: 'left' | 'right') => {},
     resetCardPosition: () => {},
   });
-  const cardTranslateX = React.useRef(new Animated.Value(0)).current;
-  const isSwipeAnimating = React.useRef(false);
+  const transition = useCardTransition({
+    enabled: isFocused && !isModalVisible && !isStatsVisible && !isPronunciationModalVisible,
+    scope: JSON.stringify([activeLanguages, wordTourSize]), cardKey: currentWord?.eng || currentWord?.word || '',
+    onSwipe: direction => direction === 'left' ? handleNext() : handlePrev(),
+    canSwipe: direction => direction === 'left' ? !!currentWord && !isTourComplete : history.length > 0,
+    distance: SWIPE_EXIT_DISTANCE, entryOffset: SWIPE_ENTRY_OFFSET, duration: 210,
+  });
+  const cardTranslateX = transition.translateX;
+  const isSwipeAnimating = transition.busy;
 
   const panResponder = React.useRef(
     PanResponder.create({
@@ -139,6 +147,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   };
 
   const startNewTour = () => {
+    if (!transition.beginAction()) return;
     setSessionCount(0);
     setHistory([]);
     cardTranslateX.setValue(0);
@@ -146,6 +155,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   };
 
   const handleNext = () => {
+    if (!transition.beginAction()) return;
     if (!currentWord || isTourComplete) return;
     if (currentWord && associationText !== currentWord.personal_association) {
       saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
@@ -159,6 +169,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   };
 
   const handleMarkLearned = () => {
+    if (!transition.beginAction()) return;
     if (currentWord && !isTourComplete) {
       if (associationText !== currentWord.personal_association) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
@@ -176,6 +187,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   };
 
   const handlePrev = () => {
+    if (!transition.beginAction()) return;
     if (history.length > 0) {
       if (currentWord && associationText !== (currentWord.personal_association || '')) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
@@ -196,56 +208,8 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     }
   };
 
-  const resetCardPosition = () => {
-    if (isSwipeAnimating.current) return;
-    Animated.spring(cardTranslateX, {
-      toValue: 0,
-      useNativeDriver: true,
-      speed: 18,
-      bounciness: 5,
-    }).start();
-  };
-
-
-  const handleSwipe = (direction: 'left' | 'right') => {
-    // Right swipe undoes the previous card; keep it in place if nothing to undo.
-    if (direction === 'right' && history.length === 0) {
-      resetCardPosition();
-      return;
-    }
-    if (isSwipeAnimating.current) return;
-    isSwipeAnimating.current = true;
-
-    const exitDirection = direction === 'left' ? -1 : 1;
-    Animated.timing(cardTranslateX, {
-      toValue: exitDirection * SWIPE_EXIT_DISTANCE,
-      duration: 210,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (!finished) {
-        isSwipeAnimating.current = false;
-        return;
-      }
-      // Drop the next card just beyond the opposite edge, then spring it home.
-      cardTranslateX.setValue(-exitDirection * SWIPE_ENTRY_OFFSET);
-      if (direction === 'left') {
-        handleNext();
-      } else {
-        handlePrev();
-      }
-      requestAnimationFrame(() => {
-        Animated.spring(cardTranslateX, {
-          toValue: 0,
-          useNativeDriver: true,
-          speed: 18,
-          bounciness: 4,
-        }).start(() => {
-          isSwipeAnimating.current = false;
-        });
-      });
-    });
-  };
+  const resetCardPosition = transition.reset;
+  const handleSwipe = transition.animate;
 
   // Only the visible word screen audits words. The trainer owns sentence top-ups.
   useEffect(() => {

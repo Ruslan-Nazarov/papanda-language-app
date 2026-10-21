@@ -122,6 +122,7 @@ const output = JSON.stringify({ title: 'Как выучить много ино�
   languages: languages.map(({ folder, ...language }) => language), chapters }, null, 2) + '\n';
 const destination = path.join(root, 'src/data/book.generated.json');
 if (process.argv.includes('--check')) {
-  if (!fs.existsSync(destination) || fs.readFileSync(destination, 'utf8') !== output) throw new Error('Book data is stale. Run npm run book:build.');
+  // Git may check text files out with CRLF on Windows. Compare content, not EOLs.
+  if (!fs.existsSync(destination) || fs.readFileSync(destination, 'utf8').replace(/\r\n/g, '\n') !== output) throw new Error('Book data is stale. Run npm run book:build.');
 } else fs.writeFileSync(destination, output);
 console.log(`Book: ${chapters.length} chapters, ${chapters.reduce((n, c) => n + c.blocks.length, 0)} blocks, ${Buffer.byteLength(output)} bytes. ${process.argv.includes('--check') ? 'Verified.' : 'Built.'}`);

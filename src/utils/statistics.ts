@@ -164,15 +164,12 @@ export const calculateImwTrend = (snapshots: ImwSnapshot[]) => {
  * Количество слов, которые отмечены как "Выучено" во ВСЕХ активных языках.
  */
 export const calculateFullyLearned = (words: Word[], activeLangs: string[]): number => {
-  if (activeLangs.length === 0) return 0;
+  return words.filter(word => isWordLearned(word, activeLangs)).length;
+};
 
-  return words.filter(w => {
-    const knowledgeStats = readWordStats(w.knowledge_stats);
-    if (!knowledgeStats) return false;
-
-    // Check if it's learned (true or 1) in ALL active languages
-    return activeLangs.every(lang => knowledgeStats[lang] === true || knowledgeStats[lang] === 1);
-  }).length;
+export const isWordLearned = (word: Word, languages: string[]): boolean => {
+  const knowledge = readWordStats(word.knowledge_stats);
+  return languages.length > 0 && languages.every(lang => knowledge[lang] === true || knowledge[lang] === 1);
 };
 
 /**

@@ -8,6 +8,7 @@ import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
+import { isWordLearned } from '../utils/statistics';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 export default function DictionaryScreen({ navigation }: DictionaryScreenProps) {
@@ -77,7 +78,7 @@ export default function DictionaryScreen({ navigation }: DictionaryScreenProps) 
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editBtn} onPress={() => openEditor(item)}>
               <Text style={styles.editBtnText}>✏️</Text>
             </TouchableOpacity>
-            {!!item.is_learned && <Text style={styles.badgeLearned}>Выучено</Text>}
+            {isWordLearned(item, activeLanguages) && <Text style={styles.badgeLearned}>Выучено</Text>}
             {isAiFlagged && (
               <TouchableOpacity style={styles.badgeAiFlagged} onPress={() => openEditor(item)}>
                 <Text style={styles.badgeAiFlaggedText}>⚠️ Проверить перевод</Text>

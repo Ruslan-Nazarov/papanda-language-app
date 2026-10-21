@@ -16,7 +16,7 @@ export function parseGenerationRequest(value: unknown): { prompt: string; provid
   if (!record(value) || typeof value.prompt !== 'string' || !value.prompt.trim() || value.prompt.length > 60_000) {
     throw new Error('prompt must be a non-empty string of at most 60000 characters.');
   }
-  if (value.provider !== undefined && !['gemini', 'cerebras', 'groq'].includes(String(value.provider))) {
+  if (value.provider !== undefined && (typeof value.provider !== 'string' || !['gemini', 'cerebras', 'groq'].includes(value.provider))) {
     throw new Error('Unknown provider.');
   }
   const config = value.generationConfig ?? {};
