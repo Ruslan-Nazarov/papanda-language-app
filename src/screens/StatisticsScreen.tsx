@@ -1,19 +1,25 @@
+import ReviewPlan from '../components/ReviewPlan';
+import { StructureProgress } from '../components/StructureExercise';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { MainTabParamList } from '../navigation/types';
+import { useShallow } from 'zustand/react/shallow';
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
 import { Word } from '../models/types';
+import { getWordTranslation } from '../utils/words';
 import {
   calculateTotalVolume,
   calculateSeenWords,
   calculateFullyLearned,
   calculateShownToday,
   calculateIMWIndex,
-  calculateImwTrend,
   calculateKnownByLanguage,
   calculateKnowledgeDistribution,
-  calculateFamiliarWordsEfficiency
+  calculateFamiliarWordsEfficiency,
+  WORD_MEMORY
 } from '../utils/statistics';
 import { ACCENT, ACCENT_DARK } from '../constants/theme';
 
@@ -41,10 +47,12 @@ function Section({ icon, title, children, defaultOpen = true, help }: SectionPro
       <TouchableOpacity style={styles.cardHeader} activeOpacity={0.7} onPress={() => setOpen(o => !o)}>
         <View style={styles.cardTitleRow}>
           <Text style={styles.cardHeaderIcon}>{icon}</Text>
-          <Text style={styles.cardHeaderTitle} numberOfLines={1}>{title}</Text>
+          <Text style={styles.cardHeaderTitle}>{title}</Text>
         </View>
         {help && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={`Как считается: ${title}`}
             onPress={() => setShowHelp(true)}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             style={styles.helpBtn}
@@ -87,11 +95,16 @@ function BarRow({ label, value, max, color, valueText }: { label: string; value:
   );
 }
 
-export default function StatisticsScreen() {
+export default function StatisticsScreen({ navigation }: BottomTabScreenProps<MainTabParamList, 'Statistics'>) {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, dailyShows, workoutSnapshots, imwSnapshots, recordImwSnapshot } = useStore();
-  const [efficiencyMode, setEfficiencyMode] = useState<'percentage' | 'absolute'>('percentage');
+  const { words, activeLanguages, dailyShows, workoutSnapshots, recordImwSnapshot } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    dailyShows: state.dailyShows,
+    workoutSnapshots: state.workoutSnapshots,
+    recordImwSnapshot: state.recordImwSnapshot,
+  })));
 
   // Refresh today's iMW point whenever the user opens this screen.
   useEffect(() => { recordImwSnapshot(); }, [recordImwSnapshot]);
@@ -154,16 +167,16 @@ export default function StatisticsScreen() {
     };
   }, [words, activeLanguages]);
 
-  const imwTrend = useMemo(() => calculateImwTrend(imwSnapshots || []).slice(-16), [imwSnapshots]);
-  const imwTrendMax = Math.max(...imwTrend.map(p => p.imw), 10);
-
   const efficiency = useMemo(() => {
     if (!workoutSnapshots?.length) return [];
     return calculateFamiliarWordsEfficiency(workoutSnapshots)
+      .filter(item => item.total > 0)
       .slice(-10)
-      .map(item => ({ ...item, shortDate: item.date.slice(5).split('-').reverse().join('.') }));
+      .reverse()
+      .map(item => ({ ...item, displayDate: item.date.split('-').reverse().join('.') }));
   }, [workoutSnapshots]);
-  const efficiencyAbsMax = Math.max(...efficiency.map(e => e.total), 1);
+  const efficiencyTotal = efficiency.reduce((sum, day) => sum + day.total, 0);
+  const efficiencyKnown = efficiency.reduce((sum, day) => sum + day.absolute, 0);
 
   const frequentWords = useMemo(
     () => words.filter(w => (w.count || 0) > 0).sort((a, b) => (b.count || 0) - (a.count || 0)).slice(0, 15),
@@ -174,6 +187,8 @@ export default function StatisticsScreen() {
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
+      <ReviewPlan onStart={() => navigation.navigate('Brain Workout')} />
+      <StructureProgress />
       {/* Summary tiles */}
       <View style={styles.tilesRow}>
         <View style={styles.tile}>
@@ -258,91 +273,71 @@ export default function StatisticsScreen() {
       {/* Efficiency */}
       <Section
         icon="🎯"
-        title="Эффективность тренировок"
-        defaultOpen={efficiency.length > 0}
-        help="Доля верных ответов («Знаю») в тренировках по дням. Несколько тренировок за один день объединяются в одну точку. Режим «Ответы (шт.)» показывает то же самое в штуках (верно / всего). Растущая линия — материал закрепляется; проседания — набрал слишком много новых слов сразу."
+        title="Результаты тренировок"
+        help="Здесь учитываются ответы в завершённых тренировках слов. «Знаю» — вы отметили, что вспомнили перевод; «Не знаю» — что не вспомнили. Процент — число ответов «Знаю», делённое на число всех ответов. Повторный ответ на то же слово считается отдельно. Несколько тренировок в один день объединяются. Показаны последние 10 дней с ответами. Это ваша самооценка: состав и сложность слов могут меняться, поэтому процент сам по себе не доказывает рост знаний."
       >
         {efficiency.length === 0 ? (
-          <Text style={styles.emptyText}>Пройдите тренировку в разделе «Тренировка», чтобы увидеть график.</Text>
+          <View testID="workout-results-empty">
+            <Text style={styles.explanation}>Пока нет завершённых тренировок слов.</Text>
+            <Text style={styles.resultDetail}>После тренировки здесь появится, сколько раз вы ответили «Знаю» и «Не знаю».</Text>
+            <TouchableOpacity accessibilityRole="button" style={styles.startButton} onPress={() => navigation.navigate('Brain Workout')}>
+              <Text style={styles.startButtonText}>Начать тренировку</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
-          <>
-            <View style={styles.modeToggle}>
-              <TouchableOpacity
-                style={[styles.modeBtn, efficiencyMode === 'percentage' && styles.modeBtnActive]}
-                onPress={() => setEfficiencyMode('percentage')}
-              >
-                <Text style={[styles.modeBtnText, efficiencyMode === 'percentage' && styles.modeBtnTextActive]}>Точность (%)</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modeBtn, efficiencyMode === 'absolute' && styles.modeBtnActive]}
-                onPress={() => setEfficiencyMode('absolute')}
-              >
-                <Text style={[styles.modeBtnText, efficiencyMode === 'absolute' && styles.modeBtnTextActive]}>Ответы (шт.)</Text>
-              </TouchableOpacity>
+          <View testID="workout-results">
+            <Text style={styles.explanation}>Как часто вы вспоминали перевод в завершённых тренировках слов.</Text>
+            <View style={styles.resultSummary}>
+              <Text style={styles.resultPercent}>{Math.round(efficiencyKnown / efficiencyTotal * 100)}%</Text>
+              <Text style={styles.resultLabel}>ответов «Знаю»</Text>
+              <Text style={styles.resultDetail}>Вспомнили: {efficiencyKnown} из {efficiencyTotal} ответов</Text>
+              <Text style={styles.resultDetail}>«Не знаю»: {efficiencyTotal - efficiencyKnown}</Text>
+              <Text style={styles.resultPeriod}>Итого за показанные ниже дни с тренировками</Text>
             </View>
-            {efficiency.map((e, i) => (
-              <BarRow
-                key={i}
-                label={e.shortDate}
-                value={efficiencyMode === 'percentage' ? e.percentage : e.absolute}
-                max={efficiencyMode === 'percentage' ? 100 : efficiencyAbsMax}
-                color={ACCENT}
-                valueText={efficiencyMode === 'percentage' ? `${Math.round(e.percentage)}%` : `${e.absolute}/${e.total}`}
-              />
+            <Text style={styles.resultLabel}>По датам · сначала новые</Text>
+            {efficiency.map(e => (
+              <View key={e.date} style={styles.resultDay}>
+                <Text style={styles.resultDate}>{e.displayDate}</Text>
+                <Text style={styles.resultDayKnown}>«Знаю»: {e.absolute} из {e.total} · {Math.round(e.percentage)}%</Text>
+                <Text style={styles.resultDetail}>«Не знаю»: {e.total - e.absolute}</Text>
+              </View>
             ))}
-          </>
+            <Text style={styles.explanation}>Это ваши отметки, а не проверка перевода. Результат зависит и от сложности выбранных слов.</Text>
+          </View>
         )}
       </Section>
 
       {/* iMW */}
       <Section
         icon="🧠"
-        title="Индекс закрепления (iMW)"
+        title="Оценка закрепления"
         defaultOpen={false}
         help={
-          'Средний «вес памяти» по словам, которые ты начал учить. Для каждого слова считается:\n\n' +
-          '• прогресс к 80 повторениям (сколько раз показывалось / 80);\n' +
-          '• отмечено ли как «выучено» (если нет — вес вдвое меньше);\n' +
-          '• забывание: чем дольше не повторял слово, тем ниже его вклад.\n\n' +
-          '100% — весь начатый словарь надёжно закреплён. Новое слово временно тянет индекс вниз, пока не закрепишь его. График показывает динамику по дням.'
+          'Условный индекс iMW от 0 до 100 по словам, которые уже показывались в активных языках.\n\n' +
+          `В расчёте приложения ${WORD_MEMORY.TARGET_SHOWS} показов дают полный балл за повторения. Без отметки «Знаю» вклад слова вдвое меньше. После перерыва вклад постепенно снижается. Итог — среднее по начатым словам и языкам.\n\n` +
+          'Число 80 — настройка расчёта, а не обязательное число повторений для запоминания. Новые слова могут снизить средний балл. Оценка не измеряет процент знания языка и не гарантирует, что вы помните перевод.'
         }
       >
-        <Text style={styles.sectionNote}>
-          Средний «вес памяти» по начатым словам: прогресс к 80 повторениям × статус «выучено» × забывание со временем.
-        </Text>
-
-        {imwTrend.length >= 2 && (
-          <>
-            <Text style={[styles.sectionNote, { marginTop: 14, color: '#475569', fontWeight: '600' }]}>
-              Динамика ({imwTrend.length} дн.)
-            </Text>
-            <View style={[styles.activityChart, { height: 110 }]}>
-              {imwTrend.map((p, i) => (
-                <View key={i} style={styles.activityCol}>
-                  <Text style={styles.activityValue}>{i === imwTrend.length - 1 ? `${p.imw.toFixed(0)}` : ''}</Text>
-                  <View style={styles.activityTrack}>
-                    <View style={[styles.activityFill, { height: `${Math.max(4, (p.imw / imwTrendMax) * 100)}%`, backgroundColor: '#38BDF8' }]} />
-                  </View>
-                  <Text style={styles.activityDay}>{p.date.slice(8)}</Text>
+        <View testID="memory-estimate">
+          <Text style={styles.explanation}>Условный балл за повторения, отметки «Знаю» и недавние занятия.</Text>
+          {summary.seen === 0 ? (
+            <Text style={styles.resultDetail}>Пока нечего оценивать: начните повторять слова.</Text>
+          ) : (
+            <>
+              <View style={styles.resultSummary}>
+                <Text style={styles.memoryScore}>{imw.overall.toFixed(1).replace('.', ',')} из 100</Text>
+                <Text style={styles.resultDetail}>По словам, которые вы уже начали учить</Text>
+              </View>
+              {imw.langs.map(lang => (
+                <View key={lang.code} style={styles.memoryRow}>
+                  <Text style={styles.memoryLanguage}>{lang.flag} {lang.label}</Text>
+                  <Text style={styles.memoryValue}>{lang.pct.toFixed(1).replace('.', ',')} / 100</Text>
                 </View>
               ))}
-            </View>
-            <View style={styles.divider} />
-          </>
-        )}
-
-        {imw.langs.map(lang => (
-          <BarRow
-            key={lang.code}
-            label={`${lang.flag} ${lang.label}`}
-            value={lang.pct}
-            max={100}
-            color="#38BDF8"
-            valueText={`${lang.pct.toFixed(0)}%`}
-          />
-        ))}
-        <View style={styles.divider} />
-        <BarRow label="Итого" value={imw.overall} max={100} color={ACCENT_DARK} valueText={`${imw.overall.toFixed(0)}%`} />
+            </>
+          )}
+          <Text style={styles.explanation}>Низкий балл обычно означает мало повторений или перерыв. Это не процент знания языка. Новые слова тоже могут снизить средний балл.</Text>
+        </View>
       </Section>
 
       {/* Frequent words */}
@@ -358,7 +353,7 @@ export default function StatisticsScreen() {
           frequentWords.map((word, i) => (
             <View key={word.eng || word.word || i} style={styles.wordCard}>
               <View style={styles.wordCardHeader}>
-                <Text style={styles.wordRu} numberOfLines={1}>{word.ru || word.eng || word.word}</Text>
+                <Text style={styles.wordRu} numberOfLines={1}>{word.ru || getWordTranslation(word, word.source_language || 'en') || word.word}</Text>
                 <Text style={styles.wordCount}>{word.count || 0}×</Text>
               </View>
               <View style={styles.wordTransRow}>
@@ -407,7 +402,7 @@ const styles = StyleSheet.create({
   cardBody: { paddingHorizontal: 16, paddingBottom: 16 },
 
   helpBtn: {
-    width: 22, height: 22, borderRadius: 11, marginRight: 10,
+    width: 22, height: 22, borderRadius: 11, marginRight: 18,
     backgroundColor: '#EEF2F7', borderWidth: 1, borderColor: '#D9E1EC',
     alignItems: 'center', justifyContent: 'center',
   },
@@ -438,11 +433,21 @@ const styles = StyleSheet.create({
   activityFill: { width: '100%', backgroundColor: ACCENT, borderRadius: 4 },
   activityDay: { fontSize: 9, color: '#94A3B8', marginTop: 5 },
 
-  modeToggle: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 10, padding: 3, marginBottom: 14, alignSelf: 'flex-start' },
-  modeBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 7 },
-  modeBtnActive: { backgroundColor: '#FFF', elevation: 1 },
-  modeBtnText: { fontSize: 12, color: '#64748B', fontWeight: '600' },
-  modeBtnTextActive: { color: '#0F172A' },
+  explanation: { fontSize: 13, color: '#475569', lineHeight: 19, marginBottom: 12 },
+  resultSummary: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 16, marginBottom: 16 },
+  resultPercent: { fontSize: 32, fontWeight: '800', color: '#15803D' },
+  resultLabel: { fontSize: 13, fontWeight: '700', color: '#334155', lineHeight: 19 },
+  resultDetail: { fontSize: 13, color: '#475569', lineHeight: 20, marginTop: 4 },
+  resultPeriod: { fontSize: 12, color: '#64748B', lineHeight: 18, marginTop: 10 },
+  resultDay: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E2E8F0', marginBottom: 10 },
+  resultDate: { fontSize: 12, fontWeight: '600', color: '#64748B', marginBottom: 4 },
+  resultDayKnown: { fontSize: 14, fontWeight: '700', color: '#1E293B', lineHeight: 21 },
+  startButton: { backgroundColor: ACCENT, borderRadius: 10, padding: 12, alignItems: 'center', marginTop: 14 },
+  startButtonText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  memoryScore: { fontSize: 26, fontWeight: '800', color: '#334155' },
+  memoryRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  memoryLanguage: { flex: 1, fontSize: 13, color: '#475569' },
+  memoryValue: { fontSize: 13, fontWeight: '700', color: '#334155' },
 
   divider: { height: 1, backgroundColor: '#F1F5F9', marginVertical: 12 },
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "papanda",
     "slug": "papanda-app",
-    "version": "1.0.1",
+    "version": "1.3.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,6 +17,7 @@
     },
     "android": {
       "package": "com.papanda.app",
+      "versionCode": 12,
       "adaptiveIcon": {
         "backgroundColor": "#F7CFA8",
         "foregroundImage": "./assets/android-icon-foreground.png",

@@ -23,136 +23,108 @@
 </style>
 </head>
 <body>
-
 <h1>Политика конфиденциальности — papanda</h1>
-<p class="updated">Последнее обновление: 8 сентября 2026 г.</p>
-
-<p>Приложение <strong>papanda</strong> (пакет <code>com.papanda.app</code>, далее — «Приложение») —
-это инструмент для изучения языков. Настоящая политика описывает, какие данные Приложение
-обрабатывает. Разработчик — частное лицо, контакт: <strong>runaz2007@gmail.com</strong>.</p>
-
-<h2>Коротко</h2>
-<ul>
-  <li>Приложение <strong>не собирает</strong> персональные данные: ни имя, ни email, ни номер
-      телефона, ни точную геолокацию.</li>
-  <li>В Приложении <strong>нет</strong> рекламы, аналитики, трекеров и SDK третьих сторон для
-      отслеживания.</li>
-  <li>Ваш словарь, прогресс обучения и статистика хранятся <strong>только на вашем
-      устройстве</strong>.</li>
-  <li>Для генерации и разбора учебных предложений короткие тексты (слова и предложения)
-      отправляются через наш прокси-сервер в облачный сервис Google Gemini.</li>
-</ul>
-
-<h2>Какие данные хранятся на устройстве</h2>
-<p>Приложение сохраняет локально (в хранилище приложения на телефоне):</p>
-<ul>
-  <li>добавленные вами слова и переводы;</li>
-  <li>отметки «знаю / не знаю», счётчики показов, даты последнего повторения;</li>
-  <li>рассчитанную статистику и ежедневные снимки индекса запоминания;</li>
-  <li>пользовательские настройки.</li>
-</ul>
-<p>Эти данные <strong>не передаются</strong> нам и никуда не загружаются автоматически. Они
-удаляются при удалении Приложения. Вы можете вручную экспортировать их в файл и импортировать
-обратно (функция «Экспорт / импорт прогресса» в настройках) — этот файл создаётся и хранится
-там, куда вы его сохраните; мы к нему доступа не имеем.</p>
-
-<h2>Какие данные покидают устройство</h2>
-<p>Для функций генерации учебных предложений и объяснения их структуры Приложение отправляет
-запрос на наш промежуточный сервер (Cloudflare Worker), который пересылает его в
-<strong>Google Gemini API</strong>. В запросе передаются:</p>
-<ul>
-  <li>текст задания для модели: изучаемый язык, несколько слов из вашего активного словаря
-      и/или предложение, которое нужно разобрать;</li>
-  <li>случайный идентификатор установки (UUID, генерируется на устройстве) — используется
-      только для ограничения частоты запросов и защиты от злоупотреблений. Он не привязан к
-      вашей личности, аккаунту или устройству и не используется для рекламы или аналитики.</li>
-</ul>
-<p>Промежуточный сервер не ведёт журналов содержимого запросов на постоянной основе и хранит
-только счётчики количества запросов по идентификатору установки (сбрасываются по времени).
-Обработка данных на стороне Google регулируется условиями
-<a href="https://developers.google.com/terms">Google APIs Terms of Service</a> и
-<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
-<p>Приложению требуется разрешение «Интернет» исключительно для этих запросов.</p>
-
-<h2>AI-генерируемый контент</h2>
-<p>Учебные предложения и объяснения создаются языковой моделью и могут содержать неточности.
-Они предназначены только для учебных целей.</p>
-
-<h2>Дети</h2>
-<p>Приложение не предназначено для детей младше 13 лет и не собирает намеренно данные детей.</p>
-
-<h2>Изменения политики</h2>
-<p>При изменении политики обновляется дата в начале документа. Существенные изменения будут
-отражены в описании обновления Приложения.</p>
-
-<h2>Контакты</h2>
-<p>По вопросам о данных: <strong>runaz2007@gmail.com</strong></p>
-
-<hr>
-
+<p><em>Последнее обновление: 21 октября 2026 г.</em></p>
+<p>Papanda (com.papanda.app) — приложение для изучения языков. Контакт разработчика: <strong>runaz2007@gmail.com</strong>.</p>
+<h2>Данные на устройстве</h2>
+<p>Приложение не запрашивает имя, email, телефон или геолокацию для обучения.
+Словарь, переводы, ассоциации, результаты тренировок и настройки сохраняются локально.
+В приложении нет встроенной рекламной или поведенческой аналитики.</p>
+<p>При импорте сохраняется одна локальная точка восстановления — состояние перед
+последним импортом. Следующий импорт заменяет эту точку. Она, как и текущий
+прогресс, может быть потеряна при удалении приложения. Файлы экспорта сохраняются
+в выбранном вами месте; их доступность и резервирование зависят от выбранного
+хранилища. Приложение не синхронизирует весь прогресс с нашим сервером.</p>
+<h2>AI и передача текстов</h2>
+<p>Собственные тексты для чтения, позиция чтения, готовые разборы и результаты
+самостоятельного выбора членов предложения хранятся на устройстве и включаются
+в экспорт прогресса. Сохранение текста само по себе не отправляет его ИИ.
+Кнопки разбора, уточнения маркеров, развития и сравнения языков отправляют выбранное
+предложение, его разметку и при необходимости указанную вами деталь. Остальная
+часть сохранённого текста в эти запросы не включается.</p>
+<p>Если AI подключён, запросы проходят через Cloudflare Worker в <strong>Google Gemini,
+Cerebras или Groq</strong>, в зависимости от серверной настройки. При ошибке основного
+провайдера тот же запрос может быть направлен резервному провайдеру.</p>
+<p>Передаются язык, учебные слова и их переводы, предложения, разметка и инструкции
+для генерации или объяснения. Проверка слов и подготовка предложений могут
+запускаться в фоне при использовании приложения. Поэтому часть словаря может
+передаваться без отдельного нажатия на AI-кнопку. Весь файл прогресса
+в эти запросы не включается. Не вводите в учебные тексты сведения,
+которые не хотите передавать AI-провайдерам.</p>
+<p>Прокси получает случайный идентификатор установки для ограничения запросов;
+он не является авторизацией. В Durable Object сохраняются счётчики по этому
+идентификатору. Код прокси не сохраняет содержимое запросов в собственной базе.
+Cloudflare и AI-провайдеры обрабатывают технические данные соединений по своим
+правилам. Сроки хранения и использование AI-текстов зависят от провайдера,
+тарифа и серверной конфигурации; единое обещание об отсутствии хранения или
+обучения моделей на этих текстах не даётся.</p>
+<p>Правила провайдеров: <a href="https://ai.google.dev/gemini-api/terms">Gemini API</a>,
+<a href="https://www.cerebras.ai/privacy-policy">Cerebras</a>,
+<a href="https://groq.com/privacy-policy">Groq</a>,
+<a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a>.</p>
+<p>Отмена генерации прекращает ожидание и следующие попытки в приложении. Она
+не отзывает текст, уже переданный провайдеру, и не гарантирует отмену его обработки.
+Встроенные предложения и словарь доступны без AI.</p>
+<h2>Озвучивание</h2>
+<p>По нажатию «Слушать» или «Медленно» текст передаётся системному синтезатору речи
+устройства или браузера. Papanda не отправляет его через свой AI-прокси для
+озвучивания. Наличие голосов и работа без сети зависят от системы и выбранного
+голоса; некоторые системные движки могут использовать сетевые сервисы.</p>
+<h2>Учебный контент и возрастные ограничения</h2>
+<p>AI-разборы могут содержать ошибки. Для AI-сервисов действуют также возрастные
+и региональные ограничения выбранных провайдеров, указанные в их условиях.</p>
+<h2>Изменения и контакт</h2>
+<p>Дата обновления указывается в начале политики. Вопросы о данных:
+<strong>runaz2007@gmail.com</strong>.</p>
 <h1>Privacy Policy — papanda</h1>
-<p class="updated">Last updated: 8 September 2026</p>
-
-<p><strong>papanda</strong> (package <code>com.papanda.app</code>, the "App") is a
-language-learning tool. This policy explains what data the App processes. The developer is an
-individual; contact: <strong>runaz2007@gmail.com</strong>.</p>
-
-<h2>Summary</h2>
-<ul>
-  <li>The App does <strong>not</strong> collect personal data — no name, email, phone number,
-      or precise location.</li>
-  <li>The App contains <strong>no</strong> ads, analytics, tracking, or third-party tracking
-      SDKs.</li>
-  <li>Your vocabulary, learning progress, and statistics are stored <strong>only on your
-      device</strong>.</li>
-  <li>To generate and analyse practice sentences, short texts (words and sentences) are sent
-      through our proxy server to the Google Gemini cloud service.</li>
-</ul>
-
-<h2>Data stored on your device</h2>
-<p>The App stores locally (in the app's storage on your phone):</p>
-<ul>
-  <li>words and translations you add;</li>
-  <li>"known / unknown" marks, view counters, last-review dates;</li>
-  <li>computed statistics and daily memory-index snapshots;</li>
-  <li>app settings.</li>
-</ul>
-<p>This data is <strong>never</strong> sent to us or uploaded automatically. It is removed
-when you uninstall the App. You can manually export it to a file and import it back ("Export
-/ import progress" in settings) — that file is stored wherever you choose to save it and we
-have no access to it.</p>
-
-<h2>Data that leaves your device</h2>
-<p>For sentence generation and structure-explanation features, the App sends a request to our
-intermediary server (a Cloudflare Worker), which forwards it to the <strong>Google Gemini
-API</strong>. The request contains:</p>
-<ul>
-  <li>the task text for the model: the language being studied, a few words from your active
-      vocabulary, and/or a sentence to analyse;</li>
-  <li>a random installation identifier (a UUID generated on the device) — used only for rate
-      limiting and abuse prevention. It is not linked to your identity, account, or device and
-      is not used for advertising or analytics.</li>
-</ul>
-<p>The intermediary server does not persistently log request contents; it stores only
-per-installation request counters that reset over time. Google's processing is governed by the
-<a href="https://developers.google.com/terms">Google APIs Terms of Service</a> and the
-<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
-<p>The App requests the "Internet" permission solely for these requests.</p>
-
-<h2>AI-generated content</h2>
-<p>Practice sentences and explanations are produced by a language model and may contain
-inaccuracies. They are for learning purposes only.</p>
-
-<h2>Children</h2>
-<p>The App is not directed to children under 13 and does not knowingly collect children's
-data.</p>
-
-<h2>Changes</h2>
-<p>If this policy changes, the date at the top is updated. Material changes will be noted in
-the App's update description.</p>
-
-<h2>Contact</h2>
-<p>Data questions: <strong>runaz2007@gmail.com</strong></p>
+<p><em>Last updated: 21 October 2026</em></p>
+<p>Papanda (com.papanda.app) is a language-learning app. Developer contact: <strong>runaz2007@gmail.com</strong>.</p>
+<h2>Local data</h2>
+<p>The app does not request a name, email address, phone number or location for
+learning. Vocabulary, translations, associations, study results and settings
+are stored locally. The app has no embedded advertising or behavioural analytics.</p>
+<p>An import saves one local recovery point containing the state before that import.
+The next import replaces this point. Uninstalling the app may remove both current
+progress and the recovery point. Exported files are stored wherever you choose;
+availability and backup depend on that storage provider. The app does not sync
+the entire progress file to our server.</p>
+<h2>AI requests</h2>
+<p>Personal reading texts, reading position, saved annotations and sentence-analysis
+results are stored locally and included in progress exports. Saving a text alone
+does not send it to AI. Analysis, marker, development and comparison buttons send
+the selected sentence, its annotation and any requested detail. The rest of the
+saved reading text is not included in these requests.</p>
+<p>When configured, AI requests go through a Cloudflare Worker to <strong>Google Gemini,
+Cerebras or Groq</strong>. Server settings select the provider; a failed request may
+be forwarded to a fallback provider.</p>
+<p>Requests include the language, practice words and translations, sentences,
+annotations and instructions for generation or explanation. Word checks and
+sentence preparation may run in the background while you use the app, without
+a separate AI button press. The full progress file is not included.
+Do not put information you do not want to share with AI providers
+in your practice texts.</p>
+<p>The proxy receives a random installation identifier for request quotas, not
+authentication. A Durable Object stores counters associated with that identifier.
+The proxy code does not store prompt content in its own database. Cloudflare and
+AI providers process connection metadata according to their policies. Retention
+and use of AI content depend on the provider, plan and server configuration;
+there is no blanket promise that content is never retained or used for training.</p>
+<p>Provider information: <a href="https://ai.google.dev/gemini-api/terms">Gemini API</a>,
+<a href="https://www.cerebras.ai/privacy-policy">Cerebras</a>,
+<a href="https://groq.com/privacy-policy">Groq</a>,
+<a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a>.</p>
+<p>Cancelling stops client waiting and subsequent attempts. It does not recall
+content already sent or guarantee that provider processing is cancelled.
+Bundled vocabulary and sentences work without AI.</p>
+<h2>Speech</h2>
+<p>Listen and Slow send the selected text to the device or browser speech engine.
+Papanda does not send it through its AI proxy for speech. Voices and offline
+availability depend on the system; some speech engines may use network services.</p>
+<h2>Learning content and age restrictions</h2>
+<p>AI explanations may be incorrect. AI services are also subject to the selected provider's age and
+regional restrictions in its terms.</p>
+<h2>Changes and contact</h2>
+<p>The update date appears above. Data questions: <strong>runaz2007@gmail.com</strong>.</p>
 
 </body>
 </html>

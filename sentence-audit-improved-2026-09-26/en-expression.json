@@ -1,0 +1,411 @@
+{
+  "scenario": {
+    "id": "en-expression",
+    "code": "en",
+    "count": 1,
+    "lemma": "take care of"
+  },
+  "startedAt": "2026-09-26T13:21:49.921Z",
+  "elapsedMs": 11545,
+  "accepted": 0,
+  "sentences": [],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: [{\"lemma\":\"take care of\",\"translation\":\"\"}]\nThe task task-1 must use the lexeme/expression \"take care of\" naturally, inflected if needed.\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The child reads.\",\"The smart child reads.\",\"The smart child reads a book.\",\"The smart child reads a book at home.\",\"The smart child does not read a book at home.\",\"Does the smart child read a book at home?\",\"The smart child reads a book because the teacher asks.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The older sister will take care of the baby.\"\n  }\n]"
+      },
+      "elapsedMs": 1879
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The older sister will take care of the baby.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The older sister will take care of the baby.\",\n    \"literalTranslation\": \"Старшая сестра позаботится о ребёнке.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"older\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"old\", \"er\"],\n        \"translation\": \"старшая\",\n        \"dictionary_form\": \"old\"\n      },\n      {\n        \"text\": \"sister\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"sister\"],\n        \"translation\": \"сестра\",\n        \"dictionary_form\": \"sister\"\n      },\n      {\n        \"text\": \"will\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"will\"],\n        \"translation\": \"будет\",\n        \"dictionary_form\": \"will\"\n      },\n      {\n        \"text\": \"take\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"take\"],\n        \"translation\": \"позаботиться\",\n        \"dictionary_form\": \"take\"\n      },\n      {\n        \"text\": \"care\",\n        \"label\": \"Noun\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"care\"],\n        \"translation\": \"заботу\",\n        \"dictionary_form\": \"care\"\n      },\n      {\n        \"text\": \"of\",\n        \"label\": \"Preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"of\"],\n        \"translation\": \"о\",\n        \"dictionary_form\": \"of\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"Article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"определенный артикль\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"baby\",\n        \"label\": \"Noun\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"baby\"],\n        \"translation\": \"ребёнке\",\n        \"dictionary_form\": \"baby\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 3494
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nALREADY ACCEPTED CONTEXT: []\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"The older sister will take care of the baby.\",\"literalTranslation\":\"Старшая сестра позаботится о ребёнке.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"определенный артикль\",\"dictionary_form\":\"the\"},{\"text\":\"older\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"old\",\"er\"],\"translation\":\"старшая\",\"dictionary_form\":\"old\"},{\"text\":\"sister\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"sister\"],\"translation\":\"сестра\",\"dictionary_form\":\"sister\"},{\"text\":\"will\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"will\"],\"translation\":\"будет\",\"dictionary_form\":\"will\"},{\"text\":\"take\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"take\"],\"translation\":\"позаботиться\",\"dictionary_form\":\"take\"},{\"text\":\"care\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"care\"],\"translation\":\"заботу\",\"dictionary_form\":\"care\"},{\"text\":\"of\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"of\"],\"translation\":\"о\",\"dictionary_form\":\"of\"},{\"text\":\"the\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"определенный артикль\",\"dictionary_form\":\"the\"},{\"text\":\"baby\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"baby\"],\"translation\":\"ребёнке\",\"dictionary_form\":\"baby\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": false,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"В словосочетании of the baby слово baby выполняет роль дополнения (Object), а не атрибута (Attribute_Object).\"\n  }\n]"
+      },
+      "elapsedMs": 1853
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: [{\"lemma\":\"take care of\",\"translation\":\"\"}]\nThe task task-1 must use the lexeme/expression \"take care of\" naturally, inflected if needed.\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The child reads.\",\"The smart child reads.\",\"The smart child reads a book.\",\"The smart child reads a book at home.\",\"The smart child does not read a book at home.\",\"Does the smart child read a book at home?\",\"The smart child reads a book because the teacher asks.\"]\nCorrect these problems from the previous attempt: [\"task-1: roles: В словосочетании of the baby слово baby выполняет роль дополнения (Object), а не атрибута (Attribute_Object).\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"The nurse takes care of the baby.\"}]"
+      },
+      "elapsedMs": 1275
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The nurse takes care of the baby.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"The nurse takes care of the baby.\",\"literalTranslation\":\"Медсестра заботится о младенце.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"The\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"nurse\",\"label\":\"Noun\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"nurse\"],\"translation\":\"медсестра\",\"dictionary_form\":\"nurse\"},{\"text\":\"takes\",\"label\":\"Verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"take\",\"s\"],\"translation\":\"заботится\",\"dictionary_form\":\"take\"},{\"text\":\"care\",\"label\":\"Noun\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"care\"],\"translation\":\"о\",\"dictionary_form\":\"care\"},{\"text\":\"of\",\"label\":\"Preposition\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"of\"],\"translation\":\"о\",\"dictionary_form\":\"of\"},{\"text\":\"the\",\"label\":\"Article\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"этом\",\"dictionary_form\":\"the\"},{\"text\":\"baby\",\"label\":\"Noun\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"baby\"],\"translation\":\"младенце\",\"dictionary_form\":\"baby\"}]}]"
+      },
+      "elapsedMs": 1733
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nALREADY ACCEPTED CONTEXT: []\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"The nurse takes care of the baby.\",\"literalTranslation\":\"Медсестра заботится о младенце.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"nurse\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"nurse\"],\"translation\":\"медсестра\",\"dictionary_form\":\"nurse\"},{\"text\":\"takes\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"take\",\"s\"],\"translation\":\"заботится\",\"dictionary_form\":\"take\"},{\"text\":\"care\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"care\"],\"translation\":\"о\",\"dictionary_form\":\"care\"},{\"text\":\"of\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"of\"],\"translation\":\"о\",\"dictionary_form\":\"of\"},{\"text\":\"the\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"этом\",\"dictionary_form\":\"the\"},{\"text\":\"baby\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"baby\"],\"translation\":\"младенце\",\"dictionary_form\":\"baby\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"natural\":true,\"translation\":true,\"roles\":false,\"morphology\":true,\"chain\":true,\"reason\":\"роль слова «care» указана как Predicate, но это часть фразового глагола «takes care of», а не отдельное сказуемое\"}]"
+      },
+      "elapsedMs": 1280
+    }
+  ],
+  "error": "task-1: roles: роль слова «care» указана как Predicate, но это часть фразового глагола «takes care of», а не отдельное сказуемое"
+}

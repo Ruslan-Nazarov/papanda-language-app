@@ -1,0 +1,49 @@
+{
+  "drafts": [
+    {
+      "taskId": "task-1",
+      "sentence": "Water boils."
+    },
+    {
+      "taskId": "task-2",
+      "sentence": "Cold water boils."
+    }
+  ],
+  "accepted": [
+    {
+      "taskId": "task-1",
+      "sentence": "Water boils.",
+      "literalTranslation": "Вода кипит.",
+      "review": {
+        "natural": true,
+        "taskFit": true,
+        "analysisReliable": true
+      },
+      "words": [
+        {
+          "text": "Water",
+          "label": "NOUN",
+          "role": "Subject",
+          "clauseIndex": 0,
+          "parts": [
+            "Water"
+          ],
+          "translation": "Вода",
+          "dictionary_form": "water"
+        },
+        {
+          "text": "boils",
+          "label": "VERB",
+          "role": "Predicate",
+          "clauseIndex": 0,
+          "parts": [
+            "boil",
+            "s"
+          ],
+          "translation": "кипит",
+          "dictionary_form": "boil"
+        }
+      ]
+    }
+  ]
+}

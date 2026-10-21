@@ -1,0 +1,49 @@
+{
+  "scenario": {
+    "id": "de-1",
+    "code": "de",
+    "count": 8
+  },
+  "startedAt": "2026-09-26T13:22:01.469Z",
+  "elapsedMs": 2594,
+  "accepted": 0,
+  "sentences": [],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Deutsch (de)\nNatural German: capitalize nouns, finite verb second in neutral main clauses, final in subordinate clauses; check article/adjective case and gender, separable verbs and negation scope.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: []\n\nAvoid exact duplicates: []\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 429,
+      "response": {
+        "error": "Сервис генерации временно перегружен запросами. Попробуйте позже.",
+        "code": "UPSTREAM_QUOTA",
+        "retryable": true
+      },
+      "elapsedMs": 1082
+    }
+  ],
+  "error": "Proxy quota/rate limit reached"
+}

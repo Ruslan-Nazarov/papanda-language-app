@@ -1,0 +1,85 @@
+{
+  "startedAt": "2026-09-26T12:54:53.058Z",
+  "node": "v24.15.0",
+  "dictionary": "bundled static catalog; no personal progress",
+  "dictionarySize": 2609,
+  "scenarios": [
+    {
+      "id": "en-1",
+      "code": "en",
+      "count": 10
+    },
+    {
+      "id": "en-2",
+      "code": "en",
+      "count": 10
+    },
+    {
+      "id": "en-expression",
+      "code": "en",
+      "count": 1,
+      "lemma": "take care of"
+    },
+    {
+      "id": "en-negative",
+      "code": "en",
+      "count": 1,
+      "lemma": "never"
+    },
+    {
+      "id": "kz-1",
+      "code": "kz",
+      "count": 10
+    },
+    {
+      "id": "kz-2",
+      "code": "kz",
+      "count": 10
+    },
+    {
+      "id": "kz-noun",
+      "code": "kz",
+      "count": 1,
+      "lemma": "үй"
+    },
+    {
+      "id": "kz-verb",
+      "code": "kz",
+      "count": 1,
+      "lemma": "оқу"
+    },
+    {
+      "id": "de-1",
+      "code": "de",
+      "count": 8
+    },
+    {
+      "id": "fr-1",
+      "code": "fr",
+      "count": 8
+    },
+    {
+      "id": "it-1",
+      "code": "it",
+      "count": 8
+    },
+    {
+      "id": "es-1",
+      "code": "es",
+      "count": 8
+    },
+    {
+      "id": "la-1",
+      "code": "la",
+      "count": 8
+    }
+  ],
+  "hashes": {
+    "src/services/sentenceGeneration.ts": "22c9917554cc18fd8aa464084ecbccbff777f81cd2c1facc3c4027568c688a47",
+    "src/services/sentencePrompts.ts": "11aa5b90e56e2fef1f4ab3ccd945996a11ad45fafbcc06d9fa8dd3690cb232c2",
+    "src/services/sentenceCurriculum.ts": "ead81a724e61e4672bd52c702a4c726d728f968173109f0e8bd6c39861903282",
+    "src/utils/sentenceValidation.ts": "6cd7219e3828af1745a8c1bdde130bf0dd2af2d4591f1484419e69a1ed129f4d"
+  },
+  "maxRequests": 38,
+  "concurrency": 2
+}

@@ -1,333 +1,153 @@
-import { Sentence, SyntaxRole, Token, Word } from '../models/types';
-import { LANGUAGES } from '../constants/languages';
+import { SyntaxRole, Word } from '../models/types';
 import { getWordTranslation } from '../utils/words';
+import { planSentenceBatch, SentenceDraft, SentenceTask } from './sentenceCurriculum';
+import { bookContextPrompt } from './bookService';
 
-export interface DictionaryCandidate {
-  lemma: string;
-  translation: string;
-}
-
-interface LanguagePrompt {
-  label: string;
-  idPrefix: string;
-  grammar: string;
-  morphology: string;
-  /** Extra language-specific line appended to the pre-answer self-check. */
-  verify?: string;
-}
+export interface DictionaryCandidate { lemma: string; translation: string }
+interface LanguagePrompt { label: string; grammar: string; morphology: string }
 
 const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
   en: {
     label: 'English',
-    idPrefix: 'en',
-    grammar: 'Use natural English with clear SVO word order. Check agreement, tense, articles, prepositions. Vary across the batch: affirmative present and past, at least one negative (do/does/did not, will not), at least one yes/no or wh- question, and — for larger batches — at least one complex sentence with a subordinate clause (that / because / when / if).',
-    morphology: 'Split only productive endings when the boundary is clear: works -> ["work","s"], melted -> ["melt","ed"], happier -> ["happy","er"]. Keep irregular forms (found, said, went) and function words whole. dictionary_form is the bare lemma: said -> "say", works -> "work".'
+    grammar: 'Natural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.',
+    morphology: 'works → ["work","s"], melted → ["melt","ed"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → ["happi","er"], dictionary_form happy, never parts ["happy","er"].',
   },
   kz: {
     label: 'Қазақша',
-    idPrefix: 'kz',
-    grammar: `Use natural Kazakh with pedagogical SOV order (Subject … Object … Predicate) unless a question needs another order. Respect vowel harmony everywhere.
-An adjective ALWAYS stands immediately before the noun it describes: «бағалы машинаны» (never «машинаны бағалы»), «үлкен үй».
-DIRECT-OBJECT CASE — the most common mistake: a direct object that is modified by an adjective, is specific/definite, or stands in a NEGATED sentence MUST take the accusative -ны/-ні/-ды/-ді/-ты/-ті. Examples: «үлкен апатты ұмытпады», «жаңа кітапты оқыды», «жаман хатты жазбады», «итті көрді». Only a bare, fully generic mass/indefinite object may stay unmarked («нан жеді», «су ішті»). When unsure, mark it.
-Direction takes the dative -ға/-ге/-қа/-ке. Negation -ма/-ме/-ба/-бе/-па/-пе goes before the tense suffix. Past is -ды/-ді/-ты/-ті. Put the yes/no particle ма/ме/ба/бе/па/пе as its own final token. Vary the batch: affirmative past, negative, a question with the particle, and a complex sentence with және / бірақ / өйткені.`,
-    morphology: 'Kazakh is agglutinative: split root + ordered affixes — оқыды -> ["оқы","ды"], жазбады -> ["жаз","ба","ды"], дүкенге -> ["дүкен","ге"], кітапты -> ["кітап","ты"], апатты -> ["апат","ты"]. dictionary_form is the verbal noun / base: оқыды -> "оқу", салды -> "салу", көрді -> "көру"; for nouns the bare stem: дүкенге -> "дүкен", кітапты -> "кітап".',
-    verify: 'Kazakh: for EVERY direct object, if it is modified by an adjective, is specific, or the sentence is negated, it must carry the accusative -ны/-ні/-ды/-ді/-ты/-ті — fix any bare-nominative object that should be accusative.'
+    grammar: 'Natural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.',
+    morphology: 'жазбады → ["жаз","ба","ды"], дүкенге → ["дүкен","ге"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.',
   },
   de: {
     label: 'Deutsch',
-    idPrefix: 'de',
-    grammar: 'Use natural German. Capitalize nouns, keep the finite verb in second position in main clauses and final in subordinate clauses, check gender/case on articles and adjectives. Vary the batch: present and Perfekt, a negative with nicht/kein, a yes/no question (verb first), and a complex sentence with dass / weil / wenn.',
-    morphology: 'Split transparent productive endings and separable prefixes only when useful: gekauft -> ["ge","kauf","t"], aufsteht -> ["auf","steht"]. Keep irregular and inseparable units whole. dictionary_form is the infinitive / nominative singular.'
+    grammar: 'Natural German: capitalize nouns, finite verb second in neutral main clauses, final in subordinate clauses; check article/adjective case and gender, separable verbs and negation scope.',
+    morphology: 'gekauft → ["ge","kauf","t"]. Keep opaque forms whole. Separated verb particles belong to the predicate with its verb. dictionary_form is infinitive / nominative singular.',
   },
   es: {
     label: 'Español',
-    idPrefix: 'es',
-    grammar: 'Use natural standard Spanish. Check gender/number agreement, verb conjugation, personal "a" before a human object, inverted question marks. Vary the batch: presente and pretérito, a negative with no, a question, and a complex sentence with que / porque / cuando.',
-    morphology: 'Split transparent productive endings only where the boundary is clear: hablas -> ["habl","as"], comió -> ["com","ió"]. Keep irregular forms whole. dictionary_form is the infinitive / masculine singular.'
+    grammar: 'Natural Spanish: agreement, conjugation, personal a where appropriate, inverted question marks and natural pronoun omission. Do not force an overt subject.',
+    morphology: 'hablas → ["habl","as"]. Keep contractions and attached clitics as written tokens; do not invent whitespace. dictionary_form is the actual lexeme (niña for niña), infinitive for verbs.',
   },
   it: {
     label: 'Italiano',
-    idPrefix: 'it',
-    grammar: 'Use natural standard Italian. Check gender/number agreement, articles, verb conjugation, pronoun placement. Subject pronouns may be dropped when clear. Vary the batch: presente and passato prossimo, a negative with non, a question, and a complex sentence with che / perché / quando.',
-    morphology: 'Split transparent productive endings only where clear: parli -> ["parl","i"], mangiato -> ["mangi","ato"]. Keep irregular forms and articulated prepositions (nel, della) whole. dictionary_form is the infinitive / masculine singular.'
+    grammar: 'Natural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.',
+    morphology: 'parli → ["parl","i"]. Keep articulated prepositions (nel, della) whole. dictionary_form is infinitive / singular.',
   },
   fr: {
     label: 'Français',
-    idPrefix: 'fr',
-    grammar: 'Use natural standard French. Check gender/number agreement, articles, elision, negation (ne … pas), auxiliary choice in the passé composé. Vary the batch: présent and passé composé, a negative, a question (est-ce que / inversion), and a complex sentence with que / parce que / quand.',
-    morphology: 'Keep elided or contracted forms as the written token (j’, l’, du). Split productive endings only when the boundary is genuinely clear. dictionary_form is the infinitive / masculine singular.'
+    grammar: 'Natural standard French: agreement, elision, negation scope (ne … pas), auxiliary choice. Use idiomatic compound forms where normal.',
+    morphology: 'Elided clitics may be separated at the apostrophe: n’a → tokens n’ and a. n’ has parts ["n’"], dictionary_form ne. Keep du, au whole; explain their composition in the explanation, not by inventing letters in parts.',
   },
   la: {
     label: 'Latin',
-    idPrefix: 'la',
-    grammar: 'Use pedagogical Classical Latin with a clear canonical order (Subject … Object … Verb). Check case, number, gender, agreement and verb endings. Vary the batch: present and perfect, a negative with non, a question with -ne or nonne, and a complex sentence with quod / quia / cum.',
-    morphology: 'Separate a transparent stem and ending only when the analysis is reliable: amat -> ["am","at"], puellam -> ["puell","am"]. Do not guess morphemes. dictionary_form is the dictionary head: nominative singular for nouns, first-person present (or infinitive) for verbs.'
-  }
-};
-
-const ROLE_VALUES: SyntaxRole[] = [
-  'Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
-  'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction',
-  'Preposition', 'Particle', 'Article', 'Other'
-];
-
-const LABEL_VOCABULARY = [
-  'Noun', 'Pronoun', 'Verb', 'Verb (Past)', 'Verb (Neg)', 'Auxiliary', 'Infinitive',
-  'Adjective', 'Adverb', 'Article', 'Particle', 'Conjunction', 'Preposition', 'Numeral',
-  'Place', 'Time'
-];
-
-// One worked example per language, in the exact shape the model must return.
-// Curated from the hand-made trainer data so generated sentences match its depth.
-const LANGUAGE_EXAMPLES: Record<string, string> = {
-  en: `[
-  {"language":"English","sentence":"The man said that the bridge was safe.","words":[
-    {"text":"The","label":"Article","role":"Article","parts":["the"],"translation":"определённый артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"the"},
-    {"text":"man","label":"Noun","role":"Subject","parts":["man"],"translation":"мужчина","is_in_my_dict":true,"dictionary_word":"man","dictionary_form":"man"},
-    {"text":"said","label":"Verb (Past)","role":"Predicate","parts":["said"],"translation":"сказал","is_in_my_dict":true,"dictionary_word":"say","dictionary_form":"say"},
-    {"text":"that","label":"Conjunction","role":"Conjunction","parts":["that"],"translation":"что","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"that"},
-    {"text":"the","label":"Article","role":"Article","parts":["the"],"translation":"определённый артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"the"},
-    {"text":"bridge","label":"Noun","role":"Subject","parts":["bridge"],"translation":"мост","is_in_my_dict":true,"dictionary_word":"bridge","dictionary_form":"bridge"},
-    {"text":"was","label":"Auxiliary","role":"Predicate","parts":["was"],"translation":"был","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"be"},
-    {"text":"safe","label":"Adjective","role":"Predicate","parts":["safe"],"translation":"безопасным","is_in_my_dict":true,"dictionary_word":"safe","dictionary_form":"safe"}
-  ]},
-  {"language":"English","sentence":"Does the farmer grow corn?","words":[
-    {"text":"Does","label":"Auxiliary","role":"Predicate","parts":["does"],"translation":"вспомогательный глагол","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"do"},
-    {"text":"the","label":"Article","role":"Article","parts":["the"],"translation":"определённый артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"the"},
-    {"text":"farmer","label":"Noun","role":"Subject","parts":["farmer"],"translation":"фермер","is_in_my_dict":true,"dictionary_word":"farmer","dictionary_form":"farmer"},
-    {"text":"grow","label":"Verb","role":"Predicate","parts":["grow"],"translation":"выращивает","is_in_my_dict":true,"dictionary_word":"grow","dictionary_form":"grow"},
-    {"text":"corn","label":"Noun","role":"Object","parts":["corn"],"translation":"кукурузу","is_in_my_dict":true,"dictionary_word":"corn","dictionary_form":"corn"}
-  ]}
-]`,
-  kz: `[
-  {"language":"Қазақша","sentence":"Жақсы дос жаман хатты жазбады.","words":[
-    {"text":"Жақсы","label":"Adjective","role":"Attribute_Subject","parts":["жақсы"],"translation":"хороший","is_in_my_dict":true,"dictionary_word":"жақсы","dictionary_form":"жақсы"},
-    {"text":"дос","label":"Noun","role":"Subject","parts":["дос"],"translation":"друг","is_in_my_dict":true,"dictionary_word":"дос","dictionary_form":"дос"},
-    {"text":"жаман","label":"Adjective","role":"Attribute_Object","parts":["жаман"],"translation":"плохое","is_in_my_dict":true,"dictionary_word":"жаман","dictionary_form":"жаман"},
-    {"text":"хатты","label":"Noun","role":"Object","parts":["хат","ты"],"translation":"письмо","is_in_my_dict":true,"dictionary_word":"хат","dictionary_form":"хат"},
-    {"text":"жазбады","label":"Verb (Neg)","role":"Predicate","parts":["жаз","ба","ды"],"translation":"не написал","is_in_my_dict":true,"dictionary_word":"жазу","dictionary_form":"жазу"}
-  ]},
-  {"language":"Қазақша","sentence":"Қыз итті көрді және ұл жаңа кітапты оқыды.","words":[
-    {"text":"Қыз","label":"Noun","role":"Subject","parts":["қыз"],"translation":"девочка","is_in_my_dict":true,"dictionary_word":"қыз","dictionary_form":"қыз"},
-    {"text":"итті","label":"Noun","role":"Object","parts":["ит","ті"],"translation":"собаку","is_in_my_dict":true,"dictionary_word":"ит","dictionary_form":"ит"},
-    {"text":"көрді","label":"Verb (Past)","role":"Predicate","parts":["көр","ді"],"translation":"увидела","is_in_my_dict":true,"dictionary_word":"көру","dictionary_form":"көру"},
-    {"text":"және","label":"Conjunction","role":"Conjunction","parts":["және"],"translation":"и","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"және"},
-    {"text":"ұл","label":"Noun","role":"Subject","parts":["ұл"],"translation":"сын","is_in_my_dict":true,"dictionary_word":"ұл","dictionary_form":"ұл"},
-    {"text":"жаңа","label":"Adjective","role":"Attribute_Object","parts":["жаңа"],"translation":"новую","is_in_my_dict":true,"dictionary_word":"жаңа","dictionary_form":"жаңа"},
-    {"text":"кітапты","label":"Noun","role":"Object","parts":["кітап","ты"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"кітап","dictionary_form":"кітап"},
-    {"text":"оқыды","label":"Verb (Past)","role":"Predicate","parts":["оқы","ды"],"translation":"прочитал","is_in_my_dict":true,"dictionary_word":"оқу","dictionary_form":"оқу"}
-  ]}
-]`,
-  it: `[
-  {"language":"Italiano","sentence":"Il cane non ha mangiato la carne.","words":[
-    {"text":"Il","label":"Article","role":"Article","parts":["il"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"il"},
-    {"text":"cane","label":"Noun","role":"Subject","parts":["cane"],"translation":"собака","is_in_my_dict":true,"dictionary_word":"cane","dictionary_form":"cane"},
-    {"text":"non","label":"Particle","role":"Predicate","parts":["non"],"translation":"не","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"non"},
-    {"text":"ha","label":"Auxiliary","role":"Predicate","parts":["ha"],"translation":"вспом. глагол","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"avere"},
-    {"text":"mangiato","label":"Verb (Past)","role":"Predicate","parts":["mangi","ato"],"translation":"съел","is_in_my_dict":true,"dictionary_word":"mangiare","dictionary_form":"mangiare"},
-    {"text":"la","label":"Article","role":"Article","parts":["la"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"la"},
-    {"text":"carne","label":"Noun","role":"Object","parts":["carne"],"translation":"мясо","is_in_my_dict":true,"dictionary_word":"carne","dictionary_form":"carne"}
-  ]}
-]`,
-  de: `[
-  {"language":"Deutsch","sentence":"Kauft der Mann das teure Auto?","words":[
-    {"text":"Kauft","label":"Verb","role":"Predicate","parts":["kauf","t"],"translation":"покупает","is_in_my_dict":true,"dictionary_word":"kaufen","dictionary_form":"kaufen"},
-    {"text":"der","label":"Article","role":"Article","parts":["der"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"der"},
-    {"text":"Mann","label":"Noun","role":"Subject","parts":["Mann"],"translation":"мужчина","is_in_my_dict":true,"dictionary_word":"Mann","dictionary_form":"Mann"},
-    {"text":"das","label":"Article","role":"Article","parts":["das"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"das"},
-    {"text":"teure","label":"Adjective","role":"Attribute_Object","parts":["teur","e"],"translation":"дорогую","is_in_my_dict":true,"dictionary_word":"teuer","dictionary_form":"teuer"},
-    {"text":"Auto","label":"Noun","role":"Object","parts":["Auto"],"translation":"машину","is_in_my_dict":true,"dictionary_word":"Auto","dictionary_form":"Auto"}
-  ]}
-]`,
-  es: `[
-  {"language":"Español","sentence":"La niña no compró el libro nuevo.","words":[
-    {"text":"La","label":"Article","role":"Article","parts":["la"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"la"},
-    {"text":"niña","label":"Noun","role":"Subject","parts":["niña"],"translation":"девочка","is_in_my_dict":true,"dictionary_word":"niña","dictionary_form":"niño"},
-    {"text":"no","label":"Particle","role":"Predicate","parts":["no"],"translation":"не","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"no"},
-    {"text":"compró","label":"Verb (Past)","role":"Predicate","parts":["compr","ó"],"translation":"купила","is_in_my_dict":true,"dictionary_word":"comprar","dictionary_form":"comprar"},
-    {"text":"el","label":"Article","role":"Article","parts":["el"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"el"},
-    {"text":"libro","label":"Noun","role":"Object","parts":["libro"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"libro","dictionary_form":"libro"},
-    {"text":"nuevo","label":"Adjective","role":"Attribute_Object","parts":["nuevo"],"translation":"новую","is_in_my_dict":true,"dictionary_word":"nuevo","dictionary_form":"nuevo"}
-  ]}
-]`,
-  fr: `[
-  {"language":"Français","sentence":"La fille n’a pas acheté le livre.","words":[
-    {"text":"La","label":"Article","role":"Article","parts":["la"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"la"},
-    {"text":"fille","label":"Noun","role":"Subject","parts":["fille"],"translation":"девочка","is_in_my_dict":true,"dictionary_word":"fille","dictionary_form":"fille"},
-    {"text":"n’","label":"Particle","role":"Predicate","parts":["ne"],"translation":"не","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"ne"},
-    {"text":"a","label":"Auxiliary","role":"Predicate","parts":["a"],"translation":"вспом. глагол","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"avoir"},
-    {"text":"pas","label":"Particle","role":"Predicate","parts":["pas"],"translation":"не","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"pas"},
-    {"text":"acheté","label":"Verb (Past)","role":"Predicate","parts":["achet","é"],"translation":"купила","is_in_my_dict":true,"dictionary_word":"acheter","dictionary_form":"acheter"},
-    {"text":"le","label":"Article","role":"Article","parts":["le"],"translation":"артикль","is_in_my_dict":false,"dictionary_word":null,"dictionary_form":"le"},
-    {"text":"livre","label":"Noun","role":"Object","parts":["livre"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"livre","dictionary_form":"livre"}
-  ]}
-]`,
-  la: `[
-  {"language":"Latin","sentence":"Puella librum novum legit.","words":[
-    {"text":"Puella","label":"Noun","role":"Subject","parts":["puell","a"],"translation":"девочка","is_in_my_dict":true,"dictionary_word":"puella","dictionary_form":"puella"},
-    {"text":"librum","label":"Noun","role":"Object","parts":["libr","um"],"translation":"книгу","is_in_my_dict":true,"dictionary_word":"liber","dictionary_form":"liber"},
-    {"text":"novum","label":"Adjective","role":"Attribute_Object","parts":["nov","um"],"translation":"новую","is_in_my_dict":true,"dictionary_word":"novus","dictionary_form":"novus"},
-    {"text":"legit","label":"Verb","role":"Predicate","parts":["leg","it"],"translation":"читает","is_in_my_dict":true,"dictionary_word":"lego","dictionary_form":"lego"}
-  ]}
-]`
-};
-
-export const getLanguagePrompt = (languageCode: string): LanguagePrompt => {
-  const prompt = LANGUAGE_PROMPTS[languageCode];
-  if (!prompt) throw new Error(`Генерация для языка «${languageCode}» пока не настроена.`);
-  return prompt;
-};
-
-const shuffle = <T>(items: T[]): T[] => {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-};
-
-// Build the pool of dictionary words offered to the model. Words the learner has
-// actually engaged with (favorites, associations, previously shown) are always
-// included; the rest of the slots are filled with a RANDOM sample so every batch
-// draws on different vocabulary instead of the same alphabetical head.
-export const getDictionaryCandidates = (words: Word[], languageCode: string, limit = 40): DictionaryCandidate[] => {
-  const seen = new Set<string>();
-
-  const scored = words
-    .map(word => {
-      const lemma = getWordTranslation(word, languageCode);
-      return {
-        lemma: lemma.trim(),
-        translation: (word.ru || '').trim(),
-        engaged: Boolean(word.is_favorite || word.personal_association || (word.count || 0) > 0),
-        score: (word.is_favorite ? 1000 : 0) + (word.personal_association ? 100 : 0) + (word.count || 0)
-      };
-    })
-    .filter(item => {
-      const key = item.lemma.toLocaleLowerCase();
-      // Skip empties, duplicates, and multi-word phrase entries — a phrase lemma
-      // breaks the morpheme analysis and the "≥2 dictionary words" check.
-      if (!item.lemma || item.lemma.length < 2 || /\s/.test(item.lemma) || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-  const engaged = scored.filter(item => item.engaged).sort((a, b) => b.score - a.score).slice(0, limit);
-  // For the random fill prefer shorter lemmas — very long ones tend to be rare
-  // vocabulary that produces stilted sentences.
-  const rest = shuffle(scored.filter(item => !item.engaged && item.lemma.length <= 16));
-
-  const picked = [...engaged];
-  for (const item of rest) {
-    if (picked.length >= limit) break;
-    picked.push(item);
-  }
-
-  return shuffle(picked).map(({ lemma, translation }) => ({ lemma, translation }));
-};
-
-const varietyLine = (count: number): string => {
-  if (count <= 3) return 'Across the batch include at least one negative sentence and at least one question.';
-  return `Across the ${count} sentences include at least ${Math.max(1, Math.round(count / 4))} negative, at least ${Math.max(1, Math.round(count / 4))} interrogative, and at least one complex (two-clause) sentence. The rest are affirmative statements. Mix present and past tense. Do not start two sentences with the same word.`;
-};
-
-export const buildSentenceGenerationPrompt = (
-  languageCode: string,
-  candidates: DictionaryCandidate[],
-  count: number,
-  avoidSentences: string[] = [],
-  requiredWord?: string
-) => {
-  const language = getLanguagePrompt(languageCode);
-  const languageLabel = LANGUAGES.find(item => item.code === languageCode)?.label || language.label;
-  const dictionary = candidates.map(item => `- ${item.lemma} — ${item.translation || 'перевод уточнить'}`).join('\n');
-  const example = LANGUAGE_EXAMPLES[languageCode] || LANGUAGE_EXAMPLES.en;
-  const avoidBlock = avoidSentences.length > 0
-    ? `\nDO NOT repeat these sentences or their templates (same structure with one word swapped) — invent genuinely different situations, subjects and verbs:\n${avoidSentences.map(s => `- ${s}`).join('\n')}\n`
-    : '';
-  const requiredWordBlock = requiredWord
-    ? `\nREQUIRED WORD: sentence #1 MUST use the exact dictionary lemma "${requiredWord}" as one of its content words (inflected/conjugated as the sentence needs), with dictionary_word set to it. The other sentences are free to use any dictionary words.\n`
-    : '';
-
-  return `You generate learning data for the Papanda Sentence Trainer, which teaches sentence structure top-down: first find the members of the sentence (predicate, subject, attributes, object, adverbials), then the meaningful parts inside each word. Return ONLY the JSON array required by the response schema — no prose, no Markdown.
-
-LANGUAGE: ${languageLabel} (${languageCode})
-TASK: Write exactly ${count} DIFFERENT sentences that a beginner would study.
-
-SENTENCE QUALITY — every sentence must:
-- be fully natural and grammatically correct in ${languageLabel};
-- describe a PLAUSIBLE everyday situation that actually makes sense in the real world. A beginner should picture it instantly. NO absurd, contradictory or surreal combinations — e.g. reject "the weak winner", "he did not insult the precious car", "the sad table runs". If the dictionary words don't combine into something sensible, choose different dictionary words rather than forcing a strange sentence;
-- adjective + noun pairs must be things that genuinely go together (a "big house", not a "big minister"); the verb must be something the subject can plausibly do to that object;
-- be a COMPLETE thought with an explicit subject and predicate; most sentences also have a direct object;
-- use 4–9 words (before punctuation) — never a bare "subject + verb" with nothing else;
-- add at least one attribute (adjective/article-carrying noun phrase) or one adverbial (place / time / manner) so there is real structure to analyse;
-- use at least TWO distinct content words (noun, verb, adjective, adverb) from the DICTIONARY below;
-- use NO content word that is not in the dictionary. Function words (articles, prepositions, particles, auxiliaries, pronouns, conjunctions) may be used freely as grammar requires.
-${varietyLine(count)}
-
-${language.grammar}
-
-DICTIONARY — only these lemmas may get is_in_my_dict: true. Keep their spelling exactly:
-${dictionary}
-${requiredWordBlock}${avoidBlock}
-
-TOKEN CONTRACT (one token per whitespace-separated word, in reading order):
-- "language" of every sentence object is exactly "${languageLabel}".
-- "sentence" carries normal punctuation; each token.text carries NONE.
-- Joining token.text with single spaces reproduces the sentence without its punctuation.
-- role ∈ ${ROLE_VALUES.join(', ')}. Use Subject / Predicate / Object / Attribute_Subject / Attribute_Object / Adverbial / Circumstance / Conjunction consistently. A multi-word verb group (auxiliary + neg/particle + main verb) — every piece is Predicate. An article belongs to Article, not Attribute.
-- label is a short pedagogical part-of-speech from: ${LABEL_VOCABULARY.join(', ')}.
-- parts = the morpheme breakdown of token.text (see rule below). A single-morpheme word is ["<text>"].
-- ${language.morphology}
-- translation = a concise contextual Russian translation of THIS token as used here (e.g. an object noun in the accusative: "книгу", not "книга").
-- dictionary_form = the canonical lemma of the token (used when the learner adds it to the dictionary), even for function words.
-- If the token is one of the dictionary lemmas: is_in_my_dict = true and dictionary_word = that exact lemma. Otherwise is_in_my_dict = false and dictionary_word = null.
-
-FOLLOW THIS SHAPE EXACTLY (structure and depth, not vocabulary):
-${example}
-
-BEFORE YOU ANSWER, silently verify EACH sentence: it describes a realistic everyday situation a beginner can picture (discard anything absurd or contradictory and rewrite it); grammar and every case ending are correct; every sentence has a predicate and ≥4 words; token.text values rebuild the sentence; ≥2 dictionary content words per sentence; the negative / question / complex quota is met; no two sentences are near-duplicates.${language.verify ? `\n${language.verify}` : ''}`;
-};
-
-export const makeGeneratedSentenceId = (languageCode: string, offset: number) => {
-  const prompt = getLanguagePrompt(languageCode);
-  return `generated_${prompt.idPrefix}_${Date.now()}_${offset + 1}`;
-};
-
-export const makeGeneratedSentence = (sentence: Omit<Sentence, 'id' | 'source'>, languageCode: string, offset: number): Sentence => ({
-  ...sentence,
-  id: makeGeneratedSentenceId(languageCode, offset),
-  source: 'generated',
-  createdAt: Date.now()
-});
-
-export const TOKEN_SCHEMA = {
-  type: 'object',
-  properties: {
-    text: { type: 'string' },
-    label: { type: 'string' },
-    role: { type: 'string', enum: ROLE_VALUES },
-    parts: { type: 'array', items: { type: 'string' } },
-    translation: { type: 'string' },
-    is_in_my_dict: { type: 'boolean' },
-    dictionary_word: { type: 'string', nullable: true },
-    dictionary_form: { type: 'string' }
+    grammar: 'Idiomatic pedagogical Classical Latin: neutral order, case government and agreement, natural implicit subjects. Avoid translating modern idioms word for word.',
+    morphology: 'amat → ["am","at"], puellam → ["puell","am"]. Only reliable surface divisions. dictionary_form is nominative singular for nouns, first-person present for verbs.',
   },
-  required: ['text', 'label', 'role', 'parts', 'translation', 'is_in_my_dict', 'dictionary_form']
 };
 
-export const SENTENCE_ARRAY_SCHEMA = {
-  type: 'array',
-  items: {
-    type: 'object',
-    properties: {
-      language: { type: 'string' },
-      sentence: { type: 'string' },
-      words: { type: 'array', items: TOKEN_SCHEMA }
-    },
-    required: ['language', 'sentence', 'words']
+export const getLanguagePrompt = (code: string): LanguagePrompt => {
+  const language = LANGUAGE_PROMPTS[code];
+  if (!language) throw new Error(`Генерация для языка «${code}» пока не настроена.`);
+  return language;
+};
+
+export const getAllDictionaryCandidates = (words: Word[], code: string): DictionaryCandidate[] => {
+  const seen = new Set<string>();
+  return words.flatMap(word => {
+    const lemma = getWordTranslation(word, code).trim().replace(/\s+/g, ' ');
+    const key = lemma.toLocaleLowerCase();
+    if (!lemma || seen.has(key)) return [];
+    seen.add(key);
+    return [{ lemma, translation: (word.ru || '').trim() }];
+  });
+};
+
+export const getSeedWords = (words: Word[], code: string, count = 25): DictionaryCandidate[] => {
+  const candidates = getAllDictionaryCandidates(words, code);
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
   }
+  return candidates.slice(0, count);
 };
 
-export const asToken = (value: unknown): Token => value as Token;
+const METHOD = `Papanda follows the author's method, not a vocabulary drill:
+The whole sentence is the unit of language and reflects a meaningful real-world action or state.
+Find the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.
+Develop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.
+Short complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.
+Prefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.
+Use frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.
+Modifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.
+Preserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.`;
+
+/** First pass: compose whole utterances without token annotation. */
+export const buildSentenceGenerationPrompt = (
+  code: string, seeds: DictionaryCandidate[], count: number, avoid: string[] = [], requiredWord?: string,
+  tasks = planSentenceBatch(count), feedback: string[] = [], context: SentenceDraft[] = [],
+): string => `COMPOSE_SENTENCES
+${METHOD}
+LANGUAGE: ${getLanguagePrompt(code).label} (${code})
+${getLanguagePrompt(code).grammar}
+Write one complete sentence per task, return ONLY JSON [{"taskId":"task-1","sentence":"..."}].
+For core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.
+For negative/question use a simple, natural scene; complex needs a clear relation between two grammatical bases. Reading is an independent simple affirmative.
+Usage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.
+If develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.
+Plan the whole development chain BACKWARDS from the object step: first choose one predicate and participant for which both the short core AND an added direct object are natural. Then derive all earlier and later steps from that same predicate and scene. Never switch verbs between task-1 and task-3. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.
+In a chain containing an object task, choose a predicate allowing an optional object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. If the verb requires an object, include it from task-1 and make it more specific at the object step. Do not write an incomplete core.
+For complex, use two closely related actions with an obvious temporal or coordinating link. Use a causal conjunction only when the second clause really explains the first; the result of an action is not its cause.
+Otherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.
+TASKS: ${JSON.stringify(tasks)}
+Already accepted development context: ${JSON.stringify(context)}
+For ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.
+Requested word hint, if any: ${JSON.stringify(seeds)}
+${requiredWord ? `The task task-1 must use the lexeme/expression ${JSON.stringify(requiredWord)} naturally, inflected if needed.` : ''}
+Avoid exact duplicates: ${JSON.stringify(avoid)}
+Correct these problems from the previous attempt: ${JSON.stringify(feedback.slice(0, 8))}`;
+
+export const buildSentenceAnnotationPrompt = (code: string, tasks: SentenceTask[], drafts: SentenceDraft[], context: SentenceDraft[] = []): string => `REVIEW_AND_ANNOTATE
+${METHOD}
+${bookContextPrompt(code, drafts.map(d => d.sentence).join('\n'), [], false)}
+LANGUAGE: ${getLanguagePrompt(code).label} (${code})
+${getLanguagePrompt(code).grammar}
+Review drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).
+Reject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.
+Check meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.
+TASKS: ${JSON.stringify(tasks)}
+DRAFTS: ${JSON.stringify(drafts)}
+Previously accepted context, only for checking development relationships (do not return it): ${JSON.stringify(context)}
+For each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.
+literalTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.
+Russian must remain grammatical and convey the same tense and negation. Natural Russian word order takes priority over mechanically copying the source order, especially in questions: Қыз кітап оқыды ма? → Читала ли девочка книгу?, not Девочка книгу читала ли? Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.
+For example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.
+words in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.
+text must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.
+role is a sentence member, NOT a part of speech: ${ROLE_VALUES.join(', ')}. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.
+clauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.
+parts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. ${getLanguagePrompt(code).morphology}
+dictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.
+translation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words. A grammatical article is not a demonstrative or numeral: the ≠ этот, a ≠ один. When an English do/does/has auxiliary accompanies another verb, gloss its auxiliary function, not lexical «делает» or «имеет». In a Kazakh analytical negative with жоқ, the preceding verbal form must not receive an isolated Russian participial gloss such as «спавшая» or «сорвавшая».
+Return ONLY the JSON array. Do not accept weak candidates to fill a quota.`;
+
+const ROLE_VALUES: SyntaxRole[] = ['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object', 'Attribute_Object',
+  'Circumstance', 'Adverbial', 'Conjunction', 'Preposition', 'Particle', 'Article', 'Other'];
+
+export const DRAFT_ARRAY_SCHEMA = {
+  type: 'array', items: { type: 'object', properties: { taskId: { type: 'string' }, sentence: { type: 'string' } }, required: ['taskId', 'sentence'] },
+};
+export const TOKEN_SCHEMA = {
+  type: 'object', properties: {
+    text: { type: 'string' }, label: { type: 'string' }, role: { type: 'string', enum: ROLE_VALUES },
+    clauseIndex: { type: 'integer' }, parts: { type: 'array', items: { type: 'string' } },
+    translation: { type: 'string' }, dictionary_form: { type: 'string' },
+  }, required: ['text', 'label', 'role', 'clauseIndex', 'parts', 'translation', 'dictionary_form'],
+};
+export const SENTENCE_ARRAY_SCHEMA = {
+  type: 'array', items: {
+    type: 'object', properties: {
+      taskId: { type: 'string' }, sentence: { type: 'string' }, literalTranslation: { type: 'string' },
+      review: { type: 'object', properties: { natural: { type: 'boolean' }, taskFit: { type: 'boolean' }, analysisReliable: { type: 'boolean' } }, required: ['natural', 'taskFit', 'analysisReliable'] },
+      words: { type: 'array', items: TOKEN_SCHEMA },
+    }, required: ['taskId', 'sentence', 'literalTranslation', 'review', 'words'],
+  },
+};

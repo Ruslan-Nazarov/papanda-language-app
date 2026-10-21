@@ -6,6 +6,11 @@
   Only user data is persisted (`partialize`); the ~5 MB static word/sentence
   dataset stays in memory. Derived `words` / `sentences` are rebuilt by
   `initializeStore`, which runs from the persist `onRehydrateStorage` hook.
+  Persisted types/defaults live in `progressTypes.ts`, runtime validation in
+  `progressValidation.ts`, and pure catalog projections in `catalog.ts`.
+  `eng` remains the legacy stable persistence key; change displayed translations
+  without renaming that key. Custom words are base definitions, with edits in
+  `userWordProgress`. The separate, non-persisted hydration status gates the UI.
 - AI (sentence generation + explanation + word audit) goes through a Cloudflare
   Worker proxy — `gemini-proxy/` — that holds the provider API key(s)
   server-side and rate-limits per install. The Worker can forward to **Gemini**,
@@ -14,6 +19,9 @@
   `gemini-proxy/README.md`. The app only knows `EXPO_PUBLIC_GEMINI_PROXY_URL`
   (not a secret). `isGeminiConfigured()` = "is the proxy URL set". The app
   attaches an `X-Install-Id` header from `src/services/installId.ts`.
+  Quotas use the `QUOTA` SQLite Durable Object binding, not Workers KV. The
+  migration in `wrangler.toml` must accompany the Worker deployment. Install IDs
+  identify clients but do not authenticate them; the global budget is authoritative.
   - Local: `.env` (git-ignored) → the workers.dev URL.
   - **EAS builds don't read `.env`** — add `EXPO_PUBLIC_GEMINI_PROXY_URL` as an
     EAS environment variable for `preview` and `production`.
@@ -24,3 +32,5 @@
     override if a specific feature should always use a specific one.
 - With no proxy URL, all AI features cleanly no-op and the Sentence Trainer runs
   on the ~170 seed sentences in `src/data/sentences.json`.
+- Validation: install root and `gemini-proxy` dependencies, then `npm run check`.
+  `npm run build --prefix gemini-proxy` is a dry run, not a deployment.

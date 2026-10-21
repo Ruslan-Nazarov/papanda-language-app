@@ -94,6 +94,7 @@ export default function OnboardingScreen({ onDone }: Props) {
   const [revealed, setRevealed] = useState(0);
   const exampleDone = revealed >= groups.length;
   const playTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoPlayed = useRef(false);
 
   const playExample = () => {
@@ -122,6 +123,7 @@ export default function OnboardingScreen({ onDone }: Props) {
 
   useEffect(() => () => {
     if (playTimer.current) clearInterval(playTimer.current);
+    if (scrollTimer.current) clearTimeout(scrollTimer.current);
   }, []);
 
   const goTo = (next: number) => {
@@ -131,8 +133,15 @@ export default function OnboardingScreen({ onDone }: Props) {
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const p = Math.round(e.nativeEvent.contentOffset.x / width);
-    if (p !== page) setPage(p);
+    const p = Math.max(0, Math.min(PAGE_COUNT - 1, Math.round(e.nativeEvent.contentOffset.x / width)));
+    // Web has no momentum-end callback. Wait for scrolling to settle so an
+    // intermediate offset cannot undo a page selected by the Next button.
+    if (Platform.OS === 'web') {
+      if (scrollTimer.current) clearTimeout(scrollTimer.current);
+      scrollTimer.current = setTimeout(() => setPage(p), 150);
+    } else {
+      setPage(p);
+    }
   };
 
   return (
@@ -152,6 +161,7 @@ export default function OnboardingScreen({ onDone }: Props) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        onScroll={Platform.OS === 'web' ? onScroll : undefined}
         onMomentumScrollEnd={onScroll}
         scrollEventThrottle={16}
       >

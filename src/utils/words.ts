@@ -1,5 +1,11 @@
 import { Word } from '../models/types';
 
+export const getWordKey = (word: Word): string => word.eng || word.word || '';
+
+/** Strip sentence punctuation at the edges without corrupting hyphens/apostrophes. */
+export const cleanDictionaryForm = (value: string): string =>
+  value.trim().replace(/^[.,;:!?"«»„“”()]+|[.,;:!?"«»„“”()]+$/gu, '').trim();
+
 /**
  * Returns the translation of a word for a given language code.
  * Prioritizes user edits / custom translations stored in `word.translations[langCode]`
@@ -17,6 +23,7 @@ export const getWordTranslation = (word: Word | undefined | null, langCode: stri
   if (langCode === 'en') {
     const customEn = word.translations?.en;
     if (typeof customEn === 'string' && customEn.trim()) return customEn.trim();
+    if (word.source_language) return word.source_language === 'en' ? (word.word || '').trim() : '';
     return (word.eng || word.word || '').trim();
   }
 
@@ -31,4 +38,14 @@ export const getWordTranslation = (word: Word | undefined | null, langCode: stri
   }
 
   return '';
+};
+
+/** Match forms only in the language being studied, never by a persistence key. */
+export const buildWordLookup = (words: Word[], language: string): Map<string, Word> => {
+  const lookup = new Map<string, Word>();
+  for (const word of words) {
+    const form = cleanDictionaryForm(getWordTranslation(word, language)).toLowerCase();
+    if (form && !lookup.has(form)) lookup.set(form, word);
+  }
+  return lookup;
 };

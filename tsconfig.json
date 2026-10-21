@@ -6,5 +6,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": ["node_modules", "gemini-proxy", "dist", "android", "ios"]
+  "exclude": ["node_modules", "gemini-proxy", "dist", "dist-audit", "android", "ios"]
 }

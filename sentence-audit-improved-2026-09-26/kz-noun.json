@@ -1,0 +1,248 @@
+{
+  "scenario": {
+    "id": "kz-noun",
+    "code": "kz",
+    "count": 1,
+    "lemma": "үй"
+  },
+  "startedAt": "2026-09-26T13:21:55.241Z",
+  "elapsedMs": 7890,
+  "accepted": 0,
+  "sentences": [],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: [{\"lemma\":\"үй\",\"translation\":\"\"}]\nThe task task-1 must use the lexeme/expression \"үй\" naturally, inflected if needed.\nAvoid exact duplicates: [\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\",\"Қыз ұйықтады.\",\"Кішкентай қыз ұйықтады.\",\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\"Кішкентай қыз кеше әдемі гүл жұлды.\",\"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Қонақ үйге келді.\"\n  }\n]"
+      },
+      "elapsedMs": 1917
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Қонақ үйге келді.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. жазбады → [\"жаз\",\"ба\",\"ды\"], дүкенге → [\"дүкен\",\"ге\"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"sentence\":\"Қонақ үйге келді.\",\"literalTranslation\":\"Он пришёл в отель.\",\"review\":{\"natural\":true,\"taskFit\":true,\"analysisReliable\":true},\"words\":[{\"text\":\"Қонақ\",\"label\":\"noun\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"Қонақ\"],\"translation\":\"гостевой\",\"dictionary_form\":\"қонақ\"},{\"text\":\"үйге\",\"label\":\"noun+case\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"үй\",\"ге\"],\"translation\":\"в отель\",\"dictionary_form\":\"үй\"},{\"text\":\"келді\",\"label\":\"verb\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"кел\",\"ді\"],\"translation\":\"пришёл\",\"dictionary_form\":\"келу\"}]}]"
+      },
+      "elapsedMs": 1639
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nALREADY ACCEPTED CONTEXT: []\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"Қонақ үйге келді.\",\"literalTranslation\":\"Он пришёл в отель.\",\"words\":[{\"text\":\"Қонақ\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"Қонақ\"],\"translation\":\"гостевой\",\"dictionary_form\":\"қонақ\"},{\"text\":\"үйге\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"үй\",\"ге\"],\"translation\":\"в отель\",\"dictionary_form\":\"үй\"},{\"text\":\"келді\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"кел\",\"ді\"],\"translation\":\"пришёл\",\"dictionary_form\":\"келу\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[{\"taskId\":\"task-1\",\"natural\":true,\"translation\":false,\"roles\":false,\"morphology\":true,\"chain\":true,\"reason\":\"Слово «Қонақ» помечено как Attribute_Object, но это подлежащее; перевод «Он пришёл в отель» заменяет «Қонақ» на местоимение, что неверно.\"}]"
+      },
+      "elapsedMs": 1728
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"usage\",\"goal\":\"Прочитайте предложение целиком. Найдите сказуемое и определите, какую роль играет выбранное слово или выражение.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: [{\"lemma\":\"үй\",\"translation\":\"\"}]\nThe task task-1 must use the lexeme/expression \"үй\" naturally, inflected if needed.\nAvoid exact duplicates: [\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\",\"Қыз ұйықтады.\",\"Кішкентай қыз ұйықтады.\",\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\"Кішкентай қыз кеше әдемі гүл жұлды.\",\"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"]\nCorrect these problems from the previous attempt: [\"task-1: translation, roles: Слово «Қонақ» помечено как Attribute_Object, но это подлежащее; перевод «Он пришёл в отель» заменяет «Қонақ» на местоимение, что неверно.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 429,
+      "response": {
+        "error": "Сервис генерации временно перегружен запросами. Попробуйте позже.",
+        "code": "UPSTREAM_QUOTA",
+        "retryable": true
+      },
+      "elapsedMs": 1078
+    }
+  ],
+  "error": "Proxy quota/rate limit reached"
+}

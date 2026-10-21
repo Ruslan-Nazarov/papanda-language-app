@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
 import { Word } from '../models/types';
 import { useStore } from '../store/useStore';
@@ -13,14 +14,19 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
-  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore();
+  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore(useShallow(state => ({
+    words: state.words,
+    activeLanguages: state.activeLanguages,
+    updateWordDetails: state.updateWordDetails,
+    addCustomWord: state.addCustomWord,
+    userWordProgress: state.userWordProgress,
+    setWordAiVerification: state.setWordAiVerification,
+  })));
   const [tempWord, setTempWord] = useState<{
-    eng: string;
     ru: string;
     personal_association: string;
     translations: Record<string, string>;
   }>({
-    eng: '',
     ru: '',
     personal_association: '',
     translations: {}
@@ -33,33 +39,36 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
   const existsInStore = Boolean(wordKey) && words.some(w => (w.eng || w.word) === wordKey);
   const isAddingNew = !wordToEdit || !existsInStore;
   const aiVerification = wordKey && existsInStore ? userWordProgress[wordKey]?.ai_verification : undefined;
+  const sourceLanguage = wordToEdit?.source_language;
+  const editableLanguages = useMemo(() => [...new Set([
+    ...(sourceLanguage && activeLanguages.includes(sourceLanguage) ? [sourceLanguage] : []), ...activeLanguages,
+  ])], [sourceLanguage, activeLanguages]);
 
   useEffect(() => {
     if (visible) {
       if (wordToEdit) {
         const trans: Record<string, string> = {};
-        activeLanguages.forEach(l => {
+        editableLanguages.forEach(l => {
           trans[l] = getWordTranslation(wordToEdit, l);
         });
 
         setTempWord({
-          eng: wordToEdit.source_language ? (wordToEdit.word || '') : (wordToEdit.eng || wordToEdit.word || ''),
-          ru: wordToEdit.ru || wordToEdit.translations?.ru || '',
+          ru: getWordTranslation(wordToEdit, 'ru'),
           personal_association: wordToEdit.personal_association || '',
           translations: trans
         });
       } else {
         const trans: Record<string, string> = {};
-        activeLanguages.forEach(l => { trans[l] = ''; });
-        setTempWord({ eng: '', ru: '', personal_association: '', translations: trans });
+        editableLanguages.forEach(l => { trans[l] = ''; });
+        setTempWord({ ru: '', personal_association: '', translations: trans });
       }
     }
-  }, [visible, wordToEdit, activeLanguages]);
+  }, [visible, wordToEdit, editableLanguages]);
 
   // Only the fields that actually changed vs. `original` — so saving (e.g. just to
   // add a personal association) doesn't freeze every translation as a permanent
   // per-word override and block future corrections to the shipped dictionary data.
-  const buildChangedDetails = (original: Word | null) => {
+  const buildChangedDetails = (original: Word, onlyFilled = false) => {
     const details: {
       word?: string;
       ru?: string;
@@ -68,22 +77,25 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
     } = {};
 
     const newRu = tempWord.ru.trim();
-    if (newRu !== (original?.ru || original?.translations?.ru || '').trim()) {
+    if ((!onlyFilled || newRu) && newRu !== getWordTranslation(original, 'ru')) {
       details.ru = newRu;
     }
 
     const changedTranslations: Record<string, string> = {};
-    activeLanguages.forEach(lang => {
-      const before = original ? getWordTranslation(original, lang) : '';
+    editableLanguages.forEach(lang => {
+      const before = getWordTranslation(original, lang);
       const after = (tempWord.translations[lang] || '').trim();
-      if (after !== before) changedTranslations[lang] = after;
+      if ((!onlyFilled || after) && after !== before) {
+        changedTranslations[lang] = after;
+        if (lang === original.source_language) details.word = after;
+      }
     });
     if (Object.keys(changedTranslations).length > 0) {
       details.translations = changedTranslations;
     }
 
     const newAssoc = tempWord.personal_association.trim();
-    if (newAssoc !== (original?.personal_association || '')) {
+    if ((!onlyFilled || newAssoc) && newAssoc !== (original.personal_association || '')) {
       details.personal_association = newAssoc;
     }
 
@@ -91,40 +103,38 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
   };
 
   const handleSave = () => {
-    const trimmedOriginal = tempWord.eng.trim();
-
     if (isAddingNew) {
-      if (!trimmedOriginal) {
-        Alert.alert('Заполните поле', "Поле «Оригинал» не может быть пустым.");
+      const filledLanguage = editableLanguages.find(lang => tempWord.translations[lang]?.trim());
+      if (!filledLanguage) {
+        Alert.alert('Введите слово', 'Заполните слово хотя бы на одном из выбранных языков.');
         return;
       }
+      const original = tempWord.translations[filledLanguage].trim();
 
       // A draft from tapping an unrecognized sentence token — check once more for
       // an existing dictionary entry (e.g. the user retyped it to match one)
       // before creating a duplicate.
-      const sourceLanguage = wordToEdit?.source_language;
-      const normalizedOriginal = trimmedOriginal.toLowerCase();
-      const existingMatch = sourceLanguage
-        ? words.find(w =>
-            (w.source_language === sourceLanguage && (w.word || '').toLowerCase() === normalizedOriginal) ||
-            getWordTranslation(w, sourceLanguage).toLowerCase() === normalizedOriginal
-          )
-        : undefined;
+      const normalizedOriginal = original.toLowerCase();
+      const existingMatch = words.find(w =>
+        getWordTranslation(w, filledLanguage).toLowerCase() === normalizedOriginal
+      );
 
       if (existingMatch) {
         const existingKey = existingMatch.eng || existingMatch.word || '';
-        const details = buildChangedDetails(existingMatch);
+        // Empty fields in a new-word form must not erase an existing entry.
+        const details = buildChangedDetails(existingMatch, true);
         if (Object.keys(details).length > 0) updateWordDetails(existingKey, details);
       } else {
-        const eng = sourceLanguage ? `user:${sourceLanguage}:${normalizedOriginal}` : trimmedOriginal;
+        const id = 'custom_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
         const newWord: Word = {
-          id: wordToEdit?.id || ('custom_' + Date.now().toString()),
-          word: trimmedOriginal,
-          eng,
+          id,
+          word: original,
+          // `eng` is a legacy persistence key, independent of displayed words.
+          eng: `user:${filledLanguage}:${id}`,
           ru: tempWord.ru.trim(),
           personal_association: tempWord.personal_association.trim(),
-          translations: { ...tempWord.translations, ...(sourceLanguage ? { [sourceLanguage]: trimmedOriginal } : {}) },
-          source_language: sourceLanguage,
+          translations: Object.fromEntries(Object.entries(tempWord.translations).map(([lang, value]) => [lang, value.trim()])),
+          source_language: filledLanguage,
           count: 0,
           is_learned: 0,
           knowledge_stats: {},
@@ -179,41 +189,30 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
               </View>
             )}
 
-            {isAddingNew && (
-              <>
-                <Text style={styles.inputLabel}>Оригинал (Слово/Ключ)</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={tempWord.eng}
-                  onChangeText={(text) => setTempWord({...tempWord, eng: text})}
-                  placeholder="Например: Apple"
-                  editable={isAddingNew}
-                />
-              </>
-            )}
-
-            <Text style={styles.inputLabel}>Русский перевод</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={tempWord.ru}
-              onChangeText={(text) => setTempWord({...tempWord, ru: text})}
-              placeholder="Например: Яблоко"
-            />
-
-            {activeLanguages.map(lang => {
+            {editableLanguages.map(lang => {
               const langLabel = LANGUAGES.find(l => l.code === lang)?.label || lang.toUpperCase();
               return (
                 <View key={lang}>
-                  <Text style={styles.inputLabel}>Перевод ({langLabel})</Text>
+                  <Text style={styles.inputLabel}>Слово ({langLabel})</Text>
                   <TextInput
                     style={styles.modalInput}
+                    accessibilityLabel={`Слово (${langLabel})`}
                     value={tempWord.translations[lang]}
                     onChangeText={(text) => setTempWord({...tempWord, translations: {...tempWord.translations, [lang]: text}})}
-                    placeholder={`Перевод на ${langLabel}`}
+                    placeholder={`Введите слово (${langLabel})`}
                   />
                 </View>
               );
             })}
+
+            <Text style={styles.inputLabel}>Русский перевод</Text>
+            <TextInput
+              style={styles.modalInput}
+              accessibilityLabel="Русский перевод"
+              value={tempWord.ru}
+              onChangeText={(text) => setTempWord({...tempWord, ru: text})}
+              placeholder="Например: яблоко"
+            />
 
             <Text style={styles.inputLabel}>Личная ассоциация</Text>
             <TextInput
@@ -221,7 +220,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
               multiline
               value={tempWord.personal_association}
               onChangeText={(text) => setTempWord({...tempWord, personal_association: text})}
-              placeholder="Смысловой якорь..."
+              placeholder="Что поможет вам запомнить это слово?"
             />
           </ScrollView>
 

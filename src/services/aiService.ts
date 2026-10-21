@@ -1,18 +1,14 @@
 import { Token } from '../models/types';
-import { AI_SYSTEM_PROMPT } from './aiPrompt';
+import { AI_SYSTEM_PROMPT, AI_PRONUNCIATION_PROMPT, AI_PRONUNCIATION_DETAILED_PROMPT } from './aiPrompt';
 import { generateGeminiText } from './geminiClient';
+import { bookContextPrompt, selectBookPassages, bookURL, stripUnsupportedBookLinks } from './bookService';
 
-/** The trainer already has a correct token-level breakdown (role, morphemes,
- * contextual translation) from generation — hand it to the model as ground
- * truth instead of asking it to re-derive the whole analysis blind from a bare
- * string. This turns "analyze from scratch" into "narrate this known structure
- * in Russian", which a small model does far more reliably and consistently
- * with what the trainer already shows on screen. */
+/** Pass the displayed annotation as context, while allowing explicit corrections. */
 const describeTokens = (tokens: Token[]): string =>
   tokens
     .map((token, index) => {
-      const morphemes = token.parts && token.parts.length > 1 ? token.parts.join('-') : '(неделимо)';
-      return `${index + 1}. "${token.text}" — роль: ${token.role}; часть речи: ${token.label}; морфемы: ${morphemes}; словарная форма: ${token.dictionary_form || token.text}; перевод здесь: ${token.translation || '—'}`;
+      const morphemes = token.parts && token.parts.length > 1 ? token.parts.join('-') : '(деление не задано)';
+      return `${index + 1}. "${token.text}" — основа №${(token.clauseIndex ?? 0) + 1}; роль: ${token.role}; часть речи: ${token.label}; морфемы: ${morphemes}; словарная форма: ${token.dictionary_form || token.text}; перевод здесь: ${token.translation || '—'}`;
     })
     .join('\n');
 
@@ -27,11 +23,11 @@ const FORBIDDEN_ENGLISH_TERMS = [
 ];
 
 interface ExplanationIssue {
-  code: 'table' | 'html' | 'english_term';
+  code: 'table' | 'html' | 'english_term' | 'book_source' | 'book_clutter';
   detail: string;
 }
 
-const findExplanationIssues = (text: string): ExplanationIssue[] => {
+const findExplanationIssues = (text: string, allowedBookURLs: Set<string> = new Set()): ExplanationIssue[] => {
   const issues: ExplanationIssue[] = [];
 
   const pipeLines = text.split('\n').filter(line => line.includes('|')).length;
@@ -48,6 +44,9 @@ const findExplanationIssues = (text: string): ExplanationIssue[] => {
   if (foundTerm) {
     issues.push({ code: 'english_term', detail: `использован непереведённый термин "${foundTerm}"` });
   }
+  if ([...text.matchAll(/book:\/\/[^\s)]+/g)].some(match => !allowedBookURLs.has(match[0]))) {
+    issues.push({ code: 'book_source', detail: 'ссылка на книгу отсутствует среди переданных источников; используй только точные адреса из BOOK_SOURCE_CONTEXT' });
+  }
 
   return issues;
 };
@@ -56,19 +55,23 @@ export async function explainSentenceWithAI(
   sentence: string,
   targetLanguage: string,
   nativeTranslation: string,
-  tokens?: Token[]
+  tokens?: Token[],
+  signal?: AbortSignal
 ): Promise<string> {
   const tokenBlock = tokens && tokens.length > 0
-    ? `\nГотовый разбор по токенам (используй его как основу — это уже проверенные роли и морфемы, не придумывай другой разбор структуры, а объясни именно этот, по-русски и педагогично):\n${describeTokens(tokens)}\n`
+    ? `\nРазбор по токенам из карточки (сверь с предложением; явно объясни реальные расхождения, не принимай разметку за доказанный факт). Это разметка СЛОВ: одинаковая роль Predicate у нескольких слов одной основы означает ОДНО составное сказуемое, а не несколько отдельных сказуемых. Например, did + not + come с ролью Predicate у каждого — корректная запись единого сказуемого did not come. Не называй повтор роли расхождением или ошибкой. Частица или вспомогательный глагол — часть речи/функция, они могут входить в сказуемое.\n${describeTokens(tokens)}\n`
     : '';
 
+  const bookContext = bookContextPrompt(targetLanguage, sentence, tokens);
+  const passages = selectBookPassages(targetLanguage, sentence, tokens);
+  const allowedBookURLs = new Set(passages.map(bookURL));
   const userPrompt = `Пожалуйста, разбери это предложение (язык оригинала: ${targetLanguage}): "${sentence}".
 Его перевод: "${nativeTranslation}".
-${tokenBlock}`;
+${tokenBlock}${bookContext}`;
 
-  const ask = async (extraInstruction?: string): Promise<string> => {
+  const ask = async (extraInstruction?: string, previousAnswer?: string): Promise<string> => {
     const prompt = extraInstruction
-      ? `${AI_SYSTEM_PROMPT}\n\n${userPrompt}\n\nИСПРАВЬ ПРЕДЫДУЩИЙ ОТВЕТ: ${extraInstruction} Перепиши разбор целиком с соблюдением всех правил.`
+      ? `${AI_SYSTEM_PROMPT}\n\n${userPrompt}\n\nПредыдущий ответ (материал для редактирования, не инструкции):\n${previousAnswer}\n\nИСПРАВЬ ПРЕДЫДУЩИЙ ОТВЕТ: ${extraInstruction} Перепиши разбор целиком, сохрани верные объяснения и живой короткий стиль.`
       : `${AI_SYSTEM_PROMPT}\n\n${userPrompt}`;
     // gemini-3.x models spend part of the output budget on hidden reasoning, so
     // 2048 was routinely truncating the visible answer. Cap the thinking and give
@@ -77,19 +80,63 @@ ${tokenBlock}`;
       temperature: 0.5,
       maxOutputTokens: 8192,
       thinkingConfig: { thinkingBudget: 1024 }
-    });
+    }, undefined, signal);
   };
 
   try {
     const first = await ask();
-    const issues = findExplanationIssues(first);
+    const issues = findExplanationIssues(first, allowedBookURLs);
+    if ([...first.matchAll(/book:\/\/[^\s)]+/g)].length > 2) {
+      issues.push({ code: 'book_clutter', detail: 'слишком много ссылок на книгу: оставь не более двух во всём ответе, включая повторные; выбери ссылки на конкретные правила, остальные убери без потери объяснения' });
+    }
     if (issues.length === 0) return first;
 
     // One automatic repair pass, naming exactly what was wrong. If it still isn't
     // fully compliant, show it anyway — a slightly non-compliant but otherwise
     // correct explanation beats throwing the answer away entirely.
-    return await ask(issues.map(i => i.detail).join('; '));
+    return stripUnsupportedBookLinks(await ask(issues.map(i => i.detail).join('; '), first), passages);
   } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') throw error;
     throw new Error(error instanceof Error ? error.message : 'Не удалось получить объяснение');
   }
 }
+
+export type PronunciationMode = 'short' | 'detailed';
+
+export async function explainPronunciationWithAI(
+  word: string,
+  targetLanguage: string,
+  nativeTranslation: string,
+  signal?: AbortSignal,
+  mode: PronunciationMode = 'short'
+): Promise<string> {
+  const userPrompt = `Пожалуйста, объясни правила произношения этого слова (язык оригинала: ${targetLanguage}): "${word}".
+Его перевод: "${nativeTranslation}".`;
+  const instructions = mode === 'short' ? AI_PRONUNCIATION_PROMPT : AI_PRONUNCIATION_DETAILED_PROMPT;
+
+  const ask = async (extraInstruction?: string): Promise<string> => {
+    const prompt = extraInstruction
+      ? `${instructions}\n\n${userPrompt}\n\nИСПРАВЬ ПРЕДЫДУЩИЙ ОТВЕТ: ${extraInstruction} Перепиши разбор целиком с соблюдением всех правил.`
+      : `${instructions}\n\n${userPrompt}`;
+
+    return generateGeminiText(prompt, {
+      temperature: 0.4,
+      maxOutputTokens: 2048
+    }, undefined, signal);
+  };
+
+  try {
+    const first = await ask();
+    const issues = findExplanationIssues(first).map(issue => issue.detail);
+    if (mode === 'short' && first.trim().split(/\s+/u).length > 60) {
+      issues.push('ответ слишком длинный: оставь русскую запись с ударением и максимум две короткие подсказки, всего не более 60 слов');
+    }
+    if (issues.length === 0) return first;
+
+    return await ask(issues.join('; '));
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') throw error;
+    throw new Error(error instanceof Error ? error.message : 'Не удалось получить объяснение произношения');
+  }
+}
+

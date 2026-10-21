@@ -17,9 +17,9 @@ export interface TokenGroup {
  * Splits a sentence's tokens into clauses, then groups each clause's tokens by
  * syntactic role and orders the groups the way the trainer reveals them.
  *
- * Clause boundary rules:
- *  - a conjunction (that / because / және / бірақ …) after a subject or predicate;
- *  - a fresh subject once the current clause already has BOTH a subject and a predicate.
+ * New annotations carry explicit clause IDs, including interrupted main clauses.
+ * Legacy data uses a conservative heuristic: only split at a conjunction when
+ * complete subject/predicate bases can be found on both sides.
  * A run of consecutive Predicate tokens is ONE verb group ("did not support",
  * "will not buy") and never starts a new clause.
  */
@@ -29,13 +29,13 @@ export const computeSentenceGroups = (words: Token[] | undefined | null): TokenG
   let currentClause = 0;
   let seenPredicate = false;
   let seenSubject = false;
+  const hasExplicitClauses = words.every(word => Number.isSafeInteger(word.clauseIndex) && word.clauseIndex! >= 0);
 
   const withClause = words.map((word, originalIndex) => {
-    if (word.role === 'Conjunction' && (seenPredicate || seenSubject)) {
-      currentClause++;
-      seenPredicate = false;
-      seenSubject = false;
-    } else if (word.role === 'Subject' && seenPredicate && seenSubject) {
+    if (hasExplicitClauses) return { role: word.role, clauseIndex: word.clauseIndex!, originalIndex };
+    const rest = words.slice(originalIndex + 1);
+    if (word.role === 'Conjunction' && seenPredicate && seenSubject &&
+      rest.some(token => token.role === 'Subject') && rest.some(token => token.role === 'Predicate')) {
       currentClause++;
       seenPredicate = false;
       seenSubject = false;

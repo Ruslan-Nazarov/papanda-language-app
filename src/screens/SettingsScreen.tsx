@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator } from 'react-native';
+import * as Application from 'expo-application';
+import type { BackupPreview } from '../services/backupFormat';
+import { getRestorePointDate, importWithRestorePoint, restoreBeforeImport } from '../services/progressRestore';
+import { useShallow } from 'zustand/react/shallow';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
-import { exportProgressToFile, importProgressFromFile } from '../services/backupService';
+import { exportProgressToFile, previewProgressFromFile } from '../services/backupService';
 import { ACCENT, ACCENT_LIGHT } from '../constants/theme';
+import appConfig from '../../app.json';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
+const WORD_TOUR_COUNT_OPTIONS = [5, 10, 15, 20, 30, 50];
 const ONBOARDING_KEY = 'papanda-onboarded';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount } = useStore();
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount, wordTourSize, setWordTourSize } = useStore(useShallow(state => ({
+    activeLanguages: state.activeLanguages,
+    setLanguages: state.setLanguages,
+    resetStatistics: state.resetStatistics,
+    workoutWordCount: state.workoutWordCount,
+    setWorkoutWordCount: state.setWorkoutWordCount,
+    workoutLearnedWordCount: state.workoutLearnedWordCount,
+    setWorkoutLearnedWordCount: state.setWorkoutLearnedWordCount,
+    wordTourSize: state.wordTourSize,
+    setWordTourSize: state.setWordTourSize,
+  })));
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+
+  const [preview, setPreview] = useState<BackupPreview | null>(null);
+  const [restoreDate, setRestoreDate] = useState<string | null>(null);
+  const [showRestore, setShowRestore] = useState(false);
+  const [backupMessage, setBackupMessage] = useState('');
+  useEffect(() => { void getRestorePointDate().then(setRestoreDate).catch(() => setBackupMessage('Не удалось прочитать точку восстановления.')); }, []);
 
   const toggleLanguage = (code: string) => {
     let newLangs = [...activeLanguages];
@@ -55,31 +77,23 @@ export default function SettingsScreen() {
     }
   };
 
-  const runImport = async () => {
+  const handleImport = async () => {
     if (isImporting) return;
+    setIsImporting(true); setBackupMessage('');
+    try { setPreview(await previewProgressFromFile()); }
+    catch (error) { setBackupMessage(error instanceof Error ? error.message : 'Не удалось прочитать копию.'); }
+    finally { setIsImporting(false); }
+  };
+  const commitImport = async (restore = false) => {
+    if (isImporting || (!restore && !preview)) return;
     setIsImporting(true);
     try {
-      const result = await importProgressFromFile();
-      if (result.canceled) return;
-      if (result.ok) {
-        Alert.alert('Готово', 'Прогресс восстановлен из резервной копии.');
-      } else {
-        Alert.alert('Не удалось восстановить', result.error || 'Проверьте выбранный файл.');
-      }
-    } finally {
-      setIsImporting(false);
-    }
-  };
-
-  const handleImport = () => {
-    Alert.alert(
-      'Импортировать резервную копию?',
-      'Это заменит текущий прогресс, словарь и предложения данными из файла. Действие нельзя отменить.',
-      [
-        { text: 'Отмена', style: 'cancel' },
-        { text: 'Импортировать', style: 'destructive', onPress: () => void runImport() }
-      ]
-    );
+      if (restore) await restoreBeforeImport(); else await importWithRestorePoint(preview!.data);
+      setPreview(null); setShowRestore(false);
+      setRestoreDate(await getRestorePointDate());
+      setBackupMessage(restore ? 'Состояние до импорта восстановлено.' : 'Прогресс импортирован. Предыдущее состояние сохранено на устройстве.');
+    } catch (error) { setBackupMessage(error instanceof Error ? error.message : 'Не удалось восстановить прогресс.'); }
+    finally { setIsImporting(false); }
   };
 
   const handleReplayOnboarding = () => {
@@ -94,13 +108,13 @@ export default function SettingsScreen() {
       "Вы уверены, что хотите обнулить весь прогресс, показы и статус выученных слов?",
       [
         { text: "Отмена", style: "cancel" },
-        { 
-          text: "Сбросить всё", 
-          style: "destructive", 
+        {
+          text: "Сбросить всё",
+          style: "destructive",
           onPress: () => {
             resetStatistics();
             Alert.alert("Готово", "Статистика успешно сброшена.");
-          } 
+          }
         }
       ]
     );
@@ -109,8 +123,9 @@ export default function SettingsScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
       <Text style={styles.header}>Настройки</Text>
-      
+
       <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.sectionSub}>papanda {Application.nativeApplicationVersion ?? appConfig.expo.version} · {Application.nativeBuildVersion ? 'сборка ' + Application.nativeBuildVersion : 'web'}</Text>
         {/* Active Languages for Triples */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Изучаемые языки</Text>
@@ -118,8 +133,8 @@ export default function SettingsScreen() {
           {LANGUAGES.map(lang => {
             const isActive = activeLanguages.includes(lang.code);
             return (
-              <TouchableOpacity 
-                key={`triple-${lang.code}`} 
+              <TouchableOpacity
+                key={`triple-${lang.code}`}
                 style={[styles.row, isActive && styles.rowActive]}
                 onPress={() => toggleLanguage(lang.code)}
               >
@@ -139,16 +154,16 @@ export default function SettingsScreen() {
               <View key={`order-${code}`} style={styles.row}>
                 <Text style={styles.rowText}>{index + 1}. {getLanguageLabel(code)}</Text>
                 <View style={styles.orderControls}>
-                  <TouchableOpacity 
-                    style={styles.orderBtn} 
-                    onPress={() => moveLanguage(index, -1)} 
+                  <TouchableOpacity
+                    style={styles.orderBtn}
+                    onPress={() => moveLanguage(index, -1)}
                     disabled={index === 0}
                   >
                     <Text style={[styles.orderBtnText, index === 0 && styles.disabledText]}>⬆️</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.orderBtn} 
-                    onPress={() => moveLanguage(index, 1)} 
+                  <TouchableOpacity
+                    style={styles.orderBtn}
+                    onPress={() => moveLanguage(index, 1)}
                     disabled={index === activeLanguages.length - 1}
                   >
                     <Text style={[styles.orderBtnText, index === activeLanguages.length - 1 && styles.disabledText]}>⬇️</Text>
@@ -159,10 +174,30 @@ export default function SettingsScreen() {
           })}
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Карточки слов</Text>
+          <Text style={styles.sectionSub}>Количество карточек за тур. По умолчанию — 10. Изменение начнёт новый тур.</Text>
+          <View style={styles.optionsRow}>
+            {WORD_TOUR_COUNT_OPTIONS.map(count => (
+              <TouchableOpacity
+                key={`word-tour-${count}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Карточек за тур: ${count}`}
+                accessibilityState={{ selected: wordTourSize === count }}
+                aria-selected={wordTourSize === count}
+                style={[styles.optionChip, wordTourSize === count && styles.optionChipActive]}
+                onPress={() => setWordTourSize(count)}
+              >
+                <Text style={[styles.optionChipText, wordTourSize === count && styles.optionChipTextActive]}>{count}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Brain Workout Options */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Настройки тренировки (Brain Workout)</Text>
-          
+
           <Text style={styles.sectionSub}>Количество слов за одну сессию</Text>
           <View style={[styles.optionsRow, {marginBottom: 20}]}>
             {WORKOUT_COUNT_OPTIONS.map(count => (
@@ -211,6 +246,10 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {restoreDate && <TouchableOpacity style={styles.row} onPress={() => setShowRestore(true)} disabled={isImporting}>
+          <Text style={styles.rowText}>↩ Вернуть состояние до импорта</Text>
+        </TouchableOpacity>}
+        {backupMessage ? <Text accessibilityLiveRegion="polite" style={styles.sectionSub}>{backupMessage}</Text> : null}
         {/* About */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>О приложении</Text>
@@ -222,14 +261,27 @@ export default function SettingsScreen() {
         {/* Reset Data Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Сброс данных и прогресса</Text>
-          <TouchableOpacity 
-            style={[styles.row, styles.resetRow]} 
+          <TouchableOpacity
+            style={[styles.row, styles.resetRow]}
             onPress={handleReset}
           >
             <Text style={styles.resetText}>🗑️ Сбросить всю статистику и показы</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Modal visible={Boolean(preview) || showRestore} transparent animationType="fade" onRequestClose={() => { if (!isImporting) { setPreview(null); setShowRestore(false); } }}>
+        <View style={{ flex: 1, backgroundColor: '#0008', justifyContent: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: '#FFF', padding: 24, borderRadius: 16 }}>
+            <Text style={styles.sectionTitle}>{showRestore ? 'Восстановить прежний прогресс?' : 'Проверка резервной копии'}</Text>
+            <Text style={styles.sectionSub}>{showRestore ? 'Текущие изменения будут заменены состоянием до последнего импорта.' :
+              'Слов: ' + (preview?.customWords ?? 0) + ' · Предложений: ' + (preview?.sentences ?? 0) + '\nТекстов: ' + (preview?.readingTexts ?? 0) + ' · Ответов разбора: ' + (preview?.structureAttempts ?? 0) + '\nЗаписей прогресса: ' + (preview?.progressWords ?? 0) +
+              '\nСовпадающих ключей: ' + (preview?.conflicts ?? 0) + '. Последняя пользовательская запись заменит совпадающую, без дублей.\nТекущий прогресс будет заменён. Сначала сохраним точку восстановления на этом устройстве.'}</Text>
+            {backupMessage ? <Text>{backupMessage}</Text> : null}
+            <TouchableOpacity style={styles.row} disabled={isImporting} onPress={() => void commitImport(showRestore)}><Text style={styles.rowText}>{isImporting ? 'Сохраняем…' : showRestore ? 'Восстановить' : 'Заменить прогресс'}</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.row} disabled={isImporting} onPress={() => { setPreview(null); setShowRestore(false); }}><Text>Отмена</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -241,13 +293,13 @@ const styles = StyleSheet.create({
   section: { marginBottom: 28 },
   sectionTitle: { fontSize: 16, color: '#4A5568', marginBottom: 4, fontWeight: '700' },
   sectionSub: { fontSize: 13, color: '#A0AEC0', marginBottom: 12 },
-  row: { 
-    flexDirection: 'row', 
+  row: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFF', 
-    padding: 15, 
-    borderRadius: 12, 
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#E2E8F0',

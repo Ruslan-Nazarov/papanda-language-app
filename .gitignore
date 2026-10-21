@@ -38,6 +38,31 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Local validation output
+*.log
+.npm-audit-cache/
+dependency-audit*.json
+dependency-fix.log
+dependency-speech.log
+smoke-audit.log
+smoke-workshop.log
+study-live.log
+.wrangler/
+dist-audit/
+dist-book/
+check-book.log
+export-book.log
+smoke-book.log
+export-audit.log
+check-audit.log
+check-build*.log
+
 # generated native folders
 /ios
 /android
+/credentials.json
+/credentials/
+
+# Local EAS responses may contain temporary signed log URLs.
+eas-*-local.json
+eas-*.log

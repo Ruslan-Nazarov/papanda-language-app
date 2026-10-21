@@ -15,19 +15,18 @@ omitted, the Worker uses `DEFAULT_PROVIDER` from `wrangler.toml`.
 
 ```bash
 cd gemini-proxy
-npm install
+npm ci                                    # Node.js 22+
 npx wrangler login                         # opens browser, free Cloudflare account
 
-# 1. create the rate-limit KV store, paste the printed id into wrangler.toml
-npx wrangler kv namespace create RL
-
-# 2. store the key(s) for whichever provider(s) you use — only the one matching
+# 1. store the key(s) for whichever provider(s) you use — only the one matching
 #    DEFAULT_PROVIDER is required, the others are optional
 npx wrangler secret put GEMINI_API_KEY      # aistudio.google.com
 npx wrangler secret put CEREBRAS_API_KEY    # cloud.cerebras.ai
 npx wrangler secret put GROQ_API_KEY        # console.groq.com
 
-# 3. deploy
+# 2. validate locally, then deploy (creates the QUOTA Durable Object binding)
+npm run type-check
+npm run build                             # dry run; nothing is published
 npx wrangler deploy
 ```
 
@@ -46,11 +45,23 @@ Limits are plain vars in `wrangler.toml` (`PER_INSTALL_HOURLY`, `PER_INSTALL_DAI
 change and `npx wrangler deploy`, no app release needed. `GLOBAL_DAILY` is the
 safety net against a leaked/abused install id draining the free-tier quota.
 
+`X-Install-Id` is client-controlled, not authentication. Quotas are atomically
+reserved in one SQLite Durable Object; rejected requests do not consume the
+global budget. Each admitted generation request can try two providers. The
+counter therefore measures client requests, not provider calls or tokens.
+The `v1-quota` migration replaces the former KV implementation and starts a new
+budget on its first deployment. Old KV data is not deleted by this change.
+
+Each provider attempt has a 20-second timeout; two attempts fit within the
+client's 45-second timeout. Bodies are limited to 256000 bytes, prompts to
+60000 characters, output tokens to 16384. Browser preflight is supported;
+public CORS is not an access-control mechanism.
+
 Cerebras and Groq speak the OpenAI-compatible chat-completions dialect, so the
 Worker folds Gemini's `responseJsonSchema` into the prompt text and asks for
 generic JSON-object mode (`response_format: {type:"json_object"}`) for those
-two — there's no native JSON-Schema-constrained decoding on their APIs, so the
-app's existing sentence validation is the real safety net either way.
+two. This adapter uses that common protocol; the app validates returned
+sentences regardless of the provider's own schema capabilities.
 
 ## Watch traffic
 

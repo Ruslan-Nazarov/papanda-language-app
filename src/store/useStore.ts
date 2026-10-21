@@ -1,13 +1,20 @@
+import type { StructureAttempt, ReadingText } from '../models/study';
+import { cancelGenerations } from '../services/generationControl';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Word, Sentence, Token } from '../models/types';
-import { DailyShows, WorkoutSnapshot, ImwSnapshot, calculateIMWIndex } from '../utils/statistics';
-import wordsData from '../data/words.json';
-import sentencesData from '../data/sentences.json';
-
-import { getWordTranslation } from '../utils/words';
+import { WorkoutSnapshot, calculateIMWIndex } from '../utils/statistics';
+import { cleanDictionaryForm, getWordKey, getWordTranslation } from '../utils/words';
+import { localDateKey } from '../utils/date';
 import { sentenceFingerprint } from '../utils/sentenceValidation';
+import { trimGeneratedCache } from '../utils/sentenceQueue';
+import { LANGUAGES } from '../constants/languages';
+import { applyWordProgress, baseStaticWords, deriveCatalog, mergeSentences } from './catalog';
+import { createDefaultProgress, pickPersistedFields, PersistedProgress, UserWordProgress, WordAiVerification } from './progressTypes';
+import { parseProgress } from './progressValidation';
+import { effectiveWordProgress, undoKnowledge, type KnowledgeUndo } from '../utils/wordProgress';
+export type { PersistedProgress, UserWordProgress, WordAiVerification, WordAiIssue } from './progressTypes';
 
 interface TargetSentenceInfo {
   langCode: string;
@@ -16,49 +23,18 @@ interface TargetSentenceInfo {
   highlightWord?: string;
 }
 
-export interface WordAiIssue {
-  lang: string;
-  issue: string;
-  suggestion?: string;
-}
-
-export interface WordAiVerification {
-  status: 'verified' | 'flagged';
-  issues?: WordAiIssue[];
-  checkedAt: string;
-}
-
-export interface UserWordProgress {
-  count?: number;
-  is_learned?: number;
-  knowledge_stats?: Record<string, boolean>;
-  show_stats?: Record<string, number>;
-  last_shown?: string;
-  last_shown_by_lang?: Record<string, string>;
-  personal_association?: string;
-  custom_word?: string;
-  custom_ru?: string;
-  custom_translations?: Record<string, string>;
-  is_favorite?: boolean;
-  ai_verification?: WordAiVerification;
-}
-
-interface AppState {
+interface AppState extends PersistedProgress {
+  progressRevision: number;
+  undoWordKnowledge: (wordKey: string, undo: KnowledgeUndo) => void;
+  recordStructureAttempt: (attempt: StructureAttempt) => void;
+  disputeStructureAttempt: (id: string) => void;
+  saveReadingText: (text: ReadingText) => void;
+  removeReadingText: (id: string) => void;
   words: Word[];
   sentences: Sentence[];
-  customSentences: Sentence[];
-  generatedSentences: Sentence[];
-  customWords: Word[];
-  userWordProgress: Record<string, UserWordProgress>;
-  activeLanguages: string[];
   targetSentenceInfo: TargetSentenceInfo | null;
-  dailyShows: DailyShows;
-  workoutSnapshots: WorkoutSnapshot[];
-  imwSnapshots: ImwSnapshot[];
-  workoutWordCount: number;
-  workoutLearnedWordCount: number;
-  workoutFavoritesOnly: boolean;
-  learnedSentences: string[];
+  workoutReviewOnly: boolean;
+  setWorkoutReviewOnly: (enabled: boolean) => void;
 
   // Actions
   initializeStore: () => void;
@@ -66,7 +42,9 @@ interface AppState {
   setLanguages: (langs: string[]) => void;
   setTargetSentenceInfo: (info: TargetSentenceInfo | null) => void;
   markWordKnown: (wordEng: string, lang: string, isKnown: boolean) => void;
+  snoozeWord: (wordEng: string, lang: string, days: number) => void;
   incrementShowCount: (wordEng: string, lang: string) => void;
+  incrementShowCounts: (wordEngs: string[], lang: string) => void;
   recordTripleCardShow: (wordEng: string) => void;
   markTripleKnown: (wordEng: string) => void;
   saveWordAssociation: (wordEng: string, assoc: string) => void;
@@ -75,792 +53,247 @@ interface AppState {
   addGeneratedSentences: (sentences: Sentence[]) => void;
   clearGeneratedSentences: (languageLabel?: string) => void;
   updateSentence: (id: string, sentence: Sentence) => void;
-  markSentenceLearned: (id: string, isLearned: boolean) => void;
   updateWordDetails: (wordKey: string, details: { word?: string; ru?: string; translations?: Record<string, string>; personal_association?: string }) => void;
   addCustomWord: (word: Word) => void;
   addWordFromSentenceToken: (token: Token, languageCode: string) => boolean;
   resetStatistics: () => void;
   addWorkoutSnapshot: (snapshot: WorkoutSnapshot) => void;
+  setWordTourSize: (count: number) => void;
   setWorkoutWordCount: (count: number) => void;
   setWorkoutLearnedWordCount: (count: number) => void;
   setWorkoutFavoritesOnly: (onlyFavorites: boolean) => void;
+  setHasSeenSnoozeHint: (hasSeen: boolean) => void;
   toggleWordFavorite: (wordEng: string) => void;
   restoreWordProgress: (wordEng: string, previousProgress: UserWordProgress | null) => void;
   exportProgress: () => PersistedProgress;
   importProgress: (data: unknown) => { ok: boolean; error?: string };
 }
 
-// Helper to parse JSON fields safely
-const parseJSONField = (field: string | Record<string, any> | null) => {
-  if (typeof field === 'string') {
-    try { return JSON.parse(field); } catch { return {}; }
-  }
-  return field || {};
-};
 
-const normalizeDictionaryValue = (value: string) => value.trim().toLocaleLowerCase();
+// Hydration status lives outside persistence: reporting a read error must not
+// overwrite the unread/corrupted on-device data with the default state.
+export const useHydrationState = create<{ ready: boolean; error: string | null }>(() => ({ ready: false, error: null }));
+const MAX_GENERATED = 80;
+const normalize = (value: string) => value.trim().toLocaleLowerCase();
 
-// The subset of state that is persisted to disk and what a backup file
-// contains. Shared by the persist middleware's `partialize` and by
-// exportProgress/importProgress, so the two can never drift apart.
-export interface PersistedProgress {
-  userWordProgress: Record<string, UserWordProgress>;
-  customSentences: Sentence[];
-  generatedSentences: Sentence[];
-  customWords: Word[];
-  activeLanguages: string[];
-  dailyShows: DailyShows;
-  workoutSnapshots: WorkoutSnapshot[];
-  imwSnapshots: ImwSnapshot[];
-  workoutWordCount: number;
-  workoutLearnedWordCount: number;
-  workoutFavoritesOnly: boolean;
-  learnedSentences: string[];
-}
+export const useStore = create<AppState>()(persist<AppState, [], [], PersistedProgress>((set, get) => {
+  const baseFor = (key: string) => get().customWords.find(word => getWordKey(word) === key)
+    ?? baseStaticWords.find(word => getWordKey(word) === key);
 
-const pickPersistedFields = (state: AppState): PersistedProgress => ({
-  userWordProgress: state.userWordProgress,
-  customSentences: state.customSentences,
-  generatedSentences: state.generatedSentences,
-  customWords: state.customWords,
-  activeLanguages: state.activeLanguages,
-  dailyShows: state.dailyShows,
-  workoutSnapshots: state.workoutSnapshots,
-  imwSnapshots: state.imwSnapshots,
-  workoutWordCount: state.workoutWordCount,
-  workoutLearnedWordCount: state.workoutLearnedWordCount,
-  workoutFavoritesOnly: state.workoutFavoritesOnly,
-  learnedSentences: state.learnedSentences,
-});
-
-const getWordValueForLanguage = (word: Word, languageCode: string): string => {
-  return getWordTranslation(word, languageCode);
-};
-
-// Base static words dictionary
-const baseStaticWords: Word[] = (wordsData as any[]).map((w, idx) => {
-  // words.json only carries top-level it/de/ru; es/fr/la/kz live inside the
-  // `translations` JSON string. Fold them in so word.es / word.fr are populated.
-  const tr = parseJSONField(w.translations);
-  return {
-  id: w.id || idx.toString(),
-  word: w.word || w.eng || '',
-  eng: w.eng || w.word || '',
-  ru: w.ru || tr.ru || '',
-  it: w.it || tr.it || '',
-  es: w.es || tr.es || '',
-  de: w.de || tr.de || '',
-  fr: w.fr || tr.fr || '',
-  meaning: w.meaning || '',
-  count: 0,
-  is_learned: 0,
-  knowledge_stats: {},
-  show_stats: {},
-  last_shown: undefined,
-  translations: tr,
-  personal_association: '',
-  is_favorite: false
+  // Persisted overrides are authoritative; the same projection is used on edit,
+  // undo, import and hydration. Custom words remain immutable base definitions.
+  const updateProgress = (key: string, update: (progress: UserWordProgress) => UserWordProgress) => {
+    set(state => {
+      const base = baseFor(key);
+      const progress = update(effectiveWordProgress(base, state.userWordProgress[key]));
+      return {
+        userWordProgress: { ...state.userWordProgress, [key]: progress },
+        words: state.words.map(word => getWordKey(word) === key && base ? applyWordProgress(base, progress) : word),
+      };
+    });
   };
-});
 
-const baseStaticSentences: Sentence[] = (sentencesData as Sentence[]).map((s, idx) => ({
-  id: s.id || `sent_${idx}`,
-  language: s.language || 'Unknown',
-  sentence: s.sentence || (s as any).text || '',
-  words: s.words || []
-}));
-
-export const useStore = create<AppState>()(
-  persist(
-    (set, get) => ({
-      words: baseStaticWords,
-      sentences: baseStaticSentences,
-      customSentences: [],
-      generatedSentences: [],
-      customWords: [],
-      userWordProgress: {},
-      activeLanguages: ['en', 'kz', 'it'],
-      targetSentenceInfo: null,
-      dailyShows: {},
-      workoutSnapshots: [],
-      imwSnapshots: [],
-      workoutWordCount: 10,
-      workoutLearnedWordCount: 2,
-      workoutFavoritesOnly: false,
-      learnedSentences: [],
-
-      recordImwSnapshot: () => {
-        set((state) => {
-          if (state.words.length === 0 || state.activeLanguages.length === 0) return {};
-          const { overall, byLanguage } = calculateIMWIndex(state.words, state.activeLanguages);
-          const today = new Date().toISOString().split('T')[0];
-          const rest = state.imwSnapshots.filter(s => s.date !== today);
-          const next: ImwSnapshot[] = [...rest, { date: today, imw: overall, byLang: byLanguage }];
-          return { imwSnapshots: next.slice(-180) };
-        });
-      },
-
-      initializeStore: () => {
-        const { userWordProgress, customSentences, customWords, generatedSentences } = get();
-        
-        const applyUserProgress = (w: Word): Word => {
-          const key = w.eng || w.word || '';
-          const prog = userWordProgress[key];
-          if (!prog) return w;
-
-          const mergedTranslations = {
-            ...w.translations,
-            ...(prog.custom_translations || {})
-          };
-
-          const directLangUpdates: Partial<Word> = {};
-          if (prog.custom_translations) {
-            if ('it' in prog.custom_translations) directLangUpdates.it = prog.custom_translations.it;
-            if ('de' in prog.custom_translations) directLangUpdates.de = prog.custom_translations.de;
-            if ('es' in prog.custom_translations) directLangUpdates.es = prog.custom_translations.es;
-            if ('fr' in prog.custom_translations) directLangUpdates.fr = prog.custom_translations.fr;
-            if ('ru' in prog.custom_translations) directLangUpdates.ru = prog.custom_translations.ru;
-          }
-
-          const newWord = prog.custom_word !== undefined ? prog.custom_word : w.word;
-          const newEng = prog.custom_word !== undefined && !w.source_language ? prog.custom_word : w.eng;
-          const newRu = prog.custom_ru !== undefined ? prog.custom_ru : (directLangUpdates.ru ?? w.ru);
-
-          return {
-            ...w,
-            ...directLangUpdates,
-            word: newWord,
-            eng: newEng,
-            ru: newRu,
-            translations: mergedTranslations,
-            count: prog.count !== undefined ? prog.count : w.count,
-            is_learned: prog.is_learned !== undefined ? prog.is_learned : w.is_learned,
-            knowledge_stats: prog.knowledge_stats || w.knowledge_stats,
-            show_stats: prog.show_stats || w.show_stats,
-            last_shown: prog.last_shown || w.last_shown,
-            last_shown_by_lang: prog.last_shown_by_lang || w.last_shown_by_lang,
-            personal_association: prog.personal_association !== undefined ? prog.personal_association : (w.personal_association || ''),
-            is_favorite: prog.is_favorite !== undefined ? prog.is_favorite : (w.is_favorite || false)
-          };
-        };
-
-        const mergedWords = baseStaticWords.map(applyUserProgress);
-        const mergedCustomWords = (customWords || []).map(applyUserProgress);
-
-        const mergedSentences = [...baseStaticSentences, ...(customSentences || []), ...(generatedSentences || [])];
-
-        set({ 
-          words: [...mergedWords, ...mergedCustomWords], 
-          sentences: mergedSentences 
-        });
-      },
-
-      setLanguages: (langs) => set({ activeLanguages: langs }),
-
-      setTargetSentenceInfo: (info) => set({ targetSentenceInfo: info }),
-
-      markWordKnown: (wordEng, lang, isKnown) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const currentStats = { ...(currentProg.knowledge_stats || {}) };
-          currentStats[lang] = isKnown;
-
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            knowledge_stats: currentStats,
-            is_learned: isKnown ? 1 : 0
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const newWords = state.words.map(w => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return { 
-                ...w, 
-                knowledge_stats: currentStats,
-                is_learned: isKnown ? 1 : 0
-              };
-            }
-            return w;
-          });
-
-          return { 
-            userWordProgress: newProgress,
-            words: newWords 
-          };
-        });
-      },
-
-      incrementShowCount: (wordEng, lang) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const currentShowStats = { ...(currentProg.show_stats || {}) };
-          currentShowStats[lang] = (currentShowStats[lang] || 0) + 1;
-          const newCount = (currentProg.count || 0) + 1;
-          const nowIso = new Date().toISOString();
-          const today = nowIso.split('T')[0];
-          const lastShownByLang = { ...(currentProg.last_shown_by_lang || {}), [lang]: nowIso };
-
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            count: newCount,
-            last_shown: nowIso,
-            last_shown_by_lang: lastShownByLang,
-            show_stats: currentShowStats
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const newWords = state.words.map(w => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return {
-                ...w,
-                count: newCount,
-                last_shown: nowIso,
-                last_shown_by_lang: lastShownByLang,
-                show_stats: currentShowStats
-              };
-            }
-            return w;
-          });
-
-          return { 
-            userWordProgress: newProgress,
-            words: newWords,
-            dailyShows: {
-              ...state.dailyShows,
-              [today]: (state.dailyShows[today] || 0) + 1
-            }
-          };
-        });
-      },
-
-      // One triples card shown = one show, regardless of active language count.
-      // Call this whenever a new card is presented to the user, not just when
-      // they mark it known — browsing via "Дальше" is a real exposure too.
-      recordTripleCardShow: (wordEng) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const currentShowStats = { ...(currentProg.show_stats || {}) };
-          const lastShownByLang = { ...(currentProg.last_shown_by_lang || {}) };
-          const nowIso = new Date().toISOString();
-
-          state.activeLanguages.forEach(lang => {
-            currentShowStats[lang] = (currentShowStats[lang] || 0) + 1;
-            lastShownByLang[lang] = nowIso;
-          });
-
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            show_stats: currentShowStats,
-            last_shown_by_lang: lastShownByLang,
-            count: (currentProg.count || 0) + 1,
-            last_shown: nowIso
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const newWords = state.words.map(w => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return {
-                ...w,
-                show_stats: currentShowStats,
-                last_shown_by_lang: lastShownByLang,
-                count: (w.count || 0) + 1,
-                last_shown: nowIso
-              };
-            }
-            return w;
-          });
-
-          const today = nowIso.split('T')[0];
-
-          return {
-            userWordProgress: newProgress,
-            words: newWords,
-            dailyShows: {
-              ...state.dailyShows,
-              [today]: (state.dailyShows[today] || 0) + 1
-            }
-          };
-        });
-      },
-
-      // Just the "learned" verdict — the show itself was already recorded by
-      // recordTripleCardShow when this card was presented.
-      markTripleKnown: (wordEng) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const currentStats = { ...(currentProg.knowledge_stats || {}) };
-          const nowIso = new Date().toISOString();
-
-          state.activeLanguages.forEach(lang => {
-            currentStats[lang] = true;
-          });
-
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            knowledge_stats: currentStats,
-            last_shown: nowIso,
-            is_learned: 1
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const newWords = state.words.map(w => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return {
-                ...w,
-                knowledge_stats: currentStats,
-                last_shown: nowIso,
-                is_learned: 1
-              };
-            }
-            return w;
-          });
-
-          return {
-            userWordProgress: newProgress,
-            words: newWords
-          };
-        });
-      },
-
-      saveWordAssociation: (wordEng, assoc) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            personal_association: assoc
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const updateAssoc = (w: Word) => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return { ...w, personal_association: assoc };
-            }
-            return w;
-          };
-
-          const newWords = state.words.map(updateAssoc);
-          const newCustomWords = (state.customWords || []).map(updateAssoc);
-
-          return { 
-            userWordProgress: newProgress,
-            words: newWords,
-            customWords: newCustomWords
-          };
-        });
-      },
-
-      addSentence: (sentence) => {
-        set((state) => {
-          const updatedCustom = [...state.customSentences, sentence];
-          return {
-            customSentences: updatedCustom,
-            sentences: [...state.sentences, sentence]
-          };
-        });
-      },
-
-      addGeneratedSentences: (newSentences) => {
-        set((state) => {
-          // Normalized fingerprint (case/punctuation/spacing-insensitive) so a
-          // "lite" model regenerating near-identical templates doesn't silently
-          // pad the pool with sentences that only look distinct to a string diff.
-          const knownFingerprints = new Set(state.sentences.map(sentence => sentenceFingerprint(sentence.language, sentence.sentence)));
-          const uniqueSentences: typeof newSentences = [];
-          for (const sentence of newSentences) {
-            const fp = sentenceFingerprint(sentence.language, sentence.sentence);
-            if (knownFingerprints.has(fp)) continue;
-            knownFingerprints.add(fp);
-            uniqueSentences.push(sentence);
-          }
-          if (uniqueSentences.length === 0) return {};
-
-          // Cap the stored pool so an old weak batch ages out instead of looping forever.
-          const MAX_GENERATED = 80;
-          const mergedGenerated = [...state.generatedSentences, ...uniqueSentences];
-          const trimmedGenerated = mergedGenerated.slice(-MAX_GENERATED);
-          const dropped = new Set(mergedGenerated.slice(0, -MAX_GENERATED).map(s => s.id));
-
-          return {
-            generatedSentences: trimmedGenerated,
-            sentences: [
-              ...state.sentences.filter(s => !dropped.has(s.id)),
-              ...uniqueSentences
-            ]
-          };
-        });
-      },
-
-      clearGeneratedSentences: (languageLabel) => {
-        set((state) => {
-          const matches = (s: Sentence) =>
-            s.source === 'generated' &&
-            (!languageLabel || (s.language || '').toLowerCase().includes(languageLabel.toLowerCase()));
-          const removedIds = new Set(state.generatedSentences.filter(matches).map(s => s.id));
-          if (removedIds.size === 0) return {};
-          return {
-            generatedSentences: state.generatedSentences.filter(s => !removedIds.has(s.id)),
-            sentences: state.sentences.filter(s => !removedIds.has(s.id)),
-            learnedSentences: state.learnedSentences.filter(id => !removedIds.has(id))
-          };
-        });
-      },
-
-      updateSentence: (id, sentence) => {
-        set((state) => {
-          const newSentences = state.sentences.map(s => s.id === id ? sentence : s);
-          
-          let newCustom = [...state.customSentences];
-          const customIdx = newCustom.findIndex(s => s.id === id);
-          if (customIdx >= 0) {
-            newCustom[customIdx] = sentence;
-          } else {
-            // It was a static sentence, save the customized version to persist it
-            newCustom.push(sentence);
-          }
-
-          return { 
-            sentences: newSentences,
-            customSentences: newCustom 
-          };
-        });
-      },
-
-      markSentenceLearned: (id, isLearned) => {
-        set((state) => {
-          let updated = [...state.learnedSentences];
-          if (isLearned && !updated.includes(id)) {
-            updated.push(id);
-          } else if (!isLearned && updated.includes(id)) {
-            updated = updated.filter(sId => sId !== id);
-          }
-          return { learnedSentences: updated };
-        });
-      },
-
-      updateWordDetails: (wordKey, details) => {
-        set((state) => {
-          const key = wordKey;
-          const currentProg = state.userWordProgress[key] || {};
-          
-          const updatedTranslations: Record<string, string> = { 
-            ...(currentProg.custom_translations || {}), 
-            ...(details.translations || {}),
-            ...(details.ru !== undefined ? { ru: details.ru } : {})
-          };
-
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            ...(details.word !== undefined && { custom_word: details.word }),
-            ...(details.ru !== undefined && { custom_ru: details.ru }),
-            ...(details.personal_association !== undefined && { personal_association: details.personal_association }),
-            ...(Object.keys(updatedTranslations).length > 0 && { custom_translations: updatedTranslations })
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const updateWord = (w: Word): Word => {
-            if (w.eng === wordKey || w.word === wordKey) {
-              const mergedTranslations = {
-                ...w.translations,
-                ...updatedTranslations
-              };
-
-              const directLangUpdates: Partial<Word> = {};
-              if (updatedTranslations.it !== undefined) directLangUpdates.it = updatedTranslations.it;
-              if (updatedTranslations.de !== undefined) directLangUpdates.de = updatedTranslations.de;
-              if (updatedTranslations.es !== undefined) directLangUpdates.es = updatedTranslations.es;
-              if (updatedTranslations.fr !== undefined) directLangUpdates.fr = updatedTranslations.fr;
-
-              const newRu = details.ru !== undefined ? details.ru : (updatedTranslations.ru ?? w.ru);
-              const newWord = details.word !== undefined ? details.word : w.word;
-              const newEng = details.word !== undefined && !w.source_language ? details.word : w.eng;
-              const newAssoc = details.personal_association !== undefined ? details.personal_association : (w.personal_association || '');
-
-              return { 
-                ...w, 
-                ...directLangUpdates,
-                word: newWord,
-                eng: newEng,
-                ru: newRu,
-                personal_association: newAssoc,
-                translations: mergedTranslations
-              };
-            }
-            return w;
-          };
-
-          const newWords = state.words.map(updateWord);
-          const newCustomWords = (state.customWords || []).map(updateWord);
-
-          return { 
-            userWordProgress: newProgress,
-            words: newWords,
-            customWords: newCustomWords
-          };
-        });
-      },
-
-      addCustomWord: (word) => {
-        set((state) => {
-          const updatedCustom = [...state.customWords, word];
-          return {
-            customWords: updatedCustom,
-            words: [word, ...state.words] // Prepend new words so they appear first in dictionary
-          };
-        });
-      },
-
-      setWordAiVerification: (wordKey, verification) => {
-        set((state) => {
-          const key = wordKey;
-          const currentProg = state.userWordProgress[key] || {};
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            ai_verification: verification,
-          };
-          return {
-            userWordProgress: {
-              ...state.userWordProgress,
-              [key]: updatedProg,
-            }
-          };
-        });
-      },
-
-      addWordFromSentenceToken: (token, languageCode) => {
-        // Prioritize canonical dictionary form (lemma) or dictionary_word.
-        // If neither exists, clean up token.text (strip punctuation) - NEVER use parts[0].
-        const rawForm = token.dictionary_form || token.dictionary_word || token.text;
-        const dictionaryForm = (rawForm || '')
-          .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, '')
-          .trim();
-        if (!dictionaryForm) return false;
-
-        const normalizedForm = normalizeDictionaryValue(dictionaryForm);
-        const alreadyExists = get().words.some(word =>
-          normalizeDictionaryValue(getWordValueForLanguage(word, languageCode)) === normalizedForm ||
-          (word.source_language === languageCode && normalizeDictionaryValue(word.word || '') === normalizedForm)
-        );
-        if (alreadyExists) return false;
-
-        const stableKey = `user:${languageCode}:${normalizedForm}`;
-        // Prefill every language the user has active in the app (not just the one
-        // being studied right now), matching how EditWordModal adds a word manually —
-        // otherwise the word is missing translations for other active languages.
-        const translations: Record<string, string> = {};
-        get().activeLanguages.forEach(lang => { translations[lang] = ''; });
-        translations[languageCode] = dictionaryForm;
-
-        const newWord: Word = {
-          id: `custom_${Date.now().toString()}`,
-          // `eng` is a legacy internal key in this app, not the visible language value.
-          eng: stableKey,
-          word: dictionaryForm,
-          ru: token.translation?.trim() || '',
-          translations,
-          source_language: languageCode,
-          count: 0,
-          is_learned: 0,
-          knowledge_stats: {},
-          show_stats: {},
-          personal_association: '',
-          is_favorite: false
-        };
-
-        set((state) => ({
-          customWords: [newWord, ...state.customWords],
-          words: [newWord, ...state.words]
-        }));
-        return true;
-      },
-
-      resetStatistics: () => {
-        // Clear only progress/stats — keep the user's own words and sentences.
-        set(() => ({
-          userWordProgress: {},
-          dailyShows: {},
-          workoutSnapshots: [],
-          imwSnapshots: [],
-          learnedSentences: []
-        }));
-        get().initializeStore();
-      },
-
-      addWorkoutSnapshot: (snapshot) => {
-        const MAX_SNAPSHOTS = 200;
-        set((state) => ({
-          workoutSnapshots: [...state.workoutSnapshots, snapshot].slice(-MAX_SNAPSHOTS)
-        }));
-      },
-      
-      setWorkoutWordCount: (count) => set({ workoutWordCount: count }),
-      setWorkoutLearnedWordCount: (count) => set({ workoutLearnedWordCount: count }),
-
-      setWorkoutFavoritesOnly: (onlyFavorites) => set({ workoutFavoritesOnly: onlyFavorites }),
-
-      toggleWordFavorite: (wordEng) => {
-        set((state) => {
-          const key = wordEng;
-          const currentProg = state.userWordProgress[key] || {};
-          const currentFav = currentProg.is_favorite;
-          
-          const updatedProg: UserWordProgress = {
-            ...currentProg,
-            is_favorite: !currentFav
-          };
-
-          const newProgress = {
-            ...state.userWordProgress,
-            [key]: updatedProg
-          };
-
-          const updateFav = (w: Word) => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              return { ...w, is_favorite: !currentFav };
-            }
-            return w;
-          };
-
-          const newWords = state.words.map(updateFav);
-          const newCustomWords = (state.customWords || []).map(updateFav);
-
-          return { 
-            userWordProgress: newProgress,
-            words: newWords,
-            customWords: newCustomWords
-          };
-        });
-      },
-
-      restoreWordProgress: (wordEng, previousProgress) => {
-        set((state) => {
-          const key = wordEng;
-          
-          const newProgress = { ...state.userWordProgress };
-          if (previousProgress) {
-            newProgress[key] = previousProgress;
-          } else {
-            delete newProgress[key];
-          }
-
-          const baseWord = baseStaticWords.find(w => w.eng === wordEng || w.word === wordEng);
-
-          const restoreWord = (w: Word): Word => {
-            if (w.eng === wordEng || w.word === wordEng) {
-              if (previousProgress) {
-                const mergedTranslations = {
-                  ...(baseWord?.translations || {}),
-                  ...(previousProgress.custom_translations || {})
-                };
-
-                const directLangUpdates: Partial<Word> = {};
-                if (previousProgress.custom_translations) {
-                  if ('it' in previousProgress.custom_translations) directLangUpdates.it = previousProgress.custom_translations.it;
-                  if ('de' in previousProgress.custom_translations) directLangUpdates.de = previousProgress.custom_translations.de;
-                  if ('es' in previousProgress.custom_translations) directLangUpdates.es = previousProgress.custom_translations.es;
-                  if ('fr' in previousProgress.custom_translations) directLangUpdates.fr = previousProgress.custom_translations.fr;
-                  if ('ru' in previousProgress.custom_translations) directLangUpdates.ru = previousProgress.custom_translations.ru;
-                }
-
-                return {
-                  ...w,
-                  ...directLangUpdates,
-                  word: previousProgress.custom_word !== undefined ? previousProgress.custom_word : (baseWord?.word || w.word),
-                  eng: previousProgress.custom_word !== undefined && !w.source_language ? previousProgress.custom_word : (baseWord?.eng || w.eng),
-                  ru: previousProgress.custom_ru !== undefined ? previousProgress.custom_ru : (directLangUpdates.ru ?? baseWord?.ru ?? w.ru),
-                  translations: mergedTranslations,
-                  count: previousProgress.count !== undefined ? previousProgress.count : (baseWord?.count || 0),
-                  is_learned: previousProgress.is_learned !== undefined ? previousProgress.is_learned : (baseWord?.is_learned || 0),
-                  knowledge_stats: previousProgress.knowledge_stats || (baseWord?.knowledge_stats || {}),
-                  show_stats: previousProgress.show_stats || (baseWord?.show_stats || {}),
-                  last_shown: previousProgress.last_shown || baseWord?.last_shown,
-                  last_shown_by_lang: previousProgress.last_shown_by_lang || baseWord?.last_shown_by_lang,
-                  personal_association: previousProgress.personal_association || baseWord?.personal_association || '',
-                  is_favorite: previousProgress.is_favorite !== undefined ? previousProgress.is_favorite : (baseWord?.is_favorite || false)
-                };
-              } else if (baseWord) {
-                return { ...baseWord }; // restore to base
-              }
-            }
-            return w;
-          };
-
-          const newWords = state.words.map(restoreWord);
-          const newCustomWords = (state.customWords || []).map(restoreWord);
-
-          return {
-            userWordProgress: newProgress,
-            words: newWords,
-            customWords: newCustomWords
-          };
-        });
-      },
-
-      exportProgress: () => pickPersistedFields(get()),
-
-      importProgress: (data) => {
-        if (!data || typeof data !== 'object' || Array.isArray(data)) {
-          return { ok: false, error: 'Файл повреждён или имеет неверный формат.' };
+  const recordShows = (keys: string[], languages: string[]) => {
+    if (!keys.length || !languages.length) return;
+    const now = new Date().toISOString();
+    const today = localDateKey();
+    const uniqueKeys = [...new Set(keys.filter(key => Boolean(key) && Boolean(baseFor(key))))];
+    if (!uniqueKeys.length) return;
+
+    set(state => {
+      const userWordProgress = { ...state.userWordProgress };
+      const keySet = new Set(uniqueKeys);
+      for (const key of uniqueKeys) {
+        const previous = effectiveWordProgress(baseFor(key), userWordProgress[key]);
+        const showStats = { ...previous.show_stats };
+        const lastShown = { ...previous.last_shown_by_lang };
+        for (const lang of languages) {
+          showStats[lang] = (showStats[lang] ?? 0) + 1;
+          lastShown[lang] = now;
         }
-        const d = data as Partial<PersistedProgress>;
-        set({
-          userWordProgress: d.userWordProgress || {},
-          customSentences: Array.isArray(d.customSentences) ? d.customSentences : [],
-          generatedSentences: Array.isArray(d.generatedSentences) ? d.generatedSentences : [],
-          customWords: Array.isArray(d.customWords) ? d.customWords : [],
-          activeLanguages: Array.isArray(d.activeLanguages) && d.activeLanguages.length > 0
-            ? d.activeLanguages
-            : ['en', 'kz', 'it'],
-          dailyShows: d.dailyShows || {},
-          workoutSnapshots: Array.isArray(d.workoutSnapshots) ? d.workoutSnapshots : [],
-          imwSnapshots: Array.isArray(d.imwSnapshots) ? d.imwSnapshots : [],
-          workoutWordCount: typeof d.workoutWordCount === 'number' ? d.workoutWordCount : 10,
-          workoutLearnedWordCount: typeof d.workoutLearnedWordCount === 'number' ? d.workoutLearnedWordCount : 2,
-          workoutFavoritesOnly: Boolean(d.workoutFavoritesOnly),
-          learnedSentences: Array.isArray(d.learnedSentences) ? d.learnedSentences : [],
-        });
-        get().initializeStore();
-        return { ok: true };
+        userWordProgress[key] = {
+          ...previous,
+          count: (previous.count ?? 0) + 1,
+          show_stats: showStats,
+          last_shown: now,
+          last_shown_by_lang: lastShown,
+        };
       }
+      return {
+        userWordProgress,
+        words: state.words.map(word => {
+          const key = getWordKey(word);
+          if (!keySet.has(key)) return word;
+          const base = baseFor(key);
+          return base ? applyWordProgress(base, userWordProgress[key]) : word;
+        }),
+        dailyShows: { ...state.dailyShows, [today]: (state.dailyShows[today] ?? 0) + uniqueKeys.length },
+      };
+    });
+  };
+
+  const defaults = createDefaultProgress();
+  return {
+    ...defaults, ...deriveCatalog(defaults), targetSentenceInfo: null, workoutReviewOnly: false, progressRevision: 0,
+    undoWordKnowledge: (key, undo) => updateProgress(key, progress => undoKnowledge(progress, undo, get().activeLanguages)),
+    recordStructureAttempt: attempt => set(state => ({ structureAttempts: [...state.structureAttempts.filter(a => a.id !== attempt.id), attempt].slice(-500) })),
+    disputeStructureAttempt: id => set(state => ({ structureAttempts: state.structureAttempts.map(a => a.id === id ? { ...a, result: 'disputed' as const } : a) })),
+    saveReadingText: text => set(state => {
+      const next = [...state.readingTexts.filter(t => t.id !== text.id), text];
+      if (next.length > 10) throw new Error('Уже сохранено 10 текстов. Удалите ненужный текст перед добавлением нового.');
+      const validated = parseProgress({ ...state, readingTexts: next });
+      return { readingTexts: validated.readingTexts };
     }),
-    {
-      name: 'papanda-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-      // AsyncStorage rehydrates asynchronously — once the persisted slices are in,
-      // rebuild the derived `words` / `sentences` from them.
-      onRehydrateStorage: () => (state) => {
-        state?.initializeStore();
+    removeReadingText: id => set(state => ({ readingTexts: state.readingTexts.filter(t => t.id !== id) })),
+    setWorkoutReviewOnly: workoutReviewOnly => set({ workoutReviewOnly }),
+    initializeStore: () => set(deriveCatalog(get())),
+    recordImwSnapshot: () => set(state => {
+      if (!state.words.length || !state.activeLanguages.length) return {};
+      const { overall, byLanguage } = calculateIMWIndex(state.words, state.activeLanguages);
+      const date = localDateKey();
+      return { imwSnapshots: [...state.imwSnapshots.filter(item => item.date !== date), { date, imw: overall, byLang: byLanguage }].slice(-180) };
+    }),
+    setLanguages: langs => {
+      const activeLanguages = [...new Set(langs)].filter(code => LANGUAGES.some(lang => lang.code === code));
+      if (activeLanguages.length) { cancelGenerations(); set({ activeLanguages }); }
+    },
+    setTargetSentenceInfo: targetSentenceInfo => set({ targetSentenceInfo }),
+    markWordKnown: (key, lang, known) => updateProgress(key, progress => {
+      const knowledge = { ...progress.knowledge_stats, [lang]: known };
+      return { ...progress, knowledge_stats: knowledge,
+        is_learned: get().activeLanguages.every(code => knowledge[code] === true) ? 1 : 0 };
+    }),
+    snoozeWord: (key, lang, days) => {
+      if (!Number.isFinite(days) || days < 0 || days > 3650) return;
+      updateProgress(key, progress => ({ ...progress, snoozed_until_by_lang: {
+        ...progress.snoozed_until_by_lang, [lang]: new Date(Date.now() + days * 86400000).toISOString(),
+      } }));
+    },
+    incrementShowCount: (key, lang) => recordShows([key], [lang]),
+    incrementShowCounts: (keys, lang) => recordShows(keys, [lang]),
+    recordTripleCardShow: key => recordShows([key], get().activeLanguages),
+    markTripleKnown: key => updateProgress(key, progress => ({
+      ...progress, is_learned: 1, knowledge_stats: {
+        ...progress.knowledge_stats, ...Object.fromEntries(get().activeLanguages.map(lang => [lang, true])),
       },
-      // CRITICAL FOR ANDROID: Only persist user changes, NOT the entire 5MB static dataset!
-      partialize: pickPersistedFields,
+    })),
+    saveWordAssociation: (key, association) => updateProgress(key, progress => ({ ...progress, personal_association: association })),
+    setWordAiVerification: (key, verification) => updateProgress(key, progress => ({ ...progress, ai_verification: verification })),
+    updateWordDetails: (key, details) => updateProgress(key, progress => ({
+      ...progress,
+      ...(details.word !== undefined ? { custom_word: details.word } : {}),
+      ...(details.ru !== undefined ? { custom_ru: details.ru } : {}),
+      ...(details.personal_association !== undefined ? { personal_association: details.personal_association } : {}),
+      custom_translations: { ...progress.custom_translations, ...details.translations, ...(details.ru !== undefined ? { ru: details.ru } : {}) },
+      // A changed translation invalidates a previous AI verdict.
+      ...(details.word !== undefined || details.ru !== undefined || details.translations ? { ai_verification: undefined } : {}),
+    })),
+    toggleWordFavorite: key => updateProgress(key, progress => ({
+      ...progress, is_favorite: !(progress.is_favorite ?? baseFor(key)?.is_favorite ?? false),
+    })),
+    restoreWordProgress: (key, previousProgress) => set(state => {
+      const userWordProgress = { ...state.userWordProgress };
+      if (previousProgress) userWordProgress[key] = previousProgress;
+      else delete userWordProgress[key];
+      const base = baseFor(key);
+      return { userWordProgress, words: state.words.map(word =>
+        getWordKey(word) === key && base ? applyWordProgress(base, previousProgress ?? undefined) : word) };
+    }),
+    addCustomWord: word => set(state => {
+      const key = getWordKey(word);
+      if (!key || state.words.some(item => getWordKey(item) === key)) return {};
+      return { customWords: [word, ...state.customWords], words: [word, ...state.words] };
+    }),
+    addWordFromSentenceToken: (token, languageCode) => {
+      const dictionaryForm = cleanDictionaryForm(token.dictionary_form || token.dictionary_word || token.text || '');
+      if (!dictionaryForm) return false;
+      const normalized = normalize(dictionaryForm);
+      if (get().words.some(word => normalize(getWordTranslation(word, languageCode)) === normalized ||
+        (word.source_language === languageCode && normalize(word.word || '') === normalized))) return false;
+      const key = 'user:' + languageCode + ':' + normalized;
+      const translations = Object.fromEntries(get().activeLanguages.map(lang => [lang, '']));
+      translations[languageCode] = dictionaryForm;
+      get().addCustomWord({ id: key, eng: key, word: dictionaryForm, ru: token.translation?.trim() || '',
+        translations, source_language: languageCode, count: 0, is_learned: 0, knowledge_stats: {}, show_stats: {},
+        personal_association: '', is_favorite: false });
+      return true;
+    },
+    addSentence: sentence => set(state => {
+      const customSentences = [...state.customSentences.filter(item => item.id !== sentence.id), sentence];
+      return { customSentences, sentences: mergeSentences(customSentences, state.generatedSentences) };
+    }),
+    updateSentence: (id, sentence) => set(state => {
+      const customSentences = [...state.customSentences.filter(item => item.id !== id), { ...sentence, id, source: 'manual' as const }];
+      const generatedSentences = state.generatedSentences.filter(item => item.id !== id);
+      return { customSentences, generatedSentences, sentences: mergeSentences(customSentences, generatedSentences) };
+    }),
+    addGeneratedSentences: incoming => set(state => {
+      const fingerprints = new Set(state.sentences.map(sentence => sentenceFingerprint(sentence.language, sentence.sentence)));
+      const ids = new Set(state.sentences.map(sentence => sentence.id));
+      const unique = incoming.filter(sentence => {
+        const fingerprint = sentenceFingerprint(sentence.language, sentence.sentence);
+        if (fingerprints.has(fingerprint) || ids.has(sentence.id)) return false;
+        fingerprints.add(fingerprint); ids.add(sentence.id); return true;
+      }).map(sentence => ({ ...sentence, source: 'generated' as const }));
+      if (!unique.length) return {};
+      const generatedSentences = trimGeneratedCache([...state.generatedSentences, ...unique], MAX_GENERATED);
+      return { generatedSentences, sentences: mergeSentences(state.customSentences, generatedSentences) };
+    }),
+    clearGeneratedSentences: language => set(state => {
+      cancelGenerations(LANGUAGES.find(item => item.label === language)?.code);
+      const generatedSentences = state.generatedSentences.filter(sentence => language && !sentence.language.toLowerCase().includes(language.toLowerCase()));
+      return { generatedSentences, sentences: mergeSentences(state.customSentences, generatedSentences) };
+    }),
+    resetStatistics: () => set(state => {
+      cancelGenerations();
+      const userWordProgress = Object.fromEntries(Object.entries(state.userWordProgress).map(([key, progress]) => [key, {
+        custom_word: progress.custom_word, custom_ru: progress.custom_ru, custom_translations: progress.custom_translations,
+        personal_association: progress.personal_association, is_favorite: progress.is_favorite, ai_verification: progress.ai_verification,
+      }]));
+      const customWords = state.customWords.map(word => ({ ...word, count: 0, is_learned: 0,
+        knowledge_stats: {}, show_stats: {}, last_shown: undefined, last_shown_by_lang: undefined, snoozed_until_by_lang: undefined }));
+      const next = { ...state, structureAttempts: [], userWordProgress, customWords, dailyShows: {}, workoutSnapshots: [], imwSnapshots: [] };
+      return { ...pickPersistedFields(next), ...deriveCatalog(next), progressRevision: state.progressRevision + 1 };
+    }),
+    addWorkoutSnapshot: snapshot => set(state => ({ workoutSnapshots: [...state.workoutSnapshots, snapshot].slice(-200) })),
+    setWordTourSize: count => {
+      if (!Number.isSafeInteger(count) || count < 1 || count > 100) return;
+      set({ wordTourSize: count });
+    },
+    setWorkoutWordCount: count => {
+      if (!Number.isSafeInteger(count) || count < 1 || count > 100) return;
+      set(state => ({ workoutWordCount: count, workoutLearnedWordCount: Math.min(count, state.workoutLearnedWordCount) }));
+    },
+    setWorkoutLearnedWordCount: count => {
+      if (!Number.isSafeInteger(count) || count < 0) return;
+      set({ workoutLearnedWordCount: Math.min(count, get().workoutWordCount) });
+    },
+    setWorkoutFavoritesOnly: workoutFavoritesOnly => set({ workoutFavoritesOnly }),
+    setHasSeenSnoozeHint: hasSeenSnoozeHint => set({ hasSeenSnoozeHint }),
+    exportProgress: () => JSON.parse(JSON.stringify(pickPersistedFields(get()))) as PersistedProgress,
+    importProgress: data => {
+      try {
+        const progress = parseProgress(data);
+        cancelGenerations();
+        set({ ...progress, ...deriveCatalog(progress), targetSentenceInfo: null, workoutReviewOnly: false,
+          progressRevision: get().progressRevision + 1 });
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, error: error instanceof Error ? error.message : 'Не удалось восстановить прогресс.' };
+      }
+    },
+  };
+}, {
+  name: 'papanda-storage',
+  storage: createJSONStorage(() => AsyncStorage),
+  partialize: pickPersistedFields,
+  merge: (persisted, current) => persisted === undefined ? current : ({ ...current, ...parseProgress(persisted) }),
+  onRehydrateStorage: () => (state, error) => {
+    if (error) {
+      useHydrationState.setState({ ready: false, error: 'Не удалось прочитать сохранённый прогресс. Повторите загрузку.' });
+      return;
     }
-  )
-);
+    state?.initializeStore();
+    useHydrationState.setState({ ready: true, error: null });
+  },
+}));

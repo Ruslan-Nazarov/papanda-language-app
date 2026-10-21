@@ -1,0 +1,2226 @@
+[
+  {
+    "id": "offline_it_1",
+    "language": "Italiano",
+    "sentence": "Marco legge.",
+    "literalTranslation": "Марко читает.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marco",
+        "translation": "Марко",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marco"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marco"
+      },
+      {
+        "text": "legge.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legge."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leggere"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_2",
+    "language": "Italiano",
+    "sentence": "Marco legge un libro.",
+    "literalTranslation": "Марко читает книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marco",
+        "translation": "Марко",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marco"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marco"
+      },
+      {
+        "text": "legge",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leggere"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_3",
+    "language": "Italiano",
+    "sentence": "Marco legge un libro nuovo.",
+    "literalTranslation": "Марко читает новую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marco",
+        "translation": "Марко",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marco"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marco"
+      },
+      {
+        "text": "legge",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leggere"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      },
+      {
+        "text": "nuovo.",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nuovo."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nuovo"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_4",
+    "language": "Italiano",
+    "sentence": "Marco legge un libro nuovo qui.",
+    "literalTranslation": "Марко читает новую книгу здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marco",
+        "translation": "Марко",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marco"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marco"
+      },
+      {
+        "text": "legge",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leggere"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      },
+      {
+        "text": "nuovo",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nuovo"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nuovo"
+      },
+      {
+        "text": "qui.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "qui."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "qui"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_5",
+    "language": "Italiano",
+    "sentence": "Luca dorme.",
+    "literalTranslation": "Лука спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Luca",
+        "translation": "Лука",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Luca"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Luca"
+      },
+      {
+        "text": "dorme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dorme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_6",
+    "language": "Italiano",
+    "sentence": "Il bambino dorme.",
+    "literalTranslation": "Ребёнок спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Il",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Il"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Il"
+      },
+      {
+        "text": "bambino",
+        "translation": "ребёнок",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "bambino"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bambino"
+      },
+      {
+        "text": "dorme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dorme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_7",
+    "language": "Italiano",
+    "sentence": "Il bambino piccolo dorme.",
+    "literalTranslation": "Маленький ребёнок спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Il",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Il"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Il"
+      },
+      {
+        "text": "bambino",
+        "translation": "ребёнок",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "bambino"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bambino"
+      },
+      {
+        "text": "piccolo",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "piccolo"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "piccolo"
+      },
+      {
+        "text": "dorme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dorme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_it_8",
+    "language": "Italiano",
+    "sentence": "Il bambino piccolo dorme qui.",
+    "literalTranslation": "Маленький ребёнок спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Il",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Il"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Il"
+      },
+      {
+        "text": "bambino",
+        "translation": "ребёнок",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "bambino"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bambino"
+      },
+      {
+        "text": "piccolo",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "piccolo"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "piccolo"
+      },
+      {
+        "text": "dorme",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dorme"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      },
+      {
+        "text": "qui.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "qui."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "qui"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_1",
+    "language": "Español",
+    "sentence": "Ana lee.",
+    "literalTranslation": "Ана читает.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Ana",
+        "translation": "Ана",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Ana"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Ana"
+      },
+      {
+        "text": "lee.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lee."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leer"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_2",
+    "language": "Español",
+    "sentence": "Ana lee un libro.",
+    "literalTranslation": "Ана читает книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Ana",
+        "translation": "Ана",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Ana"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Ana"
+      },
+      {
+        "text": "lee",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lee"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leer"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_3",
+    "language": "Español",
+    "sentence": "Ana lee un libro nuevo.",
+    "literalTranslation": "Ана читает новую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Ana",
+        "translation": "Ана",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Ana"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Ana"
+      },
+      {
+        "text": "lee",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lee"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leer"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      },
+      {
+        "text": "nuevo.",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nuevo."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nuevo"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_4",
+    "language": "Español",
+    "sentence": "Ana lee un libro nuevo aquí.",
+    "literalTranslation": "Ана читает новую книгу здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Ana",
+        "translation": "Ана",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Ana"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Ana"
+      },
+      {
+        "text": "lee",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lee"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "leer"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "libro",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "libro"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "libro"
+      },
+      {
+        "text": "nuevo",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nuevo"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nuevo"
+      },
+      {
+        "text": "aquí.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "aquí."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "aquí"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_5",
+    "language": "Español",
+    "sentence": "Luis duerme.",
+    "literalTranslation": "Луис спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Luis",
+        "translation": "Луис",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Luis"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Luis"
+      },
+      {
+        "text": "duerme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "duerme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_6",
+    "language": "Español",
+    "sentence": "El niño duerme.",
+    "literalTranslation": "Мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "El",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "El"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "El"
+      },
+      {
+        "text": "niño",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "niño"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "niño"
+      },
+      {
+        "text": "duerme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "duerme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_7",
+    "language": "Español",
+    "sentence": "El niño pequeño duerme.",
+    "literalTranslation": "Маленький мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "El",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "El"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "El"
+      },
+      {
+        "text": "niño",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "niño"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "niño"
+      },
+      {
+        "text": "pequeño",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "pequeño"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "pequeño"
+      },
+      {
+        "text": "duerme.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "duerme."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_es_8",
+    "language": "Español",
+    "sentence": "El niño pequeño duerme aquí.",
+    "literalTranslation": "Маленький мальчик спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "El",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "El"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "El"
+      },
+      {
+        "text": "niño",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "niño"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "niño"
+      },
+      {
+        "text": "pequeño",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "pequeño"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "pequeño"
+      },
+      {
+        "text": "duerme",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "duerme"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      },
+      {
+        "text": "aquí.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "aquí."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "aquí"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_1",
+    "language": "Deutsch",
+    "sentence": "Anna liest.",
+    "literalTranslation": "Анна читает.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Anna",
+        "translation": "Анна",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Anna"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Anna"
+      },
+      {
+        "text": "liest.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "liest."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lesen"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_2",
+    "language": "Deutsch",
+    "sentence": "Anna liest ein Buch.",
+    "literalTranslation": "Анна читает книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Anna",
+        "translation": "Анна",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Anna"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Anna"
+      },
+      {
+        "text": "liest",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "liest"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lesen"
+      },
+      {
+        "text": "ein",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "ein"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "ein"
+      },
+      {
+        "text": "Buch.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "Buch."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Buch"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_3",
+    "language": "Deutsch",
+    "sentence": "Anna liest ein neues Buch.",
+    "literalTranslation": "Анна читает новую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Anna",
+        "translation": "Анна",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Anna"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Anna"
+      },
+      {
+        "text": "liest",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "liest"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lesen"
+      },
+      {
+        "text": "ein",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "ein"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "ein"
+      },
+      {
+        "text": "neues",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "neues"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "neu"
+      },
+      {
+        "text": "Buch.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "Buch."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Buch"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_4",
+    "language": "Deutsch",
+    "sentence": "Anna liest hier ein neues Buch.",
+    "literalTranslation": "Анна читает здесь новую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Anna",
+        "translation": "Анна",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Anna"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Anna"
+      },
+      {
+        "text": "liest",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "liest"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lesen"
+      },
+      {
+        "text": "hier",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "hier"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "hier"
+      },
+      {
+        "text": "ein",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "ein"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "ein"
+      },
+      {
+        "text": "neues",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "neues"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "neu"
+      },
+      {
+        "text": "Buch.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "Buch."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Buch"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_5",
+    "language": "Deutsch",
+    "sentence": "Paul schläft.",
+    "literalTranslation": "Пауль спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Paul",
+        "translation": "Пауль",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Paul"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Paul"
+      },
+      {
+        "text": "schläft.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "schläft."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "schlafen"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_6",
+    "language": "Deutsch",
+    "sentence": "Der Junge schläft.",
+    "literalTranslation": "Мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Der",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Der"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Der"
+      },
+      {
+        "text": "Junge",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Junge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Junge"
+      },
+      {
+        "text": "schläft.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "schläft."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "schlafen"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_7",
+    "language": "Deutsch",
+    "sentence": "Der müde Junge schläft.",
+    "literalTranslation": "Усталый мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Der",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Der"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Der"
+      },
+      {
+        "text": "müde",
+        "translation": "усталый",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "müde"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "müde"
+      },
+      {
+        "text": "Junge",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Junge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Junge"
+      },
+      {
+        "text": "schläft.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "schläft."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "schlafen"
+      }
+    ]
+  },
+  {
+    "id": "offline_de_8",
+    "language": "Deutsch",
+    "sentence": "Der müde Junge schläft hier.",
+    "literalTranslation": "Усталый мальчик спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Der",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Der"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Der"
+      },
+      {
+        "text": "müde",
+        "translation": "усталый",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "müde"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "müde"
+      },
+      {
+        "text": "Junge",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Junge"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Junge"
+      },
+      {
+        "text": "schläft",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "schläft"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "schlafen"
+      },
+      {
+        "text": "hier.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "hier."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "hier"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_1",
+    "language": "Français",
+    "sentence": "Marie lit.",
+    "literalTranslation": "Мари читает.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marie",
+        "translation": "Мари",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marie"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marie"
+      },
+      {
+        "text": "lit.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lire"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_2",
+    "language": "Français",
+    "sentence": "Marie lit un livre.",
+    "literalTranslation": "Мари читает книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marie",
+        "translation": "Мари",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marie"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marie"
+      },
+      {
+        "text": "lit",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lit"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lire"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "livre.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "livre."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "livre"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_3",
+    "language": "Français",
+    "sentence": "Marie lit un nouveau livre.",
+    "literalTranslation": "Мари читает новую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marie",
+        "translation": "Мари",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marie"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marie"
+      },
+      {
+        "text": "lit",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lit"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lire"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "nouveau",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nouveau"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nouveau"
+      },
+      {
+        "text": "livre.",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "livre."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "livre"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_4",
+    "language": "Français",
+    "sentence": "Marie lit un nouveau livre ici.",
+    "literalTranslation": "Мари читает новую книгу здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Marie",
+        "translation": "Мари",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Marie"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Marie"
+      },
+      {
+        "text": "lit",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "lit"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "lire"
+      },
+      {
+        "text": "un",
+        "translation": "неопределённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "un"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "un"
+      },
+      {
+        "text": "nouveau",
+        "translation": "новую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "nouveau"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "nouveau"
+      },
+      {
+        "text": "livre",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "livre"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "livre"
+      },
+      {
+        "text": "ici.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "ici."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "ici"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_5",
+    "language": "Français",
+    "sentence": "Paul dort.",
+    "literalTranslation": "Поль спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Paul",
+        "translation": "Поль",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Paul"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Paul"
+      },
+      {
+        "text": "dort.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dort."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_6",
+    "language": "Français",
+    "sentence": "Le garçon dort.",
+    "literalTranslation": "Мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Le",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Le"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Le"
+      },
+      {
+        "text": "garçon",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "garçon"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "garçon"
+      },
+      {
+        "text": "dort.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dort."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_7",
+    "language": "Français",
+    "sentence": "Le jeune garçon dort.",
+    "literalTranslation": "Юный мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Le",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Le"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Le"
+      },
+      {
+        "text": "jeune",
+        "translation": "юный",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "jeune"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "jeune"
+      },
+      {
+        "text": "garçon",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "garçon"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "garçon"
+      },
+      {
+        "text": "dort.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dort."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      }
+    ]
+  },
+  {
+    "id": "offline_fr_8",
+    "language": "Français",
+    "sentence": "Le jeune garçon dort ici.",
+    "literalTranslation": "Юный мальчик спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Le",
+        "translation": "определённый артикль",
+        "role": "Article",
+        "label": "Article",
+        "parts": [
+          "Le"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "Le"
+      },
+      {
+        "text": "jeune",
+        "translation": "юный",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "jeune"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "jeune"
+      },
+      {
+        "text": "garçon",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "garçon"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "garçon"
+      },
+      {
+        "text": "dort",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dort"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormir"
+      },
+      {
+        "text": "ici.",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "ici."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "ici"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_1",
+    "language": "Latin",
+    "sentence": "Puella legit.",
+    "literalTranslation": "Девочка читает.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puella",
+        "translation": "девочка",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puella"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puella"
+      },
+      {
+        "text": "legit.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "legere"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_2",
+    "language": "Latin",
+    "sentence": "Puella librum legit.",
+    "literalTranslation": "Девочка читает книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puella",
+        "translation": "девочка",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puella"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puella"
+      },
+      {
+        "text": "librum",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "librum"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "liber"
+      },
+      {
+        "text": "legit.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "legere"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_3",
+    "language": "Latin",
+    "sentence": "Puella bonum librum legit.",
+    "literalTranslation": "Девочка читает хорошую книгу.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puella",
+        "translation": "девочка",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puella"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puella"
+      },
+      {
+        "text": "bonum",
+        "translation": "хорошую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "bonum"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bonus"
+      },
+      {
+        "text": "librum",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "librum"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "liber"
+      },
+      {
+        "text": "legit.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "legere"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_4",
+    "language": "Latin",
+    "sentence": "Puella bonum librum domi legit.",
+    "literalTranslation": "Девочка читает хорошую книгу дома.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puella",
+        "translation": "девочка",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puella"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puella"
+      },
+      {
+        "text": "bonum",
+        "translation": "хорошую",
+        "role": "Attribute_Object",
+        "label": "Attribute_Object",
+        "parts": [
+          "bonum"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bonus"
+      },
+      {
+        "text": "librum",
+        "translation": "книгу",
+        "role": "Object",
+        "label": "Object",
+        "parts": [
+          "librum"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "liber"
+      },
+      {
+        "text": "domi",
+        "translation": "дома",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "domi"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "domus"
+      },
+      {
+        "text": "legit.",
+        "translation": "читает",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "legit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "legere"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_5",
+    "language": "Latin",
+    "sentence": "Puer dormit.",
+    "literalTranslation": "Мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puer",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puer"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puer"
+      },
+      {
+        "text": "dormit.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dormit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_6",
+    "language": "Latin",
+    "sentence": "Puer parvus dormit.",
+    "literalTranslation": "Маленький мальчик спит.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puer",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puer"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puer"
+      },
+      {
+        "text": "parvus",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "parvus"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "parvus"
+      },
+      {
+        "text": "dormit.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dormit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_7",
+    "language": "Latin",
+    "sentence": "Puer parvus hic dormit.",
+    "literalTranslation": "Маленький мальчик спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puer",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puer"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puer"
+      },
+      {
+        "text": "parvus",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "parvus"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "parvus"
+      },
+      {
+        "text": "hic",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "hic"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "hic"
+      },
+      {
+        "text": "dormit.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dormit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  },
+  {
+    "id": "offline_la_8",
+    "language": "Latin",
+    "sentence": "Puer parvus hic bene dormit.",
+    "literalTranslation": "Маленький мальчик хорошо спит здесь.",
+    "source": "seed",
+    "learningGoal": "Основа предложения и её распространение",
+    "words": [
+      {
+        "text": "Puer",
+        "translation": "мальчик",
+        "role": "Subject",
+        "label": "Subject",
+        "parts": [
+          "Puer"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "puer"
+      },
+      {
+        "text": "parvus",
+        "translation": "маленький",
+        "role": "Attribute_Subject",
+        "label": "Attribute_Subject",
+        "parts": [
+          "parvus"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "parvus"
+      },
+      {
+        "text": "hic",
+        "translation": "здесь",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "hic"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "hic"
+      },
+      {
+        "text": "bene",
+        "translation": "хорошо",
+        "role": "Circumstance",
+        "label": "Circumstance",
+        "parts": [
+          "bene"
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "bene"
+      },
+      {
+        "text": "dormit.",
+        "translation": "спит",
+        "role": "Predicate",
+        "label": "Predicate",
+        "parts": [
+          "dormit."
+        ],
+        "is_in_my_dict": false,
+        "clauseIndex": 0,
+        "dictionary_form": "dormire"
+      }
+    ]
+  }
+]

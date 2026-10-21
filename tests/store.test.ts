@@ -4,10 +4,11 @@ import assert from 'node:assert/strict';
 import { useStore } from '../src/store/useStore';
 import { Token, Sentence } from '../src/models/types';
 import { getWordTranslation } from '../src/utils/words';
+import { createDefaultProgress } from '../src/store/progressTypes';
 
 describe('Zustand useStore', () => {
   beforeEach(() => {
-    useStore.getState().initializeStore();
+    useStore.getState().importProgress(createDefaultProgress());
   });
 
   describe('addWordFromSentenceToken', () => {
@@ -168,6 +169,27 @@ describe('Zustand useStore', () => {
       useStore.getState().clearGeneratedSentences('Italiano');
       state = useStore.getState();
       assert.strictEqual(state.generatedSentences.some(s => s.id === 'gen_test_1'), false);
+    });
+  });
+
+  describe('incrementShowCounts', () => {
+    it('batches show count updates for multiple words atomically', () => {
+      const state = useStore.getState();
+      const word1 = state.words[0];
+      const word2 = state.words[1];
+      const key1 = word1.eng || word1.word || '';
+      const key2 = word2.eng || word2.word || '';
+      const count1Before = word1.count;
+      const count2Before = word2.count;
+
+      useStore.getState().incrementShowCounts([key1, key2], 'en');
+      const updated1 = useStore.getState().words.find(w => (w.eng || w.word) === key1);
+      const updated2 = useStore.getState().words.find(w => (w.eng || w.word) === key2);
+
+      assert.strictEqual(updated1?.count, count1Before + 1);
+      assert.strictEqual(updated2?.count, count2Before + 1);
+      assert.strictEqual((updated1?.show_stats as Record<string, number>)?.en, 1);
+      assert.strictEqual((updated2?.show_stats as Record<string, number>)?.en, 1);
     });
   });
 });

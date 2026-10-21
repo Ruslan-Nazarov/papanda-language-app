@@ -1,0 +1,934 @@
+{
+  "scenario": {
+    "id": "kz-1",
+    "code": "kz",
+    "count": 8
+  },
+  "startedAt": "2026-09-26T13:21:27.039Z",
+  "elapsedMs": 28199,
+  "accepted": 6,
+  "sentences": [
+    {
+      "language": "Қазақша",
+      "sentence": "Қыз ұйықтады.",
+      "words": [
+        {
+          "text": "Қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "Қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "ұйықтады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ұйық",
+            "та",
+            "ды"
+          ],
+          "translation": "спала",
+          "dictionary_form": "ұйықтау",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Девочка спала.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_kz_1790428913332_17",
+      "source": "generated",
+      "createdAt": 1790428913332
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай қыз ұйықтады.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленькая",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "ұйықтады",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "ұйық",
+            "та",
+            "ды"
+          ],
+          "translation": "спала",
+          "dictionary_form": "ұйықтау",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькая девочка спала.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_kz_1790428913336_18",
+      "source": "generated",
+      "createdAt": 1790428913336
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай қыз кеше әдемі гүл жұлған жоқ.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленькая",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кеше",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "кеше"
+          ],
+          "translation": "вчера",
+          "dictionary_form": "кеше",
+          "is_in_my_dict": true,
+          "dictionary_word": "кеше",
+          "clauseIndex": 0
+        },
+        {
+          "text": "әдемі",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "әдемі"
+          ],
+          "translation": "красивый",
+          "dictionary_form": "әдемі",
+          "is_in_my_dict": true,
+          "dictionary_word": "әдемі",
+          "clauseIndex": 0
+        },
+        {
+          "text": "гүл",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "гүл"
+          ],
+          "translation": "цветок",
+          "dictionary_form": "гүл",
+          "is_in_my_dict": true,
+          "dictionary_word": "гүл",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жұлған",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жұл",
+            "ған"
+          ],
+          "translation": "сорвавшая",
+          "dictionary_form": "жұлу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "жоқ",
+          "label": "particle",
+          "role": "Predicate",
+          "parts": [
+            "жоқ"
+          ],
+          "translation": "нет",
+          "dictionary_form": "жоқ",
+          "is_in_my_dict": true,
+          "dictionary_word": "жоқ",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькая девочка вчера красивый цветок не сорвала.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_kz_1790428900429_12",
+      "source": "generated",
+      "createdAt": 1790428900429
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай қыз кеше әдемі гүл жұлды.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленькая",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кеше",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "кеше"
+          ],
+          "translation": "вчера",
+          "dictionary_form": "кеше",
+          "is_in_my_dict": true,
+          "dictionary_word": "кеше",
+          "clauseIndex": 0
+        },
+        {
+          "text": "әдемі",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "әдемі"
+          ],
+          "translation": "красивый",
+          "dictionary_form": "әдемі",
+          "is_in_my_dict": true,
+          "dictionary_word": "әдемі",
+          "clauseIndex": 0
+        },
+        {
+          "text": "гүл",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "гүл"
+          ],
+          "translation": "цветок",
+          "dictionary_form": "гүл",
+          "is_in_my_dict": true,
+          "dictionary_word": "гүл",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жұлды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жұл",
+            "ды"
+          ],
+          "translation": "сорвала",
+          "dictionary_form": "жұлу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькая девочка вчера красивый цветок сорвала.",
+      "learningGoal": "Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.",
+      "generationTaskId": "task-6",
+      "id": "generated_kz_1790428900435_13",
+      "source": "generated",
+      "createdAt": 1790428900435
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай қыз кеше әдемі гүл жұлды ма?",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленькая",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кеше",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "кеше"
+          ],
+          "translation": "вчера",
+          "dictionary_form": "кеше",
+          "is_in_my_dict": true,
+          "dictionary_word": "кеше",
+          "clauseIndex": 0
+        },
+        {
+          "text": "әдемі",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "әдемі"
+          ],
+          "translation": "красивый",
+          "dictionary_form": "әдемі",
+          "is_in_my_dict": true,
+          "dictionary_word": "әдемі",
+          "clauseIndex": 0
+        },
+        {
+          "text": "гүл",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "гүл"
+          ],
+          "translation": "цветок",
+          "dictionary_form": "гүл",
+          "is_in_my_dict": true,
+          "dictionary_word": "гүл",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жұлды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жұл",
+            "ды"
+          ],
+          "translation": "сорвала",
+          "dictionary_form": "жұлу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "ма",
+          "label": "particle",
+          "role": "Particle",
+          "parts": [
+            "ма"
+          ],
+          "translation": "ли",
+          "dictionary_form": "ма",
+          "is_in_my_dict": true,
+          "dictionary_word": "ма",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Маленькая девочка вчера красивый цветок сорвала ли?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_kz_1790428900442_14",
+      "source": "generated",
+      "createdAt": 1790428900442
+    },
+    {
+      "language": "Қазақша",
+      "sentence": "Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.",
+      "words": [
+        {
+          "text": "Кішкентай",
+          "label": "adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "Кішкентай"
+          ],
+          "translation": "маленькая",
+          "dictionary_form": "кішкентай",
+          "is_in_my_dict": true,
+          "dictionary_word": "кішкентай",
+          "clauseIndex": 0
+        },
+        {
+          "text": "қыз",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "қыз"
+          ],
+          "translation": "девочка",
+          "dictionary_form": "қыз",
+          "is_in_my_dict": true,
+          "dictionary_word": "қыз",
+          "clauseIndex": 0
+        },
+        {
+          "text": "кеше",
+          "label": "adverb",
+          "role": "Circumstance",
+          "parts": [
+            "кеше"
+          ],
+          "translation": "вчера",
+          "dictionary_form": "кеше",
+          "is_in_my_dict": true,
+          "dictionary_word": "кеше",
+          "clauseIndex": 0
+        },
+        {
+          "text": "әдемі",
+          "label": "adjective",
+          "role": "Attribute_Object",
+          "parts": [
+            "әдемі"
+          ],
+          "translation": "красивый",
+          "dictionary_form": "әдемі",
+          "is_in_my_dict": true,
+          "dictionary_word": "әдемі",
+          "clauseIndex": 0
+        },
+        {
+          "text": "гүл",
+          "label": "noun",
+          "role": "Object",
+          "parts": [
+            "гүл"
+          ],
+          "translation": "цветок",
+          "dictionary_form": "гүл",
+          "is_in_my_dict": true,
+          "dictionary_word": "гүл",
+          "clauseIndex": 0
+        },
+        {
+          "text": "жұлды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "жұл",
+            "ды"
+          ],
+          "translation": "сорвала",
+          "dictionary_form": "жұлу",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "өйткені",
+          "label": "conjunction",
+          "role": "Conjunction",
+          "parts": [
+            "өйткені"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "өйткені",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "анасы",
+          "label": "noun",
+          "role": "Subject",
+          "parts": [
+            "ана",
+            "сы"
+          ],
+          "translation": "мама",
+          "dictionary_form": "ана",
+          "is_in_my_dict": true,
+          "dictionary_word": "ана",
+          "clauseIndex": 1
+        },
+        {
+          "text": "қуанды",
+          "label": "verb",
+          "role": "Predicate",
+          "parts": [
+            "қуан",
+            "ды"
+          ],
+          "translation": "обрадовалась",
+          "dictionary_form": "қуану",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Маленькая девочка вчера красивый цветок сорвала, потому что мама обрадовалась.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_kz_1790428900451_15",
+      "source": "generated",
+      "createdAt": 1790428900451
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: []\n\nAvoid exact duplicates: [\"Кішкентай ұл жаңа кітап оқыды.\",\"Әке үлкен үй салды ма?\",\"Жақсы дос жаман хат жазбады.\",\"Қыз барды дүкенге.\",\"Кеше адам тамақ жеді.\",\"Қыз ит көрді және ұл кітап оқыды.\",\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Қыз ұйықтады.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Кішкентай қыз ұйықтады.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Кішкентай қыз әдемі гүл жұлды.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды ма?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"\n  }\n]"
+      },
+      "elapsedMs": 2874
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Қыз ұйықтады.\"},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай қыз ұйықтады.\"},{\"taskId\":\"task-3\",\"sentence\":\"Кішкентай қыз әдемі гүл жұлды.\"},{\"taskId\":\"task-4\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\"},{\"taskId\":\"task-5\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\"},{\"taskId\":\"task-6\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. жазбады → [\"жаз\",\"ба\",\"ды\"], дүкенге → [\"дүкен\",\"ге\"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Қыз ұйықтады.\",\n    \"literalTranslation\": \"Девочка спала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"ұйықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ұйық\", \"та\", \"ды\"],\n        \"translation\": \"спала\",\n        \"dictionary_form\": \"ұйықтау\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Кішкентай қыз ұйықтады.\",\n    \"literalTranslation\": \"Маленькая девочка спала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"ұйықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ұйық\", \"та\", \"ды\"],\n        \"translation\": \"спала\",\n        \"dictionary_form\": \"ұйықтау\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Кішкентай қыз әдемі гүл жұлды.\",\n    \"literalTranslation\": \"Маленькая девочка красивый цветок сорвала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ды\"],\n        \"translation\": \"сорвала\",\n        \"dictionary_form\": \"жұлу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды.\",\n    \"literalTranslation\": \"Маленькая девочка вчера красивый цветок сорвала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кеше\"],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ды\"],\n        \"translation\": \"сорвала\",\n        \"dictionary_form\": \"жұлу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\n    \"literalTranslation\": \"Маленькая девочка вчера красивый цветок не сорвала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кеше\"],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлған\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ған\"],\n        \"translation\": \"сорвавшая\",\n        \"dictionary_form\": \"жұлу\"\n      },\n      {\n        \"text\": \"жоқ\",\n        \"label\": \"particle\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жоқ\"],\n        \"translation\": \"нет\",\n        \"dictionary_form\": \"жоқ\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды.\",\n    \"literalTranslation\": \"Маленькая девочка вчера красивый цветок сорвала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кеше\"],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ды\"],\n        \"translation\": \"сорвала\",\n        \"dictionary_form\": \"жұлу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\n    \"literalTranslation\": \"Маленькая девочка вчера красивый цветок сорвала ли?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кеше\"],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ды\"],\n        \"translation\": \"сорвала\",\n        \"dictionary_form\": \"жұлу\"\n      },\n      {\n        \"text\": \"ма\",\n        \"label\": \"particle\",\n        \"role\": \"Particle\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"ма\"],\n        \"translation\": \"ли\",\n        \"dictionary_form\": \"ма\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\",\n    \"literalTranslation\": \"Маленькая девочка вчера красивый цветок сорвала, потому что мама обрадовалась.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Кішкентай\"],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"қыз\"],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"кеше\"],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"әдемі\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"әдемі\"],\n        \"translation\": \"красивый\",\n        \"dictionary_form\": \"әдемі\"\n      },\n      {\n        \"text\": \"гүл\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"гүл\"],\n        \"translation\": \"цветок\",\n        \"dictionary_form\": \"гүл\"\n      },\n      {\n        \"text\": \"жұлды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"жұл\", \"ды\"],\n        \"translation\": \"сорвала\",\n        \"dictionary_form\": \"жұлу\"\n      },\n      {\n        \"text\": \"өйткені\",\n        \"label\": \"conjunction\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"өйткені\"],\n        \"translation\": \"потому что\",\n        \"dictionary_form\": \"өйткені\"\n      },\n      {\n        \"text\": \"анасы\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"ана\", \"сы\"],\n        \"translation\": \"мама\",\n        \"dictionary_form\": \"ана\"\n      },\n      {\n        \"text\": \"қуанды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"қуан\", \"ды\"],\n        \"translation\": \"обрадовалась\",\n        \"dictionary_form\": \"қуану\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 10468
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nALREADY ACCEPTED CONTEXT: []\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"Қыз ұйықтады.\",\"literalTranslation\":\"Девочка спала.\",\"words\":[{\"text\":\"Қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"Қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"ұйықтады\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"ұйық\",\"та\",\"ды\"],\"translation\":\"спала\",\"dictionary_form\":\"ұйықтау\"}]},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай қыз ұйықтады.\",\"literalTranslation\":\"Маленькая девочка спала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"ұйықтады\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"ұйық\",\"та\",\"ды\"],\"translation\":\"спала\",\"dictionary_form\":\"ұйықтау\"}]},{\"taskId\":\"task-5\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок не сорвала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"кеше\"],\"translation\":\"вчера\",\"dictionary_form\":\"кеше\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"әдемі\"],\"translation\":\"красивый\",\"dictionary_form\":\"әдемі\"},{\"text\":\"гүл\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"гүл\"],\"translation\":\"цветок\",\"dictionary_form\":\"гүл\"},{\"text\":\"жұлған\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"жұл\",\"ған\"],\"translation\":\"сорвавшая\",\"dictionary_form\":\"жұлу\"},{\"text\":\"жоқ\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"жоқ\"],\"translation\":\"нет\",\"dictionary_form\":\"жоқ\"}]},{\"taskId\":\"task-6\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"кеше\"],\"translation\":\"вчера\",\"dictionary_form\":\"кеше\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"әдемі\"],\"translation\":\"красивый\",\"dictionary_form\":\"әдемі\"},{\"text\":\"гүл\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"гүл\"],\"translation\":\"цветок\",\"dictionary_form\":\"гүл\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"жұл\",\"ды\"],\"translation\":\"сорвала\",\"dictionary_form\":\"жұлу\"}]},{\"taskId\":\"task-7\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала ли?\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"кеше\"],\"translation\":\"вчера\",\"dictionary_form\":\"кеше\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"әдемі\"],\"translation\":\"красивый\",\"dictionary_form\":\"әдемі\"},{\"text\":\"гүл\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"гүл\"],\"translation\":\"цветок\",\"dictionary_form\":\"гүл\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"жұл\",\"ды\"],\"translation\":\"сорвала\",\"dictionary_form\":\"жұлу\"},{\"text\":\"ма\",\"role\":\"Particle\",\"clauseIndex\":0,\"parts\":[\"ма\"],\"translation\":\"ли\",\"dictionary_form\":\"ма\"}]},{\"taskId\":\"task-8\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала, потому что мама обрадовалась.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"кеше\"],\"translation\":\"вчера\",\"dictionary_form\":\"кеше\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"әдемі\"],\"translation\":\"красивый\",\"dictionary_form\":\"әдемі\"},{\"text\":\"гүл\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"гүл\"],\"translation\":\"цветок\",\"dictionary_form\":\"гүл\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"жұл\",\"ды\"],\"translation\":\"сорвала\",\"dictionary_form\":\"жұлу\"},{\"text\":\"өйткені\",\"role\":\"Conjunction\",\"clauseIndex\":1,\"parts\":[\"өйткені\"],\"translation\":\"потому что\",\"dictionary_form\":\"өйткені\"},{\"text\":\"анасы\",\"role\":\"Subject\",\"clauseIndex\":1,\"parts\":[\"ана\",\"сы\"],\"translation\":\"мама\",\"dictionary_form\":\"ана\"},{\"text\":\"қуанды\",\"role\":\"Predicate\",\"clauseIndex\":1,\"parts\":[\"қуан\",\"ды\"],\"translation\":\"обрадовалась\",\"dictionary_form\":\"қуану\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  }\n]"
+      },
+      "elapsedMs": 5151
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nAlready accepted development context: [{\"taskId\":\"task-5\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\"},{\"taskId\":\"task-6\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"}]\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: []\n\nAvoid exact duplicates: [\"Кішкентай ұл жаңа кітап оқыды.\",\"Әке үлкен үй салды ма?\",\"Жақсы дос жаман хат жазбады.\",\"Қыз барды дүкенге.\",\"Кеше адам тамақ жеді.\",\"Қыз ит көрді және ұл кітап оқыды.\",\"Әке жұмыс істемеді, өйткені ол ауру болды.\",\"Адам хат жазды, бірақ қыз оқымады.\",\"Егер жұмыс жақсы болса, біз қалаға барамыз.\",\"Кітап оқыған адам үйге келді.\",\"Жұмысшы ауыр көйлек киді.\",\"Әйел әмиян тапты ма?\",\"Бала нан жемеді.\",\"Күшті жел болды.\",\"Ит мысықты көрді.\",\"Кеше жаңбыр болды, сондықтан көше ылғалды.\",\"Мен ұйқышыл болдым, бірақ қатты шу мені оятты.\",\"Мұғалім сұрақ сұрады, және студент жауап берді.\",\"Егер күн жылы болса, біз саябаққа барамыз.\",\"Көшеде жүгірген бала тиын тапты.\",\"Үлкен ағаш өсті.\",\"Дәрігер ауруханада жұмыс істеді ме?\",\"Қара мысық секірмеді.\",\"Таза суды құйды ол.\",\"Мұғалім мектепке келді.\",\"Адам машинаны қалады, бірақ ақша жоқ болды.\",\"Қыз жылады, өйткені ойыншық бұзылды.\",\"Жаңбыр тоқтады, және күн жылы болды.\",\"Егер қонақ келсе, ана тамақ жасайды.\",\"Кітапты оқып, бала отырды.\",\"Жұмысшы жаңа көпір салды.\",\"Дүкен арзан киімдер сатты ма?\",\"Көрші ескі көлікті сатпады.\",\"Кеше машина жылдам жүрді.\",\"Студент жаңа кітап ашты.\",\"Дүкен ашылды, және көрші тамақ алды.\",\"Көлік қымбат болды, бірақ адам оны алды.\",\"Күз салқын болды, сондықтан құс ұшты.\",\"Егер баға арзан болса, мен киімдер аламын.\",\"Шаршаған жұмысшы үлкен ағаш астында жатты.\",\"Ұры ақша ұрлады.\",\"Фермер картоп сатты ма?\",\"Дәрігер пациентті емдемеді.\",\"Жас сарбаз жеңіс әкелді.\",\"Бүгін мұғалім мектепке келді.\",\"Күн жылы болды, және қар балқыды.\",\"Бала жылады, өйткені ит тістеді.\",\"Емтихан жақын болды, сондықтан студент уайымдады.\",\"Егер жел қатты болса, кеме қалады.\",\"Хатты жазып, қыз күлімсіреді.\",\"Машина көпірден өтті.\",\"Жұмысшы терезені жапты ма?\",\"Ол дәмді ет жемеді.\",\"Таза су ыстық болды.\",\"Дәрігер жаңа дәрі берді.\",\"Мұғалім сөйледі, және студент тыңдады.\",\"Әйел дәрігерге барды, өйткені ол ауру болды.\",\"Дүкен жұмыс істемеді, сондықтан ақша қалды.\",\"Егер емтихан қиын болса, студент жылайды.\",\"Сурет салған суретші ақша алды.\",\"Кішкентай құс ағашта отырды.\",\"Әйел дәмді тамақ жасады ма?\",\"Үлкен балық секірмеді.\",\"Жас студент кітапты ашты.\",\"Кеше фермер қалаға барды.\",\"Қыз тамақ жеді, және бала су құйды.\",\"Емтихан қиын болды, бірақ студент жақсы жазды.\",\"Күн салқын болды, сондықтан әйел көйлек киді.\",\"Егер дәрігер келсе, пациент жақсы болады.\",\"Терезені ашып, мұғалім мектепке кірді.\",\"Жақсы адам сыйлық тапты.\",\"Дәрігер жаман дәрі берді ме?\",\"Жас қыз терезені жаппады.\",\"Күшті жел болды, сондықтан үлкен ағаш құлады.\",\"Ұры ақша ұрлады, бірақ күзетші оны тапты.\",\"Егер күн суық болса, мен қалың пальто киемін.\",\"Терезені ашқан адам қатты жел сезінді.\",\"Қасқыр орманға қашты.\",\"Ана тамақ жасады, және қыз үстелді дайындады.\",\"Әнді тыңдап, ол үйде отырды.\",\"Мұғалім жаңа кітап алды.\",\"Сен жаңа кітапты алдың ба?\",\"Бала лас суды құймады.\",\"Терезені ашты дәрігер.\",\"Әке таза көйлек киді.\",\"Ана тамақ жасады, және әке хат жазды.\",\"Жұмысшы жұмыс істеді, бірақ ақша алмады.\",\"Қыз жылады, өйткені дәрігер ауруды тапты.\",\"Егер сен жақсы оқысаң, үлкен сыйлық аласың.\",\"Көшеге шығып, бала жүгірді.\",\"Машина жаңа көпірден өтті.\",\"Әйел дүкеннен дәмді нан алды ма?\",\"Мұғалім ескі кітапты оқымады.\",\"Бала жылады, өйткені үлкен ит секірді.\",\"Дәрігер келді, бірақ ауру адам үйде қалды.\",\"Күн суық болды, сондықтан қыз қалың пальто киді.\",\"Егер сен таза тамақ жесең, жақсы боласың.\",\"Көшеде жүгірген қасқыр орманға кірді.\",\"Әке хат жазып, үстелге қойды.\",\"Үлкен құс көктемде ұшты.\",\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\"Кішкентай қыз кеше әдемі гүл жұлды.\",\"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"]\nCorrect these problems from the previous attempt: [\"Пересоставьте всю связанную серию вместе: выберите основу, которую можно естественно дополнить признаком, дополнением и обстоятельством.\",\"task-3: сохраните значение и форму сказуемого, подлежащее и уже добавленные детали из task-2.\",\"task-4: сначала нужна принятая основа task-3.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\"taskId\":\"task-1\",\"sentence\":\"Қыз ұйықтады.\"},\n  {\"taskId\":\"task-2\",\"sentence\":\"Кішкентай қыз ұйықтады.\"},\n  {\"taskId\":\"task-3\",\"sentence\":\"Кішкентай қыз жаңа кітап оқыды.\"},\n  {\"taskId\":\"task-4\",\"sentence\":\"Кішкентай қыз кеше жаңа кітап оқыды.\"}\n]"
+      },
+      "elapsedMs": 2754
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"Қыз ұйықтады.\"},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай қыз ұйықтады.\"},{\"taskId\":\"task-3\",\"sentence\":\"Кішкентай қыз жаңа кітап оқыды.\"},{\"taskId\":\"task-4\",\"sentence\":\"Кішкентай қыз кеше жаңа кітап оқыды.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-5\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\"},{\"taskId\":\"task-6\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\"},{\"taskId\":\"task-7\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды ма?\"},{\"taskId\":\"task-8\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. жазбады → [\"жаз\",\"ба\",\"ды\"], дүкенге → [\"дүкен\",\"ге\"]. Show reliable surface root/allomorph and affixes in order. dictionary_form is the headword: жазбады → жазу, оқыды → оқу. Do not substitute a lemma for a surface root.\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"Қыз ұйықтады.\",\n    \"literalTranslation\": \"Девочка спала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Қыз\"\n        ],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"ұйықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"ұйық\",\n          \"та\",\n          \"ды\"\n        ],\n        \"translation\": \"спала\",\n        \"dictionary_form\": \"ұйықтау\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"Кішкентай қыз ұйықтады.\",\n    \"literalTranslation\": \"Маленькая девочка спала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кішкентай\"\n        ],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"қыз\"\n        ],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"ұйықтады\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"ұйық\",\n          \"та\",\n          \"ды\"\n        ],\n        \"translation\": \"спала\",\n        \"dictionary_form\": \"ұйықтау\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"Кішкентай қыз жаңа кітап оқыды.\",\n    \"literalTranslation\": \"Маленькая девочка новую книгу читала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кішкентай\"\n        ],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"қыз\"\n        ],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"жаңа\"\n        ],\n        \"translation\": \"новую\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"оқыды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқы\",\n          \"ды\"\n        ],\n        \"translation\": \"читала\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"Кішкентай қыз кеше жаңа кітап оқыды.\",\n    \"literalTranslation\": \"Маленькая девочка вчера новую книгу читала.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Кішкентай\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кішкентай\"\n        ],\n        \"translation\": \"маленькая\",\n        \"dictionary_form\": \"кішкентай\"\n      },\n      {\n        \"text\": \"қыз\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"қыз\"\n        ],\n        \"translation\": \"девочка\",\n        \"dictionary_form\": \"қыз\"\n      },\n      {\n        \"text\": \"кеше\",\n        \"label\": \"adverb\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кеше\"\n        ],\n        \"translation\": \"вчера\",\n        \"dictionary_form\": \"кеше\"\n      },\n      {\n        \"text\": \"жаңа\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"жаңа\"\n        ],\n        \"translation\": \"новую\",\n        \"dictionary_form\": \"жаңа\"\n      },\n      {\n        \"text\": \"кітап\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"кітап\"\n        ],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"кітап\"\n      },\n      {\n        \"text\": \"оқыды\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"оқы\",\n          \"ды\"\n        ],\n        \"translation\": \"читала\",\n        \"dictionary_form\": \"оқу\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 4965
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: Қазақша (kz)\nNatural Kazakh: prefer neutral SOV order, check vowel harmony and case government. Attributive adjectives precede their noun. Direct-object marking depends on meaning (including specificity) and syntactic position: both кітап оқыды and кітапты оқыды can be appropriate in their respective contexts. Neither negation nor an adjective alone forces accusative. Choose a clear context; do not insert case suffixes mechanically. Direction commonly takes dative. Question particles ма/ме/ба/бе/па/пе are separate words. Nominal predicates need no invented copula.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"}]\nALREADY ACCEPTED CONTEXT: [{\"taskId\":\"task-5\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлған жоқ.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок не сорвала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"translation\":\"маленькая\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"translation\":\"девочка\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"translation\":\"вчера\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"translation\":\"красивый\"},{\"text\":\"гүл\",\"role\":\"Object\",\"translation\":\"цветок\"},{\"text\":\"жұлған\",\"role\":\"Predicate\",\"translation\":\"сорвавшая\"},{\"text\":\"жоқ\",\"role\":\"Predicate\",\"translation\":\"нет\"}]},{\"taskId\":\"task-6\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"translation\":\"маленькая\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"translation\":\"девочка\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"translation\":\"вчера\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"translation\":\"красивый\"},{\"text\":\"гүл\",\"role\":\"Object\",\"translation\":\"цветок\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"translation\":\"сорвала\"}]},{\"taskId\":\"task-7\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды ма?\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала ли?\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"translation\":\"маленькая\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"translation\":\"девочка\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"translation\":\"вчера\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"translation\":\"красивый\"},{\"text\":\"гүл\",\"role\":\"Object\",\"translation\":\"цветок\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"translation\":\"сорвала\"},{\"text\":\"ма\",\"role\":\"Particle\",\"translation\":\"ли\"}]},{\"taskId\":\"task-8\",\"sentence\":\"Кішкентай қыз кеше әдемі гүл жұлды, өйткені анасы қуанды.\",\"literalTranslation\":\"Маленькая девочка вчера красивый цветок сорвала, потому что мама обрадовалась.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"translation\":\"маленькая\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"translation\":\"девочка\"},{\"text\":\"кеше\",\"role\":\"Circumstance\",\"translation\":\"вчера\"},{\"text\":\"әдемі\",\"role\":\"Attribute_Object\",\"translation\":\"красивый\"},{\"text\":\"гүл\",\"role\":\"Object\",\"translation\":\"цветок\"},{\"text\":\"жұлды\",\"role\":\"Predicate\",\"translation\":\"сорвала\"},{\"text\":\"өйткені\",\"role\":\"Conjunction\",\"translation\":\"потому что\"},{\"text\":\"анасы\",\"role\":\"Subject\",\"translation\":\"мама\"},{\"text\":\"қуанды\",\"role\":\"Predicate\",\"translation\":\"обрадовалась\"}]}]\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"Қыз ұйықтады.\",\"literalTranslation\":\"Девочка спала.\",\"words\":[{\"text\":\"Қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"Қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"ұйықтады\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"ұйық\",\"та\",\"ды\"],\"translation\":\"спала\",\"dictionary_form\":\"ұйықтау\"}]},{\"taskId\":\"task-2\",\"sentence\":\"Кішкентай қыз ұйықтады.\",\"literalTranslation\":\"Маленькая девочка спала.\",\"words\":[{\"text\":\"Кішкентай\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"Кішкентай\"],\"translation\":\"маленькая\",\"dictionary_form\":\"кішкентай\"},{\"text\":\"қыз\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"қыз\"],\"translation\":\"девочка\",\"dictionary_form\":\"қыз\"},{\"text\":\"ұйықтады\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"ұйық\",\"та\",\"ды\"],\"translation\":\"спала\",\"dictionary_form\":\"ұйықтау\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  }\n]"
+      },
+      "elapsedMs": 1889
+    }
+  ]
+}

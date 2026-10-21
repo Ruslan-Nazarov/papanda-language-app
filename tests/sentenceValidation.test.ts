@@ -1,192 +1,188 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateGeneratedSentences } from '../src/utils/sentenceValidation';
-import { DictionaryCandidate } from '../src/services/sentencePrompts';
+import { findLemmaSpan, sentenceFingerprint, tokensMatchSentence, validateGeneratedSentences, validateGeneratedSentencesAsync } from '../src/utils/sentenceValidation';
+import { isAbortError } from '../src/services/generationControl';
+import { planSentenceBatch } from '../src/services/sentenceCurriculum';
+import { Token } from '../src/models/types';
 
-describe('Sentence Validation Logic', () => {
-  const mockDictionary: DictionaryCandidate[] = [
-    { lemma: 'бала', translation: 'ребенок' },
-    { lemma: 'кітап', translation: 'книга' },
-    { lemma: 'оқу', translation: 'читать/учиться' },
-    { lemma: 'мектеп', translation: 'школа' }
-  ];
+const tok = (text: string, role: Token['role'], lemma = text): Token => ({ text, role, label: 'Noun',
+  dictionary_form: lemma, translation: 'перевод', parts: [text], is_in_my_dict: false, clauseIndex: 0 });
+const train = { sentence: 'The train stopped.', words: [tok('The', 'Article'), tok('train', 'Subject'), tok('stopped', 'Predicate', 'stop')] };
+const validate = (value: unknown) => validateGeneratedSentences(value, 'en', 'English', []);
 
-  it('rejects non-array payloads with error message', () => {
-    const result = validateGeneratedSentences(null, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.sentences.length, 0);
-    assert.strictEqual(result.errors.length, 1);
-    assert.match(result.errors[0], /массива/i);
+export const reviewedTrain = () => ({ ...train, taskId: 'task-1', literalTranslation: 'Поезд остановился.',
+  review: { natural: true, taskFit: true, analysisReliable: true }, words: train.words.map(word => ({ ...word })) });
 
-    const stringResult = validateGeneratedSentences('{"invalid": true}', 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(stringResult.sentences.length, 0);
+// Fixtures cover actual failures observed in the old engine, not model fluency.
+ describe('generated sentence contract', () => {
+  it('rejects malformed payloads and incomplete annotations', () => {
+    for (const value of [null, {}, [{ sentence: '', words: [] }], [{ ...train, words: [null] }]]) assert.equal(validate(value).sentences.length, 0);
   });
-
-  it('rejects candidate if missing sentence or tokens', () => {
-    const invalidCandidates = [
-      { sentence: '', words: [] },
-      { sentence: 'Адам кітап оқиды.', words: [] }
-    ];
-
-    const result = validateGeneratedSentences(invalidCandidates, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.sentences.length, 0);
-    assert.strictEqual(result.errors.length, 2);
+  it('accepts a short complete sentence without dictionary prerequisites', () => {
+    assert.equal(validate([train]).sentences.length, 1);
+    assert.equal(validate([{ sentence: 'Келді.', words: [tok('Келді', 'Predicate', 'келу')] }]).sentences.length, 1);
+    assert.equal(validate([{ sentence: 'Ол — дәрігер.', words: [tok('Ол', 'Subject'), tok('дәрігер', 'Predicate')] }]).sentences.length, 1);
   });
-
-  it('rejects sentences missing a Predicate', () => {
-    const candidateWithoutPredicate = [
-      {
-        sentence: 'Бала мен кітап мектепте.',
-        words: [
-          { text: 'Бала', label: 'Noun', role: 'Subject', translation: 'ребенок' },
-          { text: 'мен', label: 'Conjunction', role: 'Conjunction', translation: 'и' },
-          { text: 'кітап', label: 'Noun', role: 'Subject', translation: 'книга' },
-          { text: 'мектепте', label: 'Noun', role: 'Circumstance', translation: 'в школе' }
-        ]
-      }
-    ];
-
-    const result = validateGeneratedSentences(candidateWithoutPredicate, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.sentences.length, 0);
-    assert.strictEqual(result.errors.length, 1);
-    assert.match(result.errors[0], /нет сказуемого/i);
+  it('rejects text/token mismatches, dropped words, merged words and false boundaries', () => {
+    for (const sentence of ['The train drinks.', 'The train stopped yesterday.', 'Thetrain stopped.', 'The train stop ped.']) {
+      assert.equal(validate([{ ...train, sentence }]).sentences.length, 0, sentence);
+    }
+    assert.equal(tokensMatchSentence('a part', [{ text: 'apart' }]), false);
+    assert.equal(tokensMatchSentence('apart', [{ text: 'a' }, { text: 'part' }]), false);
   });
-
-  it('rejects sentences shorter than 4 tokens', () => {
-    const shortCandidate = [
-      {
-        sentence: 'Бала кітап оқиды.',
-        words: [
-          { text: 'Бала', label: 'Noun', role: 'Subject', translation: 'ребенок' },
-          { text: 'кітап', label: 'Noun', role: 'Object', translation: 'книгу' },
-          { text: 'оқиды', label: 'Verb', role: 'Predicate', translation: 'читает' }
-        ]
-      }
-    ];
-
-    const result = validateGeneratedSentences(shortCandidate, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.sentences.length, 0);
-    assert.strictEqual(result.errors.length, 1);
-    assert.match(result.errors[0], /слишком короткое/i);
+  it('handles apostrophe clitics, hyphens and Spanish punctuation without rewriting letters', () => {
+    assert.equal(tokensMatchSentence('La fille n’a pas acheté le livre.', ['La', 'fille', 'n’', 'a', 'pas', 'acheté', 'le', 'livre'].map(text => ({ text }))), true);
+    assert.equal(tokensMatchSentence('¿Llegó?', [{ text: 'Llegó' }]), true);
+    assert.equal(tokensMatchSentence('Ата-ана келді.', [{ text: 'Ата-ана' }, { text: 'келді' }]), true);
+    assert.equal(tokensMatchSentence('Ата-ана келді.', [{ text: 'Ата' }, { text: 'ана' }, { text: 'келді' }]), false);
   });
-
-  it('rejects sentences with fewer than 2 dictionary words', () => {
-    const lowDictionaryCandidate = [
-      {
-        sentence: 'Бала бүгін ерте келді.',
-        words: [
-          { text: 'Бала', label: 'Noun', role: 'Subject', translation: 'ребенок' },
-          { text: 'бүгін', label: 'Adverb', role: 'Adverbial', translation: 'сегодня' },
-          { text: 'ерте', label: 'Adverb', role: 'Adverbial', translation: 'рано' },
-          { text: 'келді', label: 'Verb', role: 'Predicate', translation: 'пришел' }
-        ]
-      }
-    ];
-
-    const result = validateGeneratedSentences(lowDictionaryCandidate, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.sentences.length, 0);
-    assert.strictEqual(result.errors.length, 1);
-    assert.match(result.errors[0], /менее двух слов из словаря/i);
+  it('never guesses syntactic role from part of speech', () => {
+    assert.equal(validate([{ ...train, words: train.words.map(word => ({ ...word, role: 'Noun' })) }]).sentences.length, 0);
+    assert.equal(validate([{ ...train, words: train.words.map(word => ({ ...word, role: 'Subject' })) }]).sentences.length, 0);
   });
-
-  it('validates a correct sentence, normalizes roles, and strips edge punctuation', () => {
-    const validCandidate = [
-      {
-        sentence: '«Бала» мектепте жаңа кітапты қызығып оқиды.',
-        words: [
-          {
-            text: '«Бала»',
-            label: 'Бала',
-            role: 'Noun', // Should be aliased to 'Subject'
-            parts: ['Бала'],
-            translation: 'ребенок',
-            dictionary_form: 'бала'
-          },
-          {
-            text: 'мектепте,',
-            label: 'Мектеп',
-            role: 'Circumstance',
-            parts: ['мектеп', 'те'],
-            translation: 'в школе',
-            dictionary_form: 'мектеп'
-          },
-          {
-            text: 'жаңа',
-            label: 'Жаңа',
-            role: 'Attribute',
-            parts: ['жаңа'],
-            translation: 'новую'
-          },
-          {
-            text: 'кітапты',
-            label: 'Кітап',
-            role: 'Object',
-            parts: ['кітап', 'ты'],
-            translation: 'книгу',
-            dictionary_form: 'кітап'
-          },
-          {
-            text: 'қызығып',
-            label: 'Қызығу',
-            role: 'Adverbial',
-            parts: ['қызығ', 'ып'],
-            translation: 'с интересом'
-          },
-          {
-            text: 'оқиды.',
-            label: 'Оқу',
-            role: 'Verb', // Should be aliased to 'Predicate'
-            parts: ['оқ', 'иды'],
-            translation: 'читает',
-            dictionary_form: 'оқу'
-          }
-        ]
-      }
-    ];
-
-    const result = validateGeneratedSentences(validCandidate, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.errors.length, 0);
-    assert.strictEqual(result.sentences.length, 1);
-
-    const sentence = result.sentences[0];
-    assert.strictEqual(sentence.language, 'Казахский');
-    assert.strictEqual(sentence.words.length, 6);
-
-    // Verify token 0 edge punctuation stripping and role alias
-    assert.strictEqual(sentence.words[0].text, 'Бала');
-    assert.strictEqual(sentence.words[0].role, 'Subject');
-    assert.strictEqual(sentence.words[0].is_in_my_dict, true);
-    assert.strictEqual(sentence.words[0].dictionary_word, 'бала');
-
-    // Verify token 1 edge comma stripping
-    assert.strictEqual(sentence.words[1].text, 'мектепте');
-    assert.strictEqual(sentence.words[1].is_in_my_dict, true);
-
-    // Verify predicate token role alias and period stripping
-    const predicateToken = sentence.words[5];
-    assert.strictEqual(predicateToken.text, 'оқиды');
-    assert.strictEqual(predicateToken.role, 'Predicate');
-    assert.strictEqual(predicateToken.is_in_my_dict, true);
-    assert.strictEqual(predicateToken.dictionary_word, 'оқу');
+  it('does not confuse a lemma with surface morphemes', () => {
+    const result = validate([{ sentence: 'She is happier.', words: [tok('She', 'Subject'), tok('is', 'Predicate'),
+      { ...tok('happier', 'Predicate', 'happy'), parts: ['happy', 'er'] }] }]);
+    assert.deepEqual(result.sentences[0].words[2].parts, ['happier']);
+    assert.equal(result.sentences[0].words[2].dictionary_form, 'happy');
   });
-
-  it('preserves inner hyphens for compound words while stripping edge punctuation', () => {
-    const candidate = [
-      {
-        sentence: 'Ата-ана балаға кітапты сыйлап берді.',
-        words: [
-          { text: 'Ата-ана', label: 'Noun', role: 'Subject', translation: 'родители' },
-          { text: 'балаға', label: 'Noun', role: 'Object', translation: 'ребенку', dictionary_form: 'бала' },
-          { text: 'кітапты', label: 'Noun', role: 'Object', translation: 'книгу', dictionary_form: 'кітап' },
-          { text: 'сыйлап', label: 'Adverbial', role: 'Adverbial', translation: 'подарив' },
-          { text: 'берді.', label: 'Verb', role: 'Predicate', translation: 'дали' }
-        ]
-      }
-    ];
-
-    const result = validateGeneratedSentences(candidate, 'kz', 'Казахский', mockDictionary);
-    assert.strictEqual(result.errors.length, 0);
-    assert.strictEqual(result.sentences.length, 1);
-    assert.strictEqual(result.sentences[0].words[0].text, 'Ата-ана');
-    assert.strictEqual(result.sentences[0].words[4].text, 'берді');
+  it('ignores forged dictionary references and recognises inflected expressions', () => {
+    const words = [tok('He', 'Subject'), tok('took', 'Predicate', 'take'), tok('care', 'Object'), tok('of', 'Preposition'), tok('her', 'Object')];
+    const result = validateGeneratedSentences([{ sentence: 'He took care of her.', words }], 'en', 'English', [{ lemma: 'take care of', translation: 'заботиться' }]);
+    assert.deepEqual(result.sentences[0].words.slice(1, 4).map(word => word.dictionary_word), ['take care of', 'take care of', 'take care of']);
+    assert.deepEqual(findLemmaSpan(words, 'take care of'), [1, 2, 3]);
+    const forged = validateGeneratedSentences([{ ...train, words: train.words.map(word => ({ ...word, dictionary_word: 'cat', is_in_my_dict: true })) }], 'en', 'English', [{ lemma: 'cat', translation: 'кот' }]);
+    assert.ok(forged.sentences[0].words.every(word => !word.is_in_my_dict));
+  });
+  it('marks every occurrence of a dictionary lexeme', () => {
+    const words = [tok('Dogs', 'Subject', 'dog'), tok('see', 'Predicate'), tok('dogs', 'Object', 'dog')];
+    const result = validateGeneratedSentences([{ sentence: 'Dogs see dogs.', words }], 'en', 'English', [{ lemma: 'dog', translation: 'собака' }]);
+    assert.deepEqual(result.sentences[0].words.map(word => word.is_in_my_dict), [true, false, true]);
+  });
+  it('preserves longest-expression and dictionary-order priority with overlapping inflected matches', () => {
+    const words = [tok('He', 'Subject'), tok('took', 'Predicate', 'take'), tok('care', 'Object'),
+      tok('of', 'Preposition'), tok('her', 'Object'), tok('and', 'Conjunction'), tok('took', 'Predicate', 'take'), tok('care', 'Object')];
+    const dictionary = ['take', 'care of', 'take care of', 'take care', 'TAKE CARE OF', 'unrelated']
+      .map(lemma => ({ lemma, translation: '' }));
+    const result = validateGeneratedSentences([{ sentence: 'He took care of her and took care.', words }], 'en', 'English', dictionary);
+    assert.deepEqual(result.sentences[0].words.map(word => word.dictionary_word),
+      [null, 'take care of', 'take care of', 'take care of', null, null, 'take care', 'take care']);
+  });
+  it('matches Unicode-normalized forms and expressions mixing surface words with lemmas', () => {
+    const words = [tok('Éva', 'Subject'), tok('took', 'Predicate', 'take'), tok('care', 'Object'), tok('of', 'Preposition'),
+      tok('l’enfant', 'Object', "l'enfant")];
+    const dictionary = ['E\u0301va', 'take care of', "L'ENFANT"].map(lemma => ({ lemma, translation: '' }));
+    const result = validateGeneratedSentences([{ sentence: 'Éva took care of l’enfant.', words }], 'en', 'English', dictionary);
+    assert.deepEqual(result.sentences[0].words.map(word => word.dictionary_word),
+      ['E\u0301va', 'take care of', 'take care of', 'take care of', "L'ENFANT"]);
+  });
+  it('validates asynchronously with the same errors, task uniqueness and dictionary matches', async () => {
+    const cards = [reviewedTrain(), null, reviewedTrain()];
+    const context = { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: train.sentence }] };
+    const dictionary = [{ lemma: 'stop', translation: '' }];
+    const sync = validateGeneratedSentences(cards, 'en', 'English', dictionary, context);
+    const asyncResult = await validateGeneratedSentencesAsync(cards, 'en', 'English', dictionary, context);
+    assert.deepEqual(asyncResult.errors, sync.errors);
+    assert.equal(asyncResult.sentences.length, sync.sentences.length);
+    assert.deepEqual(asyncResult.sentences[0].words, sync.sentences[0].words);
+  });
+  it('processes cancellation between cards instead of monopolizing the event loop', async () => {
+    const controller = new AbortController();
+    let inspectedSecond = false;
+    const first = { ...train, get sentence() {
+      setTimeout(() => controller.abort(), 0);
+      return train.sentence;
+    } };
+    const second = { ...train, get sentence() { inspectedSecond = true; return train.sentence; } };
+    await assert.rejects(validateGeneratedSentencesAsync([first, second], 'en', 'English', [], undefined, controller.signal), isAbortError);
+    assert.equal(inspectedSecond, false);
+  });
+  it('distinguishes intonation questions from affirmative sentences when deduplicating', () => {
+    assert.notEqual(sentenceFingerprint('Français', 'Tu viens.'), sentenceFingerprint('Français', 'Tu viens ?'));
+    assert.equal(sentenceFingerprint('Français', 'Tu viens?'), sentenceFingerprint('Français', 'Tu viens ?'));
+    assert.equal(sentenceFingerprint('English', 'The train stopped.'), sentenceFingerprint('English', ' the TRAIN stopped! '));
+  });
+  it('requires surface morphemes to preserve written case too', () => {
+    const result = validate([{ ...train, words: train.words.map(word => ({ ...word, parts: [word.text.toUpperCase()] })) }]);
+    assert.deepEqual(result.sentences[0].words[1].parts, ['train']);
+  });
+  it('does not display invented visible stems for irregular English auxiliaries', () => {
+    const sentence = { sentence: 'Does the train stop?', words: [tok('Does', 'Predicate', 'do'),
+      tok('the', 'Article'), tok('train', 'Subject'), tok('stop', 'Predicate')] };
+    sentence.words[0].parts = ['Doe', 's'];
+    const result = validate([sentence]);
+    assert.deepEqual(result.sentences[0].words[0].parts, ['Does']);
+  });
+  it('rejects a bare Kazakh object separated from the predicate, including a falsely tagged subject piece', () => {
+    const tasks = planSentenceBatch(1);
+    const check = (sentence: string, words: Token[]) => validateGeneratedSentences([{
+      taskId: 'task-1', sentence, words, literalTranslation: 'Ребёнок читает книгу.',
+      review: { natural: true, taskFit: true, analysisReliable: true },
+    }], 'kz', 'Қазақша', [], { tasks, drafts: [{ taskId: 'task-1', sentence }] });
+    assert.equal(check('Бала кітап мектепте оқиды.', [tok('Бала', 'Subject', 'бала'),
+      tok('кітап', 'Object', 'кітап'), tok('мектепте', 'Circumstance', 'мектеп'), tok('оқиды', 'Predicate', 'оқу')]).sentences.length, 0);
+    assert.equal(check('Сатып алушы келді.', [tok('Сатып', 'Object', 'сату'),
+      tok('алушы', 'Subject', 'алу'), tok('келді', 'Predicate', 'келу')]).sentences.length, 0);
+    assert.equal(check('Бала мектепте кітап оқиды.', [tok('Бала', 'Subject', 'бала'),
+      tok('мектепте', 'Circumstance', 'мектеп'), tok('кітап', 'Object', 'кітап'), tok('оқиды', 'Predicate', 'оқу')]).sentences.length, 1);
+    assert.equal(check('Бала кітапты мектепте оқиды.', [tok('Бала', 'Subject', 'бала'),
+      tok('кітапты', 'Object', 'кітап'), tok('мектепте', 'Circumstance', 'мектеп'), tok('оқиды', 'Predicate', 'оқу')]).sentences.length, 1);
+  });
+  it('normalizes Italian predicate negation and rejects joined Russian question particle', () => {
+    const sentence = 'La donna non canta.';
+    const result = validateGeneratedSentences([{ taskId: 'task-1', sentence,
+      literalTranslation: 'Женщина не поёт.', review: { natural: true, taskFit: true, analysisReliable: true },
+      words: [tok('La', 'Article'), tok('donna', 'Subject'), tok('non', 'Particle'), tok('canta', 'Predicate')],
+    }], 'it', 'Italiano', [], { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence }] });
+    assert.equal(result.sentences[0].words[2].role, 'Predicate');
+    const bad = validateGeneratedSentences([{ ...reviewedTrain(), literalTranslation: 'Поезд остановился-ли?' }],
+      'en', 'English', [], { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: train.sentence }] });
+    assert.equal(bad.sentences.length, 0);
+  });
+  it('uses grammatical glosses for English articles and auxiliary verbs', () => {
+    const sentence = 'Does the child read a book?';
+    const words = [tok('Does', 'Predicate', 'do'), tok('the', 'Article'), tok('child', 'Subject'),
+      tok('read', 'Predicate'), tok('a', 'Article'), tok('book', 'Object')];
+    words[0].translation = 'делает';
+    words[0].label = 'Verb';
+    words[3].label = 'Verb';
+    words[1].translation = 'этот';
+    words[4].translation = 'один';
+    const result = validateGeneratedSentences([{ taskId: 'task-1', sentence, words,
+      literalTranslation: 'Читает ли ребёнок книгу?', review: { natural: true, taskFit: true, analysisReliable: true },
+    }], 'en', 'English', [], { tasks: [{ ...planSentenceBatch(1)[0], focus: 'question' }], drafts: [{ taskId: 'task-1', sentence }] });
+    assert.deepEqual(result.sentences[0].words.filter(word => ['Does', 'the', 'a'].includes(word.text))
+      .map(word => word.translation), ['вспомогательный глагол', 'определённый артикль', 'неопределённый артикль']);
+  });
+  it('rejects Kazakh question translation with sentence-final «ли» and isolated negative participle gloss', () => {
+    const question = 'Қыз кітап оқыды ма?';
+    const questionWords = [tok('Қыз', 'Subject'), tok('кітап', 'Object'), tok('оқыды', 'Predicate', 'оқу'), tok('ма', 'Particle')];
+    const questionTask = [{ ...planSentenceBatch(1)[0], focus: 'question' as const }];
+    const context = { tasks: questionTask, drafts: [{ taskId: 'task-1', sentence: question }] };
+    const card = { taskId: 'task-1', sentence: question, words: questionWords,
+      review: { natural: true, taskFit: true, analysisReliable: true } };
+    assert.equal(validateGeneratedSentences([{ ...card, literalTranslation: 'Девочка книгу читала ли?' }],
+      'kz', 'Қазақша', [], context).sentences.length, 0);
+    assert.equal(validateGeneratedSentences([{ ...card, literalTranslation: 'Читала ли девочка книгу?' }],
+      'kz', 'Қазақша', [], context).sentences.length, 1);
+    const negative = 'Қыз ұйықтаған жоқ.';
+    const negativeWords = [tok('Қыз', 'Subject'), { ...tok('ұйықтаған', 'Predicate', 'ұйықтау'), translation: 'спавшая' }, tok('жоқ', 'Predicate')];
+    assert.equal(validateGeneratedSentences([{ taskId: 'task-1', sentence: negative, words: negativeWords,
+      literalTranslation: 'Девочка не спала.', review: { natural: true, taskFit: true, analysisReliable: true },
+    }], 'kz', 'Қазақша', [], { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: negative }] }).sentences.length, 0);
+  });
+  it('rejects missing predicates in clauses and incomplete/gapped clause IDs', () => {
+    for (const clauseIndex of [1, -1, 0.5, undefined]) {
+      assert.equal(validate([{ ...train, words: train.words.map((word, i) => i === 1 ? { ...word, clauseIndex } : word) }]).sentences.length, 0);
+    }
+  });
+  it('requires independent review, unchanged draft, literal translation and requested lemma', () => {
+    const context = { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: train.sentence }], requiredWord: 'stop' };
+    const check = (data: unknown) => validateGeneratedSentences([data], 'en', 'English', [], context);
+    assert.equal(check(reviewedTrain()).sentences.length, 1);
+    for (const change of [{ review: { natural: false, taskFit: true, analysisReliable: true } }, { taskId: 'unknown' },
+      { literalTranslation: '' }, { sentence: 'The train stopped!' }, { words: train.words.map(word => ({ ...word, dictionary_form: 'wrong' })) }]) {
+      assert.equal(check({ ...reviewedTrain(), ...change }).sentences.length, 0);
+    }
   });
 });

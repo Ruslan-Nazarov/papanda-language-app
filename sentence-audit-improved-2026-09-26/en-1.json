@@ -1,0 +1,1150 @@
+{
+  "scenario": {
+    "id": "en-1",
+    "code": "en",
+    "count": 8
+  },
+  "startedAt": "2026-09-26T13:21:27.036Z",
+  "elapsedMs": 22879,
+  "accepted": 7,
+  "sentences": [
+    {
+      "language": "English",
+      "sentence": "The child reads.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "reads",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read",
+            "s"
+          ],
+          "translation": "читает",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Ребёнок читает.",
+      "learningGoal": "Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.",
+      "generationTaskId": "task-1",
+      "id": "generated_en_1790428900020_1",
+      "source": "generated",
+      "createdAt": 1790428900020
+    },
+    {
+      "language": "English",
+      "sentence": "The smart child reads.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "reads",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read",
+            "s"
+          ],
+          "translation": "читает",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок читает.",
+      "learningGoal": "Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.",
+      "generationTaskId": "task-2",
+      "id": "generated_en_1790428900025_2",
+      "source": "generated",
+      "createdAt": 1790428900025
+    },
+    {
+      "language": "English",
+      "sentence": "The smart child reads a book.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "reads",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read",
+            "s"
+          ],
+          "translation": "читает",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "один",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "book",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "book"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "book",
+          "is_in_my_dict": true,
+          "dictionary_word": "book",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок читает книгу.",
+      "learningGoal": "От сказуемого перейдите к подлежащему и определите, на что направлено действие.",
+      "generationTaskId": "task-3",
+      "id": "generated_en_1790428900030_3",
+      "source": "generated",
+      "createdAt": 1790428900030
+    },
+    {
+      "language": "English",
+      "sentence": "The smart child reads a book at home.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "reads",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read",
+            "s"
+          ],
+          "translation": "читает",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "один",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "book",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "book"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "book",
+          "is_in_my_dict": true,
+          "dictionary_word": "book",
+          "clauseIndex": 0
+        },
+        {
+          "text": "at",
+          "label": "Preposition",
+          "role": "Preposition",
+          "parts": [
+            "at"
+          ],
+          "translation": "в",
+          "dictionary_form": "at",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "home",
+          "label": "Noun",
+          "role": "Circumstance",
+          "parts": [
+            "home"
+          ],
+          "translation": "доме",
+          "dictionary_form": "home",
+          "is_in_my_dict": true,
+          "dictionary_word": "home",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок читает книгу дома.",
+      "learningGoal": "Найдите основу предложения, затем определите обстоятельства действия и их маркеры.",
+      "generationTaskId": "task-4",
+      "id": "generated_en_1790428900036_4",
+      "source": "generated",
+      "createdAt": 1790428900036
+    },
+    {
+      "language": "English",
+      "sentence": "The smart child does not read a book at home.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "does",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "does"
+          ],
+          "translation": "делает",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "not",
+          "label": "Particle",
+          "role": "Predicate",
+          "parts": [
+            "not"
+          ],
+          "translation": "не",
+          "dictionary_form": "not",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "read",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read"
+          ],
+          "translation": "читать",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "один",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "book",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "book"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "book",
+          "is_in_my_dict": true,
+          "dictionary_word": "book",
+          "clauseIndex": 0
+        },
+        {
+          "text": "at",
+          "label": "Preposition",
+          "role": "Preposition",
+          "parts": [
+            "at"
+          ],
+          "translation": "в",
+          "dictionary_form": "at",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "home",
+          "label": "Noun",
+          "role": "Circumstance",
+          "parts": [
+            "home"
+          ],
+          "translation": "доме",
+          "dictionary_form": "home",
+          "is_in_my_dict": true,
+          "dictionary_word": "home",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Умный ребёнок не читает книгу дома.",
+      "learningGoal": "Найдите всё сказуемое и определите, какими средствами выражено отрицание.",
+      "generationTaskId": "task-5",
+      "id": "generated_en_1790428900042_5",
+      "source": "generated",
+      "createdAt": 1790428900042
+    },
+    {
+      "language": "English",
+      "sentence": "Does the smart child read a book at home?",
+      "words": [
+        {
+          "text": "Does",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "Does"
+          ],
+          "translation": "делает",
+          "dictionary_form": "do",
+          "is_in_my_dict": true,
+          "dictionary_word": "do",
+          "clauseIndex": 0
+        },
+        {
+          "text": "the",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "read",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read"
+          ],
+          "translation": "читать",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "один",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "book",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "book"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "book",
+          "is_in_my_dict": true,
+          "dictionary_word": "book",
+          "clauseIndex": 0
+        },
+        {
+          "text": "at",
+          "label": "Preposition",
+          "role": "Preposition",
+          "parts": [
+            "at"
+          ],
+          "translation": "в",
+          "dictionary_form": "at",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "home",
+          "label": "Noun",
+          "role": "Circumstance",
+          "parts": [
+            "home"
+          ],
+          "translation": "доме",
+          "dictionary_form": "home",
+          "is_in_my_dict": true,
+          "dictionary_word": "home",
+          "clauseIndex": 0
+        }
+      ],
+      "literalTranslation": "Читает ли умный ребёнок книгу дома?",
+      "learningGoal": "Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.",
+      "generationTaskId": "task-7",
+      "id": "generated_en_1790428900049_6",
+      "source": "generated",
+      "createdAt": 1790428900049
+    },
+    {
+      "language": "English",
+      "sentence": "The smart child reads a book because the teacher asks.",
+      "words": [
+        {
+          "text": "The",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "The"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "smart",
+          "label": "Adjective",
+          "role": "Attribute_Subject",
+          "parts": [
+            "smart"
+          ],
+          "translation": "умный",
+          "dictionary_form": "smart",
+          "is_in_my_dict": true,
+          "dictionary_word": "smart",
+          "clauseIndex": 0
+        },
+        {
+          "text": "child",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "child"
+          ],
+          "translation": "ребёнок",
+          "dictionary_form": "child",
+          "is_in_my_dict": true,
+          "dictionary_word": "child",
+          "clauseIndex": 0
+        },
+        {
+          "text": "reads",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "read",
+            "s"
+          ],
+          "translation": "читает",
+          "dictionary_form": "read",
+          "is_in_my_dict": true,
+          "dictionary_word": "read",
+          "clauseIndex": 0
+        },
+        {
+          "text": "a",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "a"
+          ],
+          "translation": "один",
+          "dictionary_form": "a",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 0
+        },
+        {
+          "text": "book",
+          "label": "Noun",
+          "role": "Object",
+          "parts": [
+            "book"
+          ],
+          "translation": "книгу",
+          "dictionary_form": "book",
+          "is_in_my_dict": true,
+          "dictionary_word": "book",
+          "clauseIndex": 0
+        },
+        {
+          "text": "because",
+          "label": "Conjunction",
+          "role": "Conjunction",
+          "parts": [
+            "because"
+          ],
+          "translation": "потому что",
+          "dictionary_form": "because",
+          "is_in_my_dict": true,
+          "dictionary_word": "because",
+          "clauseIndex": 1
+        },
+        {
+          "text": "the",
+          "label": "Determiner",
+          "role": "Article",
+          "parts": [
+            "the"
+          ],
+          "translation": "этот",
+          "dictionary_form": "the",
+          "is_in_my_dict": false,
+          "dictionary_word": null,
+          "clauseIndex": 1
+        },
+        {
+          "text": "teacher",
+          "label": "Noun",
+          "role": "Subject",
+          "parts": [
+            "teacher"
+          ],
+          "translation": "учитель",
+          "dictionary_form": "teacher",
+          "is_in_my_dict": true,
+          "dictionary_word": "teacher",
+          "clauseIndex": 1
+        },
+        {
+          "text": "asks",
+          "label": "Verb",
+          "role": "Predicate",
+          "parts": [
+            "ask",
+            "s"
+          ],
+          "translation": "просит",
+          "dictionary_form": "ask",
+          "is_in_my_dict": true,
+          "dictionary_word": "ask",
+          "clauseIndex": 1
+        }
+      ],
+      "literalTranslation": "Умный ребёнок читает книгу, потому что учитель просит.",
+      "learningGoal": "Найдите грамматические основы и связь между ними. Начните разбор с главной части.",
+      "generationTaskId": "task-8",
+      "id": "generated_en_1790428900055_7",
+      "source": "generated",
+      "createdAt": 1790428900055
+    }
+  ],
+  "requests": [
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nAlready accepted development context: []\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: []\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\"]\nCorrect these problems from the previous attempt: []",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The child reads.\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The smart child reads.\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The smart child reads a book.\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The smart child reads a book at home.\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The smart child does not read a book at home.\"\n  },\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Reading a book helps to learn.\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the smart child read a book at home?\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The smart child reads a book because the teacher asks.\"\n  }\n]"
+      },
+      "elapsedMs": 3198
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nDRAFTS: [{\"taskId\":\"task-1\",\"sentence\":\"The child reads.\"},{\"taskId\":\"task-2\",\"sentence\":\"The smart child reads.\"},{\"taskId\":\"task-3\",\"sentence\":\"The smart child reads a book.\"},{\"taskId\":\"task-4\",\"sentence\":\"The smart child reads a book at home.\"},{\"taskId\":\"task-5\",\"sentence\":\"The smart child does not read a book at home.\"},{\"taskId\":\"task-6\",\"sentence\":\"Reading a book helps to learn.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the smart child read a book at home?\"},{\"taskId\":\"task-8\",\"sentence\":\"The smart child reads a book because the teacher asks.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): []\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"sentence\": \"The child reads.\",\n    \"literalTranslation\": \"Ребёнок читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"reads\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\", \"s\"],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"read\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"sentence\": \"The smart child reads.\",\n    \"literalTranslation\": \"Умный ребёнок читает.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"reads\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\", \"s\"],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"read\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"sentence\": \"The smart child reads a book.\",\n    \"literalTranslation\": \"Умный ребёнок читает книгу.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"reads\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\", \"s\"],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"read\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"один\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"book\",\n        \"label\": \"Noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"book\"],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"book\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"sentence\": \"The smart child reads a book at home.\",\n    \"literalTranslation\": \"Умный ребёнок читает книгу дома.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"reads\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\", \"s\"],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"read\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"один\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"book\",\n        \"label\": \"Noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"book\"],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"book\"\n      },\n      {\n        \"text\": \"at\",\n        \"label\": \"Preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"at\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"at\"\n      },\n      {\n        \"text\": \"home\",\n        \"label\": \"Noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"home\"],\n        \"translation\": \"доме\",\n        \"dictionary_form\": \"home\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"sentence\": \"The smart child does not read a book at home.\",\n    \"literalTranslation\": \"Умный ребёнок не читает книгу дома.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"does\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"does\"],\n        \"translation\": \"делает\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"not\",\n        \"label\": \"Particle\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"not\"],\n        \"translation\": \"не\",\n        \"dictionary_form\": \"not\"\n      },\n      {\n        \"text\": \"read\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\"],\n        \"translation\": \"читать\",\n        \"dictionary_form\": \"read\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"один\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"book\",\n        \"label\": \"Noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"book\"],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"book\"\n      },\n      {\n        \"text\": \"at\",\n        \"label\": \"Preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"at\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"at\"\n      },\n      {\n        \"text\": \"home\",\n        \"label\": \"Noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"home\"],\n        \"translation\": \"доме\",\n        \"dictionary_form\": \"home\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"sentence\": \"Does the smart child read a book at home?\",\n    \"literalTranslation\": \"Читает ли умный ребёнок книгу дома?\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Does\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"Does\"],\n        \"translation\": \"делает\",\n        \"dictionary_form\": \"do\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"the\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"read\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\"],\n        \"translation\": \"читать\",\n        \"dictionary_form\": \"read\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"один\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"book\",\n        \"label\": \"Noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"book\"],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"book\"\n      },\n      {\n        \"text\": \"at\",\n        \"label\": \"Preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"at\"],\n        \"translation\": \"в\",\n        \"dictionary_form\": \"at\"\n      },\n      {\n        \"text\": \"home\",\n        \"label\": \"Noun\",\n        \"role\": \"Circumstance\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"home\"],\n        \"translation\": \"доме\",\n        \"dictionary_form\": \"home\"\n      }\n    ]\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"sentence\": \"The smart child reads a book because the teacher asks.\",\n    \"literalTranslation\": \"Умный ребёнок читает книгу, потому что учитель просит.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"The\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"The\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"smart\",\n        \"label\": \"Adjective\",\n        \"role\": \"Attribute_Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"smart\"],\n        \"translation\": \"умный\",\n        \"dictionary_form\": \"smart\"\n      },\n      {\n        \"text\": \"child\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"child\"],\n        \"translation\": \"ребёнок\",\n        \"dictionary_form\": \"child\"\n      },\n      {\n        \"text\": \"reads\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"read\", \"s\"],\n        \"translation\": \"читает\",\n        \"dictionary_form\": \"read\"\n      },\n      {\n        \"text\": \"a\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"a\"],\n        \"translation\": \"один\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"book\",\n        \"label\": \"Noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\"book\"],\n        \"translation\": \"книгу\",\n        \"dictionary_form\": \"book\"\n      },\n      {\n        \"text\": \"because\",\n        \"label\": \"Conjunction\",\n        \"role\": \"Conjunction\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"because\"],\n        \"translation\": \"потому что\",\n        \"dictionary_form\": \"because\"\n      },\n      {\n        \"text\": \"the\",\n        \"label\": \"Determiner\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"the\"],\n        \"translation\": \"этот\",\n        \"dictionary_form\": \"the\"\n      },\n      {\n        \"text\": \"teacher\",\n        \"label\": \"Noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"teacher\"],\n        \"translation\": \"учитель\",\n        \"dictionary_form\": \"teacher\"\n      },\n      {\n        \"text\": \"asks\",\n        \"label\": \"Verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 1,\n        \"parts\": [\"ask\", \"s\"],\n        \"translation\": \"просит\",\n        \"dictionary_form\": \"ask\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 9772
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-1\",\"focus\":\"core\",\"goal\":\"Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.\"},{\"id\":\"task-2\",\"focus\":\"attribute\",\"goal\":\"Найдите сказуемое и подлежащее, затем признак предмета и маркер этого признака.\",\"develops\":\"task-1\"},{\"id\":\"task-3\",\"focus\":\"object\",\"goal\":\"От сказуемого перейдите к подлежащему и определите, на что направлено действие.\",\"develops\":\"task-2\"},{\"id\":\"task-4\",\"focus\":\"circumstance\",\"goal\":\"Найдите основу предложения, затем определите обстоятельства действия и их маркеры.\",\"develops\":\"task-3\"},{\"id\":\"task-5\",\"focus\":\"negative\",\"goal\":\"Найдите всё сказуемое и определите, какими средствами выражено отрицание.\"},{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"},{\"id\":\"task-7\",\"focus\":\"question\",\"goal\":\"Найдите сказуемое и подлежащее; определите, что делает предложение вопросом.\"},{\"id\":\"task-8\",\"focus\":\"complex\",\"goal\":\"Найдите грамматические основы и связь между ними. Начните разбор с главной части.\"}]\nALREADY ACCEPTED CONTEXT: []\nCANDIDATES: [{\"taskId\":\"task-1\",\"sentence\":\"The child reads.\",\"literalTranslation\":\"Ребёнок читает.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\",\"s\"],\"translation\":\"читает\",\"dictionary_form\":\"read\"}]},{\"taskId\":\"task-2\",\"sentence\":\"The smart child reads.\",\"literalTranslation\":\"Умный ребёнок читает.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\",\"s\"],\"translation\":\"читает\",\"dictionary_form\":\"read\"}]},{\"taskId\":\"task-3\",\"sentence\":\"The smart child reads a book.\",\"literalTranslation\":\"Умный ребёнок читает книгу.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\",\"s\"],\"translation\":\"читает\",\"dictionary_form\":\"read\"},{\"text\":\"a\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"один\",\"dictionary_form\":\"a\"},{\"text\":\"book\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"book\"],\"translation\":\"книгу\",\"dictionary_form\":\"book\"}]},{\"taskId\":\"task-4\",\"sentence\":\"The smart child reads a book at home.\",\"literalTranslation\":\"Умный ребёнок читает книгу дома.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\",\"s\"],\"translation\":\"читает\",\"dictionary_form\":\"read\"},{\"text\":\"a\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"один\",\"dictionary_form\":\"a\"},{\"text\":\"book\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"book\"],\"translation\":\"книгу\",\"dictionary_form\":\"book\"},{\"text\":\"at\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"at\"],\"translation\":\"в\",\"dictionary_form\":\"at\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"home\"],\"translation\":\"доме\",\"dictionary_form\":\"home\"}]},{\"taskId\":\"task-5\",\"sentence\":\"The smart child does not read a book at home.\",\"literalTranslation\":\"Умный ребёнок не читает книгу дома.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"does\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"does\"],\"translation\":\"делает\",\"dictionary_form\":\"do\"},{\"text\":\"not\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"not\"],\"translation\":\"не\",\"dictionary_form\":\"not\"},{\"text\":\"read\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\"],\"translation\":\"читать\",\"dictionary_form\":\"read\"},{\"text\":\"a\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"один\",\"dictionary_form\":\"a\"},{\"text\":\"book\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"book\"],\"translation\":\"книгу\",\"dictionary_form\":\"book\"},{\"text\":\"at\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"at\"],\"translation\":\"в\",\"dictionary_form\":\"at\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"home\"],\"translation\":\"доме\",\"dictionary_form\":\"home\"}]},{\"taskId\":\"task-7\",\"sentence\":\"Does the smart child read a book at home?\",\"literalTranslation\":\"Читает ли умный ребёнок книгу дома?\",\"words\":[{\"text\":\"Does\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"Does\"],\"translation\":\"делает\",\"dictionary_form\":\"do\"},{\"text\":\"the\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"the\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"read\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\"],\"translation\":\"читать\",\"dictionary_form\":\"read\"},{\"text\":\"a\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"один\",\"dictionary_form\":\"a\"},{\"text\":\"book\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"book\"],\"translation\":\"книгу\",\"dictionary_form\":\"book\"},{\"text\":\"at\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"at\"],\"translation\":\"в\",\"dictionary_form\":\"at\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"clauseIndex\":0,\"parts\":[\"home\"],\"translation\":\"доме\",\"dictionary_form\":\"home\"}]},{\"taskId\":\"task-8\",\"sentence\":\"The smart child reads a book because the teacher asks.\",\"literalTranslation\":\"Умный ребёнок читает книгу, потому что учитель просит.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"The\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"clauseIndex\":0,\"parts\":[\"smart\"],\"translation\":\"умный\",\"dictionary_form\":\"smart\"},{\"text\":\"child\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"child\"],\"translation\":\"ребёнок\",\"dictionary_form\":\"child\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"read\",\"s\"],\"translation\":\"читает\",\"dictionary_form\":\"read\"},{\"text\":\"a\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"a\"],\"translation\":\"один\",\"dictionary_form\":\"a\"},{\"text\":\"book\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"book\"],\"translation\":\"книгу\",\"dictionary_form\":\"book\"},{\"text\":\"because\",\"role\":\"Conjunction\",\"clauseIndex\":1,\"parts\":[\"because\"],\"translation\":\"потому что\",\"dictionary_form\":\"because\"},{\"text\":\"the\",\"role\":\"Article\",\"clauseIndex\":1,\"parts\":[\"the\"],\"translation\":\"этот\",\"dictionary_form\":\"the\"},{\"text\":\"teacher\",\"role\":\"Subject\",\"clauseIndex\":1,\"parts\":[\"teacher\"],\"translation\":\"учитель\",\"dictionary_form\":\"teacher\"},{\"text\":\"asks\",\"role\":\"Predicate\",\"clauseIndex\":1,\"parts\":[\"ask\",\"s\"],\"translation\":\"просит\",\"dictionary_form\":\"ask\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-1\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-2\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-3\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-4\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-5\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-7\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  },\n  {\n    \"taskId\": \"task-8\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": true,\n    \"morphology\": true,\n    \"chain\": true,\n    \"reason\": \"\"\n  }\n]"
+      },
+      "elapsedMs": 2709
+    },
+    {
+      "stage": "COMPOSE_SENTENCES",
+      "prompt": "COMPOSE_SENTENCES\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nWrite one complete sentence per task, return ONLY JSON [{\"taskId\":\"task-1\",\"sentence\":\"...\"}].\nFor core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.\nFor negative/question change that feature only; complex needs a meaningful relation between two grammatical bases. Reading is an independent simple affirmative.\nUsage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.\nIf develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.\nPlan the whole development chain together: choose a base that naturally allows the later attribute, object and circumstance. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.\nIn a chain containing an object task, choose a predicate allowing an object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. A core may already contain an obligatory object: later make that object more specific rather than inventing an incomplete base.\nOtherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.\nTASKS: [{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"}]\nAlready accepted development context: [{\"taskId\":\"task-1\",\"sentence\":\"The child reads.\"},{\"taskId\":\"task-2\",\"sentence\":\"The smart child reads.\"},{\"taskId\":\"task-3\",\"sentence\":\"The smart child reads a book.\"},{\"taskId\":\"task-4\",\"sentence\":\"The smart child reads a book at home.\"},{\"taskId\":\"task-5\",\"sentence\":\"The smart child does not read a book at home.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the smart child read a book at home?\"},{\"taskId\":\"task-8\",\"sentence\":\"The smart child reads a book because the teacher asks.\"}]\nFor ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.\nRequested word hint, if any: []\n\nAvoid exact duplicates: [\"The cat drinks milk.\",\"He found a heavy box.\",\"She will not buy the cheap coat.\",\"Does the farmer grow corn?\",\"The dog eats meat.\",\"The man said that the bridge was safe.\",\"Because the snow melts, the river flows.\",\"The woman wants a red dress, but she buys a white hat.\",\"The old book was stolen by the thief.\",\"If the student likes reading, he will buy the magazine.\",\"The girl sings a beautiful song.\",\"A big truck destroyed the bridge.\",\"The black cat sleeps.\",\"The doctor examines the sick patient.\",\"Does the teacher know the secret?\",\"The merchant said that the gold was expensive.\",\"Because the storm was severe, the ship disappeared.\",\"If the wind blows, the tree falls.\",\"The letter was written by the lawyer.\",\"The worker stopped building the house.\",\"The doctor does not drink wine.\",\"Does the blind man hear the song?\",\"The wild cat catches a mouse.\",\"Because the weather is cold, the farmer wears a warm coat.\",\"The scientist knows that the formula is correct.\",\"If the owner pays the debt, the company will survive.\",\"The expensive truck was stolen yesterday.\",\"The young child likes reading a story.\",\"The woman wants to buy a silver ring.\",\"The hungry wolf eats meat.\",\"The rich investor buys the farm.\",\"The lazy student does not read the textbook.\",\"Because the river freezes, the bear sleeps.\",\"The old tree was destroyed by the storm.\",\"Does the angry neighbour hate the dog?\",\"He believes that the brave soldier wins the war.\",\"Drinking hot tea is a good habit.\",\"The clever child finds the treasure.\",\"If the owner offers a good salary, the employee accepts the job.\",\"The woman wants to open the heavy door.\",\"The fast truck drives along the street.\",\"If the sun shines, the child plays.\",\"The difficult lesson was taught by the teacher.\",\"The bird flew yesterday.\",\"The lawyer advises because the case is difficult.\",\"Does the soldier protect the country?\",\"Reading a book is a good habit.\",\"The cat eats fish, but the dog eats meat.\",\"If winter comes, the snow falls.\",\"The writer publishes a novel.\",\"The honest worker builds the new house.\",\"The good doctor does not ignore the sick child.\",\"Because the sun shines, the snow melts completely.\",\"The lost bag was found by the smart citizen.\",\"Does the cruel leader punish the innocent captive?\",\"If the owner increases the salary, the employee works better.\",\"Reading a difficult book requires total attention.\",\"The fast airplane crosses the empty desert.\",\"The angry customer complains because the food is cold.\",\"If the machine stops, the enterprise loses money.\",\"The poor farmer sells meat.\",\"The good doctor does not drink bad water.\",\"Because the weather is hot, the man drinks water.\",\"The old village was destroyed by the storm.\",\"Does the smart child read the thick book?\",\"If the train arrives, the passenger buys a ticket.\",\"Buying an expensive house requires money.\",\"The husband wants to buy a beautiful house.\",\"The leader knows that the enemy attacks the city.\",\"The injured soldier was found near the river.\",\"The child reads.\",\"The smart child reads.\",\"The smart child reads a book.\",\"The smart child reads a book at home.\",\"The smart child does not read a book at home.\",\"Does the smart child read a book at home?\",\"The smart child reads a book because the teacher asks.\"]\nCorrect these problems from the previous attempt: [\"task-6: составьте новый естественный пример и надёжный разбор.\"]",
+      "generationConfig": {
+        "temperature": 0.8,
+        "topP": 0.92,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Reading is an important skill for every student.\"\n  }\n]"
+      },
+      "elapsedMs": 1970
+    },
+    {
+      "stage": "REVIEW_AND_ANNOTATE",
+      "prompt": "REVIEW_AND_ANNOTATE\nPapanda follows the author's method, not a vocabulary drill:\nThe whole sentence is the unit of language and reflects a meaningful real-world action or state.\nFind the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.\nDevelop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.\nShort complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.\nPrefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.\nUse frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.\nModifiers, predicates and circumstances must be mutually compatible in the stated scene. Do not rescue a contradictory or odd example by imagining an unstated event or unusual conditions. For example, Cold water boils is unsuitable as a neutral beginner statement: the modifier conflicts with the stated action in an ordinary setting. Choose an attribute that adds useful, plausible information. Case/preposition choices must express the ordinary intended relation without requiring an unstated remote-work, metaphorical or other special context.\nPreserve the language's own grammar. Do not force a universal SVO order or explicit copula/subject.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nReview drafts independently on three criteria: naturalness/grammar and plausible meaning (natural), fit to assigned structural exercise including development relationship (taskFit), reliability of grammatical analysis AND Russian translation (analysisReliable).\nReject doubtful items by omitting them. Do not repair or change sentence text in this pass. A check is not automatically true because a previous model produced the sentence.\nCheck meaning before annotation: a grammatically well-formed sentence with an incompatible modifier/action or an unexplained unusual circumstance must be omitted. Do not mark natural:true merely because the words have identifiable grammatical roles.\nTASKS: [{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"}]\nDRAFTS: [{\"taskId\":\"task-6\",\"sentence\":\"Reading is an important skill for every student.\"}]\nPreviously accepted context, only for checking development relationships (do not return it): [{\"taskId\":\"task-1\",\"sentence\":\"The child reads.\"},{\"taskId\":\"task-2\",\"sentence\":\"The smart child reads.\"},{\"taskId\":\"task-3\",\"sentence\":\"The smart child reads a book.\"},{\"taskId\":\"task-4\",\"sentence\":\"The smart child reads a book at home.\"},{\"taskId\":\"task-5\",\"sentence\":\"The smart child does not read a book at home.\"},{\"taskId\":\"task-7\",\"sentence\":\"Does the smart child read a book at home?\"},{\"taskId\":\"task-8\",\"sentence\":\"The smart child reads a book because the teacher asks.\"}]\nFor each accepted draft return taskId, sentence unchanged, review {natural:true,taskFit:true,analysisReliable:true}, literalTranslation and words.\nliteralTranslation: a complete grammatical Russian translation, not an interlinear gloss or list of token translations. Preserve the order of sentence MEMBERS as far as Russian grammar permits, but translate each phrase as a unit with normal Russian word order INSIDE it. She bought a book yesterday → Она купила книгу вчера, not Вчера она купила книгу. Russian prepositions must precede their noun even if the source uses postpositions. Do not concatenate grammatical labels instead of translating.\nRussian must remain grammatical and convey the same tense and negation. Translate analytical predicates as a unit: Қыз ұйықтаған жоқ → Девочка не спала, never Девочка спавшей нет. Explain the source construction through token glosses, not by breaking the Russian whole-sentence translation.\nFor example, Кішкентай бала үстел басында хат жазады → Маленький ребёнок за столом письмо пишет. The phrase үстел басында is за столом, never стол у басы. No untranslated source fragments in the Russian sentence except proper names. Before accepting, read the Russian translation independently: every phrase must be meaningful Russian and must express the source meaning; otherwise correct the translation or omit the item.\nwords in reading order: text, label (part of speech), role, clauseIndex, parts, translation, dictionary_form.\ntext must match the written surface exactly, excluding surrounding sentence punctuation. Keep internal hyphens/apostrophes. No missing, added, reordered or merged words. French elisions may split immediately after apostrophe (n’ + a). Keep other written words whole.\nrole is a sentence member, NOT a part of speech: Predicate, Subject, Attribute, Attribute_Subject, Object, Attribute_Object, Circumstance, Adverbial, Conjunction, Preposition, Particle, Article, Other. A noun is not necessarily Subject. Every piece of a compound predicate, including auxiliaries and predicate negation, has role Predicate, even when separated by the subject. An adjective used predicatively is Predicate, not Attribute. Use Attribute_Subject for a subject's modifier and Attribute_Object for an object's modifier, so the trainer reveals each after its head. Articles retain Article.\nclauseIndex: nonnegative integer identifying a grammatical base. Main clause 0, subordinate clauses 1 onwards in dependency order; coordinate clauses in reading order. Embedded clauses may interrupt another clause's tokens. Conjunction of nouns does NOT start a new clause. Put a clause linker in the clause it introduces. Each clause must include its predicate, including nominal predicates.\nparts: surface pieces concatenating EXACTLY to text. If unsure keep [text]; this means segmentation unavailable, not proof of indivisibility. works → [\"work\",\"s\"], melted → [\"melt\",\"ed\"]. Keep went and irregular auxiliaries does/did/has/had/is/was whole; never invent stems like doe in does. Surface parts must concatenate to the written form: happier → [\"happi\",\"er\"], dictionary_form happy, never parts [\"happy\",\"er\"].\ndictionary_form: actual lemma, never a part-of-speech label or unrelated dictionary hint. Each token has its own lemma, not a multiword expression substituted for a single token.\ntranslation: contextual Russian gloss of the token in its current form; concise grammatical gloss allowed for function words.\nReturn ONLY the JSON array. Do not accept weak candidates to fill a quota.",
+      "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 16384,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "sentence": {
+                "type": "string"
+              },
+              "literalTranslation": {
+                "type": "string"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "natural": {
+                    "type": "boolean"
+                  },
+                  "taskFit": {
+                    "type": "boolean"
+                  },
+                  "analysisReliable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "natural",
+                  "taskFit",
+                  "analysisReliable"
+                ]
+              },
+              "words": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "Predicate",
+                        "Subject",
+                        "Attribute",
+                        "Attribute_Subject",
+                        "Object",
+                        "Attribute_Object",
+                        "Circumstance",
+                        "Adverbial",
+                        "Conjunction",
+                        "Preposition",
+                        "Particle",
+                        "Article",
+                        "Other"
+                      ]
+                    },
+                    "clauseIndex": {
+                      "type": "integer"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "translation": {
+                      "type": "string"
+                    },
+                    "dictionary_form": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "label",
+                    "role",
+                    "clauseIndex",
+                    "parts",
+                    "translation",
+                    "dictionary_form"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "sentence",
+              "literalTranslation",
+              "review",
+              "words"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-6\",\n    \"sentence\": \"Reading is an important skill for every student.\",\n    \"literalTranslation\": \"Чтение есть важный навык для каждого студента.\",\n    \"review\": {\n      \"natural\": true,\n      \"taskFit\": true,\n      \"analysisReliable\": true\n    },\n    \"words\": [\n      {\n        \"text\": \"Reading\",\n        \"label\": \"noun\",\n        \"role\": \"Subject\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"Read\",\n          \"ing\"\n        ],\n        \"translation\": \"чтение\",\n        \"dictionary_form\": \"reading\"\n      },\n      {\n        \"text\": \"is\",\n        \"label\": \"verb\",\n        \"role\": \"Predicate\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"is\"\n        ],\n        \"translation\": \"есть\",\n        \"dictionary_form\": \"be\"\n      },\n      {\n        \"text\": \"an\",\n        \"label\": \"article\",\n        \"role\": \"Article\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"an\"\n        ],\n        \"translation\": \"неопределенный артикль\",\n        \"dictionary_form\": \"a\"\n      },\n      {\n        \"text\": \"important\",\n        \"label\": \"adjective\",\n        \"role\": \"Attribute\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"important\"\n        ],\n        \"translation\": \"важный\",\n        \"dictionary_form\": \"important\"\n      },\n      {\n        \"text\": \"skill\",\n        \"label\": \"noun\",\n        \"role\": \"Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"skill\"\n        ],\n        \"translation\": \"навык\",\n        \"dictionary_form\": \"skill\"\n      },\n      {\n        \"text\": \"for\",\n        \"label\": \"preposition\",\n        \"role\": \"Preposition\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"for\"\n        ],\n        \"translation\": \"для\",\n        \"dictionary_form\": \"for\"\n      },\n      {\n        \"text\": \"every\",\n        \"label\": \"determiner\",\n        \"role\": \"Attribute\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"every\"\n        ],\n        \"translation\": \"каждого\",\n        \"dictionary_form\": \"every\"\n      },\n      {\n        \"text\": \"student\",\n        \"label\": \"noun\",\n        \"role\": \"Attribute_Object\",\n        \"clauseIndex\": 0,\n        \"parts\": [\n          \"student\"\n        ],\n        \"translation\": \"студента\",\n        \"dictionary_form\": \"student\"\n      }\n    ]\n  }\n]"
+      },
+      "elapsedMs": 3052
+    },
+    {
+      "stage": "AUDIT_SENTENCE_CARDS",
+      "prompt": "AUDIT_SENTENCE_CARDS\nYou are checking finished language-learning cards. You did not compose or annotate them. Be skeptical: a fluent-looking source can have a wrong translation or analysis. Return ONLY a JSON array with one verdict per CANDIDATE, in the requested schema. Do not rewrite cards. A missing or malformed verdict causes rejection.\nLANGUAGE: English (en)\nNatural English: check agreement, tense, articles, collocations and prepositions. Keep neutral word order except where questions require inversion.\nFor each card judge independently:\nnatural: Is the source a grammatical, idiomatic, plausible complete utterance in a neutral context? Reject forced collocations, missing obligatory complements/articles and invented causal links.\ntranslation: Is the WHOLE Russian sentence grammatical and faithful to every source phrase? Reject added or omitted participants, attributes, negation or tense; reject wrong agreement. Preserve source member order only when Russian remains grammatical. Token glosses may explain a construction but cannot excuse a wrong whole-sentence translation.\nroles: Are the sentence-member roles and clause numbers correct? Read multiword lexical units as units; a piece of a subject expression must not become a separate object. Prepositional location is not a direct object. Every actual grammatical base needs a predicate. Reject an indivisible written token that hides a syntactic subject inside a predicate if the card cannot teach that distinction reliably.\nPapanda treats all pieces of predicate negation as Predicate, including French ne … pas, Italian non, English not and German nicht. Do not reject that teaching convention as an error. For Kazakh, a bare direct object is normally immediately before the predicate; an intervening subject or circumstance signals an error or wrong role.\nmorphology: Are every stated morpheme boundary and dictionary form linguistically credible? A single whole-word part is allowed when uncertain. Written concatenation alone does not prove a division is valid.\nchain: When a task develops another, does it keep the same scene, participants, predicate MEANING, tense and earlier details, adding the requested member? The same verb spelling can change meaning when its complements change. For independent tasks mark chain true if the structural focus is met.\nUse the language's own grammar. Do not demand an overt subject, copula, article or case ending where the language does not require it. Do not reject a simple sentence merely for being short or a literal Russian translation merely for having neutral source order. If genuinely uncertain about a card's correctness, set the relevant check false.\nEach verdict: taskId, five booleans, reason. For a rejected card, reason must identify a concrete phrase and defect in concise Russian; for a fully accepted card, reason may be empty.\nTASKS: [{\"id\":\"task-6\",\"focus\":\"reading\",\"goal\":\"Прочитайте предложение целиком. Найдите его основу по порядку слов и грамматическим маркерам.\"}]\nALREADY ACCEPTED CONTEXT: [{\"taskId\":\"task-1\",\"sentence\":\"The child reads.\",\"literalTranslation\":\"Ребёнок читает.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"translation\":\"читает\"}]},{\"taskId\":\"task-2\",\"sentence\":\"The smart child reads.\",\"literalTranslation\":\"Умный ребёнок читает.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"translation\":\"читает\"}]},{\"taskId\":\"task-3\",\"sentence\":\"The smart child reads a book.\",\"literalTranslation\":\"Умный ребёнок читает книгу.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"translation\":\"читает\"},{\"text\":\"a\",\"role\":\"Article\",\"translation\":\"один\"},{\"text\":\"book\",\"role\":\"Object\",\"translation\":\"книгу\"}]},{\"taskId\":\"task-4\",\"sentence\":\"The smart child reads a book at home.\",\"literalTranslation\":\"Умный ребёнок читает книгу дома.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"translation\":\"читает\"},{\"text\":\"a\",\"role\":\"Article\",\"translation\":\"один\"},{\"text\":\"book\",\"role\":\"Object\",\"translation\":\"книгу\"},{\"text\":\"at\",\"role\":\"Preposition\",\"translation\":\"в\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"translation\":\"доме\"}]},{\"taskId\":\"task-5\",\"sentence\":\"The smart child does not read a book at home.\",\"literalTranslation\":\"Умный ребёнок не читает книгу дома.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"does\",\"role\":\"Predicate\",\"translation\":\"делает\"},{\"text\":\"not\",\"role\":\"Predicate\",\"translation\":\"не\"},{\"text\":\"read\",\"role\":\"Predicate\",\"translation\":\"читать\"},{\"text\":\"a\",\"role\":\"Article\",\"translation\":\"один\"},{\"text\":\"book\",\"role\":\"Object\",\"translation\":\"книгу\"},{\"text\":\"at\",\"role\":\"Preposition\",\"translation\":\"в\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"translation\":\"доме\"}]},{\"taskId\":\"task-7\",\"sentence\":\"Does the smart child read a book at home?\",\"literalTranslation\":\"Читает ли умный ребёнок книгу дома?\",\"words\":[{\"text\":\"Does\",\"role\":\"Predicate\",\"translation\":\"делает\"},{\"text\":\"the\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"read\",\"role\":\"Predicate\",\"translation\":\"читать\"},{\"text\":\"a\",\"role\":\"Article\",\"translation\":\"один\"},{\"text\":\"book\",\"role\":\"Object\",\"translation\":\"книгу\"},{\"text\":\"at\",\"role\":\"Preposition\",\"translation\":\"в\"},{\"text\":\"home\",\"role\":\"Circumstance\",\"translation\":\"доме\"}]},{\"taskId\":\"task-8\",\"sentence\":\"The smart child reads a book because the teacher asks.\",\"literalTranslation\":\"Умный ребёнок читает книгу, потому что учитель просит.\",\"words\":[{\"text\":\"The\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"smart\",\"role\":\"Attribute_Subject\",\"translation\":\"умный\"},{\"text\":\"child\",\"role\":\"Subject\",\"translation\":\"ребёнок\"},{\"text\":\"reads\",\"role\":\"Predicate\",\"translation\":\"читает\"},{\"text\":\"a\",\"role\":\"Article\",\"translation\":\"один\"},{\"text\":\"book\",\"role\":\"Object\",\"translation\":\"книгу\"},{\"text\":\"because\",\"role\":\"Conjunction\",\"translation\":\"потому что\"},{\"text\":\"the\",\"role\":\"Article\",\"translation\":\"этот\"},{\"text\":\"teacher\",\"role\":\"Subject\",\"translation\":\"учитель\"},{\"text\":\"asks\",\"role\":\"Predicate\",\"translation\":\"просит\"}]}]\nCANDIDATES: [{\"taskId\":\"task-6\",\"sentence\":\"Reading is an important skill for every student.\",\"literalTranslation\":\"Чтение есть важный навык для каждого студента.\",\"words\":[{\"text\":\"Reading\",\"role\":\"Subject\",\"clauseIndex\":0,\"parts\":[\"Read\",\"ing\"],\"translation\":\"чтение\",\"dictionary_form\":\"reading\"},{\"text\":\"is\",\"role\":\"Predicate\",\"clauseIndex\":0,\"parts\":[\"is\"],\"translation\":\"есть\",\"dictionary_form\":\"be\"},{\"text\":\"an\",\"role\":\"Article\",\"clauseIndex\":0,\"parts\":[\"an\"],\"translation\":\"неопределенный артикль\",\"dictionary_form\":\"a\"},{\"text\":\"important\",\"role\":\"Attribute\",\"clauseIndex\":0,\"parts\":[\"important\"],\"translation\":\"важный\",\"dictionary_form\":\"important\"},{\"text\":\"skill\",\"role\":\"Object\",\"clauseIndex\":0,\"parts\":[\"skill\"],\"translation\":\"навык\",\"dictionary_form\":\"skill\"},{\"text\":\"for\",\"role\":\"Preposition\",\"clauseIndex\":0,\"parts\":[\"for\"],\"translation\":\"для\",\"dictionary_form\":\"for\"},{\"text\":\"every\",\"role\":\"Attribute\",\"clauseIndex\":0,\"parts\":[\"every\"],\"translation\":\"каждого\",\"dictionary_form\":\"every\"},{\"text\":\"student\",\"role\":\"Attribute_Object\",\"clauseIndex\":0,\"parts\":[\"student\"],\"translation\":\"студента\",\"dictionary_form\":\"student\"}]}]",
+      "generationConfig": {
+        "temperature": 0.1,
+        "maxOutputTokens": 4096,
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "natural": {
+                "type": "boolean"
+              },
+              "translation": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "boolean"
+              },
+              "morphology": {
+                "type": "boolean"
+              },
+              "chain": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "natural",
+              "translation",
+              "roles",
+              "morphology",
+              "chain",
+              "reason"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "text": "[\n  {\n    \"taskId\": \"task-6\",\n    \"natural\": true,\n    \"translation\": true,\n    \"roles\": false,\n    \"morphology\": true,\n    \"chain\": false,\n    \"reason\": \"Слово skill в данном предложении после глагола-связки is выполняет роль именной части составного именного сказуемого (или предикатива), а не прямого объекта (Object).\"\n  }\n]"
+      },
+      "elapsedMs": 2120
+    }
+  ]
+}
