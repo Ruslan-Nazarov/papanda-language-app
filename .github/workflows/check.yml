@@ -4,7 +4,7 @@ on:
   pull_request:
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,3 +26,6 @@ jobs:
         env:
           WRANGLER_SEND_METRICS: 'false'
       - run: npm run check:ui
+        env:
+          # Use the runner's Chrome with Ubuntu's AppArmor sandbox profile.
+          PUPPETEER_EXECUTABLE_PATH: /opt/google/chrome/chrome
