@@ -116,6 +116,7 @@ async function main() {
     await saved();
     assert.equal((await state()).customWords.length, 1);
     await (await visibleField('[aria-label="Редактировать слово"]')).click();
+    await page.waitForFunction(selector => document.querySelector(selector)?.value === 'яблоневый сад', {}, input('Русский перевод'));
     assert.equal(await page.$eval(input('Русский перевод'), el => el.value), 'яблоневый сад');
     assert.equal(await (await visibleField(association)).evaluate(el => el.value), 'мой сад');
     await click('Отмена');
@@ -150,6 +151,7 @@ async function main() {
     await seed({ activeLanguages: ['kz'], customWords: [{ eng: 'user:en:fixture', word: 'orchard', source_language: 'en', ru: 'сад', translations: { en: 'orchard', kz: 'алма бағы' }, count: 0, is_learned: 0 }] });
     await search('алма бағы');
     await (await visibleField('[aria-label="Редактировать слово"]')).click();
+    await page.waitForFunction(selector => document.querySelector(selector)?.value === 'алма бағы', {}, input('Слово (Қазақша)'));
     assert.equal(await page.$(input('Слово (English)')), null);
     assert.equal(await page.$eval(input('Слово (Қазақша)'), el => el.value), 'алма бағы');
     await click('Сохранить');
