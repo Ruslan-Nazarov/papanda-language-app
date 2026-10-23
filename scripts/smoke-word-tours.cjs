@@ -64,15 +64,10 @@ async function main() {
     await complete();
     assert.equal(await shows(), 10, 'Returning to a completed tour must not display another card');
     await page.screenshot({ path: path.join(root, 'word-tour-complete.png') });
-    await click('Вернуть предыдущее слово');
-    await progress(9, 10);
-    assert.equal(await shows(), 11, 'Undo counts the real repeated presentation');
-    await click('✓ Выучено');
-    await complete();
-    assert.equal(await shows(), 11);
+    assert.ok(!(await page.$eval('[data-testid="word-tour-complete"]', el => el.innerText)).includes('Вернуть предыдущее слово'));
     await click('Следующий тур');
     await progress(0, 10);
-    assert.equal(await shows(), 12);
+    assert.equal(await shows(), 11);
     await tab('Settings');
     await page.waitForSelector('[aria-label="Карточек за тур: 5"]');
     await page.click('[aria-label="Карточек за тур: 5"]');
@@ -99,7 +94,7 @@ async function main() {
       await page.screenshot({ path: path.join(root, `word-tour-progress-${width}.png`) });
     }
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('PASS: default ten, swipe and learned cards, exact tour limit, undo, next tour, settings, five-card limit, reload and narrow layout.');
+    console.log('PASS: default ten, swipe and learned cards, exact tour limit, completion without undo, next tour, settings, five-card limit, reload and narrow layout.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

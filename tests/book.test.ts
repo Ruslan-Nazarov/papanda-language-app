@@ -82,7 +82,7 @@ it('searches source paragraphs and table cells with valid exact destinations and
 it('selects actual passages only in the requested language within a bounded prompt, including the applicable negative rule', () => {
   for (const code of ['en','de','it','fr','es','ru','kz','la']) {
     const passages = selectBookPassages(code, 'She did not come.', tokens);
-    assert.ok(passages.length > 1);
+    assert.ok(code === 'la' ? passages.length === 1 : passages.length > 1);
     assert.ok(passages.reduce((n, p) => n + p.text.length, 0) <= 11000);
     assert.ok(passages.every(p => isBookLocation(p)));
     assert.ok(passages.every(p => p.chapterId.startsWith((code === 'la' ? 'scheme' : code) + '-') || p.chapterId === 'method-0'));
@@ -96,6 +96,34 @@ it('selects actual passages only in the requested language within a bounded prom
   assert.match(prompt, /BOOK_SOURCE_CONTEXT/);
   assert.match(prompt, /book:\/\/kz-/);
 });
+it('grounds Kazakh questions only in Kazakh rules and the common method', () => {
+  for (const language of ['kz', 'kk', 'Қазақша', 'казахский']) {
+    const passages = selectBookPassages(language, 'Олар кеше жұмыс істеді ме?');
+    assert.ok(passages.some(p => p.chapterId === 'kz-1' && p.title.includes('Вопросительное')));
+    assert.ok(passages.some(p => /ма \/|ме|вопросительным словом/.test(p.text)));
+    assert.ok(passages.every(p => p.chapterId.startsWith('kz-') || p.chapterId === 'method-0'));
+    assert.ok(passages.every(p => !p.title.includes('отрицанием')));
+    assert.ok(passages.length <= 7);
+  }
+});
+it('does not supply question or negative sections for affirmative sentences', () => {
+  for (const [language, sentence] of [['kz', 'Бала кітап оқиды.'], ['en', 'She does read.'], ['en', 'She did come.']]) {
+    const passages = selectBookPassages(language, sentence);
+    assert.ok(passages.every(p => !/Вопросительное|отрицанием/.test(p.title)), JSON.stringify(passages));
+    assert.ok(passages.every(p => !/-[4-8]$/.test(p.chapterId)), 'Do not automatically include every chapter when tokens are absent');
+  }
+});
+it('keeps negative and question evidence separate, including Kazakh negative suffixes', () => {
+  const negative = selectBookPassages('kz', 'Ол мәтінді аудармады.', [{
+    text: 'аудармады', role: 'Predicate', label: 'глагол', parts: ['аудар', 'ма', 'ды'], translation: 'не перевёл', is_in_my_dict: false,
+  }]);
+  assert.ok(negative.some(p => p.title.includes('отрицанием')));
+  assert.ok(negative.every(p => !p.title.includes('Вопросительное')));
+  const question = selectBookPassages('en', 'Does she read?');
+  assert.ok(question.some(p => p.title.includes('Вопросительное')));
+  assert.ok(question.every(p => !p.title.includes('отрицанием')));
+  assert.ok(selectBookPassages('la', 'Puer legit?').every(p => p.chapterId === 'method-0'));
+});
 it('rejects fabricated addresses and removes unsupported book links while preserving supported references', () => {
   const passage = selectBookPassages('en', 'She did not come.', tokens)[0];
   assert.deepEqual(parseBookURL(bookURL(passage)), { chapterId: passage.chapterId, blockId: passage.blockId });
@@ -106,6 +134,19 @@ it('rejects fabricated addresses and removes unsupported book links while preser
 const originalFetch = globalThis.fetch;
 const originalURL = process.env.EXPO_PUBLIC_GEMINI_PROXY_URL;
 afterEach(() => { globalThis.fetch = originalFetch; if (originalURL === undefined) delete process.env.EXPO_PUBLIC_GEMINI_PROXY_URL; else process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = originalURL; });
+it('passes only the Kazakh question sources to the explanation model', async () => {
+  process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
+  let prompt = '';
+  globalThis.fetch = async (_, init) => {
+    prompt = JSON.parse(init!.body as string).prompt;
+    return Response.json({ text: 'Частица «ме» превращает высказывание в вопрос.' });
+  };
+  await explainSentenceWithAI('Олар кеше жұмыс істеді ме?', 'Қазақша', 'Они вчера работали?');
+  const sources = [...prompt.matchAll(/"source":"book:\/\/([\w-]+)\//g)].map(match => match[1]);
+  assert.ok(sources.some(id => id === 'kz-1'));
+  assert.ok(sources.every(id => id.startsWith('kz-') || id === 'method-0'));
+  assert.match(prompt, /Правила других языков не используй/);
+});
 it('sends the book context to explanations and repairs invented citations without losing the explanation', async () => {
   process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
   const requests: string[] = [];

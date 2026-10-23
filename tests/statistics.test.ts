@@ -6,6 +6,7 @@ import {
   calculateTotalVolume,
   calculateCoverage,
   calculateIMWIndex,
+  formatIMWScore,
   calculateFullyLearned,
   calculateKnownByLanguage,
   calculateShownToday,
@@ -97,14 +98,88 @@ describe('Statistics Utilities', () => {
     assert.strictEqual(Math.round(coverage.overall), 50);
   });
 
-  it('calculates iMW as the mean memory weight of started words', () => {
+  it('calculates iMW over the entire dictionary, including unseen words', () => {
     // mockWords have no last_shown -> retention = 1, both kz words known.
     // Word 1 kz: min(1, 80/80) * 1 * 1 = 1.0
     // Word 2 kz: min(1, 20/80) * 1 * 1 = 0.25
-    // mean = 0.625 -> 62.5%. Word 3 (0 shows) is excluded.
+    // Word 3 (0 shows) contributes 0 but stays in the denominator.
     const imw = calculateIMWIndex(mockWords, ['kz']);
-    assert.strictEqual(imw.byLanguage.kz, 62.5);
-    assert.strictEqual(imw.overall, 62.5);
+    assert.strictEqual(imw.byLanguage.kz, (1.25 / 3) * 100);
+    assert.strictEqual(imw.overall, (1.25 / 3) * 100);
+  });
+
+  it('includes unpractised active languages in the overall catalog score', () => {
+    const imw = calculateIMWIndex(mockWords, ['kz', 'en', 'it']);
+    assert.strictEqual(imw.byLanguage.kz, (1.25 / 3) * 100);
+    assert.strictEqual(imw.byLanguage.en, (0.5 / 3) * 100);
+    assert.strictEqual(imw.byLanguage.it, 0);
+    assert.strictEqual(imw.overall, (1.75 / 9) * 100);
+  });
+
+  it('keeps one or two ten-word exercises proportional to a 2600-word catalog', () => {
+    const words = Array.from({ length: 2600 }, (_, i): Word => ({
+      id: String(i), count: 0, is_learned: 0, show_stats: {}, knowledge_stats: {},
+    }));
+    for (const word of words.slice(0, 10)) {
+      word.show_stats = { kz: 1 };
+      word.knowledge_stats = { kz: false };
+    }
+    const first = calculateIMWIndex(words, ['kz']).overall;
+    assert.ok(Math.abs(first - 0.002403846153846154) < 1e-12);
+
+    for (const word of words.slice(10, 20)) {
+      word.show_stats = { kz: 1 };
+      word.knowledge_stats = { kz: false };
+    }
+    const second = calculateIMWIndex(words, ['kz']).overall;
+    assert.ok(Math.abs(second - 2 * first) < 1e-12);
+    assert.equal(formatIMWScore(first), '0,002');
+    assert.equal(formatIMWScore(second), '0,005');
+  });
+
+  it('cannot give 100 for mastering only a small subset of the catalog', () => {
+    const words = Array.from({ length: 2600 }, (_, i): Word => ({
+      count: i < 10 ? 500 : 0, is_learned: i < 10 ? 1 : 0,
+      show_stats: { kz: i < 10 ? 500 : 0 }, knowledge_stats: { kz: i < 10 },
+    }));
+    assert.strictEqual(calculateIMWIndex(words, ['kz']).overall, (10 / 2600) * 100);
+  });
+
+  it('reaches 100 only when the entire catalog is fully weighted in every active language', () => {
+    const words = mockWords.map(word => ({
+      ...word, show_stats: { kz: 80, en: 80 }, knowledge_stats: { kz: true, en: true },
+    }));
+    assert.deepStrictEqual(calculateIMWIndex(words, ['kz', 'en']), {
+      overall: 100, byLanguage: { kz: 100, en: 100 },
+    });
+    words[2].show_stats.en = 0;
+    assert.ok(calculateIMWIndex(words, ['kz', 'en']).overall < 100);
+  });
+
+  it('does not dilute existing progress when an unseen catalog word is first studied', () => {
+    const words: Word[] = [
+      { count: 80, is_learned: 1, show_stats: { kz: 80 }, knowledge_stats: { kz: true } },
+      { count: 0, is_learned: 0, show_stats: {}, knowledge_stats: {} },
+    ];
+    const before = calculateIMWIndex(words, ['kz']).overall;
+    assert.equal(before, 50);
+    words[1].show_stats = { kz: 1 };
+    assert.ok(calculateIMWIndex(words, ['kz']).overall > before);
+  });
+
+  it('returns zero for empty or completely unstudied catalogs', () => {
+    assert.deepStrictEqual(calculateIMWIndex([], ['kz']), { overall: 0, byLanguage: {} });
+    assert.deepStrictEqual(calculateIMWIndex(mockWords, []), { overall: 0, byLanguage: {} });
+    assert.deepStrictEqual(calculateIMWIndex([mockWords[2]], ['kz']), { overall: 0, byLanguage: { kz: 0 } });
+  });
+
+  it('formats tiny positive catalog scores without rounding them to zero', () => {
+    assert.equal(formatIMWScore(0), '0');
+    assert.equal(formatIMWScore(0.0002), '<0,001');
+    assert.equal(formatIMWScore(0.001), '0,001');
+    assert.equal(formatIMWScore(0.7), '0,700');
+    assert.equal(formatIMWScore(12.5), '12,5');
+    assert.equal(formatIMWScore(100), '100,0');
   });
 
   it('wordMemoryWeight: 0 for never-shown, halved for not-known, decays over time', () => {

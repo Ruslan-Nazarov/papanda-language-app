@@ -16,6 +16,7 @@ import {
   calculateFullyLearned,
   calculateShownToday,
   calculateIMWIndex,
+  formatIMWScore,
   calculateKnownByLanguage,
   calculateKnowledgeDistribution,
   calculateFamiliarWordsEfficiency,
@@ -313,30 +314,24 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
         title="Оценка закрепления"
         defaultOpen={false}
         help={
-          'Условный индекс iMW от 0 до 100 по словам, которые уже показывались в активных языках.\n\n' +
-          `В расчёте приложения ${WORD_MEMORY.TARGET_SHOWS} показов дают полный балл за повторения. Без отметки «Знаю» вклад слова вдвое меньше. После перерыва вклад постепенно снижается. Итог — среднее по начатым словам и языкам.\n\n` +
-          'Число 80 — настройка расчёта, а не обязательное число повторений для запоминания. Новые слова могут снизить средний балл. Оценка не измеряет процент знания языка и не гарантирует, что вы помните перевод.'
+          `Индекс iMW от 0 до 100 оценивает закрепление всего словаря: ${summary.total} слов в активных языках. Непоказанные слова тоже учитываются, с нулевым вкладом.\n\n` +
+          `Вес каждого слова зависит от числа показов, отметки «Знаю» и давности занятий. ${WORD_MEMORY.TARGET_SHOWS} показов дают полный балл за повторения; без «Знаю» вклад вдвое меньше. После перерыва вклад постепенно снижается. Итог — сумма весов, делённая на число всех слов и активных языков, умноженная на 100.\n\n` +
+          'Число 80 — настройка расчёта, а не обязательное число повторений для запоминания. Оценка относится к вашему словарю, не измеряет знание всего языка и не гарантирует, что вы помните перевод.'
         }
       >
         <View testID="memory-estimate">
-          <Text style={styles.explanation}>Условный балл за повторения, отметки «Знаю» и недавние занятия.</Text>
-          {summary.seen === 0 ? (
-            <Text style={styles.resultDetail}>Пока нечего оценивать: начните повторять слова.</Text>
-          ) : (
-            <>
-              <View style={styles.resultSummary}>
-                <Text style={styles.memoryScore}>{imw.overall.toFixed(1).replace('.', ',')} из 100</Text>
-                <Text style={styles.resultDetail}>По словам, которые вы уже начали учить</Text>
-              </View>
-              {imw.langs.map(lang => (
-                <View key={lang.code} style={styles.memoryRow}>
-                  <Text style={styles.memoryLanguage}>{lang.flag} {lang.label}</Text>
-                  <Text style={styles.memoryValue}>{lang.pct.toFixed(1).replace('.', ',')} / 100</Text>
-                </View>
-              ))}
-            </>
-          )}
-          <Text style={styles.explanation}>Низкий балл обычно означает мало повторений или перерыв. Это не процент знания языка. Новые слова тоже могут снизить средний балл.</Text>
+          <Text style={styles.explanation}>Закрепление всего словаря с учётом повторений, отметок «Знаю» и давности занятий.</Text>
+          <View style={styles.resultSummary}>
+            <Text testID="memory-score" style={styles.memoryScore}>{formatIMWScore(imw.overall)} из 100</Text>
+            <Text style={styles.resultDetail}>По всему словарю: {summary.total} слов</Text>
+          </View>
+          {imw.langs.map(lang => (
+            <View key={lang.code} style={styles.memoryRow}>
+              <Text style={styles.memoryLanguage}>{lang.flag} {lang.label}</Text>
+              <Text testID={`memory-score-${lang.code}`} style={styles.memoryValue}>{formatIMWScore(lang.pct)} / 100</Text>
+            </View>
+          ))}
+          <Text style={styles.explanation}>Непоказанные слова дают нулевой вклад. Индекс растёт по мере изучения и закрепления базы; после перерыва может снижаться.</Text>
         </View>
       </Section>
 

@@ -1,3 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import * as Application from 'expo-application';
 import type { BackupPreview } from '../services/backupFormat';
 import { getRestorePointDate, importWithRestorePoint, restoreBeforeImport } from '../services/progressRestore';
@@ -17,6 +20,7 @@ const WORD_TOUR_COUNT_OPTIONS = [5, 10, 15, 20, 30, 50];
 const ONBOARDING_KEY = 'papanda-onboarded';
 
 export default function SettingsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount, wordTourSize, setWordTourSize } = useStore(useShallow(state => ({
@@ -126,6 +130,14 @@ export default function SettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sectionSub}>papanda {Application.nativeApplicationVersion ?? appConfig.expo.version} · {Application.nativeBuildVersion ? 'сборка ' + Application.nativeBuildVersion : 'web'}</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Книга и метод</Text>
+          <Text style={styles.sectionSub}>Авторская методика и грамматика изучаемых языков. Доступны без интернета.</Text>
+          <TouchableOpacity testID="book-entry" accessibilityRole="button" style={styles.row}
+            onPress={() => navigation.navigate('Book', { language: activeLanguages[0] })}>
+            <Text style={styles.rowText}>Открыть книгу</Text><Text style={styles.rowText}>›</Text>
+          </TouchableOpacity>
+        </View>
         {/* Active Languages for Triples */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Изучаемые языки</Text>

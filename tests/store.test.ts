@@ -192,4 +192,21 @@ describe('Zustand useStore', () => {
       assert.strictEqual((updated2?.show_stats as Record<string, number>)?.en, 1);
     });
   });
+
+  it('records a whole-catalog iMW snapshot after a ten-word workout', () => {
+    const store = useStore.getState();
+    store.setLanguages(['kz']);
+    const keys = store.words.slice(0, 10).map(word => word.eng || word.word || '');
+    store.incrementShowCounts(keys, 'kz');
+    store.recordImwSnapshot();
+    const state = useStore.getState();
+    const snapshot = state.imwSnapshots.at(-1)!;
+    const expected = (10 * (1 / 80) * 0.5 / state.words.length) * 100;
+    assert.ok(snapshot.imw > 0);
+    assert.ok(Math.abs(snapshot.imw - expected) < 1e-6);
+    assert.equal(snapshot.byLang.kz, snapshot.imw);
+    const backup = store.exportProgress();
+    assert.equal(store.importProgress(backup).ok, true);
+    assert.deepEqual(useStore.getState().imwSnapshots, state.imwSnapshots);
+  });
 });

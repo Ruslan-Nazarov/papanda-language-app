@@ -34,6 +34,44 @@ it('preserves a detailed explanation longer than the short limit', async () => {
   assert.equal(calls, 1);
 });
 
+it('rewrites conversational filler in detailed pronunciation while preserving the original explanation as context', async () => {
+  process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
+  const verbose = 'Привет! С удовольствием помогу тебе разобраться.\n\nДавай разберём по звукам, чтобы звучало максимально естественно.\n\n**thanks** — [θæŋks].\nПервый звук произносится с языком между зубами.';
+  const edited = '**thanks** — [θæŋks].\n- **Звуки:** для первого звука помести кончик языка между зубами и выдохни без голоса.';
+  const prompts: string[] = [];
+  globalThis.fetch = async (_, init) => {
+    prompts.push(JSON.parse(init!.body as string).prompt);
+    return Response.json({ text: prompts.length === 1 ? verbose : edited });
+  };
+  assert.equal(await explainPronunciationWithAI('thanks', 'English', 'спасибо', undefined, 'detailed'), edited);
+  assert.equal(prompts.length, 2);
+  assert.ok(prompts[1].includes(verbose));
+  assert.match(prompts[1], /убери приветствие, вступление и разговорные связки/);
+  assert.match(prompts[0], /Не считай количество слов и букв/);
+});
+
+it('bounds detailed pronunciation without applying the short-mode limit or truncating text', async () => {
+  process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
+  let calls = 0;
+  const edited = '**word** — [wɜːd].\n- **Звуки:** объяснение артикуляции.';
+  globalThis.fetch = async (_, init) => {
+    calls++;
+    if (calls === 2) assert.match(JSON.parse(init!.body as string).prompt, /ответ слишком длинный: не более 180 слов/);
+    return Response.json({ text: calls === 1 ? 'лишние подробности '.repeat(100) : edited });
+  };
+  assert.equal(await explainPronunciationWithAI('word', 'English', 'слово', undefined, 'detailed'), edited);
+  assert.equal(calls, 2);
+});
+
+it('does not mistake a greeting in the word translation for conversational filler', async () => {
+  process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
+  let calls = 0;
+  const explanation = '**salut** («привет») — [saly].\n- Конечная t не читается.';
+  globalThis.fetch = async () => { calls++; return Response.json({ text: explanation }); };
+  assert.equal(await explainPronunciationWithAI('salut', 'Français', 'привет', undefined, 'detailed'), explanation);
+  assert.equal(calls, 1);
+});
+
 it('cancels a pronunciation request without starting a repair request', async () => {
   process.env.EXPO_PUBLIC_GEMINI_PROXY_URL = 'https://test.invalid/v1/generate';
   const controller = new AbortController();

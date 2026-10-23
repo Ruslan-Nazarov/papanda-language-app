@@ -3,7 +3,7 @@ const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
 const cwd = path.resolve(__dirname, '..');
-const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours'];
+const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours', 'statistics'];
 for (const name of scripts) {
   console.log(`\nUI check: ${name}`);
   const result = spawnSync(process.execPath, [path.join(__dirname, `smoke-${name}.cjs`)], {
@@ -13,4 +13,4 @@ for (const name of scripts) {
   if (result.error) console.error(result.error.message);
   if (result.status !== 0) process.exit(result.status || 1);
 }
-console.log('\nAll 9 UI checks passed.');
+console.log(`\nAll ${scripts.length} UI checks passed.`);

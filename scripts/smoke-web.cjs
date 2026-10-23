@@ -47,7 +47,7 @@ async function main() {
           body: JSON.stringify({ text: `Объяснение фразы №${explanationRequests.length}` }) });
       }
       else if (pronunciationFixture && request.postData()?.includes('объясни правила произношения')) {
-        const detailed = request.postData().includes('Ты опытный фонетист');
+        const detailed = request.postData().includes('подробную практическую справку о произношении');
         pronunciationRequests.push(detailed ? 'detailed' : 'short');
         if (holdPronunciation && detailed) { heldPronunciation.push(request); return; }
         if (failDetailedPronunciation && detailed) {
@@ -198,7 +198,7 @@ async function main() {
       await clickText('📢');
       await page.waitForFunction(() => document.body.innerText.includes('Тест произношения → нэ́йм'));
       holdPronunciation = true;
-      const pendingDetails = page.waitForRequest(request => request.postData()?.includes('Ты опытный фонетист'));
+      const pendingDetails = page.waitForRequest(request => request.postData()?.includes('подробную практическую справку о произношении'));
       await page.click('[data-testid="pronunciation-mode-detailed"]');
       await pendingDetails;
       assert.equal(heldPronunciation.length, 1);
@@ -214,7 +214,7 @@ async function main() {
       await page.waitForNetworkIdle({ idleTime: 100 });
       assert.ok(!(await page.$eval('body', el => el.innerText)).includes('Поздний подробный ответ'));
       holdPronunciation = true;
-      const detailsBeforeClose = page.waitForRequest(request => request.postData()?.includes('Ты опытный фонетист'));
+      const detailsBeforeClose = page.waitForRequest(request => request.postData()?.includes('подробную практическую справку о произношении'));
       await page.click('[data-testid="pronunciation-mode-detailed"]');
       await detailsBeforeClose;
       await page.click('[data-testid="pronunciation-close"]');
@@ -297,7 +297,7 @@ async function main() {
     });
     await page.reload({ waitUntil: 'networkidle0' });
     await page.click('[role="tab"][aria-label="Sentence Trainer"]');
-    for (const label of ['🇬🇧 English', '🇮🇹 Italiano', '🇪🇸 Español', '🇩🇪 Deutsch', '🇫🇷 Français', '🇰🇿 Қазақша', '🏛️ Latin']) {
+    for (const label of ['English', 'Italiano', 'Español', 'Deutsch', 'Français', 'Қазақша', 'Latin']) {
       await clickText(label);
       await page.waitForSelector('[data-testid="sentence-options"]', { visible: true });
       assert.ok(!(await page.$eval('body', el => el.innerText)).includes('Пока нет предложений'), label);

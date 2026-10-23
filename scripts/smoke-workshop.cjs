@@ -6,7 +6,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const puppeteer = require('puppeteer');
 async function main() {
-  const root = path.resolve(__dirname, '../dist-audit');
+  const root = path.resolve(__dirname, '..', process.env.SMOKE_BUNDLE_DIR || 'dist-audit');
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const file = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
@@ -49,7 +49,10 @@ async function main() {
     };
     const body=()=>page.$eval('[data-testid="workshop-screen"]',el=>el.innerText);
     const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('papanda-storage')).state);
+    await page.click('[data-testid="sentence-options"]');
+    await page.waitForSelector('[data-testid="trainer-cache-stats"]', { visible: true });
     await click('Мастерская предложения');
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
     await click('🇬🇧 English');
     assert.ok(!(await body()).includes('Маленький мальчик читает книгу здесь.'));
     await page.click('[aria-label="Слово 1: The"]');
@@ -104,7 +107,10 @@ async function main() {
     await new Promise(resolve=>setTimeout(resolve,300));
     assert.equal((await state()).readingTexts[0].cards['1'],undefined);
     await page.reload({waitUntil:'networkidle0'});
+    await page.click('[data-testid="sentence-options"]');
+    await page.waitForSelector('[data-testid="trainer-cache-stats"]', { visible: true });
     await click('Мастерская предложения');
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
     await click('Мой текст');
     await click('Открыть текст');
     assert.ok((await body()).includes('Предложение 2 из 2'));

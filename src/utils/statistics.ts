@@ -115,7 +115,8 @@ export const calculateCoverage = (words: Word[], activeLangs: string[]) => {
 
 /**
  * 3. iMW Index (Intelligent Memory Weight)
- * Средний вес памяти по словам, которые пользователь начал учить.
+ * Средний вес памяти по ВСЕМ словам словаря и активным языкам.
+ * Непоказанные слова входят в знаменатель с нулевым весом.
  * Учитывает прогресс к 80 показам, статус "выучено" и забывание со временем.
  */
 export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
@@ -124,30 +125,28 @@ export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
   const now = Date.now();
   const byLanguage: Record<string, number> = {};
   let overallWeightSum = 0;
-  let overallStudiedCount = 0;
 
   activeLangs.forEach(lang => {
     let weightSum = 0;
-    let studiedCount = 0;
 
     words.forEach(w => {
-      const shows = readWordStats(w.show_stats)[lang];
-      if (typeof shows === 'number' && shows > 0) {
-        weightSum += wordMemoryWeight(w, lang, now);
-        studiedCount += 1;
-      }
+      weightSum += wordMemoryWeight(w, lang, now);
     });
 
-    byLanguage[lang] = studiedCount > 0 ? Math.min(100, (weightSum / studiedCount) * 100) : 0;
+    byLanguage[lang] = Math.min(100, (weightSum / words.length) * 100);
     overallWeightSum += weightSum;
-    overallStudiedCount += studiedCount;
   });
 
-  const overall = overallStudiedCount > 0
-    ? Math.min(100, (overallWeightSum / overallStudiedCount) * 100)
-    : 0;
+  const overall = Math.min(100, (overallWeightSum / (words.length * activeLangs.length)) * 100);
 
   return { overall, byLanguage };
+};
+
+/** Keep the first few exercises visible on the full-catalog scale. */
+export const formatIMWScore = (score: number): string => {
+  if (score === 0) return '0';
+  if (score < 0.001) return '<0,001';
+  return score.toFixed(score < 1 ? 3 : 1).replace('.', ',');
 };
 
 /**

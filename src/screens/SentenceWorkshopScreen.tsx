@@ -15,7 +15,6 @@ import { generateSentenceBatch } from '../services/sentenceGeneration';
 import { useStudyTask } from '../hooks/useStudyTask';
 import StructureExercise, { StructureProgress } from '../components/StructureExercise';
 import { StudyButton, StudyTokens, studyStyles as s } from '../components/StudyUI';
-import BookConnections from '../components/BookConnections';
 
 type Mode = 'Самостоятельно' | 'Нарастающее' | 'Развитие' | 'Языки' | 'Мой текст';
 const modes: Mode[] = ['Самостоятельно', 'Нарастающее', 'Развитие', 'Языки', 'Мой текст'];
@@ -105,7 +104,6 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
     <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 16) + 24, maxWidth: 850, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
       <Text style={s.title}>Мастерская предложения</Text>
       <Text style={s.text}>От целого предложения — к его основе, уточнениям и связному тексту.</Text>
-      <StudyButton title="Книга и метод" onPress={() => navigation.push('Book', { language: code })} />
       <View style={s.row}>{modes.map(item => <StudyButton key={item} title={item} selected={mode === item} onPress={() => { task.cancel(); setMode(item); }} />)}</View>
       {mode !== 'Языки' && <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={{ gap: 8, paddingVertical: 10 }}>{LANGUAGES.map(item => <StudyButton key={item.code} title={`${item.flag} ${item.label}`} selected={code === item.code} onPress={() => changeLanguage(item.code)} />)}</ScrollView>}
       {!isGeminiConfigured() && <Text style={s.warning}>ИИ сейчас не подключён. Встроенные упражнения, цепочки и сравнение семи языков доступны без интернета.</Text>}
@@ -119,7 +117,6 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
         </View>
         <Text style={s.small}>Уточнение отправляет ИИ только выбранное предложение. Полученный разбор проходит дополнительную проверку, но может содержать ошибки.</Text>
         <StructureProgress language={language.label} />
-        <BookConnections language={language.label} sentence={card.sentence} tokens={card.words} />
       </>}
       {mode === 'Нарастающее' && (() => {
         const step = Math.min(seriesStep, activeSeries.length - 1);

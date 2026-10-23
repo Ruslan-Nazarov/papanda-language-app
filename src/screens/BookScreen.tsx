@@ -7,6 +7,7 @@ import type { BookLocation } from '../models/book';
 import { BOOK_TITLE, BOOK_AUTHOR, bookLanguages, bookChapters, getBookChapter, chaptersForLanguage, bookLanguageCode, isBookLocation, searchBook, bookSnippet } from '../services/bookService';
 import { useBookStore } from '../store/bookStore';
 import { BookBlockContent } from '../components/BookContent';
+import { BookSections } from '../components/BookSections';
 import { StudyButton } from '../components/StudyUI';
 import { ACCENT_DARK } from '../constants/theme';
 
@@ -71,14 +72,12 @@ export default function BookScreen({ route, navigation }: NativeStackScreenProps
         <Text style={s.eyebrow}>{bookLanguages.find(l => l.code === chapter.language)?.title} · {chapter.number ? `Глава ${chapter.number}` : 'Метод'}</Text>
         <Text style={s.readerTitle}>{chapter.title}</Text>
         <View style={s.row}>
-          <StudyButton title={showSections ? 'Скрыть разделы' : 'Разделы главы'} onPress={() => setShowSections(!showSections)} />
+          <StudyButton title="Разделы главы" onPress={() => setShowSections(true)} />
           <StudyButton title={marked ? '★ В закладках' : '☆ Закладка'} onPress={() => actualLocation && toggleBookmark(actualLocation)} />
         </View>
       </View>
-      {showSections && <ScrollView style={{ maxHeight: 220 }} contentContainerStyle={s.sections}>
-        {chapter.blocks.filter(b => b.kind === 'heading').map(block => <TouchableOpacity key={block.id} accessibilityRole="button" style={s.sectionLink} onPress={() => open({ chapterId: chapter.id, blockId: block.id })}><Text style={s.link}>{block.text}</Text></TouchableOpacity>)}
-        {chapter.blocks.filter(b => b.kind === 'heading').length === 0 && <Text style={s.small}>Эта глава читается последовательно.</Text>}
-      </ScrollView>}
+      {showSections && <BookSections chapter={chapter} currentBlockId={currentBlockId} fontSize={fontSize}
+        onSelect={blockId => open({ chapterId: chapter.id, blockId })} onClose={() => setShowSections(false)} />}
       <ScrollView key={chapter.id} ref={scroll} testID="book-reader" scrollEventThrottle={250}
         onScroll={event => {
           if (pendingJump.current) return;
@@ -155,7 +154,7 @@ const s = StyleSheet.create({
   link: { color: ACCENT_DARK, fontSize: 14, lineHeight: 22, fontWeight: '600' }, search: { borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFF', color: '#172033', borderRadius: 12, padding: 14, fontSize: 16 },
   readerBar: { paddingHorizontal: 18, paddingVertical: 10, gap: 5, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }, readerTitle: { color: '#172033', fontSize: 18, lineHeight: 25, fontWeight: '700' },
   reader: { paddingHorizontal: 18, paddingTop: 20, width: '100%', maxWidth: 780, alignSelf: 'center' }, block: { marginBottom: 8, paddingHorizontal: 8 }, target: { backgroundColor: '#FFF7E8', borderRadius: 10 },
-  fontButton: { paddingVertical: 12, paddingHorizontal: 8 }, fontText: { fontSize: 16, color: ACCENT_DARK, fontWeight: '600' }, sections: { paddingHorizontal: 18, paddingVertical: 8, backgroundColor: '#FFF' }, sectionLink: { paddingVertical: 9 },
+  fontButton: { paddingVertical: 12, paddingHorizontal: 8 }, fontText: { fontSize: 16, color: ACCENT_DARK, fontWeight: '600' },
   source: { color: '#64748B', fontSize: 11, lineHeight: 17, marginVertical: 12 }, endCard: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 14, padding: 16, gap: 12, marginTop: 20 },
   notice: { color: '#92400E', fontSize: 14, lineHeight: 21, backgroundColor: '#FFF7E8', borderRadius: 10, padding: 14 },
 });

@@ -40,10 +40,26 @@ async function main() {
       await page.evaluate((text, scope) => [...([...document.querySelectorAll(scope)].find(el => el.getBoundingClientRect().height > 0) || document).querySelectorAll('[role="button"]')].find(el => el.textContent === text && el.getBoundingClientRect().height > 0).click(), text, scope);
     };
     const wait = () => new Promise(resolve => setTimeout(resolve, 180));
+    const waitSections = async () => {
+      await page.waitForSelector('[role="dialog"] [data-testid="book-sections-panel"]', { visible:true });
+      await page.waitForFunction(() => {
+        for (let el = document.querySelector('[data-testid="book-sections-panel"]'); el; el = el.parentElement) {
+          if (Number(getComputedStyle(el).opacity) < 1) return false;
+        }
+        return true;
+      });
+    };
     const overflow = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'No horizontal page overflow at 320px');
     const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('papanda-book-reader')).state);
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil:'networkidle0' });
-    await page.waitForSelector('[data-testid="book-entry"]');
+    await page.waitForSelector('[data-testid="sentence-options"]');
+    assert.equal(await page.$('[data-testid="book-rules-toggle"]'), null, 'No book rules on the exercise screen');
+    await page.click('[data-testid="sentence-options"]');
+    assert.equal(await page.$('[data-testid="book-entry"]'), null, 'The library entry belongs in Settings');
+    await page.click('[aria-label="Закрыть меню"]');
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
+    await page.click('[role="tab"][aria-label="Settings"]');
+    await page.waitForSelector('[data-testid="book-entry"]', { visible: true });
     await page.click('[data-testid="book-entry"]');
     await page.waitForSelector('[data-testid="book-library"]');
     await overflow();
@@ -64,6 +80,61 @@ async function main() {
           await page.screenshot({ path:path.join(root, `book-${language.code}-reader.png`) });
           const toggle = await page.$('[aria-label="Показать исходную таблицу"]');
           if (toggle) { await toggle.click(); await overflow(); await page.click('[aria-label="Показать таблицу карточками"]'); }
+        }
+        if (['method-0', 'ru-9', 'kz-3'].includes(chapter.id)) {
+          const sections = chapter.blocks.filter(block => block.kind === 'heading');
+          const readerBefore = await page.$eval('[data-testid="book-reader"]', el => ({ top:el.getBoundingClientRect().top, height:el.clientHeight, scroll:el.scrollTop }));
+          await click('Разделы главы');
+          await waitSections();
+          assert.equal(await page.$$eval('[data-testid^="book-section-"]', rows => rows.length), sections.length);
+          assert.equal(await page.$$eval('[data-testid^="book-section-"][aria-selected="true"]', rows => rows.length), 1);
+          assert.deepEqual(await page.$eval('[data-testid="book-reader"]', el => ({ top:el.getBoundingClientRect().top, height:el.clientHeight, scroll:el.scrollTop })), readerBefore, 'Opening sections leaves the reading viewport and position unchanged');
+          assert.ok(await page.$$eval('[data-testid^="book-section-"]', rows => rows.every(el => el.getBoundingClientRect().height >= 64)), 'Section rows have large touch targets');
+          await overflow();
+          if (chapter.id === 'kz-3') {
+            assert.ok(await page.$eval('[data-testid="book-sections-list"]', el => el.scrollHeight <= el.clientHeight + 1), 'Both Kazakh section titles fit without clipping');
+            await page.screenshot({ path:path.join(root, 'book-kz-sections.png') });
+            await page.click('[aria-label="Закрыть разделы главы"]');
+            await page.waitForSelector('[data-testid="book-sections-panel"]', { hidden:true });
+            assert.equal(await page.$eval('[data-testid="book-reader"]', el => el.scrollTop), readerBefore.scroll, 'Closing preserves the reading position');
+            await click('Разделы главы');
+            await waitSections();
+          }
+          const last = sections.at(-1);
+          await page.click(`[data-testid="book-section-${last.id}"]`);
+          await page.waitForSelector('[data-testid="book-sections-panel"]', { hidden:true });
+          await wait();
+          assert.equal((await saved()).lastLocation.blockId, last.id, 'Section selection remembers the selected source');
+          assert.ok(await page.$eval(`[data-testid="book-block-${last.id}"]`, el => {
+            const block = el.getBoundingClientRect(), reader = el.closest('[data-testid="book-reader"]').getBoundingClientRect();
+            return block.top >= reader.top - 1 && block.top < reader.bottom;
+          }), 'Section selection brings the heading into view');
+          await click('Разделы главы');
+          await page.waitForSelector(`[data-testid="book-section-${last.id}"][aria-selected="true"]`);
+          await waitSections();
+          assert.ok(await page.$eval(`[data-testid="book-section-${last.id}"]`, el => {
+            const row = el.getBoundingClientRect(), list = el.closest('[data-testid="book-sections-list"]').getBoundingClientRect();
+            return row.top >= list.top && row.bottom <= list.bottom + 1;
+          }), 'Reopening sections scrolls to the current section');
+          if (chapter.id === 'ru-9') {
+            for (const viewport of [{ width:320, height:480 }, { width:640, height:360 }]) {
+              await page.setViewport(viewport); await wait();
+              assert.ok(await page.$eval('[data-testid="book-sections-panel"]', el => {
+                const rect = el.getBoundingClientRect(), list = el.querySelector('[data-testid="book-sections-list"]');
+                return rect.top >= 0 && rect.bottom <= innerHeight && list.clientHeight > 80 && list.scrollHeight > list.clientHeight;
+              }), 'Long section lists stay scrollable on short and landscape screens');
+              await overflow();
+            }
+            await page.screenshot({ path:path.join(root, 'book-sections-landscape.png') });
+            await page.setViewport({ width:320, height:780 }); await wait();
+            await page.screenshot({ path:path.join(root, 'book-long-sections.png') });
+          }
+          await page.keyboard.press('Escape');
+          await page.waitForSelector('[data-testid="book-sections-panel"]', { hidden:true });
+          await click('Разделы главы');
+          await waitSections();
+          await page.click('[data-testid="book-sections-backdrop"]', { offset:{ x:10, y:10 } });
+          await page.waitForSelector('[data-testid="book-sections-panel"]', { hidden:true });
         }
         await click('Оглавление');
         await page.waitForSelector(`[data-testid="book-chapter-${chapter.id}"]`);
@@ -92,6 +163,8 @@ async function main() {
     await page.click('[aria-label="Увеличить шрифт книги"]');
     await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-book-reader')).state.fontSize === 18);
     await page.reload({ waitUntil:'networkidle0' });
+    await page.click('[role="tab"][aria-label="Settings"]');
+    await page.waitForSelector('[data-testid="book-entry"]', { visible: true });
     await page.click('[data-testid="book-entry"]');
     assert.equal((await saved()).bookmarks.length, 1);
     const continueText = await page.$eval('[data-testid="book-library"]', el => [...el.querySelectorAll('[role="button"]')].find(b => b.textContent.startsWith('Продолжить:')).textContent);
@@ -114,6 +187,7 @@ async function main() {
     assert.ok(requests.every(body => !body.includes('Пожалуйста, разбери')), 'Offline reading never requests an AI explanation');
     await click('Назад', '[data-testid="workshop-screen"]');
     await click('Назад');
+    await page.click('[role="tab"][aria-label="Sentence Trainer"]');
     await page.click('[data-testid="trainer-ai-explain"]');
     await page.waitForFunction(() => document.body.innerText.includes('Разобрать слова и окончания'));
     assert.ok(await page.evaluate(() => {
@@ -136,7 +210,7 @@ async function main() {
     assert.ok(requests.some(body => body.includes('BOOK_SOURCE_CONTEXT') && body.includes('Пожалуйста, разбери')));
     await overflow();
     assert.deepEqual(errors, []);
-    console.log(`Book UI passed: ${verified} chapters at 320px, card/table modes, search anchor, bookmarks, resume, font size, book → practice → rule → assisted answer, layered AI explanation and clickable citation. No runtime errors.`);
+    console.log(`Book UI passed: ${verified} chapters at 320px, section sheet with current position, section jumps, dismiss/resume and short/landscape layouts, card/table modes, search anchor, bookmarks, resume, font size, book → practice → rule → assisted answer, layered AI explanation and clickable citation. No runtime errors.`);
   } catch (error) {
     if (page) {
       console.error('Failed screen:', (await page.$eval('body', el => el.innerText)).slice(-4000));

@@ -15,10 +15,10 @@ async function main() {
     fs.createReadStream(file).pipe(res);
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  let browser;
+  let browser, page;
   try {
     browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    page = await browser.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.setRequestInterception(true);
@@ -27,7 +27,10 @@ async function main() {
       return void request.respond({ status: 503, contentType: 'application/json',
         headers: { 'access-control-allow-origin': '*' }, body: '{"error":"Offline test","retryable":false}' });
     });
-    await page.evaluateOnNewDocument(() => localStorage.setItem('papanda-onboarded', '1'));
+    await page.evaluateOnNewDocument(() => {
+      localStorage.setItem('papanda-onboarded', '1');
+      Math.random = () => 0;
+    });
     await page.setViewport({ width: 320, height: 740 });
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
     const clickText = async text => {
@@ -47,29 +50,36 @@ async function main() {
     const learned = Object.fromEntries(require('../src/data/words.json').map(w =>
       [w.eng || w.word, { knowledge_stats: { en: true, it: true }, is_learned: 1 }]));
     const fixture = { userWordProgress: learned, activeLanguages: ['en', 'it'], customWords: [custom] };
-    await seed(fixture);
+    // Undo is available during a tour; keep another card pending after "Learned".
+    await seed({ ...fixture, customWords: [custom, { ...custom, eng: 'review-spare-fixture', word: 'spare' }] });
     const showsBefore = await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('papanda-storage')).state.dailyShows).reduce((a, b) => a + b, 0));
     await tab('Word Triples');
     const counter = '[data-testid="word-show-count"]';
-    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.textContent === 'Показов слова: 8');
+    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.getAttribute('aria-label') === 'Показов слова: 8');
     const input = '[data-testid="word-association"]';
     await page.type(input, 'Два смысла');
     await page.click('[aria-label="Изменить отметку избранного"]');
     assert.equal(await page.$eval(input, el => el.value), 'Два смысла', 'Favourite must not erase the association draft');
     await clickText('✓ Выучено');
-    await clickText('Вернуть предыдущее слово');
-    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.textContent === 'Показов слова: 9');
+    await page.waitForFunction(() => document.querySelector('[data-testid="word-tour-progress"]')?.textContent === 'Пройдено: 1 / 10');
+    await page.mouse.move(60, 350);
+    await page.mouse.down();
+    await page.mouse.move(280, 350, { steps: 12 });
+    await page.mouse.up();
+    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.getAttribute('aria-label') === 'Показов слова: 9');
     assert.equal(await page.$eval(input, el => el.value), 'Два смысла');
     const progress = await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);
     assert.equal(progress.userWordProgress['review-fixture'].count, 9);
     assert.equal(progress.userWordProgress['review-fixture'].is_favorite, true);
-    assert.equal(Object.values(progress.dailyShows).reduce((a, b) => a + b, 0), showsBefore + 2);
+    assert.equal(Object.values(progress.dailyShows).reduce((a, b) => a + b, 0), showsBefore + 3);
     for (const width of [320, 430]) {
       await page.setViewport({ width, height: 740 });
-      assert.ok(await page.$eval(counter, el => {
+      await page.waitForFunction(selector => {
+        const el = document.querySelector(selector);
+        if (!el) return false;
         const rect = el.getBoundingClientRect();
         return rect.left >= 0 && rect.right <= innerWidth && rect.height > 0;
-      }));
+      }, {}, counter);
       await page.screenshot({ path: path.join(root, `review-counter-${width}.png`) });
     }
     await clickText('📊 Статистика');
@@ -89,7 +99,7 @@ async function main() {
     await clickText('Заменить прогресс');
     await page.waitForFunction(() => !document.body.innerText.includes('Проверка резервной копии'));
     await tab('Word Triples');
-    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.textContent === 'Показов слова: 1');
+    await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.getAttribute('aria-label') === 'Показов слова: 1');
     assert.equal(await page.$eval(input, el => el.value), '');
     assert.equal(await page.$eval('[data-testid="word-tour-progress"]', el => el.textContent), 'Пройдено: 0 / 10');
 
@@ -146,6 +156,12 @@ async function main() {
     assert.deepEqual(state.userWordProgress['review-fixture'].ai_verification, flagged);
     assert.equal(errors.length, 0, errors.join('\n'));
     console.log('PASS: counts, drafts, undo, import, last review, animation cancellation, overlapping answers, AI verdict preservation, 320/430px.');
+  } catch (error) {
+    if (page) {
+      console.error('Failed screen:', (await page.$eval('body', el => el.innerText)).slice(-4000));
+      await page.screenshot({ path: path.join(root, 'review-failure.png') });
+    }
+    throw error;
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

@@ -647,14 +647,13 @@ export default function SentenceTrainerScreen() {
           <TouchableOpacity testID={`trainer-block-${index}`} accessibilityRole="button"
             accessibilityLabel={`Раскрыть блок ${index + 1}`} activeOpacity={0.65}
             onPress={() => revealBlock(index)} style={styles.hiddenCard}>
-            <Ionicons name="hand-left-outline" size={19} color={ACCENT_DARK} />
-            <Text style={styles.hiddenText}>Открыть</Text>
+            <View style={styles.hiddenMark} />
           </TouchableOpacity>
     );
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tokenContainer}>
-        {secondaryClause ? (
+        {secondaryClause && isRevealed ? (
           <View style={[styles.clauseFrame, { borderColor: isRevealed ? getRoleColor(token.role) : '#94A3B8' }]}>
             {card}
           </View>
@@ -718,16 +717,15 @@ export default function SentenceTrainerScreen() {
     ) : (
             <TouchableOpacity testID={`trainer-block-${index}`} accessibilityRole="button"
               accessibilityLabel={`Раскрыть блок ${index + 1}`} activeOpacity={0.65}
-              onPress={() => revealBlock(index)} style={[styles.hiddenCard, { minWidth: 0, paddingHorizontal: 12 }]}>
-              <Ionicons name="hand-left-outline" size={19} color={ACCENT_DARK} />
-              <Text style={styles.hiddenText}>Открыть</Text>
+              onPress={() => revealBlock(index)} style={styles.hiddenCard}>
+              <View style={styles.hiddenMark} />
             </TouchableOpacity>
     );
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
         <View style={styles.tableColWord}>
-          {secondaryClause ? (
+          {secondaryClause && isRevealed ? (
             <View style={[styles.clauseFrame, { borderColor: isRevealed ? getRoleColor(token.role) : '#94A3B8' }]}>
               {card}
             </View>
@@ -756,16 +754,16 @@ export default function SentenceTrainerScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPadding }]}>
-      <Text style={styles.header}>Разбор предложений</Text>
-      <TouchableOpacity accessibilityRole="button" testID="book-entry" style={{ alignSelf: 'center', padding: 10 }} onPress={() => navigation.navigate('Book', { language: selectedLanguageCode })}>
-        <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Книга и метод</Text>
-      </TouchableOpacity>
-      <TouchableOpacity accessibilityRole="button" style={{ alignSelf: 'center', padding: 10 }} onPress={() => navigation.navigate('SentenceWorkshop', { sentenceId: currentSentence?.id, language: selectedLanguageCode })}>
-        <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Мастерская предложения</Text>
-      </TouchableOpacity>
-      <TouchableOpacity accessibilityRole="button" testID="growing-sentence-entry" style={{ alignSelf: 'center', paddingBottom: 6 }} onPress={() => navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode, mode: 'Нарастающее' })}>
-        <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Предложение по нарастающей</Text>
-      </TouchableOpacity>
+      <View style={styles.headingRow}>
+        <Text style={styles.header}>Разбор предложений</Text>
+          <TouchableOpacity
+            style={styles.optionsButton}
+            testID="sentence-options" accessibilityLabel="Действия с предложением" accessibilityRole="button"
+            onPress={() => setIsMenuVisible(true)}
+          >
+            <Ionicons name="ellipsis-vertical" size={20} color="#475569" />
+          </TouchableOpacity>
+      </View>
 
       {/* Language Selector */}
       <View style={styles.languageToolbar}>
@@ -773,6 +771,8 @@ export default function SentenceTrainerScreen() {
           {LANGUAGES.filter(lang => activeLanguages.includes(lang.code)).map(lang => (
             <TouchableOpacity
               key={lang.code}
+              accessibilityRole="button"
+              accessibilityState={{ selected: selectedLanguageCode === lang.code }}
               style={[
                 styles.langSelectBtn,
                 selectedLanguageCode === lang.code && styles.langSelectBtnActive
@@ -792,9 +792,9 @@ export default function SentenceTrainerScreen() {
             >
               <Text style={[
                 styles.langSelectText,
-                selectedLanguageCode === lang.code && {color: '#FFF', fontWeight: 'bold'}
+                selectedLanguageCode === lang.code && {color: ACCENT_DARK, fontWeight: '700'}
               ]}>
-                {lang.flag} {lang.label}
+                {lang.label}
               </Text>
             </TouchableOpacity>
           ))}
@@ -816,25 +816,54 @@ export default function SentenceTrainerScreen() {
           <ScrollView
             {...sentencePanResponder.panHandlers}
             style={{flex: 1}}
-            contentContainerStyle={{flexGrow: 1}}
+            contentContainerStyle={styles.exerciseContent}
           >
             <View style={{ flex: 1 }}>
-              <Text testID="trainer-sentence-text" style={{ fontSize: 18, color: '#475569', textAlign: 'center', marginBottom: 6 }}>
-                {currentSentence?.sentence || currentSentence?.words?.map(w => w.text).join(' ')}
-              </Text>
-              {showTranslations && currentSentence?.literalTranslation && (
-                <Text style={{ color: '#666', textAlign: 'center', marginBottom: 8, paddingHorizontal: 16 }}>
-                  {currentSentence.literalTranslation}
-                </Text>
-              )}
+              <View style={styles.sentenceSurface}>
+                <View style={styles.sentenceMeta}>
+                  <Text testID="trainer-position" style={styles.positionText}>{targetSentenceId ? 'Из словаря' : `${safeIndex + 1} / ${filteredSentences.length}`}</Text>
+        <TouchableOpacity testID="trainer-translation" accessibilityRole="button" disabled={!currentSentence} style={styles.translationToggle} onPress={() => setShowTranslations(!showTranslations)}>
+          <Text style={styles.translationToggleText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
+        </TouchableOpacity>
 
-              <View style={[isTableMode ? styles.tableContainer : styles.sentenceWrapper, { minHeight: 200 }]}>
+
+                </View>
+                <Text testID="trainer-sentence-text" style={styles.sentenceText}>
+                  {currentSentence?.sentence || currentSentence?.words.map(word => word.text).join(' ')}
+                </Text>
+                {showTranslations && currentSentence?.literalTranslation && <Text style={styles.sentenceTranslation}>{currentSentence.literalTranslation}</Text>}
+              </View>
+
+              <View style={styles.exerciseHeading}>
+                <Text style={styles.exerciseLabel}>Разбор по шагам</Text>
+                <Text style={styles.exerciseProgress}>{revealedTokens === null ? currentSentence?.words.length : revealedTokens.size} / {currentSentence?.words.length}</Text>
+              </View>
+              <View style={isTableMode ? styles.tableContainer : styles.sentenceWrapper}>
                 {isTableMode
                   ? currentSentence?.words?.map(renderTokenTableMode)
                   : currentSentence?.words?.map(renderToken)
                 }
               </View>
-              {currentSentence && <BookConnections key={currentSentence.id} language={selectedLanguageCode} sentence={currentSentence.sentence} tokens={currentSentence.words} />}
+              <View style={styles.explanationRow}>
+                {currentSentence && isSentenceGenerationConfigured() && (
+                  <TouchableOpacity
+                    testID="trainer-ai-explain" accessibilityRole="button" accessibilityLabel="Объяснить структуру"
+                    onPress={handleExplainAI}
+                    disabled={isAiLoading}
+                    style={styles.aiButton}
+                  >
+                    {isAiLoading ? (
+                      <ActivityIndicator size="small" color="#EAB308" />
+                    ) : (
+                      <>
+                        <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
+                        <Text style={styles.aiButtonText}>Объяснить структуру</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                )}
+
+              </View>
             </View>
           </ScrollView>
         </Animated.View>
@@ -862,57 +891,19 @@ export default function SentenceTrainerScreen() {
         </View>
       )}
 
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
-          {currentSentence && isSentenceGenerationConfigured() && (
-            <TouchableOpacity
-              testID="trainer-ai-explain" accessibilityRole="button" accessibilityLabel="Объяснить структуру"
-              onPress={handleExplainAI}
-              disabled={isAiLoading}
-              style={styles.aiButton}
-            >
-              {isAiLoading ? (
-                <ActivityIndicator size="small" color="#EAB308" />
-              ) : (
-                <>
-                  <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
-                  <Text style={styles.aiButtonText}>Объяснить структуру</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            style={styles.optionsButton}
-            testID="sentence-options" accessibilityLabel="Действия с предложением" accessibilityRole="button"
-            onPress={() => setIsMenuVisible(true)}
-          >
-            <Ionicons name="ellipsis-vertical" size={20} color="#475569" />
-          </TouchableOpacity>
-        </View>
-
-      {filteredSentences.length > 0 && <View style={styles.sentenceNavigation}>
+      <View style={styles.controls}>
         <TouchableOpacity testID="trainer-previous" accessibilityRole="button" accessibilityLabel="Предыдущее предложение"
           disabled={filteredSentences.length < 2} onPress={moveToPrevSentence}
           style={[styles.navigationButton, filteredSentences.length < 2 && styles.disabledButton]}>
           <Ionicons name="chevron-back" size={20} color={ACCENT_DARK} />
-          <Text style={styles.navigationText}>Назад</Text>
         </TouchableOpacity>
-        <Text testID="trainer-position" style={styles.positionText}>{targetSentenceId ? 'Из словаря' : `${safeIndex + 1} / ${filteredSentences.length}`}</Text>
+        <TouchableOpacity testID="trainer-reveal" accessibilityRole="button" disabled={!currentSentence} style={styles.button} onPress={handleReveal}>
+          <Text style={styles.buttonText}>{allBlocksRevealed ? 'Скрыть разбор' : 'Разбор'}</Text>
+        </TouchableOpacity>
         <TouchableOpacity testID="trainer-next" accessibilityRole="button" accessibilityLabel="Следующее предложение"
           disabled={filteredSentences.length < 2} onPress={moveToNextSentence}
           style={[styles.navigationButton, filteredSentences.length < 2 && styles.disabledButton]}>
-          <Text style={styles.navigationText}>Вперёд</Text>
           <Ionicons name="chevron-forward" size={20} color={ACCENT_DARK} />
-        </TouchableOpacity>
-      </View>}
-      {/* Primary Action */}
-      <View style={[styles.controls, { marginBottom: 5 }]}>
-        <TouchableOpacity testID="trainer-translation" accessibilityRole="button" disabled={!currentSentence} style={[styles.button, styles.buttonSecondary]} onPress={() => setShowTranslations(!showTranslations)}>
-          <Text style={styles.buttonText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity testID="trainer-reveal" accessibilityRole="button" disabled={!currentSentence} style={styles.button} onPress={handleReveal}>
-          <Text style={styles.buttonText}>{allBlocksRevealed ? 'Скрыть разбор' : 'Разбор'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -921,6 +912,14 @@ export default function SentenceTrainerScreen() {
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsMenuVisible(false)}>
           <TouchableOpacity activeOpacity={1} onPress={event => event.stopPropagation()} style={styles.menuCard}>
             <ScrollView>
+            <Text style={styles.menuHeading}>Практика и материалы</Text>
+            <TouchableOpacity accessibilityRole="button" style={styles.menuItem} onPress={() => { setIsMenuVisible(false); navigation.navigate('SentenceWorkshop', { sentenceId: currentSentence?.id, language: selectedLanguageCode }); }}>
+              <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Мастерская предложения</Text>
+            </TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" testID="growing-sentence-entry" style={styles.menuItem} onPress={() => { setIsMenuVisible(false); navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode, mode: 'Нарастающее' }); }}>
+              <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Предложение по нарастающей</Text>
+            </TouchableOpacity>
+
             <View testID="trainer-cache-stats" style={styles.menuStats}>
               <Text style={styles.menuStatsTitle}>{activeLangObj?.label} · предложения</Text>
               <Text style={styles.menuStatsText}>В кеше: {languageCache.length}</Text>
@@ -1067,36 +1066,47 @@ export default function SentenceTrainerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#F5F5F5' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  languageToolbar: { height: 50, marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 },
-  tokenContainer: { margin: 4 },
-  wordCard: { minHeight: 64, justifyContent: 'center', backgroundColor: '#FFFFFF', padding: 12, borderRadius: 12, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, alignItems: 'center', minWidth: 80 },
+  sentenceSurface: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E8EC', borderRadius: 18, padding: 14 },
+  sentenceMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: -8, marginBottom: 6 },
+  translationToggle: { minHeight: 44, paddingLeft: 12, justifyContent: 'center' },
+  translationToggleText: { fontSize: 13, color: '#667085', fontWeight: '600' },
+  headingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  exerciseContent: { paddingBottom: 16 },
+  sentenceText: { fontSize: 22, lineHeight: 32, color: '#172033' },
+  sentenceTranslation: { fontSize: 15, lineHeight: 22, color: '#697586', marginTop: 14 },
+  exerciseHeading: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 22, gap: 8 },
+  exerciseLabel: { fontSize: 16, fontWeight: '700', color: '#344054' },
+  exerciseProgress: { fontSize: 12, color: '#697586' },
+  explanationRow: { alignItems: 'flex-start', marginTop: 12 },
+  menuHeading: { fontSize: 18, fontWeight: '700', color: '#172033', padding: 15 },
+  container: { flex: 1, paddingHorizontal: 16, paddingBottom: 8, backgroundColor: '#FAFAF8' },
+  header: { flex: 1, fontSize: 22, fontWeight: '700', color: '#172033', letterSpacing: -0.6 },
+  languageToolbar: { height: 48, marginBottom: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#E4E7EC' },
+  sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 10, paddingTop: 12, paddingBottom: 10 },
+  tokenContainer: { maxWidth: '100%' },
+  hiddenCard: { backgroundColor: '#F0F1EF', borderWidth: 1, borderColor: '#E1E5E1', borderRadius: 10, minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  hiddenMark: { width: 16, height: 3, borderRadius: 2, backgroundColor: '#C3C8C2' },
+  wordCard: { minHeight: 68, justifyContent: 'center', backgroundColor: '#FFFFFF', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 10, borderRadius: 10, borderWidth: 1, alignItems: 'flex-start', minWidth: 88, maxWidth: '100%' },
   // Outer ring for words of a 2nd+ clause in a complex sentence — reads as a double frame.
   clauseFrame: { borderWidth: 2, borderRadius: 13, padding: 3, alignSelf: 'flex-start' },
-  orderBadge: { position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
-  orderBadgeText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
-  hiddenCard: { backgroundColor: '#FFF4E8', padding: 12, borderRadius: 12, borderWidth: 2, borderColor: ACCENT, alignItems: 'center', justifyContent: 'center', gap: 4, minWidth: 80, minHeight: 64, shadowColor: ACCENT_DARK, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 3, elevation: 2 },
+  orderBadge: { position: 'absolute', top: -7, right: 8, width: 16, height: 16, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
+  orderBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '700' },
   wordText: { fontSize: 18, fontWeight: '600' },
   wordRoot: { fontWeight: '600', color: '#111827' },
   wordAffix: { fontWeight: '800' },
   translationText: { fontSize: 14, color: '#666', marginTop: 4 },
-  roleText: { fontSize: 10, fontWeight: '600', marginTop: 4, opacity: 0.8 },
-  addToDictionaryBtn: { position: 'absolute', bottom: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, alignItems: 'center', justifyContent: 'center', zIndex: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 2 },
+  roleText: { fontSize: 11, fontWeight: '600', marginTop: 5 },
+  addToDictionaryBtn: { position: 'absolute', bottom: -6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, alignItems: 'center', justifyContent: 'center', zIndex: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 2 },
   addToDictionaryBtnAdded: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
   addToDictionaryText: { fontSize: 14, color: ACCENT_DARK, fontWeight: '800', lineHeight: 16 },
   addToDictionaryTextAdded: { color: '#15803D' },
-  hiddenText: { fontSize: 13, fontWeight: '700', color: ACCENT_DARK },
-  controls: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, gap: 10 },
+  controls: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, borderTopWidth: 1, borderTopColor: '#E7E9EC', gap: 10 },
   button: { minHeight: 48, flex: 1, backgroundColor: ACCENT, padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  sentenceNavigation: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navigationButton: { flex: 1, minHeight: 48, flexDirection: 'row', gap: 4, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: ACCENT, borderRadius: 12, paddingHorizontal: 8 },
+  navigationButton: { width: 48, minHeight: 48, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ECEEEC', borderRadius: 14 },
   navigationText: { color: ACCENT_DARK, fontSize: 14, fontWeight: '700' },
-  positionText: { color: '#64748B', fontSize: 12, textAlign: 'center', maxWidth: 80 },
+  positionText: { color: '#697586', fontSize: 12, fontWeight: '600' },
   disabledButton: { opacity: 0.4 },
-  optionsButton: { marginLeft: 12, minWidth: 48, minHeight: 48, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF', borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 14 },
-  buttonSecondary: { backgroundColor: '#6C757D' },
+  optionsButton: { marginLeft: 8, width: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
 
   // Table Mode Styles
@@ -1119,13 +1129,13 @@ const styles = StyleSheet.create({
 
 
 
-  langSelectBtn: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, backgroundColor: '#E0E0E0', marginHorizontal: 5 },
-  langSelectBtnActive: { backgroundColor: ACCENT },
-  langSelectText: { fontSize: 14, color: '#333' },
+  langSelectBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 12, borderBottomWidth: 2, borderBottomColor: 'transparent', marginRight: 8 },
+  langSelectBtnActive: { borderBottomColor: ACCENT },
+  langSelectText: { fontSize: 14, color: '#667085' },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 6 },
-  aiButton: { minHeight: 48, flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: '#FDE047', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
+  aiButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, paddingVertical: 8 },
   aiButtonText: { color: '#B45309', fontWeight: '600', fontSize: 14 },
   generationStatus: { color: '#64748B', textAlign: 'center', marginTop: 14, paddingHorizontal: 28, fontSize: 16, lineHeight: 23 },
   retryButton: {

@@ -265,11 +265,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
         <TouchableOpacity style={[styles.button, styles.btnKnown, styles.tourStartButton]} onPress={startNewTour} accessibilityRole="button">
           <Text style={styles.buttonText}>Следующий тур</Text>
         </TouchableOpacity>
-        {history.length > 0 && (
-          <TouchableOpacity onPress={handlePrev} accessibilityRole="button" style={{ marginTop: 16 }}>
-            <Text style={styles.statsCardBtnText}>Вернуть предыдущее слово</Text>
-          </TouchableOpacity>
-        )}
       </View>
     );
   }
@@ -316,6 +311,13 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
           ]}
         >
           <View style={styles.cardActions}>
+            <Text
+              testID="word-show-count"
+              accessibilityLabel={`Показов слова: ${totalShows}`}
+              style={styles.showCount}
+            >
+              👁 {totalShows}
+            </Text>
             <TouchableOpacity
               accessibilityRole="button" accessibilityLabel="Изменить отметку избранного" style={styles.favCardBtn}
               onPress={() => {
@@ -350,9 +352,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
           </View>
 
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
-          <Text testID="word-show-count" style={styles.showCount}>
-            Показов слова: {totalShows}
-          </Text>
 
           {currentProgress?.ai_verification?.status === 'flagged' && (
             <TouchableOpacity
@@ -582,6 +581,7 @@ const styles = StyleSheet.create({
   cardActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 2,
   },
@@ -625,8 +625,8 @@ const styles = StyleSheet.create({
   showCount: {
     fontSize: 12,
     color: '#64748B',
-    textAlign: 'center',
-    marginTop: 2,
+    marginRight: 'auto',
+    flexShrink: 1,
   },
   wordCenterContainer: {
     flex: 1,

@@ -109,7 +109,7 @@ async function main() {
     await click('Режим: Карточки');
     await page.waitForSelector('[aria-modal="true"]', { hidden: true });
     assert.equal(await hidden(), count - 1);
-    await click('🇮🇹 Italiano');
+    await click('Italiano');
     await page.waitForFunction(() => document.querySelector('[data-testid="trainer-sentence-text"]').textContent === 'Luca legge.');
     assert.equal(await hidden(), 2);
     assert.equal(await page.$eval('[data-testid="trainer-next"]', el => el.getAttribute('aria-disabled')), 'true');
@@ -120,6 +120,47 @@ async function main() {
     await page.waitForFunction(() => document.body.innerText.includes('Генерация отменена'));
     assert.deepEqual(errors, []);
     assert.ok(held.length > 0, 'Generation must actually be in flight during card interaction');
+    await closeMenu();
+    // A full sentence is essential here: short fixtures hide layout regressions.
+    await page.evaluate(() => {
+      const saved = JSON.parse(localStorage.getItem('papanda-storage'));
+      saved.state.activeLanguages = ['en', 'it', 'kz'];
+      saved.state.generatedSentences = [{
+        id: 'layout-long', language: 'English', source: 'generated', createdAt: Date.now() + 60000,
+        sentence: 'The thirsty man drinks cold water because the sun shines.',
+        literalTranslation: 'Мужчина, испытывающий жажду, пьёт холодную воду, потому что светит солнце.',
+        words: [
+          ['The', 'Attribute', 'этот'], ['thirsty', 'Attribute', 'испытывающий жажду'],
+          ['man', 'Subject', 'мужчина'], ['drinks', 'Predicate', 'пьёт'],
+          ['cold', 'Attribute', 'холодную'], ['water', 'Object', 'воду'],
+          ['because', 'Conjunction', 'потому что'], ['the', 'Attribute', 'это'],
+          ['sun', 'Subject', 'солнце'], ['shines', 'Predicate', 'светит'],
+        ].map(([text, role, translation], index) => ({ text, role, label: role, translation, parts: [text],
+          dictionary_form: text, is_in_my_dict: false, clauseIndex: index >= 7 ? 1 : 0 })),
+      }];
+      localStorage.setItem('papanda-storage', JSON.stringify(saved));
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('[data-testid="trainer-block-9"]');
+    for (const [width, height] of [[320, 640], [390, 740]]) {
+      await page.setViewport({ width, height, hasTouch: true, isMobile: true });
+      assert.ok(await page.$eval('[data-testid="trainer-block-9"]', el => {
+        const r = el.getBoundingClientRect();
+        const footer = document.querySelector('[data-testid="trainer-reveal"]').getBoundingClientRect();
+        return r.left >= 0 && r.right <= innerWidth && r.bottom < footer.top;
+      }), 'All ten closed cards must fit above the fixed actions');
+      await page.screenshot({ path: path.join(root, `trainer-long-${width}.png`) });
+    }
+    await page.click('[data-testid="trainer-reveal"]');
+    assert.equal(await page.$$eval('[data-testid^="trainer-block-"]', els => els.length), 10, 'All cards remain present throughout the exercise');
+    assert.ok(await page.$('[data-testid="trainer-block-3"][aria-label="Открыть слово: drinks"]'), 'First step reveals the predicate, not the first word');
+    assert.ok(await page.$('[data-testid="trainer-block-0"][aria-label="Раскрыть блок 1"]'), 'Other cards remain closed');
+    assert.equal(await page.$$eval('[data-testid="trainer-sentence-text"] [role="button"]', els => els.length), 0, 'The original sentence is plain text');
+    await page.screenshot({ path: path.join(root, 'trainer-long-first-step.png') });
+    await page.click('[data-testid="trainer-translation"]');
+    while (await hidden() > 0) await page.click('[data-testid="trainer-reveal"]');
+    await page.screenshot({ path: path.join(root, 'trainer-long-revealed.png') });
+    assert.deepEqual(errors, []);
     console.log('PASS: per-block tap, grouped reveal, previous/next reset, card/table modes, language/cache stats, quiet background generation and menu cancellation; 320/430px.');
   } catch (error) {
     if (page) { console.error((await bodyText(page)).slice(-3500)); await page.screenshot({ path: path.join(root, 'trainer-failure.png') }); }
