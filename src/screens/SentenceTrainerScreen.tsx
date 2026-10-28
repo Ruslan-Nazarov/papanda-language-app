@@ -814,7 +814,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
               <View style={styles.sentenceSurface}>
                 <View style={styles.sentenceMeta}>
                   <Text testID="trainer-position" style={styles.positionText}>{targetSentenceId ? 'Из словаря' : `${safeIndex + 1} / ${filteredSentences.length}`}</Text>
-        <TouchableOpacity testID="trainer-translation" accessibilityRole="button" disabled={!currentSentence} style={styles.translationToggle} onPress={() => setShowTranslations(!showTranslations)}>
+        <TouchableOpacity testID="trainer-translation" accessibilityRole="button" disabled={!currentSentence} hitSlop={6} style={styles.translationToggle} onPress={() => setShowTranslations(!showTranslations)}>
           <Text style={styles.translationToggleText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
         </TouchableOpacity>
 
@@ -1082,8 +1082,8 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 const styles = StyleSheet.create({
   sentenceSurface: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E8EC', borderRadius: 18, padding: 14 },
   sentenceMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: -8, marginBottom: 6 },
-  translationToggle: { minHeight: 48, paddingHorizontal: 16, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: '#F7C99F', borderRadius: 12 },
-  translationToggleText: { fontSize: 16, color: '#B54708', fontWeight: '600' },
+  translationToggle: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: '#F7C99F', borderRadius: 8 },
+  translationToggleText: { fontSize: 14, color: '#B54708', fontWeight: '600' },
   headingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   exerciseContent: { flexGrow: 1, paddingBottom: 16 },
   sentenceText: { fontSize: 22, lineHeight: 32, color: '#172033' },

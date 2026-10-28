@@ -83,7 +83,13 @@ export const generateGeminiText = async (
         return data.text;
       }
 
-      const message = (typeof data?.error === 'string' && data.error) || `Сервис генерации вернул ошибку ${response.status}.`;
+      const rawMessage = typeof data?.error === 'string' ? data.error : '';
+      const billingUnavailable = response.status === 402 || data?.code === 'UPSTREAM_BILLING' || /^Upstream error 402\.?$/i.test(rawMessage.trim());
+      const message = billingUnavailable
+        ? 'ИИ временно недоступен из-за ограничения на стороне сервиса. Попробуйте позже.'
+        : rawMessage || `Сервис генерации вернул ошибку ${response.status}.`;
+
+      if (billingUnavailable) throw new GeminiFatalError(message);
 
       // The proxy already classified the failure.
       if (data && data.retryable === false) {

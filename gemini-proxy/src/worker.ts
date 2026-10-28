@@ -320,16 +320,19 @@ export default {
     }
 
     if (!result.ok) {
+      const isBilling = result.status === 402;
       const isQuota = result.status === 429;
       const isOverload = result.status >= 500;
       return json(
         {
-          error: isQuota
+          error: isBilling
+            ? 'ИИ временно недоступен из-за ограничения на стороне сервиса. Попробуйте позже.'
+            : isQuota
             ? 'Сервис генерации временно перегружен запросами. Попробуйте позже.'
             : isOverload
               ? 'Серверы генерации перегружены. Попробуйте через минуту.'
               : result.message,
-          code: isQuota ? 'UPSTREAM_QUOTA' : isOverload ? 'UPSTREAM_OVERLOAD' : 'UPSTREAM_ERROR',
+          code: isBilling ? 'UPSTREAM_BILLING' : isQuota ? 'UPSTREAM_QUOTA' : isOverload ? 'UPSTREAM_OVERLOAD' : 'UPSTREAM_ERROR',
           // A 429 from the upstream provider is a transient per-minute/per-second rate
           // limit (distinct from OUR OWN daily KV limits above, which set `daily: true`
           // and are correctly non-retryable) — worth the client's built-in backoff retry

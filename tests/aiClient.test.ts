@@ -35,6 +35,20 @@ it('does not retry an unclassified permanent HTTP error', async () => {
   await assert.rejects(generateGeminiText('test'), /Bad request/);
   assert.equal(calls, 1);
 });
+
+it('explains billing failures from both current and older proxies without automatic retries', async () => {
+  configure();
+  for (const [status, data] of [
+    [402, {}],
+    [502, { error: 'Upstream error 402.', retryable: false }],
+    [502, { code: 'UPSTREAM_BILLING', error: 'Payment required', retryable: false }],
+  ] as const) {
+    let calls = 0;
+    globalThis.fetch = async () => { calls++; return Response.json(data, { status }); };
+    await assert.rejects(generateGeminiText('test'), /ИИ временно недоступен.*Попробуйте позже/);
+    assert.equal(calls, 1);
+  }
+});
 it('coalesces the three pipeline stages and releases the batch afterward, even with no dictionary', async () => {
   configure();
   const stages: string[] = [];

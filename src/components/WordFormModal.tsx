@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import type { Word } from '../models/types';
 import { explainWordForm, WordFormContext } from '../services/wordFormExplanation';
@@ -62,15 +62,13 @@ export default function WordFormModal({ context, word, onClose, onCreateNote }: 
           {!!explanation && <Markdown onLinkPress={() => false} style={{ body: studyStyles.text }}>{explanation}</Markdown>}
           {!!error && <View style={{ gap: 10 }}>
             <Text accessibilityRole="alert" style={studyStyles.warning}>{error}</Text>
-            <StudyButton title="Повторить объяснение" onPress={() => setAttempt(value => value + 1)} />
+            <StudyButton compact title="Повторить объяснение" onPress={() => setAttempt(value => value + 1)} />
           </View>}
         </ScrollView>
         <View style={styles.actions}>
-          <StudyButton title="Редактировать слово" onPress={() => setEditing(true)} />
-          {onCreateNote && <TouchableOpacity accessibilityRole="button" testID="word-create-note" style={studyStyles.button} onPress={onCreateNote}>
-            <Text style={studyStyles.buttonText}>Создать заметку</Text>
-          </TouchableOpacity>}
-          <StudyButton title="Закрыть" onPress={onClose} />
+          <StudyButton compact title="Редактировать слово" onPress={() => setEditing(true)} />
+          {onCreateNote && <StudyButton compact testID="word-create-note" title="Создать заметку" onPress={onCreateNote} />}
+          <StudyButton compact title="Закрыть" onPress={onClose} />
         </View>
       </View>
     </View>
@@ -79,8 +77,8 @@ export default function WordFormModal({ context, word, onClose, onCreateNote }: 
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
-  card: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, maxHeight: '90%', gap: 12 },
+  card: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, maxHeight: '90%', maxWidth: 480, width: '100%', alignSelf: 'center', gap: 16 },
   scroll: { flexShrink: 1 },
   word: { fontSize: 26, fontWeight: '700', color: '#172033' },
-  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
 });

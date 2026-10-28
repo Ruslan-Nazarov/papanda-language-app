@@ -310,12 +310,30 @@ export default function BrainWorkoutScreen() {
             },
           ]}
         >
+            {(typeof previousAnswer === 'boolean' || totalShows > 0) && (
+              <Text
+                testID="workout-previous-answer"
+                style={[
+                  styles.previousAnswer,
+                  previousAnswer === true && styles.scoreKnown,
+                  previousAnswer === false && styles.scoreUnknown,
+                ]}
+              >
+                {typeof previousAnswer === 'boolean'
+                  ? `В прошлый раз: ${previousAnswer ? '✓ Знаю' : '✗ Не знаю'}`
+                  : 'На этом языке ещё не оценивали'}
+              </Text>
+            )}
           <TouchableOpacity
+            testID="workout-card"
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => setShowAnswer(!showAnswer)}
           >
             <View style={styles.cardToolbar}>
+              <Text testID="workout-show-count" accessibilityLabel={`Показов слова: ${totalShows}`} style={styles.showCount}>
+                👁 {totalShows}
+              </Text>
               <TouchableOpacity
                 accessibilityRole="button" accessibilityLabel="Изменить отметку избранного" style={styles.favCardBtn}
                 onPress={(e) => {
@@ -364,23 +382,6 @@ export default function BrainWorkoutScreen() {
               event.stopPropagation();
               if (transition.beginAction()) advanceWorkout();
             }} style={{ padding: 12 }}><Text>Пропустить без оценки</Text></TouchableOpacity>}
-            <Text testID="workout-show-count" style={styles.showCount}>
-              Показов слова: {totalShows}
-            </Text>
-            {(typeof previousAnswer === 'boolean' || totalShows > 0) && (
-              <Text
-                testID="workout-previous-answer"
-                style={[
-                  styles.previousAnswer,
-                  previousAnswer === true && styles.scoreKnown,
-                  previousAnswer === false && styles.scoreUnknown,
-                ]}
-              >
-                {typeof previousAnswer === 'boolean'
-                  ? `В прошлый раз: ${previousAnswer ? '✓ Знаю' : '✗ Не знаю'}`
-                  : 'На этом языке ещё не оценивали'}
-              </Text>
-            )}
 
             <View style={styles.divider} />
 
@@ -643,6 +644,9 @@ const styles = StyleSheet.create({
   },
   cardToolbarActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    justifyContent: 'flex-end',
     alignItems: 'center',
     gap: 8,
   },
@@ -703,13 +707,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     textAlign: 'center',
-    marginTop: 6,
+    marginBottom: 12,
   },
   showCount: {
     fontSize: 12,
     color: '#64748B',
     textAlign: 'center',
-    marginTop: 2,
+    marginRight: 'auto',
   },
   divider: {
     width: '90%',

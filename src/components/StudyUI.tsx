@@ -4,9 +4,10 @@ import type { Sentence, SyntaxRole } from '../models/types';
 import { getRoleColor, ROLE_TRANSLATIONS } from '../constants/sentencePresentation';
 import { ACCENT } from '../constants/theme';
 
-export function StudyButton({ title, onPress, disabled, selected }: { title: string; onPress: () => void; disabled?: boolean; selected?: boolean }) {
-  return <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: !!disabled, selected: !!selected }} disabled={disabled} onPress={onPress}
-    style={[studyStyles.button, selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
+export function StudyButton({ title, onPress, disabled, selected, compact, testID }: { title: string; onPress: () => void; disabled?: boolean; selected?: boolean; compact?: boolean; testID?: string }) {
+  return <TouchableOpacity testID={testID} accessibilityRole="button" accessibilityState={{ disabled: !!disabled, selected: !!selected }} disabled={disabled} onPress={onPress}
+    hitSlop={compact ? 6 : undefined}
+    style={[studyStyles.button, compact && studyStyles.compactButton, selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
     <Text style={[studyStyles.buttonText, selected && { color: '#FFF' }]}>{title}</Text>
   </TouchableOpacity>;
 }
@@ -23,6 +24,7 @@ export const studyStyles = StyleSheet.create({
   text: { fontSize: 15, lineHeight: 23, color: '#334155' },
   small: { fontSize: 12, color: '#64748B', lineHeight: 18 },
   button: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: '#EEF2F6', alignSelf: 'flex-start' },
+  compactButton: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, justifyContent: 'center' },
   buttonText: { fontSize: 14, fontWeight: '600', color: '#334155' },
   input: { borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 12, padding: 12, fontSize: 16, color: '#172033', backgroundColor: '#FFF', minHeight: 48 },
   token: { padding: 8, borderBottomWidth: 3, borderRadius: 6 },

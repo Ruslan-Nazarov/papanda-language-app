@@ -64,6 +64,26 @@ it('uses the backup provider and unwraps its array response', async () => {
   assert.equal(bodies[1].reasoning_effort, undefined);
 });
 
+it('uses the backup after a 402 and gives a permanent readable error when both providers refuse', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => ++calls === 1
+    ? Response.json({ error: { message: 'Payment required' } }, { status: 402 })
+    : Response.json({ choices: [{ message: { content: 'Объяснение' }, finish_reason: 'stop' }] });
+  const config = { ...env(), CEREBRAS_API_KEY: 'backup-key' };
+  assert.deepEqual(await (await worker.fetch(request({ prompt: 'test' }), config)).json(), { text: 'Объяснение' });
+  assert.equal(calls, 2);
+
+  calls = 0;
+  globalThis.fetch = async () => { calls++; return Response.json({}, { status: 402 }); };
+  const response = await worker.fetch(request({ prompt: 'test' }), config);
+  assert.equal(calls, 2);
+  assert.equal(response.status, 502);
+  assert.deepEqual(await response.json(), {
+    error: 'ИИ временно недоступен из-за ограничения на стороне сервиса. Попробуйте позже.',
+    code: 'UPSTREAM_BILLING', retryable: false,
+  });
+});
+
 it('rejects unsupported providers and non-finite configuration', () => {
   for (const config of [{ temperature: Infinity }, { topP: -1 }, { thinkingConfig: [] }]) {
     assert.throws(() => parseGenerationRequest({ prompt: 'test', generationConfig: config }));
