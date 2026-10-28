@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const puppeteer = require('puppeteer');
 
 async function main() {
-  const root = path.resolve(__dirname, '../dist-audit');
+  const root = path.resolve(__dirname, '..', process.env.SMOKE_BUNDLE_DIR || 'dist-audit');
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const file = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
@@ -28,10 +28,11 @@ async function main() {
         headers: { 'access-control-allow-origin': '*' }, body: '{"error":"Offline test","retryable":false}' });
     });
     await page.evaluateOnNewDocument(() => {
+      if (window !== window.top || location.origin === 'null') return;
       localStorage.setItem('papanda-onboarded', '1');
       Math.random = () => 0;
     });
-    await page.setViewport({ width: 320, height: 740 });
+    await page.setViewport({ width: 320, height: 740, hasTouch: true, isMobile: true });
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
     const clickText = async text => {
       await page.waitForFunction(text => [...document.querySelectorAll('div')]
@@ -43,8 +44,10 @@ async function main() {
     const seed = async state => {
       // Inject before hydration: a pending write from the old page must not
       // replace the fixture between localStorage.setItem and reload.
-      const script = await page.evaluateOnNewDocument(state =>
-        localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
+      const script = await page.evaluateOnNewDocument(state => {
+        if (window !== window.top || location.origin === 'null') return;
+        localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 }));
+      }, state);
       try {
         await page.reload({ waitUntil: 'networkidle0' });
         await page.waitForSelector('[role="tab"]');
@@ -67,10 +70,15 @@ async function main() {
     assert.equal(await page.$eval(input, el => el.value), 'Два смысла', 'Favourite must not erase the association draft');
     await clickText('✓ Выучено');
     await page.waitForFunction(() => document.querySelector('[data-testid="word-tour-progress"]')?.textContent === 'Пройдено: 1 / 10');
-    await page.mouse.move(60, 350);
-    await page.mouse.down();
-    await page.mouse.move(280, 350, { steps: 12 });
-    await page.mouse.up();
+    // Swipe the word itself: fixed screen coordinates can land on a language
+    // badge after a layout change and start desktop text selection instead.
+    const swipe = await page.$eval('[data-testid="word-sentence-en"]', el => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + 8, y: r.top + r.height / 2, end: Math.min(innerWidth - 16, r.left + 188) };
+    });
+    await page.touchscreen.touchStart(swipe.x, swipe.y);
+    for (let step = 1; step <= 12; step++) await page.touchscreen.touchMove(swipe.x + (swipe.end - swipe.x) * step / 12, swipe.y);
+    await page.touchscreen.touchEnd();
     await page.waitForFunction(() => document.querySelector('[data-testid="word-show-count"]')?.getAttribute('aria-label') === 'Показов слова: 9');
     assert.equal(await page.$eval(input, el => el.value), 'Два смысла');
     const progress = await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);
@@ -78,7 +86,7 @@ async function main() {
     assert.equal(progress.userWordProgress['review-fixture'].is_favorite, true);
     assert.equal(Object.values(progress.dailyShows).reduce((a, b) => a + b, 0), showsBefore + 3);
     for (const width of [320, 430]) {
-      await page.setViewport({ width, height: 740 });
+      await page.setViewport({ width, height: 740, hasTouch: true, isMobile: true });
       await page.waitForFunction(selector => {
         const el = document.querySelector(selector);
         if (!el) return false;

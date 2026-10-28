@@ -27,8 +27,11 @@ async function main() {
       if (req.url().startsWith('http://127.0.0.1:') || req.url().startsWith('data:')) return void req.continue();
       return void req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"error":"Offline test","retryable":false}' });
     });
-    await page.evaluateOnNewDocument(() => localStorage.setItem('papanda-onboarded', '1'));
-    await page.setViewport({ width: 360, height: 780 });
+    await page.evaluateOnNewDocument(() => {
+      if (window !== window.top || location.origin === 'null') return;
+      localStorage.setItem('papanda-onboarded', '1');
+    });
+    await page.setViewport({ width: 360, height: 780, hasTouch: true, isMobile: true });
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
     await page.evaluate(() => localStorage.setItem('papanda-storage', JSON.stringify({ state: { userWordProgress: {}, activeLanguages: ['en'] }, version: 0 })));
     await page.reload({ waitUntil: 'networkidle0' });
@@ -59,10 +62,13 @@ async function main() {
     assert.equal(await page.$('[data-testid="word-undo"]'), null);
     assert.equal((await state()).wordTourSize, 10);
     assert.ok(!(await page.$eval('body', el => el.innerText)).includes('за заход'));
-    await page.mouse.move(280, 350);
-    await page.mouse.down();
-    await page.mouse.move(60, 350, { steps: 12 });
-    await page.mouse.up();
+    const swipe = await page.$eval('[data-testid="word-sentence-en"]', el => {
+      const r = el.getBoundingClientRect();
+      return { x: r.right - 8, y: r.top + r.height / 2, end: Math.max(16, r.right - 188) };
+    });
+    await page.touchscreen.touchStart(swipe.x, swipe.y);
+    for (let step = 1; step <= 12; step++) await page.touchscreen.touchMove(swipe.x + (swipe.end - swipe.x) * step / 12, swipe.y);
+    await page.touchscreen.touchEnd();
     await progress(1, 10);
     for (let done = 2; done <= 10; done++) {
       await click('✓ Выучено');
@@ -106,7 +112,7 @@ async function main() {
     await tab('Word Triples');
     await progress(0, 5);
     for (const width of [320, 430]) {
-      await page.setViewport({ width, height: 780 });
+      await page.setViewport({ width, height: 780, hasTouch: true, isMobile: true });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await page.screenshot({ path: path.join(root, `word-tour-progress-${width}.png`) });
     }

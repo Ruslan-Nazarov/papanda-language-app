@@ -51,8 +51,12 @@ async function main() {
       await page.evaluate(text => [...document.querySelectorAll('div')].filter(el => el.textContent === text && el.getBoundingClientRect().height > 0).at(-1).click(), text);
     };
     const seed = async state => {
-      await page.evaluate(state => localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
-      await page.reload({ waitUntil: 'networkidle0' });
+      const setup = await page.evaluateOnNewDocument(state => {
+        if (window !== window.top || location.origin === 'null') return;
+        localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 }));
+      }, state);
+      try { await page.reload({ waitUntil: 'networkidle0' }); }
+      finally { await page.removeScriptToEvaluateOnNewDocument(setup.identifier); }
       await page.waitForSelector('[role="tab"]');
     };
     const state = () => page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state);

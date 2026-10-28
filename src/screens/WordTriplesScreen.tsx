@@ -20,6 +20,7 @@ import PronunciationModal from '../components/PronunciationModal';
 import { papanda } from '../design/papanda';
 import { usePapandaFonts } from '../design/usePapandaFonts';
 import PapandaIcon from '../components/PapandaIcon';
+import CompactAction from '../components/CompactAction';
 
 
 const SWIPE_THRESHOLD = 72;
@@ -304,7 +305,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       {...panResponder.panHandlers}
     >
       <ScrollView testID="words-scroll" keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.innerWrapper, { paddingTop: topPadding }]}>
@@ -345,7 +346,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                 const wordKey = currentWord.eng || currentWord.word || '';
                 toggleWordFavorite(wordKey);
               }}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <PapandaIcon name="star" color={isFavorite ? papanda.color.accentHover : papanda.color.textSecondary} />
               {isFavorite && <View style={styles.favoriteMark}><Text style={styles.favoriteMarkText}>✓</Text></View>}
@@ -355,7 +355,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
               style={styles.statsCardBtn}
               accessibilityRole="button" accessibilityLabel="Статистика слова"
               onPress={() => setIsStatsVisible(true)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <PapandaIcon name="chart" size={16} />
               <Text style={styles.statsCardBtnText}>Статистика</Text>
@@ -367,7 +366,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                 setEditingWord(currentWord);
                 setIsModalVisible(true);
               }}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <PapandaIcon name="edit" />
             </TouchableOpacity>
@@ -439,26 +437,24 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                       style={styles.pronunciationBtn}
                       activeOpacity={0.7}
                       onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
                       <PapandaIcon name="microphone" />
                     </TouchableOpacity>
                   )}
                 </View>
                 {translation && (
-                  <TouchableOpacity
+                  <CompactAction
                     testID={`word-compose-${lang}`}
                     accessibilityRole="button"
                     accessibilityLabel={`Составить предложение со словом ${translation}`}
                     style={styles.composeSentenceButton}
+                    surfaceStyle={styles.composeSentenceSurface}
                     activeOpacity={0.7}
                     onPress={composeSentence}
                   >
-                    <View style={styles.composeSentenceSurface}>
-                      <Text style={styles.composeSentenceButtonText}>Составить предложение</Text>
-                      <PapandaIcon name="next" size={14} />
-                    </View>
-                  </TouchableOpacity>
+                    <Text style={styles.composeSentenceButtonText}>Составить предложение</Text>
+                    <PapandaIcon name="next" size={14} />
+                  </CompactAction>
                 )}
                 </View>
               );
@@ -663,9 +659,6 @@ const createStyles = (fontsLoaded: boolean) => {
   },
   favoriteMark: { position: 'absolute', right: 2, bottom: 4, backgroundColor: papanda.color.surface, borderRadius: 4 },
   favoriteMarkText: { fontFamily: strong, fontSize: 12, lineHeight: 14, color: papanda.color.accentText },
-  editCardBtnText: {
-    fontSize: 16,
-  },
   statsCardBtn: {
     flexDirection: 'row', gap: 4,
     alignItems: 'center', justifyContent: 'center',
@@ -706,18 +699,12 @@ const createStyles = (fontsLoaded: boolean) => {
     alignItems: 'center', justifyContent: 'center',
     borderRadius: papanda.radius.control,
   },
-  pronunciationBtnText: {
-    fontSize: 16,
-  },
   composeSentenceButton: {
-    minHeight: 44,
     alignSelf: 'flex-end',
-    justifyContent: 'center',
     maxWidth: '100%',
   },
   composeSentenceSurface: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    minHeight: papanda.compactControl.visualHeightPx,
     paddingHorizontal: 12, paddingVertical: 4,
     backgroundColor: papanda.color.accentSoft,
     borderWidth: 1,
@@ -764,9 +751,6 @@ const createStyles = (fontsLoaded: boolean) => {
     alignItems: 'center',
     gap: 8,
   },
-  aiWarningIcon: {
-    fontSize: 18,
-  },
   aiWarningTitle: {
     fontFamily: strong,
     fontSize: 12,
@@ -779,10 +763,6 @@ const createStyles = (fontsLoaded: boolean) => {
     fontSize: 14,
     color: '#78350F',
     marginTop: 1,
-  },
-  aiWarningEdit: {
-    fontSize: 16,
-    paddingHorizontal: 4,
   },
   sideBadge: {
     flexDirection: 'row',

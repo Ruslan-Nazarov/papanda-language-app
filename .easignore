@@ -59,6 +59,8 @@ check-build*.log
 /credentials/
 
 # Cloud mobile build does not need local logs, worker code or research.
+# Local Windows cache paths must not configure npm on Linux build workers.
+/.npmrc
 *.log
 eas-*-local.json
 /gemini-proxy/

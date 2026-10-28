@@ -19,6 +19,7 @@ import { useCardTransition } from '../hooks/useCardTransition';
 import { useSentenceEditor } from '../hooks/useSentenceEditor';
 import { ROLE_TRANSLATIONS, getRoleColor } from '../constants/sentencePresentation';
 import WordFormModal from '../components/WordFormModal';
+import CompactAction from '../components/CompactAction';
 import type { WordFormContext } from '../services/wordFormExplanation';
 import { buildWordLookup, cleanDictionaryForm, getWordTranslation } from '../utils/words';
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
@@ -814,9 +815,9 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
               <View style={styles.sentenceSurface}>
                 <View style={styles.sentenceMeta}>
                   <Text testID="trainer-position" style={styles.positionText}>{targetSentenceId ? 'Из словаря' : `${safeIndex + 1} / ${filteredSentences.length}`}</Text>
-        <TouchableOpacity testID="trainer-translation" accessibilityRole="button" disabled={!currentSentence} style={styles.translationTarget} onPress={() => setShowTranslations(!showTranslations)}>
-          <View style={styles.translationToggle}><Text style={styles.translationToggleText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text></View>
-        </TouchableOpacity>
+        <CompactAction testID="trainer-translation" disabled={!currentSentence} surfaceStyle={styles.translationToggle} onPress={() => setShowTranslations(!showTranslations)}>
+          <Text style={styles.translationToggleText}>{showTranslations ? 'Скрыть перевод' : 'Перевод'}</Text>
+        </CompactAction>
 
 
                 </View>
@@ -1082,8 +1083,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 const styles = StyleSheet.create({
   sentenceSurface: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E8EC', borderRadius: 18, padding: 14 },
   sentenceMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: -8, marginBottom: 6 },
-  translationToggle: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: '#F7C99F', borderRadius: 8 },
-  translationTarget: { minHeight: 44, justifyContent: 'center' },
+  translationToggle: { paddingHorizontal: 10, paddingVertical: 6, alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: '#F7C99F', borderRadius: 8 },
   translationToggleText: { fontSize: 14, color: '#B54708', fontWeight: '600' },
   headingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   exerciseContent: { flexGrow: 1, paddingBottom: 16 },

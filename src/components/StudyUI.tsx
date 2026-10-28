@@ -3,12 +3,17 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import type { Sentence, SyntaxRole } from '../models/types';
 import { getRoleColor, ROLE_TRANSLATIONS } from '../constants/sentencePresentation';
 import { ACCENT } from '../constants/theme';
+import CompactAction from './CompactAction';
 
 export function StudyButton({ title, onPress, disabled, selected, compact, testID }: { title: string; onPress: () => void; disabled?: boolean; selected?: boolean; compact?: boolean; testID?: string }) {
   const label = <Text style={[studyStyles.buttonText, selected && { color: '#FFF' }]}>{title}</Text>;
+  if (compact) return <CompactAction testID={testID} disabled={disabled} onPress={onPress}
+    accessibilityState={{ disabled: !!disabled, selected: !!selected }}
+    style={disabled && { opacity: 0.45 }}
+    surfaceStyle={[studyStyles.button, studyStyles.compactButton, selected && { backgroundColor: ACCENT }]}>{label}</CompactAction>;
   return <TouchableOpacity testID={testID} accessibilityRole="button" accessibilityState={{ disabled: !!disabled, selected: !!selected }} disabled={disabled} onPress={onPress}
-    style={[compact ? studyStyles.compactTarget : studyStyles.button, !compact && selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
-    {compact ? <View style={[studyStyles.button, studyStyles.compactButton, selected && { backgroundColor: ACCENT }]}>{label}</View> : label}
+    style={[studyStyles.button, selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
+    {label}
   </TouchableOpacity>;
 }
 export function StudyTokens({ sentence, added = [], role }: { sentence: Sentence; added?: number[]; role?: SyntaxRole }) {
@@ -24,8 +29,7 @@ export const studyStyles = StyleSheet.create({
   text: { fontSize: 15, lineHeight: 23, color: '#334155' },
   small: { fontSize: 12, color: '#64748B', lineHeight: 18 },
   button: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: '#EEF2F6', alignSelf: 'flex-start' },
-  compactButton: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, justifyContent: 'center' },
-  compactTarget: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' },
+  compactButton: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   buttonText: { fontSize: 14, fontWeight: '600', color: '#334155' },
   input: { borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 12, padding: 12, fontSize: 16, color: '#172033', backgroundColor: '#FFF', minHeight: 48 },
   token: { padding: 8, borderBottomWidth: 3, borderRadius: 6 },

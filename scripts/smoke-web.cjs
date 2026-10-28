@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const puppeteer = require('puppeteer');
 
 async function main() {
-  const root = path.resolve(__dirname, '../dist-audit');
+  const root = path.resolve(__dirname, '..', process.env.SMOKE_BUNDLE_DIR || 'dist-audit');
   const server = http.createServer((request, response) => {
     const relative = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const file = path.resolve(root, '.' + (relative === '/' ? '/index.html' : relative));
