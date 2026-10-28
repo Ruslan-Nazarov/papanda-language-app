@@ -1,18 +1,18 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { planSentenceBatch, parseSentenceDrafts } from '../src/services/sentenceCurriculum';
-import { getAllDictionaryCandidates, getLanguagePrompt } from '../src/services/sentencePrompts';
+import { buildSentenceGenerationPrompt, getAllDictionaryCandidates, getLanguagePrompt } from '../src/services/sentencePrompts';
 import { parseProgress } from '../src/store/progressValidation';
 
 it('starts with the sentence basis and develops members in the book order', () => {
   assert.deepEqual(planSentenceBatch(4).map(task => task.focus), ['core', 'attribute', 'object', 'circumstance']);
-  const tasks = planSentenceBatch(8);
+  const tasks = planSentenceBatch(8, false, 'development');
   assert.equal(tasks.filter(task => !['negative', 'question'].includes(task.focus)).length, 6);
   assert.equal(tasks.filter(task => task.focus === 'complex').length, 1);
   assert.equal(tasks[1].develops, tasks[0].id);
   assert.equal(tasks[2].develops, tasks[1].id);
   assert.equal(tasks[3].develops, tasks[2].id);
-  assert.equal(planSentenceBatch(4)[3].develops, 'task-3');
+  assert.equal(planSentenceBatch(4, false, 'development')[3].develops, 'task-3');
   assert.equal(planSentenceBatch(1)[0].develops, undefined);
 });
 it('filters foreign or duplicate draft IDs and restores planned order', () => {
@@ -37,4 +37,13 @@ it('preserves new sentence metadata through backup and rejects malformed known f
   assert.deepEqual(restored.generatedSentences[0], sentence);
   assert.throws(() => parseProgress({ userWordProgress: {}, generatedSentences: [{ ...sentence, literalTranslation: 1 }] }));
   assert.throws(() => parseProgress({ userWordProgress: {}, generatedSentences: [{ ...sentence, words: [{ ...sentence.words[0], clauseIndex: -1 }] }] }));
+});
+
+it('main trainer plans independent sentences and requests varied scenes without chain instructions', () => {
+  for (const count of [1, 4, 8, 20]) assert.ok(planSentenceBatch(count).every(task => task.develops === undefined));
+  const prompt = buildSentenceGenerationPrompt('en', [], 8);
+  assert.match(prompt, /different scenes, participants and predicates/);
+  assert.doesNotMatch(prompt, /BACKWARDS|preserve the earlier scene/);
+  const development = buildSentenceGenerationPrompt('en', [], 4, [], undefined, planSentenceBatch(4, false, 'development'));
+  assert.match(development, /BACKWARDS/);
 });

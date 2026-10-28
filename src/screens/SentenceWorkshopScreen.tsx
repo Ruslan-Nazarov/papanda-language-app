@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { ScrollView, View, Text, TextInput } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
@@ -15,9 +15,17 @@ import { generateSentenceBatch } from '../services/sentenceGeneration';
 import { useStudyTask } from '../hooks/useStudyTask';
 import StructureExercise, { StructureProgress } from '../components/StructureExercise';
 import { StudyButton, StudyTokens, studyStyles as s } from '../components/StudyUI';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 type Mode = 'Самостоятельно' | 'Нарастающее' | 'Развитие' | 'Языки' | 'Мой текст';
 const modes: Mode[] = ['Самостоятельно', 'Нарастающее', 'Развитие', 'Языки', 'Мой текст'];
+const exercises: Record<Mode, { title: string; description: string; icon: string; hint: string }> = {
+  'Самостоятельно': { title: 'Найти основу и детали', description: 'Выбирайте слова в предложении. Проверьте, где действие, кто действует и что его уточняет.', icon: '01', hint: 'Начните здесь · без ИИ' },
+  'Нарастающее': { title: 'От короткого к полному', description: 'Посмотрите, как к простой основе добавляются детали. Попробуйте заметить каждую новую часть.', icon: '02', hint: 'Готовые примеры · без ИИ' },
+  'Развитие': { title: 'Дополнить предложение', description: 'Изучите готовую цепочку и предложите свою деталь. ИИ поможет продолжить предложение.', icon: '03', hint: 'Примеры без ИИ · своё продолжение с ИИ' },
+  'Языки': { title: 'Сравнить языки', description: 'Одна мысль на семи языках. Выберите часть предложения и сравните, как она выражена.', icon: '04', hint: 'Готовое сравнение · без ИИ' },
+  'Мой текст': { title: 'Разобрать свой текст', description: 'Вставьте короткий текст и читайте по предложению. Находите основу и детали с проверкой ИИ.', icon: '05', hint: 'Сохранение без ИИ · разбор с ИИ' },
+};
 const steps = ['Основа', '+ Определение', '+ Дополнение', '+ Обстоятельство'];
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 export default function SentenceWorkshopScreen({ navigation, route }: NativeStackScreenProps<RootStackParamList, 'SentenceWorkshop'>) {
@@ -26,10 +34,14 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
   const [code, setCode] = useState(initialCode);
   const language = LANGUAGES.find(l => l.code === code)!;
   const [mode, setMode] = useState<Mode>(route.params?.mode ?? 'Самостоятельно');
+  const [choosing, setChoosing] = useState(!route.params?.mode);
+  const [choosingLanguage, setChoosingLanguage] = useState(false);
+  const scroll = useRef<ScrollView>(null);
+  useEffect(() => { scroll.current?.scrollTo({ y: 0, animated: false }); }, [choosing, mode]);
   const sentences = useStore(state => state.sentences);
   // Growing-sentence task: complete series (base → +attribute → +object → +circumstance)
   // rebuilt from generated sentences of one batch, in a random order of series.
-  const [seriesId, setSeriesId] = useState<string | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<Sentence[] | null>(null);
   const [seriesStep, setSeriesStep] = useState(0);
   const [showAdded, setShowAdded] = useState(false);
   const [seriesSeed] = useState(Math.random);
@@ -43,13 +55,15 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
       .filter(list => list.length >= 2 && list.every((s, i) => s.chainStep === i));
   }, [sentences, language.label]);
   const builtInSeries = useMemo(() => developmentExamples(code), [code]);
-  const activeSeries = seriesList.find(list => list[0].generationBatchId === seriesId)
-    ?? (seriesList.length ? seriesList[Math.floor(seriesSeed * seriesList.length)] : builtInSeries);
-  const seriesIsBuiltIn = !seriesList.length;
+  // Keep the exercise the learner opened even if background generation adds or
+  // evicts cache entries. Only an explicit choice/language change replaces it.
+  const activeSeries = selectedSeries ?? (seriesList.length ? seriesList[Math.floor(seriesSeed * seriesList.length)] : builtInSeries);
+  useEffect(() => { if (!selectedSeries) setSelectedSeries(activeSeries); }, [selectedSeries, activeSeries]);
+  const seriesIsBuiltIn = !activeSeries[0].generationBatchId;
   const otherSeries = () => {
-    const pool = seriesList.filter(list => list !== activeSeries);
+    const pool = seriesList.filter(list => list[0].generationBatchId !== activeSeries[0].generationBatchId);
     if (!pool.length) return;
-    setSeriesId(pool[Math.floor(Math.random() * pool.length)][0].generationBatchId!);
+    setSelectedSeries(pool[Math.floor(Math.random() * pool.length)]);
     setSeriesStep(0); setShowAdded(false);
   };
   const readingTexts = useStore(state => state.readingTexts);
@@ -71,9 +85,9 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
   const readingCard = reading?.cards[String(reading.position)];
   const task = useStudyTask(`${code}:${mode}:${card.id}:${readingId}:${reading?.position}:${chainIndex}:${compareBase?.id ?? ''}:${target}`);
   const changeLanguage = (next: string) => {
-    task.cancel(); setCode(next); setCard(developmentExamples(next)[3]); setExerciseVersion(v => v + 1);
+    task.cancel(); setCode(next); setChoosingLanguage(false); setCard(developmentExamples(next)[3]); setExerciseVersion(v => v + 1);
     setChain(developmentExamples(next)); setChainIndex(0); setAddition(''); setReadingId(null);
-    setSeriesId(null); setSeriesStep(0); setShowAdded(false);
+    setSelectedSeries(null); setSeriesStep(0); setShowAdded(false);
   };
   const nextExercise = () => {
     const state = useStore.getState();
@@ -101,11 +115,25 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
   };
   return <View testID="workshop-screen" style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: Math.max(insets.top, 16) }}>
     <View style={{ paddingHorizontal: 16 }}><StudyButton title="Назад" onPress={() => navigation.goBack()} /></View>
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 16) + 24, maxWidth: 850, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
-      <Text style={s.title}>Мастерская предложения</Text>
-      <Text style={s.text}>От целого предложения — к его основе, уточнениям и связному тексту.</Text>
-      <View style={s.row}>{modes.map(item => <StudyButton key={item} title={item} selected={mode === item} onPress={() => { task.cancel(); setMode(item); }} />)}</View>
-      {mode !== 'Языки' && <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={{ gap: 8, paddingVertical: 10 }}>{LANGUAGES.map(item => <StudyButton key={item.code} title={`${item.flag} ${item.label}`} selected={code === item.code} onPress={() => changeLanguage(item.code)} />)}</ScrollView>}
+    <ScrollView ref={scroll} contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 16) + 24, maxWidth: 850, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
+      {choosing ? <>
+        <Text style={ui.eyebrow}>ПРАКТИКА ЧТЕНИЯ</Text>
+        <Text accessibilityRole="header" style={ui.heading}>Разбор предложений</Text>
+        <Text style={ui.intro}>Учитесь понимать, кто что делает и как слова связаны по смыслу. Выберите, с чего начать.</Text>
+        {modes.map(item => <TouchableOpacity key={item} accessibilityRole="button" accessibilityLabel={exercises[item].title} style={ui.choice} onPress={() => { task.cancel(); setMode(item); setChoosing(false); }}>
+          <View style={ui.choiceHeader}><Text style={ui.number}>{exercises[item].icon}</Text><Text style={ui.choiceTitle}>{exercises[item].title}</Text><Text style={ui.arrow}>→</Text></View>
+          <Text style={s.text}>{exercises[item].description}</Text>
+          <Text style={ui.hint}>{exercises[item].hint}</Text>
+        </TouchableOpacity>)}
+      </> : <>
+      <StudyButton title="Все упражнения" onPress={() => { task.cancel(); setChoosing(true); }} />
+      <Text accessibilityRole="header" style={ui.heading}>{exercises[mode].title}</Text>
+      <Text style={ui.intro}>{exercises[mode].description}</Text>
+      {mode !== 'Языки' && <View style={ui.language}>
+        <Text style={s.small}>Язык упражнения</Text>
+        <StudyButton title={`${language.flag} ${language.label} · изменить`} onPress={() => setChoosingLanguage(!choosingLanguage)} />
+        {choosingLanguage && <View style={s.row}>{LANGUAGES.map(item => <StudyButton key={item.code} title={`${item.flag} ${item.label}`} selected={code === item.code} onPress={() => changeLanguage(item.code)} />)}</View>}
+      </View>}
       {!isGeminiConfigured() && <Text style={s.warning}>ИИ сейчас не подключён. Встроенные упражнения, цепочки и сравнение семи языков доступны без интернета.</Text>}
       {task.phase ? <View style={s.card}><Text accessibilityLiveRegion="polite" style={s.text}>{task.phase}</Text><StudyButton title="Отменить запрос" onPress={task.cancel} /></View> : null}
       {!!task.error && <Text accessibilityRole="alert" style={s.warning}>{task.error}</Text>}
@@ -138,12 +166,18 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
             <StudyButton title={step < activeSeries.length - 1 ? `Дальше: ${steps[step + 1] ?? '+ Деталь'}` : 'Серия закончена'} disabled={step >= activeSeries.length - 1} onPress={() => goTo(step + 1)} />
           </View>
           <View style={s.row}>
-            <StudyButton title="Другая серия" disabled={seriesList.length < 2} onPress={otherSeries} />
+            <StudyButton title="Другая серия" disabled={!seriesList.some(list => list[0].generationBatchId !== activeSeries[0].generationBatchId)} onPress={otherSeries} />
             <StudyButton title="Новые серии (ИИ)" disabled={aiDisabled} onPress={() => void task.run(async (signal, phase) => {
               phase('Составляем серии предложений…');
               const state = useStore.getState();
-              return generateSentenceBatch(code, state.words, 8, undefined, state.sentences.filter(item => item.language === language.label).map(item => item.sentence), { signal, phase });
-            }, batch => { useStore.getState().addGeneratedSentences(batch); setSeriesId(batch.find(item => item.chainStep === 0)?.generationBatchId ?? null); setSeriesStep(0); setShowAdded(false); })} />
+              return generateSentenceBatch(code, state.words, 8, undefined, state.sentences.filter(item => item.language === language.label).map(item => item.sentence), { signal, phase }, 'development');
+            }, batch => {
+              useStore.getState().addGeneratedSentences(batch);
+              const batchId = batch.find(item => item.chainStep === 0)?.generationBatchId;
+              const series = batchId ? batch.filter(item => item.generationBatchId === batchId && item.chainStep !== undefined).sort((a, b) => a.chainStep! - b.chainStep!) : [];
+              if (series.length >= 2) { setSelectedSeries(series); setSeriesStep(0); setShowAdded(false); }
+              else task.setError('Новая серия не получилась. Текущее упражнение сохранено; можно повторить запрос.');
+            })} />
           </View>
         </View>;
       })()}
@@ -180,23 +214,29 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
         {comparisons.map(item => <View key={item.language} style={s.card}><Text style={s.title}>{item.language}</Text><Text style={s.text}>{item.sentence}</Text><StudyTokens sentence={item} role={role} /></View>)}
       </>}
       {mode === 'Мой текст' && <>
-        {reading && <StudyButton title={creatingText ? 'Вернуться к чтению' : 'Добавить новый текст'} onPress={() => setCreatingText(!creatingText)} />}
+        {reading && <StudyButton title={creatingText ? 'Вернуться к чтению' : 'Добавить новый текст'} onPress={() => { task.cancel(); setCreatingText(!creatingText); }} />}
         {(!reading || creatingText) && <View style={s.card}>
-          <Text style={s.title}>Читать свой текст</Text>
-          <Text style={s.text}>Вставьте небольшой абзац на выбранном языке. До 20 предложений, 6000 символов; до 10 сохранённых текстов.</Text>
-          <TextInput accessibilityLabel="Текст для чтения" style={[s.input, { minHeight: 130, textAlignVertical: 'top' }]} multiline value={draft} onChangeText={value => { setDraft(value); setReviewed(false); }} placeholder="Вставьте текст…" />
-          <StudyButton title="Предложить границы предложений" disabled={!draft.trim()} onPress={() => { setDraft(suggestReadingSegments(draft)); setReviewed(true); }} />
-          {reviewed && <Text style={s.small}>Проверьте границы: одно предложение на строку. Автоматическое деление может ошибаться на сокращениях. Исправьте строки и сохраните.</Text>}
-          <StudyButton title="Сохранить текст с этими границами" disabled={!draft.trim()} onPress={saveText} />
+          <Text style={ui.eyebrow}>{reviewed ? 'ШАГ 2 ИЗ 3' : 'ШАГ 1 ИЗ 3'}</Text>
+          <Text style={s.title}>{reviewed ? 'Проверьте деление на предложения' : 'Вставьте текст'}</Text>
+          <Text style={s.text}>{reviewed ? 'Каждое предложение должно быть на отдельной строке. Если деление ошиблось на сокращении, исправьте перенос строки прямо в поле.' : `Небольшой абзац на языке ${language.label}. Затем приложение предложит разделить его на предложения.`}</Text>
+          <TextInput accessibilityLabel="Текст для чтения" style={[s.input, { minHeight: 180, textAlignVertical: 'top' }]} multiline value={draft} onChangeText={setDraft} placeholder="Скопируйте сюда отрывок из книги, статьи или переписки…" placeholderTextColor="#64748B" />
+          <Text style={s.small}>{draft.length} / 6000 символов · до 20 предложений</Text>
+          {!reviewed ? <StudyButton title="Разделить на предложения →" selected disabled={!draft.trim()} onPress={() => { setDraft(suggestReadingSegments(draft)); setReviewed(true); }} /> : <>
+            <StudyButton title="Сохранить и перейти к чтению →" selected disabled={!draft.trim()} onPress={saveText} />
+            <StudyButton title="Вставить другой текст" onPress={() => setReviewed(false)} />
+          </>}
+          <Text style={s.small}>Текст сохраняется на устройстве, до 10 текстов. При разборе ИИ получит только выбранное предложение.</Text>
         </View>}
+        {readingTexts.some(t => t.language === language.label) && <Text style={ui.sectionTitle}>Сохранённые тексты</Text>}
         {readingTexts.filter(t => t.language === language.label).map(item => <View key={item.id} style={s.card}>
           <Text style={s.text}>{item.title} · {item.position + 1}/{item.segments.length}</Text>
-          <View style={s.row}><StudyButton title="Открыть текст" selected={readingId === item.id} onPress={() => setReadingId(item.id)} />
+          <View style={s.row}><StudyButton title="Открыть текст" selected={readingId === item.id} onPress={() => { setReadingId(item.id); setCreatingText(false); }} />
             <StudyButton title={deleteId === item.id ? 'Подтвердить удаление текста' : 'Удалить текст'} onPress={() => { if (deleteId === item.id) { task.cancel(); useStore.getState().removeReadingText(item.id); setDeleteId(null); } else setDeleteId(item.id); }} />
             {deleteId === item.id && <StudyButton title="Оставить текст" onPress={() => setDeleteId(null)} />}
           </View>
         </View>)}
-        {reading && <View style={s.card}>
+        {reading && !creatingText && <View style={s.card}>
+          <Text style={ui.eyebrow}>ШАГ 3 ИЗ 3 · ЧИТАЙТЕ И РАЗБИРАЙТЕ</Text>
           <Text style={s.title}>Предложение {reading.position + 1} из {reading.segments.length}</Text>
           <Text style={s.text}>{reading.segments[reading.position]}</Text>
           <Text style={s.small}>Сначала попробуйте найти основу самостоятельно. Подготовка разметки отправляет ИИ только это предложение; перевод и ответы останутся скрыты до вашего действия.</Text>
@@ -208,6 +248,21 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
           </View>
         </View>}
       </>}
+      </>}
     </ScrollView>
   </View>;
 }
+
+const ui = StyleSheet.create({
+  eyebrow: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, color: ACCENT_DARK, marginTop: 8 },
+  heading: { fontSize: 28, lineHeight: 34, fontWeight: '800', color: '#172033', marginTop: 12, marginBottom: 10 },
+  intro: { fontSize: 16, lineHeight: 24, color: '#475569', marginBottom: 20 },
+  choice: { backgroundColor: '#FFF', borderRadius: 18, padding: 18, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 12, gap: 10 },
+  choiceHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  number: { color: ACCENT_DARK, backgroundColor: ACCENT_LIGHT, borderRadius: 9, padding: 8, fontSize: 13, fontWeight: '800' },
+  choiceTitle: { flex: 1, fontSize: 18, lineHeight: 24, fontWeight: '700', color: '#172033' },
+  arrow: { color: ACCENT, fontSize: 24 },
+  hint: { fontSize: 12, lineHeight: 18, fontWeight: '600', color: '#64748B' },
+  language: { backgroundColor: ACCENT_LIGHT, borderColor: ACCENT_BORDER, borderWidth: 1, borderRadius: 14, padding: 12, gap: 8, marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#172033', marginTop: 20, marginBottom: 6 },
+});

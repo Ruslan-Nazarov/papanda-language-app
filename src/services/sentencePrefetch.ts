@@ -30,7 +30,7 @@ export async function prefetchSentencesInBackground(): Promise<void> {
       if (!langObj) continue;
 
       const cachedCount = useStore.getState().generatedSentences.filter(s =>
-        s.source === 'generated' &&
+        s.source === 'generated' && s.chainStep === undefined &&
         s.language &&
         s.language.toLowerCase().includes(langObj.label.toLowerCase())
       ).length;

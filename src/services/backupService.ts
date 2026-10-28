@@ -4,6 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { useStore } from '../store/useStore';
+import { useBookStore } from '../store/bookStore';
 
 const BACKUP_VERSION = 1;
 
@@ -12,6 +13,7 @@ interface BackupFile {
   version: number;
   exportedAt: string;
   data: unknown;
+  book: unknown;
 }
 
 const backupFileName = () => {
@@ -33,6 +35,7 @@ export async function exportProgressToFile(): Promise<{ ok: boolean; error?: str
       version: BACKUP_VERSION,
       exportedAt: new Date().toISOString(),
       data,
+      book: useBookStore.getState().exportProgress(),
     };
 
     if (Platform.OS === 'web') {

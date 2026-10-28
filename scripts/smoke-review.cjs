@@ -41,9 +41,14 @@ async function main() {
     };
     const tab = name => page.click(`[role="tab"][aria-label="${name}"]`);
     const seed = async state => {
-      await page.evaluate(state => localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
-      await page.reload({ waitUntil: 'networkidle0' });
-      await page.waitForSelector('[role="tab"]');
+      // Inject before hydration: a pending write from the old page must not
+      // replace the fixture between localStorage.setItem and reload.
+      const script = await page.evaluateOnNewDocument(state =>
+        localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
+      try {
+        await page.reload({ waitUntil: 'networkidle0' });
+        await page.waitForSelector('[role="tab"]');
+      } finally { await page.removeScriptToEvaluateOnNewDocument(script.identifier); }
     };
     const custom = { eng: 'review-fixture', word: 'example', ru: 'Двусмысленность', count: 7, is_learned: 0,
       translations: { en: 'ambiguity', it: 'ambiguità' }, knowledge_stats: {}, show_stats: { en: 7, it: 7 } };

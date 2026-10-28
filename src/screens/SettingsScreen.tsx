@@ -92,12 +92,12 @@ export default function SettingsScreen() {
     if (isImporting || (!restore && !preview)) return;
     setIsImporting(true);
     try {
-      if (restore) await restoreBeforeImport(); else await importWithRestorePoint(preview!.data);
+      if (restore) await restoreBeforeImport(); else await importWithRestorePoint(preview!.data, preview!.book);
       setPreview(null); setShowRestore(false);
       setRestoreDate(await getRestorePointDate());
       setBackupMessage(restore ? 'Состояние до импорта восстановлено.' : 'Прогресс импортирован. Предыдущее состояние сохранено на устройстве.');
     } catch (error) { setBackupMessage(error instanceof Error ? error.message : 'Не удалось восстановить прогресс.'); }
-    finally { setIsImporting(false); }
+    finally { setRestoreDate(await getRestorePointDate().catch(() => null)); setIsImporting(false); }
   };
 
   const handleReplayOnboarding = () => {
@@ -131,7 +131,10 @@ export default function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sectionSub}>papanda {Application.nativeApplicationVersion ?? appConfig.expo.version} · {Application.nativeBuildVersion ? 'сборка ' + Application.nativeBuildVersion : 'web'}</Text>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Книга и метод</Text>
+          <Text style={styles.sectionTitle}>Книга и заметки</Text>
+          <TouchableOpacity testID="settings-notes" accessibilityRole="button" style={styles.row} onPress={() => navigation.navigate('Notes')}>
+            <Text style={styles.rowText}>Мои заметки</Text><Text style={styles.rowText}>›</Text>
+          </TouchableOpacity>
           <Text style={styles.sectionSub}>Авторская методика и грамматика изучаемых языков. Доступны без интернета.</Text>
           <TouchableOpacity testID="book-entry" accessibilityRole="button" style={styles.row}
             onPress={() => navigation.navigate('Book', { language: activeLanguages[0] })}>
@@ -241,6 +244,15 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Экспериментальные функции</Text>
+          <Text style={styles.sectionSub}>Пробуйте изменения, сохраняйте заметки и историю запусков.</Text>
+          <TouchableOpacity testID="settings-experiments" accessibilityRole="button" style={styles.row}
+            onPress={() => navigation.navigate('Experiments')}>
+            <Text style={styles.rowText}>Эксперименты</Text><Text style={styles.rowText}>›</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Backup Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Резервная копия</Text>
@@ -286,7 +298,8 @@ export default function SettingsScreen() {
           <View style={{ backgroundColor: '#FFF', padding: 24, borderRadius: 16 }}>
             <Text style={styles.sectionTitle}>{showRestore ? 'Восстановить прежний прогресс?' : 'Проверка резервной копии'}</Text>
             <Text style={styles.sectionSub}>{showRestore ? 'Текущие изменения будут заменены состоянием до последнего импорта.' :
-              'Слов: ' + (preview?.customWords ?? 0) + ' · Предложений: ' + (preview?.sentences ?? 0) + '\nТекстов: ' + (preview?.readingTexts ?? 0) + ' · Ответов разбора: ' + (preview?.structureAttempts ?? 0) + '\nЗаписей прогресса: ' + (preview?.progressWords ?? 0) +
+              'Слов: ' + (preview?.customWords ?? 0) + ' · Предложений: ' + (preview?.sentences ?? 0) + '\nТекстов: ' + (preview?.readingTexts ?? 0) + ' · Ответов разбора: ' + (preview?.structureAttempts ?? 0) + '\nЗаметок: ' + (preview?.notes ?? 0) + ' · Черновиков: ' + (preview?.noteDrafts ?? 0) + '\nЗаписей прогресса: ' + (preview?.progressWords ?? 0) +
+              (preview?.book ? '\nЗакладок книги: ' + preview.book.bookmarks.length + ' · Позиция и размер текста сохранены.' : '\nКнига отсутствует в этой копии; текущие закладки и позиция сохранятся.') +
               '\nСовпадающих ключей: ' + (preview?.conflicts ?? 0) + '. Последняя пользовательская запись заменит совпадающую, без дублей.\nТекущий прогресс будет заменён. Сначала сохраним точку восстановления на этом устройстве.'}</Text>
             {backupMessage ? <Text>{backupMessage}</Text> : null}
             <TouchableOpacity style={styles.row} disabled={isImporting} onPress={() => void commitImport(showRestore)}><Text style={styles.rowText}>{isImporting ? 'Сохраняем…' : showRestore ? 'Восстановить' : 'Заменить прогресс'}</Text></TouchableOpacity>

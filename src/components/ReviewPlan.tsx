@@ -6,11 +6,11 @@ import { getWordTranslation } from '../utils/words';
 import { getLanguageLabel } from '../constants/languages';
 import { ACCENT } from '../constants/theme';
 
-export default function ReviewPlan({ onStart }: { onStart: () => void }) {
+export default function ReviewPlan({ onStart, now }: { onStart: () => void; now?: number }) {
   const words = useStore(s => s.words);
   const languages = useStore(s => s.activeLanguages);
   const count = useStore(s => s.workoutWordCount);
-  const plan = buildReviewPlan(words, languages);
+  const plan = buildReviewPlan(words, languages, now);
   return <View style={{ padding: 16, backgroundColor: '#FFF7ED', borderRadius: 16, marginBottom: 16 }}>
     <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Повторение на сегодня</Text>
     <Text style={{ marginVertical: 8 }}>{plan.length ? 'Пора повторить: ' + plan.length + '. В тренировке — до ' + count + '.' : 'На сегодня повторений нет. Можно изучать новые слова.'}</Text>

@@ -23,6 +23,8 @@ const SWIPE_THRESHOLD = 72;
 const SWIPE_EXIT_DISTANCE = 520;
 const SWIPE_ENTRY_OFFSET = 56;
 
+const isHorizontalSwipe = (gesture: { dx: number; dy: number }) =>
+  Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.4;
 
 export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
   const isFocused = useIsFocused();
@@ -69,9 +71,9 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   const panResponder = React.useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_evt, gestureState) => {
-        return Math.abs(gestureState.dx) > 8 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.4;
-      },
+      onMoveShouldSetPanResponder: (_evt, gestureState) => isHorizontalSwipe(gestureState),
+      // Claim horizontal drags before a word's sentence button can treat them as taps.
+      onMoveShouldSetPanResponderCapture: (_evt, gestureState) => isHorizontalSwipe(gestureState),
       onPanResponderMove: (_evt, gestureState) => {
         if (!isSwipeAnimating.current) {
           cardTranslateX.setValue(gestureState.dx);
@@ -249,6 +251,19 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     extrapolate: 'clamp',
   });
 
+  const previousWordButton = history.length > 0 ? (
+    <TouchableOpacity
+      testID="word-undo"
+      style={styles.undoButton}
+      onPress={handlePrev}
+      accessibilityRole="button"
+    >
+      <Text style={styles.undoButtonText}>
+        {history[history.length - 1].undo ? '↶ Отменить «Выучено»' : '← Предыдущее слово'}
+      </Text>
+    </TouchableOpacity>
+  ) : null;
+
   if (activeLanguages.length === 0) {
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
@@ -262,6 +277,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
       <View style={[styles.centerContainer, { paddingTop: topPadding }]} testID="word-tour-complete">
         <Text style={styles.headerTitle}>Тур завершён</Text>
         <Text style={styles.info}>Пройдено карточек: {sessionCount}</Text>
+        {previousWordButton}
         <TouchableOpacity style={[styles.button, styles.btnKnown, styles.tourStartButton]} onPress={startNewTour} accessibilityRole="button">
           <Text style={styles.buttonText}>Следующий тур</Text>
         </TouchableOpacity>
@@ -273,11 +289,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
         <Text style={styles.info}>Нет доступных слов для выбранной комбинации языков!</Text>
-        {history.length > 0 && (
-          <TouchableOpacity onPress={handlePrev} accessibilityRole="button">
-            <Text style={styles.statsCardBtnText}>Вернуть предыдущее слово</Text>
-          </TouchableOpacity>
-        )}
+        {previousWordButton}
       </View>
     );
   }
@@ -382,6 +394,11 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             {activeLanguages.map(lang => {
               const translation = getWordTranslation(currentWord, lang);
               const langFlag = LANGUAGES.find(l => l.code === lang)?.flag || '';
+              const composeSentence = () => {
+                if (!transition.beginAction()) return;
+                setTargetSentenceInfo({ langCode: lang, highlightWord: translation });
+                navigation.navigate('Sentence Trainer');
+              };
 
               return (
                 <View key={lang}>
@@ -400,10 +417,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     style={styles.wordCenterContainer}
                     activeOpacity={translation ? 0.6 : 1}
                     disabled={!translation}
-                    onPress={() => {
-                      setTargetSentenceInfo({ langCode: lang, highlightWord: translation });
-                      navigation.navigate('Sentence Trainer');
-                    }}
+                    onPress={composeSentence}
                   >
                     <Text style={styles.langTranslation}>{translation || '—'}</Text>
                   </TouchableOpacity>
@@ -421,6 +435,18 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     </TouchableOpacity>
                   )}
                 </View>
+                {translation && (
+                  <TouchableOpacity
+                    testID={`word-compose-${lang}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Составить предложение со словом ${translation}`}
+                    style={styles.composeSentenceButton}
+                    activeOpacity={0.7}
+                    onPress={composeSentence}
+                  >
+                    <Text style={styles.composeSentenceButtonText}>Составить предложение →</Text>
+                  </TouchableOpacity>
+                )}
                 </View>
               );
             })}
@@ -442,7 +468,10 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             testID="word-association"
             placeholderTextColor="#A0AEC0"
             value={associationText}
-            onChangeText={setAssociationText}
+            onChangeText={text => {
+              setAssociationText(text);
+              saveWordAssociation(currentWordKey, text);
+            }}
           />
         </Animated.View>
 
@@ -452,6 +481,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             <Text style={styles.buttonText}>✓ Выучено</Text>
           </TouchableOpacity>
         </View>
+        {previousWordButton}
       </ScrollView>
 
       <EditWordModal
@@ -646,6 +676,24 @@ const styles = StyleSheet.create({
   pronunciationBtnText: {
     fontSize: 16,
   },
+  composeSentenceButton: {
+    minHeight: 44,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: ACCENT_LIGHT,
+    borderWidth: 1,
+    borderColor: ACCENT_BORDER,
+    borderRadius: 10,
+    marginTop: 6,
+  },
+  composeSentenceButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: ACCENT_DARK,
+    textAlign: 'center',
+  },
   divider: {
     height: 1,
     backgroundColor: '#EDF2F7',
@@ -763,6 +811,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 8,
+  },
+  undoButton: {
+    minHeight: 44,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  undoButtonText: {
+    color: '#475569',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   button: {
     flex: 1,

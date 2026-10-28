@@ -101,7 +101,7 @@ const chain = [
 it('restores development order even when both model responses are reversed', async () => {
   configure();
   globalThis.fetch = async (_, init) => reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(chain).reverse() : [...chain].reverse());
-  const result = await generateSentenceBatch('en', [], 4);
+  const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.sentence), chain.map(item => item.sentence));
 });
 
@@ -120,7 +120,7 @@ it('reconsiders the whole chain when an expansion fails and never accepts orphan
     }
     return reply(chain);
   };
-  const result = await generateSentenceBatch('en', [], 4);
+  const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), chain.map(item => item.taskId));
   assert.equal(calls, 6);
 });
@@ -130,7 +130,7 @@ it('rejects a changed participant despite a positive model review', async () => 
   const broken = chain.map((item, index) => index === 0 ? item : { ...item,
     sentence: item.sentence.replace('Mia', 'Tom'), words: item.words.map(word => word.text === 'Mia' ? { ...word, text: 'Tom', dictionary_form: 'tom', parts: ['Tom'] } : word) });
   globalThis.fetch = async (_, init) => reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(broken) : broken);
-  const result = await generateSentenceBatch('en', [], 4);
+  const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1']);
 });
 
@@ -148,7 +148,7 @@ it('retains the validated prefix when repair fails or produces a shorter differe
         words: item.words.map(word => word.text === 'Mia' ? { ...word, text: 'Tom', dictionary_form: 'tom', parts: ['Tom'] } : word) }));
       return reply(stage === 'AUDIT_SENTENCE_CARDS' ? audit(shorter) : shorter);
     };
-    const result = await generateSentenceBatch('en', [], 4);
+    const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
     assert.deepEqual(result.map(sentence => sentence.sentence), chain.slice(0, 3).map(item => item.sentence), failure);
     assert.ok(calls <= 6);
   }
@@ -165,7 +165,7 @@ it('rejects lost details and tense changes even when the model approves the chai
       return { ...item, words, sentence: words.map(word => word.text).join(' ') + '.' };
     });
     globalThis.fetch = async (_, init) => reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(broken) : broken);
-    const result = await generateSentenceBatch('en', [], 4);
+    const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
     assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1', 'task-2'], change);
   }
 });
@@ -175,7 +175,7 @@ it('rejects a chain whose unchanged verb surface changes meaning in translation'
   const shifted = chain.map((item, index) => index < 2 ? item : { ...item,
     words: item.words.map(word => word.role === 'Predicate' ? { ...word, translation: 'представляет' } : word) });
   globalThis.fetch = async (_, init) => reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(shifted) : shifted);
-  const result = await generateSentenceBatch('en', [], 4);
+  const result = await generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1', 'task-2']);
 });
 
@@ -187,7 +187,7 @@ it('does not duplicate a restored chain sentence in an independent repair task',
     const batch = calls <= 3 ? chain.slice(0, 3) : [{ ...chain[0], taskId: 'task-6' }];
     return reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(batch) : batch);
   };
-  const result = await generateSentenceBatch('en', [], 6);
+  const result = await generateSentenceBatch('en', [], 6, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1', 'task-2', 'task-3']);
 });
 
@@ -261,7 +261,7 @@ it('does not spend a second full pipeline to fill an optional card after the cur
     const stage = stageOf(init);
     return reply(stage === 'AUDIT_SENTENCE_CARDS' ? audit(chain) : chain);
   };
-  const result = await generateSentenceBatch('en', [], 5);
+  const result = await generateSentenceBatch('en', [], 5, undefined, [], undefined, 'development');
   assert.deepEqual(result.map(sentence => sentence.generationTaskId), ['task-1', 'task-2', 'task-3', 'task-4']);
   assert.equal(calls, 3);
 });
@@ -346,4 +346,34 @@ it('global cancellation also stops an independently owned workshop batch', async
     cancelGenerations();
   });
   await assert.rejects(generateSentenceBatch('en', [], 1, undefined, [], { signal: controller.signal, phase: () => {} }), isAbortError);
+});
+
+it('ordinary batches accept independent participants without chain metadata', async () => {
+  configure();
+  const people = ['Mia', 'Tom', 'Anna', 'Ben'];
+  const cards = chain.map((item, i) => ({ ...item,
+    sentence: item.sentence.replace('Mia', people[i]),
+    words: item.words.map(word => word.text === 'Mia' ? { ...word, text: people[i], dictionary_form: people[i].toLowerCase(), parts: [people[i]] } : word),
+  }));
+  globalThis.fetch = async (_, init) => {
+    if (stageOf(init) === 'COMPOSE_SENTENCES') {
+      const prompt = JSON.parse(init!.body as string).prompt;
+      assert.doesNotMatch(prompt, /"develops"|BACKWARDS/);
+    }
+    return reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(cards) : cards);
+  };
+  const result = await generateSentenceBatch('en', [], 4);
+  assert.equal(result.length, 4);
+  assert.ok(result.every(card => card.chainStep === undefined));
+});
+
+it('does not coalesce ordinary and workshop generation', async () => {
+  configure();
+  globalThis.fetch = async (_, init) => reply(stageOf(init) === 'AUDIT_SENTENCE_CARDS' ? audit(chain) : chain);
+  const ordinary = generateSentenceBatch('en', [], 4);
+  const workshop = generateSentenceBatch('en', [], 4, undefined, [], undefined, 'development');
+  assert.notEqual(ordinary, workshop);
+  const [independent, growing] = await Promise.all([ordinary, workshop]);
+  assert.ok(independent.every(card => card.chainStep === undefined));
+  assert.deepEqual(growing.map(card => card.chainStep), [0, 1, 2, 3]);
 });

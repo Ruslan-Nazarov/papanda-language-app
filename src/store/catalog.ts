@@ -4,6 +4,7 @@ import type { PersistedProgress, UserWordProgress } from './progressTypes';
 import wordsData from '../data/words.json';
 import sentencesData from '../data/sentences.json';
 import { getWordKey } from '../utils/words';
+import { asManualSentence } from '../utils/sentences';
 
 const translationsFromJSON = (value: string): Record<string, string> => {
   const parsed: unknown = JSON.parse(value);
@@ -51,7 +52,7 @@ export const applyWordProgress = (word: Word, progress?: UserWordProgress): Word
 
 /** User edits override seeds/cache by id, including after a cold start. */
 export const mergeSentences = (custom: Sentence[], generated: Sentence[]): Sentence[] =>
-  [...new Map([...baseStaticSentences, ...generated, ...custom].map(sentence => [sentence.id, sentence])).values()];
+  [...new Map([...baseStaticSentences, ...generated, ...custom.map(asManualSentence)].map(sentence => [sentence.id, sentence])).values()];
 
 export const deriveCatalog = (state: PersistedProgress) => {
   const customKeys = new Set(state.customWords.map(getWordKey));

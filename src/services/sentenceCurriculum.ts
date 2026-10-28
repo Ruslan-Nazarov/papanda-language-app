@@ -24,14 +24,16 @@ export interface SentenceTask {
   develops?: string;
 }
 
+export type SentenceBatchMode = 'independent' | 'development';
+
 export interface SentenceDraft { taskId: string; sentence: string }
 
-export const planSentenceBatch = (count: number, targeted = false): SentenceTask[] => {
+export const planSentenceBatch = (count: number, targeted = false, mode: SentenceBatchMode = 'independent'): SentenceTask[] => {
   const sequence: SentenceFocus[] = ['core', 'attribute', 'object', 'circumstance', 'negative', 'reading', 'question', 'complex'];
   return Array.from({ length: count }, (_, i) => ({
     id: `task-${i + 1}`, focus: targeted && i === 0 ? 'usage' : sequence[i % sequence.length],
     goal: GOALS[targeted && i === 0 ? 'usage' : sequence[i % sequence.length]],
-    ...(count >= 4 && !targeted && i > 0 && i < 4 ? { develops: `task-${i}` } : {}),
+    ...(mode === 'development' && count >= 4 && !targeted && i > 0 && i < 4 ? { develops: `task-${i}` } : {}),
   }));
 };
 

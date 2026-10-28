@@ -73,6 +73,14 @@ async function main() {
       }));
       await page.screenshot({ path: path.join(root, `statistics-${width}.png`) });
     }
+    await page.click('[aria-label="Как считается: Активность за 14 дней"]');
+    await page.waitForFunction(() => document.body.innerText.includes('Количество учтённых показов слов'));
+    const activityHelp = await page.$eval('[aria-modal="true"]', el => el.innerText);
+    assert.ok(activityHelp.includes('В разделе «Слова»'));
+    assert.ok(!/тройк/iu.test(activityHelp));
+    await page.screenshot({ path: path.join(root, 'statistics-activity-help.png') });
+    await page.evaluate(() => [...document.querySelector('[aria-modal="true"]').querySelectorAll('div')].filter(el => el.textContent === 'Понятно').at(-1).click());
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
     await page.click('[aria-label="Как считается: Оценка закрепления"]');
     await page.waitForFunction(() => document.body.innerText.includes('Непоказанные слова тоже учитываются'));
     assert.equal(errors.length, 0, errors.join('\n'));

@@ -29,7 +29,7 @@ const LANGUAGE_PROMPTS: Record<string, LanguagePrompt> = {
   },
   it: {
     label: 'Italiano',
-    grammar: 'Natural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences.',
+    grammar: 'Natural Italian: agreement, articles, conjugation, clitic placement and natural subject omission. Use common compound forms where idiomatic; do not impose English tense preferences. Distinguish articles from homographic clitic pronouns by context, never spelling alone: La ragazza legge has La as Article; La vedo has La as Object (her); Lo leggo has Lo as Object (it); Gli parlo and Le scrivo have indirect-object pronouns as Object. Pronouns must have label Pronoun, not Article or Predicate. A true article introduces a noun phrase, possibly across adjectives; it is not an object pronoun.',
     morphology: 'parli → ["parl","i"]. Keep articulated prepositions (nel, della) whole. dictionary_form is infinitive / singular.',
   },
   fr: {
@@ -73,7 +73,7 @@ export const getSeedWords = (words: Word[], code: string, count = 25): Dictionar
 const METHOD = `Papanda follows the author's method, not a vocabulary drill:
 The whole sentence is the unit of language and reflects a meaningful real-world action or state.
 Find the predicate first, then subject, attributes of the subject, object and its attributes, circumstances; explain markers through word order, affixes and function words.
-Develop from a simple basis to added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.
+Within each sentence, recognise the basis and its added meaning. Unknown words are allowed: structure can be recognised before vocabulary is learned.
 Short complete sentences are valuable. State/nominal predicates and naturally implicit subjects are valid. Never pad a sentence just to add words.
 Prefer typical neutral constructions, affirmative before negative before questions, present/past and third person most often. Follow each task; do not cram every construction into a small batch.
 Use frequent idiomatic expressions, plausible agents/actions, concrete coherent situations. No accidental surrealism, moral platitudes or unrelated clauses glued together.
@@ -92,13 +92,13 @@ Write one complete sentence per task, return ONLY JSON [{"taskId":"task-1","sent
 For core use a simple affirmative action/state. For attribute/object/circumstance keep it affirmative and make the focused member identifiable.
 For negative/question use a simple, natural scene; complex needs a clear relation between two grammatical bases. Reading is an independent simple affirmative.
 Usage is a natural example of a requested word/expression: allow a question, negation or multiple clauses if that is how it is normally used. Do not force words like why, never or because into a simple affirmative. Other tasks must not develop a usage task.
-If develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.
+${tasks.some(task => task.develops) ? `If develops is present, preserve the earlier scene, predicate and participants; add only the indicated detail. Each result must still sound natural on its own. Do not remove obligatory complements to make the base shorter.
 Plan the whole development chain BACKWARDS from the object step: first choose one predicate and participant for which both the short core AND an added direct object are natural. Then derive all earlier and later steps from that same predicate and scene. Never switch verbs between task-1 and task-3. Keep the earlier details in every following step. Do not change tense, polarity, or the subject while adding a detail.
-In a chain containing an object task, choose a predicate allowing an optional object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. If the verb requires an object, include it from task-1 and make it more specific at the object step. Do not write an incomplete core.
+In a chain containing an object task, choose a predicate allowing an optional object (reading, drawing, drinking etc.), not an intransitive action like sleeping or arriving. If the verb requires an object, include it from task-1 and make it more specific at the object step. Do not write an incomplete core.` : `These are independent sentences for the main trainer, never a growing series. Use different scenes, participants and predicates across tasks and previously accepted context. Vary sentence length and construction; do not take an earlier sentence and add an adjective, object or circumstance. Structural focus is a property of each independent sentence, not a progression between sentences.`}
 For complex, use two closely related actions with an obvious temporal or coordinating link. Use a causal conjunction only when the second clause really explains the first; the result of an action is not its cause.
-Otherwise use independent scenes. Repeated structures and first words are allowed; avoid exact duplicate sentences.
+For tasks without develops use independent scenes. Avoid exact duplicate sentences and near-duplicate expansions of the same scene.
 TASKS: ${JSON.stringify(tasks)}
-Already accepted development context: ${JSON.stringify(context)}
+Already accepted sentences: ${JSON.stringify(context)}
 For ordinary tasks choose familiar, concrete words freely. Do not construct a scene from unrelated dictionary entries. Only a requested word is mandatory.
 Requested word hint, if any: ${JSON.stringify(seeds)}
 ${requiredWord ? `The task task-1 must use the lexeme/expression ${JSON.stringify(requiredWord)} naturally, inflected if needed.` : ''}

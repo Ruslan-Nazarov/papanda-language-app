@@ -82,7 +82,8 @@ it('searches source paragraphs and table cells with valid exact destinations and
 it('selects actual passages only in the requested language within a bounded prompt, including the applicable negative rule', () => {
   for (const code of ['en','de','it','fr','es','ru','kz','la']) {
     const passages = selectBookPassages(code, 'She did not come.', tokens);
-    assert.ok(code === 'la' ? passages.length === 1 : passages.length > 1);
+    assert.ok(passages.length >= 1);
+    if (code === 'la') assert.equal(passages.length, 1);
     assert.ok(passages.reduce((n, p) => n + p.text.length, 0) <= 11000);
     assert.ok(passages.every(p => isBookLocation(p)));
     assert.ok(passages.every(p => p.chapterId.startsWith((code === 'la' ? 'scheme' : code) + '-') || p.chapterId === 'method-0'));
@@ -90,11 +91,36 @@ it('selects actual passages only in the requested language within a bounded prom
   }
   const passages = selectBookPassages('en', 'She did not come.', tokens);
   assert.ok(passages.some(p => p.text.includes('did') && p.text.includes('начальн')));
+  assert.ok(passages.every(p => !p.title.includes('Условные и сослагательные')));
   assert.ok(selectBookPassages('en', 'Hi.', [], 20).reduce((n,p) => n + p.text.length,0) <= 20);
   const prompt = buildSentenceAnnotationPrompt('kz', [{ id:'task-1', focus:'core', goal:'Найти основу' }], [{ taskId:'task-1', sentence:'Бала оқиды.' }]);
   assert.ok(prompt.startsWith('REVIEW_AND_ANNOTATE'));
   assert.match(prompt, /BOOK_SOURCE_CONTEXT/);
   assert.match(prompt, /book:\/\/kz-/);
+});
+it('does not retrieve rules from incidental words in token labels', () => {
+  const sentence = 'Xyzzy.';
+  const plain: Token = { text: 'Xyzzy', label: '', role: 'Other', translation: '', is_in_my_dict: false };
+  const noisy = { ...plain, label: 'дополнение обстоятельство подлежащее did come' };
+  assert.deepEqual(selectBookPassages('en', sentence, [noisy]), selectBookPassages('en', sentence, [plain]));
+  assert.deepEqual(selectBookPassages('en', sentence, [noisy]).map(p => p.chapterId), ['method-0']);
+});
+it('bounds repeated evidence and names the language and section without doubled chapter titles', () => {
+  const passages = selectBookPassages('kz', 'Олар кеше жұмыс істеді ме?', [
+    { text: 'Олар', label: 'местоимение', role: 'Subject', translation: 'они', is_in_my_dict: false },
+    { text: 'кеше', label: 'наречие', role: 'Circumstance', translation: 'вчера', is_in_my_dict: false },
+    { text: 'жұмыс істеді', label: 'глагол', role: 'Predicate', translation: 'работали', is_in_my_dict: false },
+  ]);
+  assert.ok(passages.length <= 5);
+  const counts = new Map<string, number>();
+  for (const passage of passages.filter(p => p.chapterId !== 'method-0')) {
+    counts.set(passage.title, (counts.get(passage.title) || 0) + 1);
+    assert.ok(passage.title.startsWith(bookLanguages.find(l => l.code === 'kz')!.title + ' · '));
+    const chapter = getBookChapter(passage.chapterId)!;
+    assert.ok(!passage.title.includes(`${chapter.title} · ${chapter.title}`));
+  }
+  assert.ok([...counts.values()].every(count => count <= 2));
+  assert.ok(passages.some(p => p.title.includes('Вопросительное') && /ма \/|ме/.test(p.text)));
 });
 it('grounds Kazakh questions only in Kazakh rules and the common method', () => {
   for (const language of ['kz', 'kk', 'Қазақша', 'казахский']) {

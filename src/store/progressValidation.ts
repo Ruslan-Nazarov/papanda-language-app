@@ -3,6 +3,9 @@ import { LANGUAGES } from '../constants/languages';
 import type { Sentence } from '../models/types';
 import type { PersistedProgress } from './progressTypes';
 import { createDefaultProgress, pickPersistedFields } from './progressTypes';
+import { isLanguageNote } from '../utils/notes';
+import { isExperimentProgress } from '../models/experiments';
+import { isSentenceLessonProgress } from '../utils/sentenceLessons';
 
 type Check = (value: unknown) => boolean;
 const record = (value: unknown): value is Record<string, unknown> =>
@@ -37,6 +40,7 @@ const sentence: Check = value => sentenceShape(value) && record(value) &&
       !!(value.words as { text: string }[])[e.tokenIndex]?.text.includes(e.form))));
 const verification = shape({ status: value => value === 'verified' || value === 'flagged', checkedAt: timestamp }, {
   issues: array(shape({ lang: string, issue: string }, { suggestion: string })),
+  checkedLanguages: array(string),
 });
 const statsFields = {
   count: integer, is_learned: value => value === 0 || value === 1,
@@ -60,6 +64,10 @@ const word: Check = value => wordFields(value) && record(value) &&
   ((typeof value.eng === 'string' && value.eng.trim().length > 0) || (typeof value.word === 'string' && value.word.trim().length > 0));
 const languages = new Set(LANGUAGES.map(language => language.code));
 const schema = shape({ userWordProgress: dictionary(progress) }, {
+  sentenceLessons: value => record(value) && Object.entries(value).every(([code, item]) => isSentenceLessonProgress(item, sentence, code)),
+  experiments: dictionary(isExperimentProgress),
+  languageNotes: value => Array.isArray(value) && value.every(note => isLanguageNote(note) && !!note.body.trim()) && new Set(value.map(note => note.id)).size === value.length,
+  noteDrafts: value => Array.isArray(value) && value.every(isLanguageNote) && new Set(value.map(note => note.id)).size === value.length,
   structureAttempts: value => Array.isArray(value) && value.length <= 500 && value.every(shape({
     id: string, sentenceId: string, language: string, role: value => typeof value === 'string' && roles.has(value), clauseIndex: integer,
     selected: array(integer), expected: array(integer), result: value => typeof value === 'string' && ['correct','incorrect','disputed'].includes(value),

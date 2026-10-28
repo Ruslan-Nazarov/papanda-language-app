@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SyntaxRole, Token } from '../models/types';
-import { computeSentenceGroups } from '../utils/sentenceGroups';
+import { computeSentenceRevealGroups } from '../utils/sentenceGroups';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
 
 const ROLE_RU: Record<SyntaxRole, string> = {
@@ -81,9 +81,9 @@ export default function OnboardingScreen({ onDone }: Props) {
 
   const PAGE_COUNT = 3;
 
-  const groups = useMemo(() => computeSentenceGroups(EXAMPLE_TOKENS), []);
-  // A role-group can span more than one token (here: "The" and "a" are both
-  // Article) — number cards by token position, not by group, so two different
+  const groups = useMemo(() => computeSentenceRevealGroups(EXAMPLE_TOKENS), []);
+  // A reveal group includes a head and its article. Number cards by token
+  // position, not by group, so two different
   // cards never show the same badge number.
   const cardNumbers = useMemo(() => {
     const map = new Map<number, number>();

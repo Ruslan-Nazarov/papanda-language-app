@@ -39,6 +39,7 @@ yarn-error.*
 *.tsbuildinfo
 
 # Local validation output
+.tmp-export/
 .npm-audit-cache/
 dependency-audit*.json
 dependency-fix.log

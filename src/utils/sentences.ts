@@ -1,6 +1,14 @@
 import type { Sentence } from '../models/types';
 
 let sequence = 0;
+/** A saved Workshop step becomes an independent card; its linguistic data stays intact. */
+export const asManualSentence = (sentence: Sentence): Sentence => {
+  const saved = { ...sentence, source: 'manual' as const };
+  delete saved.generationBatchId;
+  delete saved.chainStep;
+  return saved;
+};
+
 export const makeGeneratedSentence = (sentence: Omit<Sentence, 'id' | 'source'>, languageCode: string): Sentence => {
   const createdAt = Date.now();
   return { ...sentence, id: `generated_${languageCode}_${createdAt}_${++sequence}`, source: 'generated', createdAt };

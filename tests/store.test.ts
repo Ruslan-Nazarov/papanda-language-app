@@ -173,6 +173,22 @@ describe('Zustand useStore', () => {
   });
 
   describe('incrementShowCounts', () => {
+    it('counts word cards, workout answers and unique dictionary matches in daily activity', () => {
+      const store = useStore.getState();
+      store.setLanguages(['en', 'it']);
+      const [first, second] = store.words.slice(0, 2).map(word => word.eng || word.word || '');
+      const total = () => Object.values(useStore.getState().dailyShows).reduce((sum, value) => sum + value, 0);
+      store.recordTripleCardShow(first);
+      assert.equal(total(), 1, 'A multilingual word card is one presentation');
+      store.markWordKnown(first, 'en', true);
+      store.incrementShowCount(first, 'en');
+      assert.equal(total(), 2, 'A workout answer adds one presentation');
+      store.incrementShowCounts([first, first, second, '', 'missing-dictionary-key'], 'en');
+      assert.equal(total(), 4, 'A sentence counts each matched word once');
+      store.incrementShowCounts([first, second], 'en');
+      assert.equal(total(), 6, 'A new presentation counts again');
+    });
+
     it('batches show count updates for multiple words atomically', () => {
       const state = useStore.getState();
       const word1 = state.words[0];

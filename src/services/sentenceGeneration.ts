@@ -2,7 +2,7 @@ import { generationContext, generationPhase, checkAborted, isAbortError, abortab
 import { Sentence, Word } from '../models/types';
 import { generateGeminiText, isGeminiConfigured } from './geminiClient';
 import { buildSentenceGenerationPrompt, buildSentenceAnnotationPrompt, getAllDictionaryCandidates, getLanguagePrompt, SENTENCE_ARRAY_SCHEMA, DRAFT_ARRAY_SCHEMA, DictionaryCandidate } from './sentencePrompts';
-import { parseSentenceDrafts, planSentenceBatch, SentenceDraft } from './sentenceCurriculum';
+import { parseSentenceDrafts, planSentenceBatch, SentenceBatchMode, SentenceDraft } from './sentenceCurriculum';
 import { buildSentenceQualityPrompt, parseQualityVerdicts, QUALITY_VERDICT_SCHEMA } from './sentenceQuality';
 import { preservesSentenceBasis, sentenceFingerprint, validateGeneratedSentencesAsync } from '../utils/sentenceValidation';
 
@@ -16,21 +16,20 @@ const parseJSON = (text: string): unknown => {
   try { return JSON.parse(text); } catch { return null; }
 };
 
-const generateBatch = async (code: string, candidates: DictionaryCandidate[], count: number, required: RequiredWord | undefined, avoid: string[], signal: AbortSignal,
+const generateBatch = async (code: string, candidates: DictionaryCandidate[], count: number, required: RequiredWord | undefined, avoid: string[], signal: AbortSignal, mode: SentenceBatchMode,
   phase = (text: string) => generationPhase(code, signal, text)): Promise<Sentence[]> => {
   const language = getLanguagePrompt(code);
   const dictionary = [...candidates];
   if (required?.lemma && !dictionary.some(entry => entry.lemma.toLocaleLowerCase() === required.lemma.trim().toLocaleLowerCase())) {
     dictionary.push({ lemma: required.lemma.trim(), translation: required.translation || '' });
   }
-  const tasks = planSentenceBatch(count, Boolean(required?.lemma));
+  const tasks = planSentenceBatch(count, Boolean(required?.lemma), mode);
   const chainIds = new Set(tasks.filter(task => task.develops).flatMap(task => [task.id, task.develops!]));
   const accepted = new Map<string, Sentence>();
   const fingerprints = new Set(avoid.map(sentence => sentenceFingerprint(language.label, sentence)));
   let errors: string[] = [];
   for (let round = 0; round < MAX_GENERATION_ROUNDS && accepted.size < count; round++) {
-    // Once a useful curriculum chain is complete, a second three-request
-    // round just to fill optional independent cards spends quota quickly.
+    // Keep useful partial batches without spending another pipeline on optional cards.
     if (round > 0 && !required?.lemma && accepted.size > 0 && [...chainIds].every(id => accepted.has(id))) break;
     const previousChain = new Map<string, Sentence>();
     if (round > 0 && [...chainIds].some(id => !accepted.has(id))) {
@@ -145,7 +144,7 @@ const generateBatch = async (code: string, candidates: DictionaryCandidate[], co
 // Share identical work, including its dictionary projection and sentence history.
 const pendingBatches = new Map<string, Promise<Sentence[]>>();
 export const generateSentenceBatch = (code: string, words: Word[], count = DEFAULT_BATCH_SIZE, required?: RequiredWord, previousSentences: string[] = [],
-  task?: { signal: AbortSignal; phase: (text: string) => void }): Promise<Sentence[]> => {
+  task?: { signal: AbortSignal; phase: (text: string) => void }, mode: SentenceBatchMode = 'independent'): Promise<Sentence[]> => {
   if (!Number.isSafeInteger(count) || count < 1 || count > 20) return Promise.reject(new Error('Размер набора должен быть от 1 до 20.'));
   const context = generationContext(code);
   const avoid = [...new Set(previousSentences)].slice(-100);
@@ -159,14 +158,14 @@ export const generateSentenceBatch = (code: string, words: Word[], count = DEFAU
     signals.forEach(signal => signal.addEventListener('abort', abort, { once: true }));
     if (signals.some(signal => signal.aborted)) abort();
     return Promise.resolve()
-      .then(() => { checkAborted(controller.signal); return generateBatch(code, dictionary, count, required, avoid, controller.signal, task.phase); })
+      .then(() => { checkAborted(controller.signal); return generateBatch(code, dictionary, count, required, avoid, controller.signal, mode, task.phase); })
       .finally(() => signals.forEach(signal => signal.removeEventListener('abort', abort)));
   }
-  const key = JSON.stringify([context.version, code, count, required?.lemma?.trim().toLowerCase(), required?.translation, dictionary, avoid]);
+  const key = JSON.stringify([context.version, code, mode, count, required?.lemma?.trim().toLowerCase(), required?.translation, dictionary, avoid]);
   const pending = pendingBatches.get(key);
   if (pending) return pending;
   const batch = abortableDelay(0, context.signal)
-    .then(() => generateBatch(code, dictionary, count, required, avoid, context.signal))
+    .then(() => generateBatch(code, dictionary, count, required, avoid, context.signal, mode))
     .finally(() => { pendingBatches.delete(key); if (!context.signal.aborted) generationPhase(code, context.signal, ''); });
   pendingBatches.set(key, batch);
   return batch;

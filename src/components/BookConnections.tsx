@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { BookLocation, BookPassage } from '../models/book';
 import type { SyntaxRole, Token } from '../models/types';
-import { bookTopics, hasLanguageBook, selectBookPassages, chapterNumbersForRole } from '../services/bookService';
+import { bookTopics, hasLanguageBook, selectBookPassages, bookSnippet } from '../services/bookService';
 import { ACCENT_DARK } from '../constants/theme';
 
 export function BookRuleLink({ language, role, sentence = '', tokens = [], onConsult }: { language: string; role: SyntaxRole; sentence?: string; tokens?: Token[]; onConsult?: () => void }) {
@@ -25,12 +25,10 @@ export default function BookConnections({ language, sentence = '', tokens = [], 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [expanded, setExpanded] = useState(initiallyOpen);
   const links = useMemo(() => {
-    if (passages) return passages;
-    const numbers = new Set([1, 2, 3, ...tokens.flatMap(t => chapterNumbersForRole(t.role))]);
-    const selected = selectBookPassages(language, sentence, tokens);
-    return bookTopics(language).filter(chapter => numbers.has(chapter.number)).map(chapter => ({
-      chapterId: chapter.id, blockId: selected.find(p => p.chapterId === chapter.id)?.blockId, title: chapter.title,
-    }));
+    const selected = passages ?? selectBookPassages(language, sentence, tokens);
+    // Several source blocks can explain one rule. Show one entry per section;
+    // all blocks remain available to the model and its exact citations.
+    return selected.filter((passage, index) => selected.findIndex(p => p.chapterId === passage.chapterId && p.title === passage.title) === index);
   }, [language, sentence, tokens, passages]);
   const open = (location: BookLocation) => onOpen ? onOpen(location) : navigation.push('Book', location);
   return <View style={[s.card, compact && s.compactCard]}>
@@ -39,9 +37,12 @@ export default function BookConnections({ language, sentence = '', tokens = [], 
     </TouchableOpacity>
     {expanded && <View style={s.links}>
       {!hasLanguageBook(language) && <Text style={s.small}>Для этого языка отдельной главы пока нет. Эти ссылки ведут к общей методике; особенности языка требуют дополнительного пояснения.</Text>}
-      {passages && <Text style={s.small}>Эти фрагменты переданы ИИ как источники. Проверьте, подходит ли правило к предложению.</Text>}
-      {links.map((location, i) => <TouchableOpacity key={location.chapterId + (location.blockId || '') + i} accessibilityRole="button" style={s.ruleLink} onPress={() => open(location)}><Text style={s.link}>{location.title} →</Text></TouchableOpacity>)}
-      <TouchableOpacity accessibilityRole="button" style={s.ruleLink} onPress={() => open({ chapterId: 'method-0' })}><Text style={s.link}>Как пользоваться методом →</Text></TouchableOpacity>
+      {passages && <Text style={s.small}>Источники для этой фразы: правила выбранного языка и общий порядок разбора.</Text>}
+      {links.map(location => <TouchableOpacity key={location.chapterId + location.blockId} accessibilityRole="button" style={s.ruleLink} onPress={() => open(location)}>
+        <Text style={s.link}>{location.title} →</Text>
+        <Text style={s.small}>{bookSnippet(location.text, '', 130)}</Text>
+      </TouchableOpacity>)}
+      {!links.some(location => location.chapterId === 'method-0') && <TouchableOpacity accessibilityRole="button" style={s.ruleLink} onPress={() => open({ chapterId: 'method-0' })}><Text style={s.link}>Как пользоваться методом →</Text></TouchableOpacity>}
     </View>}
   </View>;
 }

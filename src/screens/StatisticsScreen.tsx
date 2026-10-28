@@ -1,4 +1,6 @@
 import ReviewPlan from '../components/ReviewPlan';
+import { activeExperimentRun } from '../models/experiments';
+import { useScreenClock } from '../hooks/useScreenClock';
 import { StructureProgress } from '../components/StructureExercise';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../navigation/types';
@@ -97,6 +99,8 @@ function BarRow({ label, value, max, color, valueText }: { label: string; value:
 }
 
 export default function StatisticsScreen({ navigation }: BottomTabScreenProps<MainTabParamList, 'Statistics'>) {
+  const hideDailyReview = useStore(state => !!activeExperimentRun(state.experiments['hide-daily-review']));
+  const nowMs = useScreenClock();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
   const { words, activeLanguages, dailyShows, workoutSnapshots, recordImwSnapshot } = useStore(useShallow(state => ({
@@ -108,7 +112,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
   })));
 
   // Refresh today's iMW point whenever the user opens this screen.
-  useEffect(() => { recordImwSnapshot(); }, [recordImwSnapshot]);
+  useEffect(() => { recordImwSnapshot(); }, [recordImwSnapshot, nowMs]);
 
   const activeLangObjs = LANGUAGES.filter(l => activeLanguages.includes(l.code));
 
@@ -116,12 +120,12 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
     total: calculateTotalVolume(words),
     seen: calculateSeenWords(words, activeLanguages),
     learned: calculateFullyLearned(words, activeLanguages),
-    today: calculateShownToday(dailyShows)
-  }), [words, activeLanguages, dailyShows]);
+    today: calculateShownToday(dailyShows, nowMs)
+  }), [words, activeLanguages, dailyShows, nowMs]);
 
   // Activity: last N days of word shows.
   const activity = useMemo(() => {
-    const now = new Date();
+    const now = new Date(nowMs);
     const days = [];
     for (let i = ACTIVITY_DAYS - 1; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
@@ -129,7 +133,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
       days.push({ label: formatDay(d), shows: dailyShows?.[iso] || 0 });
     }
     return days;
-  }, [dailyShows]);
+  }, [dailyShows, nowMs]);
   const activityTotal = activity.reduce((s, d) => s + d.shows, 0);
   const activityMax = Math.max(...activity.map(d => d.shows), 1);
 
@@ -161,12 +165,12 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
   const repetitionMax = Math.max(...repetition.buckets.map(b => b.count), 1);
 
   const imw = useMemo(() => {
-    const res = calculateIMWIndex(words, activeLanguages);
+    const res = calculateIMWIndex(words, activeLanguages, nowMs);
     return {
       overall: res.overall,
       langs: activeLangObjs.map(lang => ({ ...lang, pct: res.byLanguage[lang.code] || 0 }))
     };
-  }, [words, activeLanguages]);
+  }, [words, activeLanguages, nowMs]);
 
   const efficiency = useMemo(() => {
     if (!workoutSnapshots?.length) return [];
@@ -188,7 +192,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
-      <ReviewPlan onStart={() => navigation.navigate('Brain Workout')} />
+      {!hideDailyReview && <ReviewPlan now={nowMs} onStart={() => navigation.navigate('Brain Workout')} />}
       <StructureProgress />
       {/* Summary tiles */}
       <View style={styles.tilesRow}>
@@ -207,7 +211,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
           <Text style={styles.tileLabel}>выучено полностью</Text>
         </View>
         <View style={styles.tile}>
-          <Text style={[styles.tileValue, { color: ACCENT_DARK }]}>{summary.today}</Text>
+          <Text testID="statistics-today" style={[styles.tileValue, { color: ACCENT_DARK }]}>{summary.today}</Text>
           <Text style={styles.tileLabel}>показов сегодня</Text>
         </View>
       </View>
@@ -216,7 +220,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
       <Section
         icon="📅"
         title={`Активность за ${ACTIVITY_DAYS} дней`}
-        help="Сколько раз в день приложение показывало тебе слова — в тренировке, в тройках слов и в разборе предложений. Помогает следить за регулярностью занятий: важнее заниматься понемногу каждый день, чем помногу раз в неделю."
+        help={'Количество учтённых показов слов за каждый день. В разделе «Слова» показ засчитывается при открытии карточки, в тренировке — после ответа «Знаю» или «Не знаю». В тренажёре предложений учитывается каждое найденное в словаре слово: повтор одного слова внутри предложения считается один раз.\n\nЭто число показов, а не уникальных слов и не правильных ответов. Повторные показы учитываются снова. Самостоятельный разбор и чтение своего текста в этот график не входят; их результаты видны в «Навыках разбора». Ранее накопленная история сохранена.'}
       >
         <Text style={styles.sectionNote}>Всего показов за период: {activityTotal}</Text>
         <View style={styles.activityChart}>
@@ -241,7 +245,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
       <Section
         icon="🌍"
         title="Знание по языкам"
-        help="Сколько слов ты отметил как «выучено» отдельно по каждому языку. Отметка ставится в тренировке кнопкой «Знаю» или когда проходишь тройку слов целиком. Одно и то же слово может быть выучено на одном языке и не выучено на другом."
+        help="Сколько слов отмечено как знакомые по каждому языку. В тренировке ответ «Знаю» меняет отметку только для языка вопроса. В разделе «Слова» кнопка «Выучено» применяется ко всем активным языкам карточки. Одно слово может быть отмечено как знакомое на одном языке и незнакомое на другом. Это ваша самооценка, а не проверка перевода."
       >
         {byLanguage.length === 0 ? (
           <Text style={styles.emptyText}>Нет активных языков.</Text>

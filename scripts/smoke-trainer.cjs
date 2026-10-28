@@ -54,6 +54,31 @@ async function main() {
     };
     const body = () => page.$eval('body', el => el.innerText);
     const hidden = () => page.$$eval('[aria-label^="Раскрыть блок"]', els => els.length);
+    const revealLabel = () => page.$eval('[data-testid="trainer-reveal"]', el => el.textContent);
+    const translationLabel = () => page.$eval('[data-testid="trainer-translation"]', el => el.textContent);
+    const tapBackground = async () => {
+      const point = await page.$eval('[data-testid="trainer-step-surface"]', el => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.bottom - 12 };
+      });
+      await page.touchscreen.tap(point.x, point.y);
+    };
+    const assertClauseFrames = async () => {
+      const frames = await page.$$eval('[data-testid^="trainer-block-"]', blocks => blocks.map(block => {
+        const frame = getComputedStyle(block.parentElement);
+        const card = getComputedStyle(block);
+        return { index: Number(block.dataset.testid.split('-').at(-1)),
+          framed: parseFloat(frame.borderTopWidth) > 0 && parseFloat(card.borderTopWidth) > 0,
+          color: frame.borderTopColor, revealed: block.getAttribute('aria-label').startsWith('Объяснить форму слова:') };
+      }));
+      assert.equal(frames.length, 10);
+      for (const frame of frames) {
+        assert.equal(frame.framed, frame.index >= 7, `Block ${frame.index}: second-clause double frames must remain visible before and after reveal`);
+        if (frame.index >= 7) assert.equal(frame.color, frame.revealed
+          ? ({ 7: 'rgb(16, 185, 129)', 8: 'rgb(59, 130, 246)', 9: 'rgb(239, 68, 68)' })[frame.index]
+          : 'rgb(148, 163, 184)', 'Hidden frames show the clause boundary; revealed frames show the role color');
+      }
+    };
     const openMenu = async () => {
       await page.click('[data-testid="sentence-options"]');
       await page.waitForSelector('[data-testid="trainer-cache-stats"]', { visible: true });
@@ -74,6 +99,7 @@ async function main() {
     assert.equal(await hidden(), count - 1, 'Tap must reveal only that block, even if two words share a role');
     assert.ok(await page.$('[data-testid="trainer-block-0"][aria-label="Раскрыть блок 1"]'));
     await page.click('[data-testid="trainer-translation"]');
+    assert.equal(await hidden(), count - 1, 'Translation toggle must not also advance the exercise');
     await page.click('[data-testid="trainer-next"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent !== first, {}, first);
     assert.equal(await page.$eval('[data-testid="trainer-translation"]', el => el.textContent), 'Перевод');
@@ -83,8 +109,27 @@ async function main() {
     assert.equal(await hidden(), count);
     for (let i = 0; i < count && await hidden() > 0; i++) await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await hidden(), 0);
+    assert.equal(await revealLabel(), 'Перевод');
+    assert.equal(await translationLabel(), 'Перевод');
+    await page.click('[data-testid="trainer-reveal"]');
+    assert.equal(await hidden(), 0, 'Final translation step must keep all blocks revealed');
+    assert.equal(await translationLabel(), 'Скрыть перевод');
+    assert.ok((await body()).includes('Перевод примера.'));
+    assert.equal(await revealLabel(), 'Повторить с 1 шага');
     await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await hidden(), count);
+    assert.equal(await translationLabel(), 'Перевод', 'Restart must also hide translation');
+    await tapBackground();
+    assert.ok(await hidden() < count, 'Blank-space tap must advance a role-group');
+    for (let i = 0; i < count && await hidden() > 0; i++) await tapBackground();
+    assert.equal(await hidden(), 0);
+    assert.equal(await revealLabel(), 'Перевод');
+    await tapBackground();
+    assert.equal(await hidden(), 0);
+    assert.equal(await translationLabel(), 'Скрыть перевод', 'Blank-space tap must show the final translation');
+    await tapBackground();
+    assert.equal(await hidden(), count, 'Blank-space tap must restart after translation');
+    assert.equal(await translationLabel(), 'Перевод');
     await page.waitForFunction(() => document.body.innerText.includes('Объяснить структуру'));
     for (const width of [320, 430]) {
       await page.setViewport({ width, height: 740, hasTouch: true, isMobile: true });
@@ -142,6 +187,7 @@ async function main() {
     });
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="trainer-block-9"]');
+    await assertClauseFrames();
     for (const [width, height] of [[320, 640], [390, 740]]) {
       await page.setViewport({ width, height, hasTouch: true, isMobile: true });
       assert.ok(await page.$eval('[data-testid="trainer-block-9"]', el => {
@@ -153,15 +199,43 @@ async function main() {
     }
     await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await page.$$eval('[data-testid^="trainer-block-"]', els => els.length), 10, 'All cards remain present throughout the exercise');
-    assert.ok(await page.$('[data-testid="trainer-block-3"][aria-label="Открыть слово: drinks"]'), 'First step reveals the predicate, not the first word');
+    assert.ok(await page.$('[data-testid="trainer-block-3"][aria-label="Объяснить форму слова: drinks"]'), 'First step reveals the predicate, not the first word');
     assert.ok(await page.$('[data-testid="trainer-block-0"][aria-label="Раскрыть блок 1"]'), 'Other cards remain closed');
+    await assertClauseFrames();
     assert.equal(await page.$$eval('[data-testid="trainer-sentence-text"] [role="button"]', els => els.length), 0, 'The original sentence is plain text');
     await page.screenshot({ path: path.join(root, 'trainer-long-first-step.png') });
     await page.click('[data-testid="trainer-translation"]');
     while (await hidden() > 0) await page.click('[data-testid="trainer-reveal"]');
+    await assertClauseFrames();
     await page.screenshot({ path: path.join(root, 'trainer-long-revealed.png') });
+    await openMenu();
+    await click('Режим: Таблица');
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
+    await assertClauseFrames();
+    for (const width of [320, 390]) {
+      await page.setViewport({ width, height: 740, hasTouch: true, isMobile: true });
+      const rows = await page.$$eval('[data-testid^="trainer-role-"]', rows => rows.map(row => {
+        const label = row.firstElementChild.getBoundingClientRect();
+        const button = row.querySelector('[role="button"]').getBoundingClientRect();
+        return { separated: button.top >= label.bottom + 4, withinScreen: label.left >= 0 && label.right <= innerWidth && button.right <= innerWidth };
+      }));
+      assert.equal(rows.length, 10);
+      assert.ok(rows.every(row => row.separated && row.withinScreen), 'Dictionary actions must not overlap role labels or leave the screen');
+    }
+    await page.click('[data-testid="trainer-reveal"]');
+    assert.equal(await hidden(), 10);
+    await assertClauseFrames();
+    await page.tap('[data-testid="trainer-block-9"]');
+    assert.equal(await hidden(), 9);
+    await assertClauseFrames();
+    await page.screenshot({ path: path.join(root, 'trainer-table-clause-frames.png') });
+    await openMenu();
+    await click('Режим: Карточки');
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
+    assert.equal(await hidden(), 9);
+    await assertClauseFrames();
     assert.deepEqual(errors, []);
-    console.log('PASS: per-block tap, grouped reveal, previous/next reset, card/table modes, language/cache stats, quiet background generation and menu cancellation; 320/430px.');
+    console.log('PASS: per-block and blank-space taps, grouped reveal → translation → restart, previous/next reset, card/table modes, double clause frames before/after reveal and mode switches, language/cache stats, quiet background generation and menu cancellation; 320/430px.');
   } catch (error) {
     if (page) { console.error((await bodyText(page)).slice(-3500)); await page.screenshot({ path: path.join(root, 'trainer-failure.png') }); }
     throw error;

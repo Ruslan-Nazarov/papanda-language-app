@@ -139,6 +139,19 @@ export const reviewedTrain = () => ({ ...train, taskId: 'task-1', literalTransla
       'en', 'English', [], { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: train.sentence }] });
     assert.equal(bad.sentences.length, 0);
   });
+  it('accepts Italian homographic object pronouns but rejects their misannotation as articles', () => {
+    for (const [pronoun, verb] of [['Lo', 'leggo'], ['La', 'vedo'], ['Gli', 'parlo'], ['Le', 'scrivo']]) {
+      const words = [{ ...tok(pronoun, 'Object'), label: 'Pronoun' }, { ...tok(verb, 'Predicate'), label: 'Verb' }];
+      const card = { sentence: `${pronoun} ${verb}.`, words };
+      assert.equal(validateGeneratedSentences([card], 'it', 'Italiano', []).sentences.length, 1);
+      for (const label of ['Pronoun', 'Article']) {
+        const bad = { ...card, words: [{ ...words[0], role: 'Article', label }, words[1]] };
+        assert.equal(validateGeneratedSentences([bad], 'it', 'Italiano', []).sentences.length, 0);
+      }
+    }
+    const words = [tok('È', 'Predicate'), tok('un', 'Article'), tok('medico', 'Predicate')];
+    assert.equal(validateGeneratedSentences([{ sentence: 'È un medico.', words }], 'it', 'Italiano', []).sentences.length, 1);
+  });
   it('uses grammatical glosses for English articles and auxiliary verbs', () => {
     const sentence = 'Does the child read a book?';
     const words = [tok('Does', 'Predicate', 'do'), tok('the', 'Article'), tok('child', 'Subject'),

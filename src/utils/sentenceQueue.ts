@@ -4,16 +4,26 @@ import type { Sentence } from '../models/types';
 export interface QueueOrder { keys: Map<string, number>; batch: number }
 export const createQueueOrder = (): QueueOrder => ({ keys: new Map(), batch: 0 });
 
+/** Fresh AI cards replace the seed fallback, but never the learner's saved/edited cards. */
+export function trainerPool(sentences: Sentence[], sessionStart: number) {
+  const standalone = sentences.filter(sentence => sentence.chainStep === undefined);
+  const generated = standalone.filter(sentence => sentence.source === 'generated');
+  const session = generated.filter(sentence => (sentence.createdAt ?? 0) >= sessionStart);
+  const active = session.length ? session : generated;
+  const pool = active.length
+    ? [...active, ...standalone.filter(sentence => sentence.source === 'manual')]
+    : standalone.filter(sentence => sentence.source !== 'generated');
+  return { generated, session, pool, showingGenerated: active.length > 0 };
+}
+
 /**
  * Cards for the main trainer: stand-alone sentences only (members of a growing
  * series belong to the Workshop task), in random order. Ids seen for the first
  * time get a key above every earlier one, so late arrivals are appended after
  * the cards already queued — the card on screen never moves under the learner.
- * Falls back to the series members when nothing else exists.
  */
 export function selectTrainerQueue(pool: Sentence[], order: QueueOrder, random: () => number = Math.random): Sentence[] {
-  const standalone = pool.filter(sentence => sentence.chainStep === undefined);
-  const cards = standalone.length ? standalone : pool;
+  const cards = pool.filter(sentence => sentence.chainStep === undefined);
   if (cards.some(sentence => !order.keys.has(sentence.id))) {
     const base = ++order.batch;
     for (const sentence of cards) if (!order.keys.has(sentence.id)) order.keys.set(sentence.id, base + random() * 0.99);

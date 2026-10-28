@@ -119,10 +119,9 @@ export const calculateCoverage = (words: Word[], activeLangs: string[]) => {
  * Непоказанные слова входят в знаменатель с нулевым весом.
  * Учитывает прогресс к 80 показам, статус "выучено" и забывание со временем.
  */
-export const calculateIMWIndex = (words: Word[], activeLangs: string[]) => {
+export const calculateIMWIndex = (words: Word[], activeLangs: string[], now = Date.now()) => {
   if (words.length === 0 || activeLangs.length === 0) return { overall: 0, byLanguage: {} as Record<string, number> };
 
-  const now = Date.now();
   const byLanguage: Record<string, number> = {};
   let overallWeightSum = 0;
 
@@ -199,8 +198,8 @@ export const calculateKnownByLanguage = (words: Word[], activeLangs: string[]) =
  * 6. Shown Today (Показано сегодня)
  * Общее количество показов слов за текущие сутки.
  */
-export const calculateShownToday = (dailyShows: DailyShows): number => {
-  const today = localDateKey();
+export const calculateShownToday = (dailyShows: DailyShows, now = Date.now()): number => {
+  const today = localDateKey(new Date(now));
   return dailyShows[today] || 0;
 };
 

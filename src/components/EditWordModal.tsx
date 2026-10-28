@@ -11,9 +11,10 @@ interface EditWordModalProps {
   visible: boolean;
   onClose: () => void;
   wordToEdit?: Word | null; // If null, adding new word
+  onCreateNote?: () => void;
 }
 
-export default function EditWordModal({ visible, onClose, wordToEdit }: EditWordModalProps) {
+export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNote }: EditWordModalProps) {
   const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
@@ -33,7 +34,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
 
   const wordKey = wordToEdit?.eng || wordToEdit?.word || '';
   // A token tap can hand us a draft Word for a form that isn't in the dictionary
-  // yet (see SentenceTrainerScreen.handleTokenPress) — treat that the same as
+  // yet (via WordFormModal) — treat that the same as
   // "adding new", since updateWordDetails only touches words that already exist.
   const existsInStore = Boolean(wordKey) && words.some(w => (w.eng || w.word) === wordKey);
   const isAddingNew = !wordToEdit || !existsInStore;
@@ -224,6 +225,10 @@ export default function EditWordModal({ visible, onClose, wordToEdit }: EditWord
             />
           </ScrollView>
 
+          {onCreateNote && <TouchableOpacity accessibilityRole="button" testID="word-create-note" onPress={onCreateNote}
+            style={{ minHeight: 44, justifyContent: 'center', marginBottom: 8 }}>
+            <Text style={{ color: ACCENT, fontSize: 14, fontWeight: '600' }}>Создать заметку к слову</Text>
+          </TouchableOpacity>}
           <View style={styles.modalButtons}>
             <TouchableOpacity style={[styles.modalBtn, styles.modalCancel]} onPress={onClose}>
               <Text style={styles.modalCancelText}>Отмена</Text>

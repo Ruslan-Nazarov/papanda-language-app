@@ -76,10 +76,14 @@ export function selectBookPassages(language: string, sentence: string, tokens: T
   // The multilingual scheme is useful for browsing, but is not evidence for a
   // language without its own chapter. In that case supply only the common method.
   const chapters = hasLanguageBook(code) ? chaptersForLanguage(code) : [];
-  const numbers = new Set([1, 2, 3, ...tokens.flatMap(token => chapterNumbersForRole(token.role))]);
+  const numbers = new Set([1, ...(tokens.length ? tokens.flatMap(token => chapterNumbersForRole(token.role)) : [2])]);
   const query = normalize(sentence + ' ' + tokens.map(t => `${t.text} ${t.label} ${t.parts?.join(' ') || ''}`).join(' '));
+  // Labels describe grammar; they are not words occurring in this sentence.
+  const lexicalQuery = normalize(sentence + ' ' + tokens.map(t => `${t.text} ${t.parts?.join(' ') || ''}`).join(' '));
   const common = new Set(['the', 'she', 'he', 'it', 'they', 'we', 'you', 'der', 'die', 'das', 'ein', 'eine', 'el', 'la', 'los', 'las', 'il', 'le', 'les', 'un', 'une', 'subject', 'predicate', 'noun', 'verb']);
-  const words = new Set((query.match(/[\p{L}\p{N}]{2,}/gu) || []).filter(word => !common.has(word)));
+  const words = new Set((lexicalQuery.match(/[\p{L}\p{N}]{2,}/gu) || []).filter(word => !common.has(word)));
+  const auxiliaries = new Set(code === 'en' ? 'do does did am is are was were have has had will would can could should must may might shall'.split(' ') : []);
+  const roleNumbers = new Set(tokens.length ? tokens.flatMap(token => chapterNumbersForRole(token.role)) : [2]);
   const concepts: string[] = [];
   const isQuestion = /[?？]/.test(sentence);
   const negativeWords: Record<string, RegExp> = {
@@ -102,7 +106,7 @@ export function selectBookPassages(language: string, sentence: string, tokens: T
   if (/particip|причасти/u.test(query)) { concepts.push('причасти'); numbers.add(8); }
   if (/gerund|герунди/u.test(query)) { concepts.push('герунди'); numbers.add(8); }
   if (new Set(tokens.map(t => t.clauseIndex ?? 0)).size > 1) { concepts.push('придаточ', 'сложное'); numbers.add(7); }
-  const candidates: (BookPassage & { score: number; number: number })[] = [];
+  const candidates: (BookPassage & { score: number; section: string })[] = [];
   for (const chapter of chapters.filter(c => numbers.has(c.number))) {
     let heading = chapter.title;
     const push = (block: BookBlock, text: string) => {
@@ -111,17 +115,24 @@ export function selectBookPassages(language: string, sentence: string, tokens: T
       // Match complete words/morphemes: e.g. "ма" must not match every Russian
       // word containing those letters. Token labels must not override language.
       const sourceWords = new Set(normalized.match(/[\p{L}\p{N}]+/gu) || []);
-      const matches = [...words].filter(word => sourceWords.has(word)).length;
+      // Negation identifies a construction, but is too common to make an
+      // unrelated example (e.g. a conditional with "not") relevant by itself.
+      const matches = [...words].filter(word => sourceWords.has(word) && !negativeWords[code]?.test(word))
+        .reduce((score, word) => score + (auxiliaries.has(word) ? 8 : 3), 0);
       const conceptual = concepts.filter(term => normalize(heading + ' ' + text).includes(term)).length;
       const topic = normalize(heading);
       if (!isQuestion && /вопросительн/.test(topic)) return;
       if (!isNegative && /отрицани/.test(topic)) return;
       if (!isNegative && /отрицательн|с отрицанием|not\b/.test(normalized)) return;
       const roleTerms: Record<number, string> = { 2: 'сказуем', 3: 'подлежащ', 4: 'определени', 5: 'дополнени', 6: 'обстоятельств' };
-      const structural = heading === chapter.title && roleTerms[chapter.number] && normalized.includes(roleTerms[chapter.number]) ? 1 : 0;
+      const structural = roleNumbers.has(chapter.number) && heading === chapter.title && roleTerms[chapter.number] && normalized.includes(roleTerms[chapter.number]) ? 1 : 0;
       if (!matches && !conceptual && !structural) return;
-      candidates.push({ chapterId: chapter.id, blockId: block.id, title: `${chapter.title} · ${heading}`, text,
-        score: matches * 3 + conceptual * 9 + structural, number: chapter.number });
+      // Prefer an explanation of a form over a bare example containing it.
+      const rule = /форм[аыуы]|окончани|суффикс|образуется|порядок слов|вспомогательн|присоедин|добавл/u.test(normalized) && !/\[(?:подлежащее|сказуемое|вспомогательный)/u.test(normalized) ? 6 : 0;
+      const languageTitle = bookLanguages.find(l => l.code === chapter.language)!.title;
+      candidates.push({ chapterId: chapter.id, blockId: block.id,
+        title: `${languageTitle} · ${chapter.title}${heading === chapter.title ? '' : ` · ${heading}`}`, text,
+        score: matches + conceptual * 9 + structural + rule, section: `${chapter.id}/${heading}` });
     };
     for (const block of chapter.blocks) {
       if (block.kind === 'heading') { heading = block.text; continue; }
@@ -151,8 +162,14 @@ export function selectBookPassages(language: string, sentence: string, tokens: T
     picked.push(passage); size += passage.text.length; return true;
   };
   if (foundation) take({ chapterId: method.id, blockId: foundation.id, title: 'Введение · Порядок разбора', text: foundation.text });
-  // No quota per chapter: unrelated chapters must not be added to fill context.
-  for (const candidate of candidates) { if (picked.length >= 7) break; take(candidate); }
+  // Keep complementary evidence, rather than filling the prompt with examples
+  // from the same section. Do not add unrelated chapters to fill the limit.
+  const sectionCounts = new Map<string, number>();
+  for (const candidate of candidates) {
+    if (picked.length >= 5) break;
+    const count = sectionCounts.get(candidate.section) || 0;
+    if (count < 2 && take(candidate)) sectionCounts.set(candidate.section, count + 1);
+  }
   return picked.map(({ chapterId, blockId, title, text }) => ({ chapterId, blockId, title, text }));
 }
 export function bookContextPrompt(language: string, sentence: string, tokens: Token[] = [], links = true): string {

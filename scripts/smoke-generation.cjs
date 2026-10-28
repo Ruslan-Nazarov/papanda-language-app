@@ -101,8 +101,20 @@ async function main() {
     await respond('REVIEW_AND_ANNOTATE', cards);
     await waitStage('AUDIT_SENTENCE_CARDS');
     await exercise('AUDIT_SENTENCE_CARDS');
+    // A late background batch must not replace a Workshop series already in use.
+    await page.click('[data-testid="sentence-options"]');
+    await page.waitForSelector('[data-testid="trainer-cache-stats"]', { visible: true });
+    await page.evaluate(() => [...document.querySelectorAll('div')].filter(el => el.textContent === 'Разбор предложений · упражнения' && el.getBoundingClientRect().height > 0).at(-1).click());
+    await page.waitForSelector('[data-testid="workshop-screen"]');
+    await page.evaluate(() => [...document.querySelector('[data-testid="workshop-screen"]').querySelectorAll('[role="button"]')].find(el => el.getAttribute('aria-label') === 'От короткого к полному').click());
+    await page.waitForFunction(() => document.body.innerText.includes('Предложение по нарастающей'));
+    await page.evaluate(() => [...document.querySelector('[data-testid="workshop-screen"]').querySelectorAll('[role="button"]')].find(el => el.textContent === '2. + Определение').click());
+    const openedSeries = await page.$eval('[data-testid="workshop-screen"]', el => el.innerText);
     await respond('AUDIT_SENTENCE_CARDS', verdicts);
     await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.generatedSentences.length === 8);
+    assert.equal(await page.$eval('[data-testid="workshop-screen"]', el => el.innerText), openedSeries, 'Background cache must not switch the selected series or step');
+    await page.evaluate(() => [...document.querySelector('[data-testid="workshop-screen"]').querySelectorAll('[role="button"]')].find(el => el.textContent === 'Назад').click());
+    await page.waitForSelector('[data-testid="sentence-options"]', { visible: true });
     await tab('Settings');
     await new Promise(resolve => setTimeout(resolve, 2500));
     assert.equal(calls.filter(prompt => prompt?.startsWith('COMPOSE_SENTENCES')).length, 1, 'Hidden tabs must not start extra language batches');
@@ -118,7 +130,14 @@ async function main() {
     await tab('Word Triples');
     await page.waitForSelector('[data-testid="word-sentence-en"]', { visible: true });
     const word = await page.$eval('[data-testid="word-sentence-en"]', el => el.textContent);
-    await page.click('[data-testid="word-sentence-en"]');
+    await page.waitForSelector('[data-testid="word-compose-en"]', { visible: true });
+    assert.equal(await page.$eval('[data-testid="word-compose-en"]', el => el.textContent), 'Составить предложение →');
+    for (const width of [320, 430]) {
+      await page.setViewport({ width, height: 932, hasTouch: true, isMobile: true });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Word actions must fit a mobile screen');
+    }
+    await page.screenshot({ path: path.join(root, 'word-compose.png') });
+    await page.click('[data-testid="word-compose-en"]');
     const deadline = Date.now() + 3000;
     while (held.get('COMPOSE_SENTENCES') === background && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 25));
     assert.notEqual(held.get('COMPOSE_SENTENCES'), background, 'Explicit generation is blocked by the background batch');

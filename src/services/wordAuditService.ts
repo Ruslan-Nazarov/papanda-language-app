@@ -1,5 +1,5 @@
 import { generationContext } from './generationControl';
-import { parseWordAudit } from '../utils/wordAudit';
+import { parseWordAudit, selectWordAuditCandidate } from '../utils/wordAudit';
 import { Word } from '../models/types';
 import { useStore, WordAiVerification } from '../store/useStore';
 import { generateGeminiText, isGeminiConfigured } from './geminiClient';
@@ -8,6 +8,7 @@ import { getWordTranslation } from '../utils/words';
 
 let isAuditing = false;
 let lastAuditTime = 0;
+let lastAuditKey: string | undefined;
 const MIN_AUDIT_INTERVAL_MS = 12000; // at least 12 seconds between background audits
 
 
@@ -70,7 +71,8 @@ ${validActiveTranslations.map(t => `- ${t.langName} (код: ${t.langCode}): "${
       thinkingConfig: { thinkingBudget: 256 }
     }, undefined, signal);
 
-    return parseWordAudit(JSON.parse(text));
+    const verification = parseWordAudit(JSON.parse(text));
+    return verification ? { ...verification, checkedLanguages: validActiveTranslations.map(item => item.langCode) } : null;
   } catch (err) {
     // Background audit should fail silently
     console.warn('[WordAudit] Check error:', err);
@@ -92,21 +94,13 @@ export async function auditNextWordInBackground(): Promise<void> {
   const { words, activeLanguages, userWordProgress, setWordAiVerification } = state;
   if (!words || words.length === 0 || !activeLanguages || activeLanguages.length === 0) return;
 
-  // Find a word that hasn't been verified in the last 30 days
-  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-  const candidate = words.find(w => {
-    const key = w.eng || w.word || '';
-    if (!key) return false;
-    const progress = userWordProgress[key];
-    if (!progress?.ai_verification) return true;
-    const checkedTime = new Date(progress.ai_verification.checkedAt).getTime();
-    return isNaN(checkedTime) || checkedTime < thirtyDaysAgo;
-  });
+  const candidate = selectWordAuditCandidate(words, activeLanguages, userWordProgress, now, lastAuditKey);
 
   if (!candidate) return;
 
   isAuditing = true;
   lastAuditTime = now;
+  lastAuditKey = candidate.eng || candidate.word;
 
   try {
     const context = generationContext('word-audit');

@@ -12,13 +12,18 @@ import { ACCENT } from './src/constants/theme';
 import WordTriplesScreen from './src/screens/WordTriplesScreen';
 import SentenceTrainerScreen from './src/screens/SentenceTrainerScreen';
 import SentenceWorkshopScreen from './src/screens/SentenceWorkshopScreen';
+import NotesScreen from './src/screens/NotesScreen';
+import NoteEditorScreen from './src/screens/NoteEditorScreen';
 import BookScreen from './src/screens/BookScreen';
 import DictionaryScreen from './src/screens/DictionaryScreen';
 import BrainWorkoutScreen from './src/screens/BrainWorkoutScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import ExperimentsScreen from './src/screens/ExperimentsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { useStore, useHydrationState } from './src/store/useStore';
+import { useBookStore, useBookHydrationState } from './src/store/bookStore';
+import StorageNotice from './src/components/StorageNotice';
 
 const ONBOARDING_KEY = 'papanda-onboarded';
 
@@ -154,6 +159,7 @@ function MainTabs() {
 
 export default function App() {
   const hydration = useHydrationState();
+  const bookHydration = useBookHydrationState();
   const progressRevision = useStore(state => state.progressRevision);
   // Store hydration (and the derived `words`/`sentences` rebuild) is handled by
   // the persist `onRehydrateStorage` hook in the store itself.
@@ -175,14 +181,18 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <ErrorBoundary>
-        {hydration.error ? (
+        <StorageNotice />
+        {hydration.error || bookHydration.error ? (
           <View style={boundaryStyles.container}>
-            <Text style={boundaryStyles.sub}>{hydration.error}</Text>
-            <TouchableOpacity style={boundaryStyles.button} onPress={() => void useStore.persist.rehydrate()}>
+            <Text style={boundaryStyles.sub}>{hydration.error || bookHydration.error}</Text>
+            <TouchableOpacity style={boundaryStyles.button} onPress={() => {
+              if (!hydration.ready) void useStore.persist.rehydrate();
+              if (!bookHydration.ready) void useBookStore.persist.rehydrate();
+            }}>
               <Text style={boundaryStyles.buttonText}>Повторить загрузку</Text>
             </TouchableOpacity>
           </View>
-        ) : onboarded === null || !hydration.ready ? (
+        ) : onboarded === null || !hydration.ready || !bookHydration.ready ? (
           <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
         ) : onboarded === false ? (
           <OnboardingScreen onDone={finishOnboarding} />
@@ -191,8 +201,15 @@ export default function App() {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="MainTabs" component={MainTabs} />
               <Stack.Screen name="Book" component={BookScreen} />
+              <Stack.Screen name="Experiments" component={ExperimentsScreen} />
               <Stack.Screen name="Dictionary">
                 {props => <DictionaryScreen key={progressRevision} {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Notes">
+                {props => <NotesScreen key={progressRevision} {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="NoteEditor">
+                {props => <NoteEditorScreen key={progressRevision} {...props} />}
               </Stack.Screen>
               <Stack.Screen name="SentenceWorkshop">
                 {props => <SentenceWorkshopScreen key={progressRevision} {...props} />}

@@ -3,7 +3,7 @@ const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
 const cwd = path.resolve(__dirname, '..');
-const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours', 'statistics'];
+const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours', 'statistics', 'lifecycle', 'notes', 'discussion', 'experiments', 'sentence-lessons'];
 for (const name of scripts) {
   console.log(`\nUI check: ${name}`);
   const result = spawnSync(process.execPath, [path.join(__dirname, `smoke-${name}.cjs`)], {

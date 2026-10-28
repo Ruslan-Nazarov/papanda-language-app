@@ -1,6 +1,9 @@
 import type { StructureAttempt, ReadingText } from '../models/study';
 import type { Sentence, Word } from '../models/types';
 import type { DailyShows, ImwSnapshot, WorkoutSnapshot } from '../utils/statistics';
+import type { LanguageNote } from '../models/notes';
+import type { ExperimentProgress } from '../models/experiments';
+import type { SentenceLessonProgress } from '../models/sentenceLessons';
 
 export interface WordAiIssue {
   lang: string;
@@ -12,6 +15,7 @@ export interface WordAiVerification {
   status: 'verified' | 'flagged';
   issues?: WordAiIssue[];
   checkedAt: string;
+  checkedLanguages?: string[];
 }
 
 export interface UserWordProgress {
@@ -31,6 +35,10 @@ export interface UserWordProgress {
 }
 
 export interface PersistedProgress {
+  sentenceLessons: Record<string, SentenceLessonProgress>;
+  experiments: Record<string, ExperimentProgress>;
+  languageNotes: LanguageNote[];
+  noteDrafts: LanguageNote[];
   structureAttempts: StructureAttempt[];
   readingTexts: ReadingText[];
   userWordProgress: Record<string, UserWordProgress>;
@@ -49,6 +57,9 @@ export interface PersistedProgress {
 }
 
 export const createDefaultProgress = (): PersistedProgress => ({
+  sentenceLessons: {},
+  experiments: {},
+  languageNotes: [], noteDrafts: [],
   structureAttempts: [], readingTexts: [],
   userWordProgress: {}, customSentences: [], generatedSentences: [], customWords: [],
   activeLanguages: ['en', 'kz', 'it'], dailyShows: {}, workoutSnapshots: [], imwSnapshots: [],
@@ -57,6 +68,9 @@ export const createDefaultProgress = (): PersistedProgress => ({
 });
 
 export const pickPersistedFields = (state: PersistedProgress): PersistedProgress => ({
+  sentenceLessons: state.sentenceLessons,
+  experiments: state.experiments,
+  languageNotes: state.languageNotes, noteDrafts: state.noteDrafts,
   structureAttempts: state.structureAttempts, readingTexts: state.readingTexts,
   userWordProgress: state.userWordProgress,
   customSentences: state.customSentences,

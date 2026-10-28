@@ -180,6 +180,14 @@ const validateWithDictionaryIndex = (
       fail(`${task.id}: вопросительный знак не соответствует заданию.`); continue;
     }
     if (!tokens.some(token => token.role === 'Predicate')) { fail('нет сказуемого.'); continue; }
+    if (code === 'it' && tokens.some((token, index) => {
+      if (token.role !== 'Article') return false;
+      const next = tokens[index + 1];
+      return /^Pronoun$/iu.test(token.label) ||
+        (next?.clauseIndex === token.clauseIndex && next?.role === 'Predicate' && /^Verb$/iu.test(next.label));
+    })) {
+      fail('итальянское местоимение ошибочно размечено как артикль; проверьте функцию слова в контексте.'); continue;
+    }
     if (context && code === 'kz') {
       const isolatedNegativeParticiple = tokens.some((token, index) => token.role === 'Predicate' &&
         normalize(tokens[index + 1]?.text || '') === 'жоқ' &&

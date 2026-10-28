@@ -11,6 +11,14 @@
   `eng` remains the legacy stable persistence key; change displayed translations
   without renaming that key. Custom words are base definitions, with edits in
   `userWordProgress`. The separate, non-persisted hydration status gates the UI.
+- Main progress and the separate `bookStore` use `progressStorage`, which orders
+  writes and retains failed snapshots for retry. Async import/restore must await
+  `flush()` before reporting success. Never persist storage-error status itself.
+  Backup version 1 has an optional `book` field (position, bookmarks, font size);
+  importing an older backup without it must preserve the current reader state.
+- Preserve the exercise behavior in `docs/behavior-contract.md`. In particular,
+  second-clause double frames are visible even before a block is revealed. Both
+  trainer layouts share `renderTokenCard`; saved manual cards stay in the AI queue.
 - AI (sentence generation + explanation + word audit) goes through a Cloudflare
   Worker proxy — `gemini-proxy/` — that holds the provider API key(s)
   server-side and rate-limits per install. The Worker can forward to **Gemini**,

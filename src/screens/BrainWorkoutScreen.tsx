@@ -73,6 +73,7 @@ export default function BrainWorkoutScreen() {
     scope: JSON.stringify([activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount, regenNonce, workoutReviewOnly]),
     cardKey: JSON.stringify([queue[currentIndex]?.word.eng || queue[currentIndex]?.word.word, queue[currentIndex]?.langCode, currentIndex]),
     onSwipe: direction => handleAnswer(direction === 'right'),
+    canSwipe: () => Boolean(currentWord && currentLang && getWordTranslation(currentWord, currentLang)),
     distance: SWIPE_EXIT_DISTANCE, entryOffset: SWIPE_ENTRY_OFFSET, duration: 220,
   });
   const cardTranslateX = transition.translateX;
@@ -135,12 +136,29 @@ export default function BrainWorkoutScreen() {
     ...readWordStats(currentWord?.show_stats),
     ...(currentProgress?.show_stats || {}),
   } as Record<string, number>;
-  const isCurrentLanguageLearned = !!currentLang && knowledgeStats[currentLang] === true;
+  const previousAnswer = currentLang ? knowledgeStats[currentLang] : undefined;
+  const isCurrentLanguageLearned = previousAnswer === true;
   const totalShows = currentProgress?.count ?? currentWord?.count ?? 0;
   const lastShown = currentProgress?.last_shown ?? currentWord?.last_shown;
 
+  const advanceWorkout = (known = score.known, unknown = score.unknown) => {
+    if (currentIndex < queue.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setShowAnswer(false);
+      setPronunciationExplanation(null);
+    } else {
+      if (known + unknown > 0) {
+        addWorkoutSnapshot({ date: localDateKey(), total: known + unknown, correct: known });
+        recordImwSnapshot();
+      }
+      setWorkoutResult({ known, unknown });
+      setResultModalVisible(true);
+      setScore({ known: 0, unknown: 0 });
+    }
+  };
+
   const handleAnswer = (knew: boolean) => {
-    if (!transition.beginAction() || !currentWord || !currentLang || resultModalVisible) return;
+    if (!transition.beginAction() || !currentWord || !currentLang || !getWordTranslation(currentWord, currentLang) || resultModalVisible) return;
 
     const wordKey = currentWord.eng || currentWord.word || '';
     setHistory(prev => [...prev, {
@@ -158,28 +176,7 @@ export default function BrainWorkoutScreen() {
       setScore(s => ({ ...s, unknown: s.unknown + 1 }));
     }
 
-    if (currentIndex < queue.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setShowAnswer(false);
-      setPronunciationExplanation(null);
-    } else {
-      const finalKnown = score.known + (knew ? 1 : 0);
-      const finalUnknown = score.unknown + (knew ? 0 : 1);
-
-      addWorkoutSnapshot({
-        date: localDateKey(),
-        total: finalKnown + finalUnknown,
-        correct: finalKnown
-      });
-      // Capture how the workout moved the memory index.
-      recordImwSnapshot();
-
-      setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
-      setResultModalVisible(true);
-
-      setScore({ known: 0, unknown: 0 });
-      // Keep the last card until the result closes; the next review queue may be empty.
-    }
+    advanceWorkout(score.known + (knew ? 1 : 0), score.unknown + (knew ? 0 : 1));
   };
 
   const executeSnooze = React.useCallback(() => {
@@ -189,26 +186,7 @@ export default function BrainWorkoutScreen() {
     // Snooze for 7 days
     snoozeWord(wordKey, currentLang, 7);
 
-    if (currentIndex < queue.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setShowAnswer(false);
-      setPronunciationExplanation(null);
-    } else {
-      const finalKnown = score.known;
-      const finalUnknown = score.unknown;
-
-      addWorkoutSnapshot({
-        date: localDateKey(),
-        total: finalKnown + finalUnknown,
-        correct: finalKnown
-      });
-      recordImwSnapshot();
-
-      setWorkoutResult({ known: finalKnown, unknown: finalUnknown });
-      setResultModalVisible(true);
-
-      setScore({ known: 0, unknown: 0 });
-    }
+    advanceWorkout();
   }, [currentWord, currentLang, currentIndex, queue.length, score, snoozeWord, addWorkoutSnapshot, recordImwSnapshot]);
 
   const handleSnooze = React.useCallback(() => {
@@ -381,10 +359,28 @@ export default function BrainWorkoutScreen() {
               </View>
             </View>
 
-            <Text style={styles.targetForeignWord}>{targetTranslation}</Text>
+            <Text style={styles.targetForeignWord}>{targetTranslation || 'Перевод удалён'}</Text>
+            {!targetTranslation && <TouchableOpacity accessibilityRole="button" onPress={event => {
+              event.stopPropagation();
+              if (transition.beginAction()) advanceWorkout();
+            }} style={{ padding: 12 }}><Text>Пропустить без оценки</Text></TouchableOpacity>}
             <Text testID="workout-show-count" style={styles.showCount}>
               Показов слова: {totalShows}
             </Text>
+            {(typeof previousAnswer === 'boolean' || totalShows > 0) && (
+              <Text
+                testID="workout-previous-answer"
+                style={[
+                  styles.previousAnswer,
+                  previousAnswer === true && styles.scoreKnown,
+                  previousAnswer === false && styles.scoreUnknown,
+                ]}
+              >
+                {typeof previousAnswer === 'boolean'
+                  ? `В прошлый раз: ${previousAnswer ? '✓ Знаю' : '✗ Не знаю'}`
+                  : 'На этом языке ещё не оценивали'}
+              </Text>
+            )}
 
             <View style={styles.divider} />
 
@@ -449,6 +445,7 @@ export default function BrainWorkoutScreen() {
             style={[styles.actionBtn, styles.btnUnknown]}
             activeOpacity={0.8}
             onPress={() => handleSwipe('left')}
+            disabled={!targetTranslation}
           >
             <Text style={styles.btnIcon}>✕</Text>
             <Text style={styles.btnText}>Не знаю</Text>
@@ -458,6 +455,7 @@ export default function BrainWorkoutScreen() {
             style={[styles.actionBtn, styles.btnSnooze]}
             activeOpacity={0.8}
             onPress={handleSnooze}
+            disabled={!targetTranslation}
           >
             <Text style={[styles.btnIcon, styles.btnSnoozeText]}>⏱</Text>
             <Text style={[styles.btnText, styles.btnSnoozeText]}>Реже</Text>
@@ -467,6 +465,7 @@ export default function BrainWorkoutScreen() {
             style={[styles.actionBtn, styles.btnKnown]}
             activeOpacity={0.8}
             onPress={() => handleSwipe('right')}
+            disabled={!targetTranslation}
           >
             <Text style={styles.btnIcon}>✓</Text>
             <Text style={styles.btnText}>Знаю</Text>
@@ -699,6 +698,12 @@ const styles = StyleSheet.create({
     color: ACCENT,
     textAlign: 'center',
     marginVertical: 10,
+  },
+  previousAnswer: {
+    fontSize: 12,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 6,
   },
   showCount: {
     fontSize: 12,

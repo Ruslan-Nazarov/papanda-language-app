@@ -2,19 +2,24 @@ import type { StructureAttempt, ReadingText } from '../models/study';
 import { cancelGenerations } from '../services/generationControl';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { progressStorage } from '../services/progressStorage';
 import { Word, Sentence, Token } from '../models/types';
 import { WorkoutSnapshot, calculateIMWIndex } from '../utils/statistics';
 import { cleanDictionaryForm, getWordKey, getWordTranslation } from '../utils/words';
 import { localDateKey } from '../utils/date';
 import { sentenceFingerprint } from '../utils/sentenceValidation';
-import { prepareSentenceEdit } from '../utils/sentences';
+import { asManualSentence, prepareSentenceEdit } from '../utils/sentences';
 import { trimGeneratedCache } from '../utils/sentenceQueue';
 import { LANGUAGES } from '../constants/languages';
 import { applyWordProgress, baseStaticWords, deriveCatalog, mergeSentences } from './catalog';
 import { createDefaultProgress, pickPersistedFields, PersistedProgress, UserWordProgress, WordAiVerification } from './progressTypes';
 import { parseProgress } from './progressValidation';
 import { effectiveWordProgress, undoKnowledge, type KnowledgeUndo } from '../utils/wordProgress';
+import type { LanguageNote, NoteSource } from '../models/notes';
+import { linkNoteSource, prepareLanguageNote } from '../utils/notes';
+import { activeExperimentRun, EXPERIMENTS, type ExperimentId } from '../models/experiments';
+import { SENTENCE_LESSON_EXPERIMENT, type ExerciseCheckpoint } from '../models/sentenceLessons';
+import { advanceLesson, emptyLessonProgress, isExerciseCheckpoint, planSentenceLesson } from '../utils/sentenceLessons';
 export type { PersistedProgress, UserWordProgress, WordAiVerification, WordAiIssue } from './progressTypes';
 
 interface TargetSentenceInfo {
@@ -25,6 +30,17 @@ interface TargetSentenceInfo {
 }
 
 interface AppState extends PersistedProgress {
+  startSentenceLesson: (code: string, count?: 3 | 5) => void;
+  updateSentenceLesson: (code: string, lessonId: string, position: number, checkpoint: ExerciseCheckpoint) => void;
+  advanceSentenceLesson: (code: string, lessonId: string, position: number, skip?: boolean) => void;
+  startExperiment: (id: ExperimentId) => void;
+  stopExperiment: (id: ExperimentId) => void;
+  setExperimentNote: (id: ExperimentId, note: string, runId?: string) => void;
+  saveNoteDraft: (note: LanguageNote) => void;
+  discardNoteDraft: (id: string) => void;
+  saveLanguageNote: (note: LanguageNote) => void;
+  linkLanguageNote: (id: string, source: NoteSource) => void;
+  setNoteDisposition: (id: string, change: Partial<Pick<LanguageNote, 'pinned' | 'archived' | 'deletedAt'>>) => void;
   progressRevision: number;
   undoWordKnowledge: (wordKey: string, undo: KnowledgeUndo) => void;
   recordStructureAttempt: (attempt: StructureAttempt) => void;
@@ -136,6 +152,25 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
   const defaults = createDefaultProgress();
   return {
     ...defaults, ...deriveCatalog(defaults), targetSentenceInfo: null, workoutReviewOnly: false, progressRevision: 0,
+    saveNoteDraft: note => {
+      const draft = prepareLanguageNote(note, true);
+      set(state => ({ noteDrafts: [...state.noteDrafts.filter(item => item.id !== draft.id), draft] }));
+    },
+    discardNoteDraft: id => set(state => ({ noteDrafts: state.noteDrafts.filter(note => note.id !== id) })),
+    saveLanguageNote: note => {
+      const saved = prepareLanguageNote(note);
+      set(state => ({ languageNotes: [...state.languageNotes.filter(item => item.id !== saved.id), saved],
+        noteDrafts: state.noteDrafts.filter(item => item.id !== saved.id) }));
+    },
+    setNoteDisposition: (id, change) => set(state => ({
+      languageNotes: state.languageNotes.map(note => note.id === id ? prepareLanguageNote({ ...note, ...change }) : note),
+      // A stale editing draft must not resurrect an archived/deleted note.
+      noteDrafts: state.noteDrafts.map(note => note.id === id ? prepareLanguageNote({ ...note, ...change }, true) : note),
+    })),
+    linkLanguageNote: (id, source) => set(state => ({
+      languageNotes: state.languageNotes.map(note => note.id === id ? prepareLanguageNote(linkNoteSource(note, source)) : note),
+      noteDrafts: state.noteDrafts.map(note => note.id === id ? prepareLanguageNote(linkNoteSource(note, source), true) : note),
+    })),
     undoWordKnowledge: (key, undo) => updateProgress(key, progress => undoKnowledge(progress, undo, get().activeLanguages)),
     recordStructureAttempt: attempt => set(state => ({ structureAttempts: [...state.structureAttempts.filter(a => a.id !== attempt.id), attempt].slice(-500) })),
     disputeStructureAttempt: id => set(state => ({ structureAttempts: state.structureAttempts.map(a => a.id === id ? { ...a, result: 'disputed' as const } : a) })),
@@ -220,7 +255,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       return true;
     },
     addSentence: sentence => set(state => {
-      const customSentences = [...state.customSentences.filter(item => item.id !== sentence.id), sentence];
+      const customSentences = [...state.customSentences.filter(item => item.id !== sentence.id), asManualSentence(sentence)];
       return { customSentences, sentences: mergeSentences(customSentences, state.generatedSentences) };
     }),
     updateSentence: (id, sentence) => set(state => {
@@ -254,7 +289,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       }]));
       const customWords = state.customWords.map(word => ({ ...word, count: 0, is_learned: 0,
         knowledge_stats: {}, show_stats: {}, last_shown: undefined, last_shown_by_lang: undefined, snoozed_until_by_lang: undefined }));
-      const next = { ...state, structureAttempts: [], userWordProgress, customWords, dailyShows: {}, workoutSnapshots: [], imwSnapshots: [] };
+      const next = { ...state, structureAttempts: [], sentenceLessons: {}, userWordProgress, customWords, dailyShows: {}, workoutSnapshots: [], imwSnapshots: [] };
       return { ...pickPersistedFields(next), ...deriveCatalog(next), progressRevision: state.progressRevision + 1 };
     }),
     addWorkoutSnapshot: snapshot => set(state => ({ workoutSnapshots: [...state.workoutSnapshots, snapshot].slice(-200) })),
@@ -272,6 +307,59 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     },
     setWorkoutFavoritesOnly: workoutFavoritesOnly => set({ workoutFavoritesOnly }),
     setHasSeenSnoozeHint: hasSeenSnoozeHint => set({ hasSeenSnoozeHint }),
+    startSentenceLesson: (code, count = 5) => set(state => {
+      if (!activeExperimentRun(state.experiments[SENTENCE_LESSON_EXPERIMENT]) || !state.activeLanguages.includes(code) || ![3, 5].includes(count)) return state;
+      const progress = state.sentenceLessons[code] ?? emptyLessonProgress();
+      if (progress.current && !progress.current.completedAt) return state;
+      const current = planSentenceLesson(code, state.sentences, progress, state.structureAttempts, count);
+      return current ? { sentenceLessons: { ...state.sentenceLessons, [code]: { ...progress, current } } } : state;
+    }),
+    updateSentenceLesson: (code, lessonId, position, checkpoint) => set(state => {
+      const progress = state.sentenceLessons[code], lesson = progress?.current;
+      if (!activeExperimentRun(state.experiments[SENTENCE_LESSON_EXPERIMENT]) || !state.activeLanguages.includes(code) ||
+        !lesson || lesson.id !== lessonId || lesson.position !== position || lesson.completedAt) return state;
+      const item = lesson.items[position];
+      if (checkpoint.id !== item.progress.id || !isExerciseCheckpoint(checkpoint, item.sentence, lesson.focus)) return state;
+      const items = lesson.items.map((card, index) => index === position ? { ...card, progress: checkpoint } : card);
+      return { sentenceLessons: { ...state.sentenceLessons, [code]: { ...progress, current: { ...lesson, items } } } };
+    }),
+    advanceSentenceLesson: (code, lessonId, position, skip = false) => set(state => {
+      const progress = state.sentenceLessons[code], lesson = progress?.current;
+      if (!activeExperimentRun(state.experiments[SENTENCE_LESSON_EXPERIMENT]) || !state.activeLanguages.includes(code) ||
+        !lesson || lesson.id !== lessonId || lesson.position !== position || lesson.completedAt) return state;
+      const next = advanceLesson(progress, skip);
+      return next === progress ? state : { sentenceLessons: { ...state.sentenceLessons, [code]: next } };
+    }),
+    startExperiment: id => {
+      if (!EXPERIMENTS.some(experiment => experiment.id === id)) return;
+      set(state => {
+        const experiment = state.experiments[id] ?? { note: '', runs: [] };
+        if (activeExperimentRun(experiment)) return state;
+        const lastStop = experiment.runs[experiment.runs.length - 1]?.stoppedAt;
+        const now = new Date(Math.max(Date.now(), lastStop ? Date.parse(lastStop) : 0)).toISOString();
+        const run = { id: `run-${Date.now()}-${Math.random().toString(36).slice(2)}`, startedAt: now, stoppedAt: null, note: '' };
+        return { experiments: { ...state.experiments, [id]: { ...experiment, runs: [...experiment.runs, run] } } };
+      });
+    },
+    stopExperiment: id => set(state => {
+      const experiment = state.experiments[id];
+      const active = activeExperimentRun(experiment);
+      if (!active) return state;
+      const stoppedAt = new Date(Math.max(Date.now(), Date.parse(active.startedAt))).toISOString();
+      return { experiments: { ...state.experiments, [id]: { ...experiment,
+        runs: experiment.runs.map(run => run.id === active.id ? { ...run, stoppedAt } : run),
+      } } };
+    }),
+    setExperimentNote: (id, note, runId) => {
+      if (!EXPERIMENTS.some(experiment => experiment.id === id)) return;
+      set(state => {
+        const experiment = state.experiments[id] ?? { note: '', runs: [] };
+        if (runId !== undefined && !experiment.runs.some(run => run.id === runId)) return state;
+        return { experiments: { ...state.experiments, [id]: runId === undefined ? { ...experiment, note } : {
+          ...experiment, runs: experiment.runs.map(run => run.id === runId ? { ...run, note } : run),
+        } } };
+      });
+    },
     exportProgress: () => JSON.parse(JSON.stringify(pickPersistedFields(get()))) as PersistedProgress,
     importProgress: data => {
       try {
@@ -287,7 +375,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
   };
 }, {
   name: 'papanda-storage',
-  storage: createJSONStorage(() => AsyncStorage),
+  storage: createJSONStorage(() => progressStorage),
   partialize: pickPersistedFields,
   merge: (persisted, current) => persisted === undefined ? current : ({ ...current, ...parseProgress(persisted) }),
   onRehydrateStorage: () => (state, error) => {

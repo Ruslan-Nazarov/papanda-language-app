@@ -1,7 +1,7 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Sentence } from '../src/models/types';
-import { createQueueOrder, selectTrainerQueue, trimGeneratedCache } from '../src/utils/sentenceQueue';
+import { createQueueOrder, selectTrainerQueue, trainerPool, trimGeneratedCache } from '../src/utils/sentenceQueue';
 
 const card = (id: string, extra: Partial<Sentence> = {}): Sentence => ({ id, language: 'English', sentence: id, words: [], ...extra });
 
@@ -14,9 +14,9 @@ it('queue excludes series members and keeps order stable when cards arrive later
   assert.deepEqual(second.slice(3).map(item => item.id).sort(), ['d', 'e']);
 });
 
-it('queue falls back to series members when no stand-alone card exists', () => {
+it('queue never falls back to series members', () => {
   const queue = selectTrainerQueue([card('s0', { chainStep: 0 }), card('s1', { chainStep: 1 })], createQueueOrder());
-  assert.equal(queue.length, 2);
+  assert.equal(queue.length, 0);
 });
 
 it('queue is actually shuffled', () => {
@@ -34,4 +34,16 @@ it('cache trimming drops series whose first step was evicted', () => {
   // Cut at 4: s2 survives the slice but its series lost step 0, so it is dropped too.
   assert.deepEqual(trimGeneratedCache(list, 4).map(item => item.id), ['p', 't0', 't1']);
   assert.deepEqual(trimGeneratedCache(list, 2).map(item => item.id), ['t0', 't1']);
+});
+
+it('cached workshop chains cannot hide standalone generated cards or seed fallback', () => {
+  const series = card('s0', { source: 'generated', chainStep: 0, createdAt: 200 });
+  const seed = card('seed');
+  const manual = card('saved', { source: 'manual' });
+  const fallback = trainerPool([series, seed, manual], 100);
+  assert.deepEqual(fallback.pool.map(item => item.id), ['seed', 'saved']);
+  assert.equal(fallback.showingGenerated, false);
+  assert.equal(fallback.generated.length, 0);
+  const old = card('old', { source: 'generated', createdAt: 50 });
+  assert.deepEqual(trainerPool([series, seed, manual, old], 100).pool.map(item => item.id), ['old', 'saved']);
 });
