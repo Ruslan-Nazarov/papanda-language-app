@@ -1,0 +1,38 @@
+/* Original labels stay in the DOM for existing handlers; accessible names and
+   native tooltips are supplied by ButtonIcons.js, including for dynamic dialogs. */
+.app-action-icon.app-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 9px !important;
+    gap: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.app-action-icon.app-action-icon > * { display: none !important; }
+.app-action-icon.app-action-icon::before {
+    content: '' !important;
+    display: block !important;
+    position: static !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex: 0 0 20px !important;
+    background: currentColor !important;
+    mask: var(--app-action-image) center / contain no-repeat !important;
+    -webkit-mask: var(--app-action-image) center / contain no-repeat !important;
+}
+.app-action-icon.app-action-icon::after { display: none !important; }
+.app-action-icon:focus-visible {
+    outline: 2px solid var(--color-primary-dark, #b45309);
+    outline-offset: 3px;
+}
+.app-action-icon[hidden] { display: none !important; }

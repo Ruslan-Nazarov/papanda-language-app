@@ -87,7 +87,7 @@ async function main() {
       }, {}, counter);
       await page.screenshot({ path: path.join(root, `review-counter-${width}.png`) });
     }
-    await clickText('📊 Статистика');
+    await page.click('[aria-label="Статистика слова"]');
     await page.waitForFunction(() => document.body.innerText.includes('9\nпоказов'));
     await clickText('Закрыть');
 

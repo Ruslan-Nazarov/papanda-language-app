@@ -42,3 +42,19 @@
   on the ~170 seed sentences in `src/data/sentences.json`.
 - Validation: install root and `gemini-proxy` dependencies, then `npm run check`.
   `npm run build --prefix gemini-proxy` is a dry run, not a deployment.
+
+## Papanda design system
+
+- Follow `DESIGN_SYSTEM.md` and the pinned kit in
+  `design-system/papanda-design-system-0.7.167/` for subsequent UI changes.
+  Read its `README.md`, `AGENT.md`, `tokens.json`, catalogue and reference images.
+  Preserve the warm canvas, white surfaces, orange action with dark text,
+  Inter/Outfit typography, shared radii, Doodle icons and labelled states.
+- `src/design/papanda.ts` provides token roles; use the bundled Doodle sources
+  and preserve their manifests and licences. Record local extensions in
+  `DESIGN_SYSTEM.md`; do not silently change shared rules or add a brand accent.
+- The first pilot is `WordTriplesScreen`. Wait for the owner's assessment before
+  migrating other screens. Preserve exercise behaviour and progress handling.
+  Keep compact controls visually small with touch targets of at least 44 px.
+  Check mobile wrapping, keyboard focus/input, empty/loading/error states and
+  font scaling. Do not treat browser viewport resizing as a native keyboard test.

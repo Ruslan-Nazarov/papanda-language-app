@@ -33,8 +33,12 @@ async function main() {
     await page.setViewport({ width: 320, height: 740 });
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
     const seed = async state => {
-      await page.evaluate(state => localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
-      await page.reload({ waitUntil: 'networkidle0' });
+      // Seed before hydration. A still-mounted screen may queue a snapshot write
+      // after an in-page localStorage edit and silently overwrite the fixture.
+      const setup = await page.evaluateOnNewDocument(state =>
+        localStorage.setItem('papanda-storage', JSON.stringify({ state, version: 0 })), state);
+      try { await page.reload({ waitUntil: 'networkidle0' }); }
+      finally { await page.removeScriptToEvaluateOnNewDocument(setup.identifier); }
       await page.waitForSelector('[role="tab"][aria-label="Statistics"]');
       await page.click('[role="tab"][aria-label="Statistics"]');
       await page.waitForFunction(() => [...document.querySelectorAll('div')]

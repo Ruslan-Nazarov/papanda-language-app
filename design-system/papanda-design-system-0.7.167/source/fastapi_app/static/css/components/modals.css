@@ -1,0 +1,653 @@
+/* --- UNIFIED MODAL SYSTEM --- */
+
+@keyframes modalScaleIn {
+    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes modalBackdropFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes modalBackdropFadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.65); /* Sleek high-contrast dark overlay */
+    overflow-y: auto;
+    will-change: opacity;
+    
+    /* Center content */
+    align-items: center;
+    justify-content: center;
+    
+    opacity: 1;
+    animation: modalBackdropFadeIn 0.18s ease-out forwards;
+}
+
+.modal.closing {
+    animation: modalBackdropFadeOut 0.15s ease-in forwards;
+}
+
+.modal.active {
+    /* Kept for backwards compatibility */
+}
+
+/* Reading opens on the first tap, without waiting for a gesture or entrance animation. */
+#chronoViewModal { animation: none; touch-action: manipulation; }
+#chronoViewModal > .modal-content { animation: none; }
+
+.modal-content {
+    position: relative;
+    background-color: var(--color-bg-white);
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    will-change: transform, opacity;
+    animation: modalScaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: left !important;
+}
+
+/* Global Modal Body Reset */
+.modal-body {
+    display: block !important;
+    padding: 24px !important;
+    width: 100% !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+}
+
+.modal-header {
+    padding: 20px 24px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.modal-header h2, .modal-header h3 {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    color: var(--color-text-dark) !important;
+    margin: 0 !important;
+    text-align: left !important;
+}
+
+/* Specific Overrides for Note Modals */
+#addCategoryModal .modal-content {
+    max-width: 360px !important;
+}
+
+#addCategoryModal .form-group, #expandedNoteEditorModal:not(.record-form) .form-group {
+    margin: 0 0 20px 0 !important;
+    padding: 0 !important;
+}
+
+#addCategoryModal .form-input, #expandedNoteEditorModal:not(.record-form) .form-input,
+#addCategoryModal .dashboard-textarea, #expandedNoteEditorModal:not(.record-form) .dashboard-textarea {
+    margin: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--color-border-light);
+    background-color: var(--color-bg-subtle);
+    width: 100%;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    line-height: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.modal-close:hover {
+    background: var(--color-bg-app);
+    color: var(--color-accent-text);
+}
+
+/* Closing uses the shared quiet hover state. */
+.modal-close,
+.modal-dismiss {
+    transition: transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.modal-close:hover,
+.modal-dismiss:hover {
+    transform: none;
+}
+
+/* Modal specific helpers */
+.modal-body .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Choice Selection Styles (used in recurring deletion) */
+.choice-container {
+    width: 100%;
+}
+
+.choice-message {
+    margin-bottom: 24px;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.choice-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--color-bg-white);
+    border: 2px solid var(--color-border-light);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    line-height: 1.4;
+}
+
+.choice-item:hover {
+    background: var(--color-bg-subtle);
+    border-color: var(--color-border-dark);
+}
+
+.choice-item.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+.choice-item input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-border-medium);
+    border-radius: 50%;
+    margin: 0 16px 0 0;
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    background: white;
+}
+
+.choice-item:hover input[type="radio"] {
+    border-color: var(--color-text-faint);
+}
+
+.choice-item.selected input[type="radio"] {
+    border-color: var(--color-primary);
+}
+
+.choice-item input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 11px;
+    height: 11px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    animation: modalScaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.choice-item span {
+    flex: 1;
+}
+
+/* ─── Horizontal Editor Modals ─────────────────────────────────────────────── */
+/* Override the global .modal-body { display: block !important; padding: 24px !important } */
+
+#editChronoModal:not(.record-form) .modal-content,
+#editNoteModal .modal-content,
+#expandedNoteEditorModal:not(.record-form) .modal-content,
+#editTaskModal:not(.record-form) .modal-content,
+#editHabitModal:not(.record-form) .modal-content,
+#editWinkModal:not(.record-form) .modal-content,
+#obsAddModal:not(.record-form) .modal-content,
+#obsEditModal:not(.record-form) .modal-content {
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-radius: 28px !important;
+    background: var(--color-bg-white) !important;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.28) !important;
+}
+
+#editChronoModal:not(.record-form) .modal-header,
+#editNoteModal .modal-header,
+#expandedNoteEditorModal:not(.record-form) .modal-header,
+#editTaskModal:not(.record-form) .modal-header,
+#editHabitModal:not(.record-form) .modal-header,
+#editWinkModal:not(.record-form) .modal-header,
+#obsAddModal:not(.record-form) .modal-header,
+#obsEditModal:not(.record-form) .modal-header {
+    background: var(--color-bg-white) !important;
+    border-bottom: 1px solid var(--color-bg-app) !important;
+    padding: 20px 28px !important;
+    flex-shrink: 0 !important;
+}
+
+#editChronoModal:not(.record-form) .modal-body,
+#editNoteModal .modal-body,
+#expandedNoteEditorModal:not(.record-form) .modal-body,
+#editTaskModal:not(.record-form) .modal-body,
+#editHabitModal:not(.record-form) .modal-body,
+#editWinkModal:not(.record-form) .modal-body,
+#obsAddModal:not(.record-form) .modal-body,
+#obsEditModal:not(.record-form) .modal-body {
+    display: flex !important;
+    flex: 1 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+}
+
+/* The inner two-column grid */
+#editChronoModal:not(.record-form) .editor-layout,
+#editNoteModal .editor-layout,
+#expandedNoteEditorModal:not(.record-form) .editor-layout,
+#editTaskModal:not(.record-form) .editor-layout,
+#editHabitModal:not(.record-form) .editor-layout,
+#editWinkModal:not(.record-form) .editor-layout,
+#obsAddModal:not(.record-form) .editor-layout,
+#obsEditModal:not(.record-form) .editor-layout {
+    display: grid !important;
+    grid-template-columns: 260px 1fr !important;
+    width: 100% !important;
+    min-height: 400px !important;
+    flex: 1 !important;
+}
+
+/* Left meta panel */
+#editChronoModal:not(.record-form) .editor-meta,
+#editNoteModal .editor-meta,
+#expandedNoteEditorModal:not(.record-form) .editor-meta,
+#editTaskModal:not(.record-form) .editor-meta,
+#editHabitModal:not(.record-form) .editor-meta,
+#editWinkModal:not(.record-form) .editor-meta,
+#obsAddModal:not(.record-form) .editor-meta,
+#obsEditModal:not(.record-form) .editor-meta {
+    padding: 28px 22px !important;
+    border-right: 1.5px solid var(--color-bg-app) !important;
+    background: var(--color-bg-subtle) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    overflow-y: auto !important;
+}
+
+/* Right editor panel */
+#editChronoModal:not(.record-form) .editor-main,
+#editNoteModal .editor-main,
+#expandedNoteEditorModal:not(.record-form) .editor-main,
+#editTaskModal:not(.record-form) .editor-main,
+#editHabitModal:not(.record-form) .editor-main,
+#editWinkModal:not(.record-form) .editor-main,
+#obsAddModal:not(.record-form) .editor-main,
+#obsEditModal:not(.record-form) .editor-main {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    background: var(--color-bg-white) !important;
+}
+
+/* Full-fill textarea inside the right panel */
+#editChronoModal:not(.record-form) .editor-main textarea,
+#editNoteModal .editor-main textarea,
+#expandedNoteEditorModal:not(.record-form) .editor-main textarea,
+#editTaskModal:not(.record-form) .editor-main textarea {
+    flex: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 420px !important;
+    resize: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 28px 32px !important;
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    background: var(--color-bg-white) !important;
+    outline: none !important;
+    font-family: inherit !important;
+    color: var(--color-text-dark) !important;
+    box-sizing: border-box !important;
+}
+
+#editChronoModal:not(.record-form) .modal-footer,
+#editNoteModal .modal-footer,
+#expandedNoteEditorModal:not(.record-form) .modal-footer,
+#editTaskModal:not(.record-form) .modal-footer,
+#editHabitModal:not(.record-form) .modal-footer,
+#editWinkModal:not(.record-form) .modal-footer,
+#obsAddModal:not(.record-form) .modal-footer,
+#obsEditModal:not(.record-form) .modal-footer {
+    background: var(--color-bg-white) !important;
+    border-top: 1px solid var(--color-bg-app) !important;
+    padding: 16px 28px !important;
+    flex-shrink: 0 !important;
+}
+
+/* ─── Event Modal Specifics ──────────────────────────────────────────────── */
+.info-box {
+    background: var(--color-primary-soft);
+    border: 1px solid var(--color-primary-glow);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+.weekday-pill {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+    background: var(--color-bg-subtle);
+    padding: 8px;
+    border-radius: 12px;
+}
+.day-checkbox {
+    display: none;
+}
+.day-label {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    color: var(--color-text-muted);
+}
+.day-checkbox:checked + .day-label {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: 0 4px 10px var(--color-primary-soft);
+}
+.sticker-mini-pill {
+    background: #fff;
+    border: 1.5px solid var(--color-bg-app);
+    border-radius: 10px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-body);
+    box-shadow: var(--shadow-sm);
+}
+.sticker-mini-pill button {
+    background: none;
+    border: none;
+    color: var(--color-error);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+.color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+.color-dot:hover {
+    transform: scale(1.1);
+}
+.color-dot.active {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* ─── Premium Confirm Modal Specifics ────────────────────────────────────── */
+.premium-confirm:not(.system-dialog) .modal-content {
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid var(--color-border-light) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: var(--color-bg-white) !important;
+    max-width: 480px !important;
+    width: 92% !important;
+    height: auto !important;
+    margin: 0 !important;
+}
+
+.premium-confirm:not(.system-dialog) .modal-header {
+    padding: 18px 24px !important;
+    background: var(--color-bg-white) !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.premium-confirm:not(.system-dialog) .modal-header h2 {
+    margin: 0 !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: var(--color-text-dark) !important;
+    text-align: left !important;
+}
+
+.premium-confirm:not(.system-dialog) .modal-body {
+    padding: 24px !important;
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    background: var(--color-bg-white) !important;
+    box-sizing: border-box !important;
+}
+
+.premium-confirm:not(.system-dialog) #confirmModalMessage {
+    color: var(--color-text-body) !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+    word-break: break-word !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.premium-confirm:not(.system-dialog) .modal-footer {
+    padding: 16px 24px !important;
+    background: var(--color-bg-subtle) !important;
+    display: flex !important;
+    gap: 10px !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    border-top: 1px solid var(--color-border-light) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.premium-confirm:not(.system-dialog) .btn {
+    flex: 1 1 auto !important;
+    min-width: 100px !important;
+    max-width: 100% !important;
+    padding: 10px 18px !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 650 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+    text-align: center !important;
+    word-break: keep-all !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-secondary {
+    background: var(--color-bg-white) !important;
+    color: var(--color-text-body) !important;
+    border: 1.5px solid var(--color-border-medium) !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-secondary:hover {
+    background: var(--color-bg-app) !important;
+    color: var(--color-text-dark) !important;
+    border-color: var(--color-text-faint) !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-danger {
+    background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-danger:hover {
+    transform: none !important;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35) !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-primary {
+    background: var(--color-primary) !important;
+    color: var(--color-on-primary) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px var(--color-primary-glow) !important;
+}
+
+.premium-confirm:not(.system-dialog) .confirm-btn-primary:hover {
+    transform: none !important;
+    box-shadow: 0 6px 16px rgba(242, 153, 74, 0.3) !important;
+}
+
+
+/* Parent Stickers Modal */
+.parent-stickers-grid {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.mini-sticker-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #fff9c4;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.mini-sticker-card:hover {
+    transform: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.mini-sticker-title {
+    font-weight: 750;
+    font-size: 0.8em;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 2px;
+}
+
+.mini-sticker-text {
+    font-size: 0.75em;
+    color: var(--color-text-body);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.mini-sticker-date {
+    font-size: 0.55em;
+    color: var(--color-text-muted);
+    margin-top: auto;
+    text-align: right;
+}
+
+/* Custom Prompt Input Premium Styling */
+.prompt-container .form-input-premium, .latex-prompt-container .form-input-premium {
+    padding: 10px 14px !important;
+    border: 1.5px solid var(--color-border-medium, #cbd5e1) !important;
+    border-radius: 8px !important;
+    font-size: 0.95rem !important;
+    color: var(--color-text-header, #1e293b) !important;
+    background: var(--color-bg-base, #ffffff) !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.prompt-container .form-input-premium:focus, .latex-prompt-container .form-input-premium:focus {
+    border-color: var(--color-primary, #f97316) !important;
+    background: var(--color-bg-base, #ffffff) !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15) !important;
+}
+

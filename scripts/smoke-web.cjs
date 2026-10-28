@@ -162,12 +162,12 @@ async function main() {
     await page.reload({ waitUntil: 'networkidle0' });
     assert.equal((await storedSentences()).find(s => s.id === created.id).sentence, 'Birds sing softly');
     await page.click('[role="tab"][aria-label="Word Triples"]');
-    await clickText('📖');
+    await page.click('[aria-label="Открыть словарь"]');
     await page.waitForFunction(() => document.body.innerText.includes('Словарь ('));
     await clickText('←');
     await page.waitForSelector('[role="tab"]');
     pronunciationFixture = true;
-    await clickText('📢');
+    await page.click('[aria-label="Разбор произношения"]');
     await page.waitForSelector('[data-testid="pronunciation-close"]', { visible: true });
     // A bundle without a proxy URL cannot call the AI fixture.
     const hasProxy = await page.waitForFunction(() => document.body.innerText.includes('Тест произношения'), { timeout: 3000 }).then(() => true, () => false);
@@ -185,7 +185,7 @@ async function main() {
       await page.click('[data-testid="pronunciation-mode-detailed"]');
       assert.deepEqual(pronunciationRequests, ['short', 'detailed'], 'Switching back must reuse both answers');
       await page.click('[data-testid="pronunciation-close"]');
-      await clickText('📢');
+      await page.click('[aria-label="Разбор произношения"]');
       await page.waitForFunction(() => document.body.innerText.includes('Тест произношения → нэ́йм'));
       assert.equal(await page.$eval('[data-testid="pronunciation-mode-short"]', el => el.getAttribute('aria-selected')), 'true');
       failDetailedPronunciation = true;
@@ -195,7 +195,7 @@ async function main() {
       await page.click('[data-testid="pronunciation-retry"]');
       await page.waitForFunction(() => document.body.innerText.includes('Подробный тест произношения'));
       await page.click('[data-testid="pronunciation-close"]');
-      await clickText('📢');
+      await page.click('[aria-label="Разбор произношения"]');
       await page.waitForFunction(() => document.body.innerText.includes('Тест произношения → нэ́йм'));
       holdPronunciation = true;
       const pendingDetails = page.waitForRequest(request => request.postData()?.includes('подробную практическую справку о произношении'));
@@ -223,7 +223,7 @@ async function main() {
         await request.respond({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
           body: JSON.stringify({ text: 'Ответ после закрытия' }) }).catch(() => {});
       }
-      await clickText('📢');
+      await page.click('[aria-label="Разбор произношения"]');
       await page.waitForFunction(() => document.body.innerText.includes('Тест произношения → нэ́йм'));
       await page.waitForNetworkIdle({ idleTime: 100 });
       assert.ok(!(await page.$eval('body', el => el.innerText)).includes('Ответ после закрытия'));

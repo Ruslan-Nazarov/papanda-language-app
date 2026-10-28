@@ -1,0 +1,219 @@
+/* Shared record editors in the papanda design system. */
+.record-form, .settings-page, .record-browser {
+    --record-form-accent-text: #9A4D13;
+    --record-form-error-text: #B91C1C;
+}
+
+.record-form .modal-content {
+    width: calc(100% - 32px);
+    max-width: 1000px;
+    max-height: calc(100dvh - 32px);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-white);
+    box-shadow: var(--shadow-lg);
+}
+
+/* These declarations replace the legacy modal reset, which uses !important. */
+.record-form .modal-header {
+    padding: 20px 24px !important;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.record-form .modal-header :is(h2, h3) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    margin-right: auto !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    overflow-wrap: anywhere;
+}
+.record-form .modal-header > button { flex-shrink: 0; }
+.record-form .modal-body {
+    padding: 0 !important;
+    min-height: 0;
+    overflow: auto;
+}
+.record-form .editor-layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-width: 0;
+}
+.record-form .editor-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    padding: 24px;
+    border-right: 1px solid var(--color-border-light);
+    background: var(--color-bg-subtle);
+    min-width: 0;
+    max-height: calc(100dvh - 200px);
+    overflow-y: auto;
+}
+.record-form .editor-main {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 24px;
+}
+.record-form :is(.record-form-label, .form-label, .note-meta-label) {
+    display: block;
+    margin: 0 0 8px;
+    color: var(--color-text-body);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: normal;
+}
+:is(.record-form, .settings-page, .record-browser) :is(.form-input, .form-select) {
+    width: 100%; min-width: 0; max-width: 100%; min-height: 44px;
+    padding: 10px 12px;
+    border: 2px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    color: var(--color-text-dark);
+    background-color: var(--color-bg-white);
+    font-family: var(--font-ui);
+    font-size: 16px; font-weight: 400; line-height: 1.5;
+}
+:is(.record-form, .settings-page, .record-browser) .form-select { padding-right: 36px; }
+.record-form .record-form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    color: var(--color-text-dark);
+    font-size: 16px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+.record-form-check input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin: 2px 0 0;
+    accent-color: var(--record-form-accent-text);
+}
+.record-form .task-lifecycle {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+}
+.record-form .task-lifecycle:empty { display: none; }
+.record-form .note-rich-editor,
+.record-form .editor-main textarea:not([hidden]) {
+    width: 100%;
+    min-height: 220px;
+    border: 2px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    color: var(--color-text-dark);
+    background: var(--color-bg-white);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.record-form .note-rich-editor { max-height: 55dvh; overflow-y: auto; }
+.record-form .editor-main > .voice-field { min-width: 0; }
+.record-form .note-rich-editor[aria-invalid="true"] { border-color: var(--record-form-error-text); }
+.record-form .record-form-error {
+    color: var(--record-form-error-text);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.record-form .record-form-error:empty { display: none; }
+.record-form .modal-footer {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--color-bg-white);
+    flex-shrink: 0;
+}
+.record-form .record-form-status {
+    margin-right: auto;
+    font-size: 14px;
+    color: var(--color-text-body);
+}
+.record-form .record-form-status:empty { display: none; }
+:is(.record-form, .settings-page, .record-browser) .btn:not(:where(.note-editor-toolbar *, .note-word-actions *)) {
+    min-height: 44px;
+    padding: 10px 16px;
+    gap: 8px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: normal;
+    transform: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+:is(.record-form, .settings-page, .record-browser) .btn.btn-primary,
+:is(.record-form, .settings-page, .record-browser) .btn.btn-primary:hover:not(:disabled) {
+    color: var(--color-text-dark);
+    transform: none;
+}
+:is(.record-form, .settings-page, .record-browser) .btn.btn-secondary { color: var(--color-text-body); }
+:is(.record-form, .settings-page, .record-browser) .btn.btn-danger { background: var(--color-error-soft); color: var(--record-form-error-text); }
+:is(.record-form, .settings-page, .record-browser) .btn.btn-danger:hover:not(:disabled) { background: var(--record-form-error-text); color: var(--color-bg-white); }
+:is(.record-form, .settings-page, .record-browser) .btn.btn-secondary:hover:not(:disabled) {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary-dark);
+}
+:is(.record-form, .settings-page, .record-browser) .btn.btn-primary:disabled {
+    opacity: 1;
+    background: var(--color-border-medium);
+    color: var(--color-text-body);
+    box-shadow: none;
+}
+.record-form .btn:disabled { cursor: wait; }
+.record-form .btn.record-form-icon,
+.record-form .modal-close,
+.record-form .voice-input-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+    border-radius: var(--radius-md);
+    transform: none;
+}
+.record-form :is(.record-form-icon, .modal-close):hover { transform: none; }
+.record-form .record-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.record-form .record-form-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.record-form .record-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.record-form .record-form-row > * { min-width: 0; }
+.record-form .record-form-title-field { flex: 1 1 240px; margin-bottom: 0; }
+.record-form.record-form-stacked .modal-content { max-width: 640px; }
+.record-form.record-form-stacked .modal-body { padding: 24px !important; }
+:is(.record-form, .settings-page, .record-browser) :is(button, input, select, textarea, .note-rich-editor):focus-visible {
+    outline: 2px solid var(--record-form-accent-text);
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .record-form .modal-header { padding: 16px !important; }
+    .record-form .modal-header :is(h2, h3) { gap: 8px; }
+    .record-form .editor-layout { grid-template-columns: minmax(0, 1fr); }
+    .record-form .editor-main { order: -1; padding: 16px; }
+    .record-form .editor-meta { max-height: none; overflow: visible; padding: 16px; gap: 16px; border-right: none; border-top: 1px solid var(--color-border-light); }
+    .record-form .modal-footer { padding: 16px; gap: 8px; }
+    .record-form .modal-footer .btn { flex: 1 1 120px; }
+    .record-form .record-form-status { flex-basis: 100%; }
+    .record-form .note-rich-editor { min-height: 140px; }
+    .record-form .record-form-actions { flex: 1 1 100%; }
+    .record-form .record-form-columns { grid-template-columns: minmax(0, 1fr); }
+    .record-form.record-form-stacked .modal-body { padding: 16px !important; }
+    .record-form .note-word-actions .btn { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .record-form, .record-form .modal-content, .record-form button { animation: none; transition: none; }
+}

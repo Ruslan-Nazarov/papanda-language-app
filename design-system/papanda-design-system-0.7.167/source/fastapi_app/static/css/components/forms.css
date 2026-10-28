@@ -1,0 +1,111 @@
+/* --- PREMIUM FORM ELEMENTS (UNIFIED) --- */
+
+/* Text Inputs & Textareas */
+.form-input, .form-select {
+    width: 100%;
+    background: var(--color-bg-white);
+    border: 2px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 1rem;
+    min-height: 44px;
+    color: var(--color-text-dark);
+    font-family: var(--font-ui);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Specific for number inputs */
+input[type="number"].form-input {
+    font-weight: 400;
+    color: var(--color-text-dark);
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--color-primary-glow);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-faint);
+}
+
+/* Custom Styled Select */
+.form-select {
+    appearance: none;
+    background: var(--color-bg-white) var(--icon-pack-down, url("data:image/svg+xml,%3Csvg%20width%3D%2291%22%20height%3D%2299%22%20viewBox%3D%220%200%2091%2099%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M45.4294%2089.0373C49.7395%2083.5897%2053.604%2078.742%2057.4357%2073.8654C63.7103%2065.8785%2069.8405%2057.7719%2076.2864%2049.9274C78.9741%2046.6568%2082.2998%2043.9049%2085.3833%2040.9678C86.7071%2039.7063%2088.4109%2038.6049%2090.0065%2040.1007C91.7786%2041.7606%2090.6629%2043.5722%2089.2846%2044.9577C74.4514%2059.8625%2064.2741%2078.3141%2051.3705%2094.6891C47.5677%2099.5145%2044.3654%20100.143%2039.6608%2096.0575C38.1526%2094.7928%2036.7389%2093.4196%2035.4308%2091.9489C26.2532%2081.2604%2016.9876%2070.6421%208.06665%2059.7423C5.20239%2056.2434%203.23017%2051.9976%201.00124%2048.0084C0.621879%2047.3284%200.775416%2045.5366%201.08521%2045.4303C2.22264%2045.0365%203.88641%2044.6052%204.71077%2045.1526C7.95308%2047.3073%2011.3608%2049.4549%2013.9593%2052.2896C20.2312%2059.1333%2026.0667%2066.3753%2032.111%2073.429C35.6657%2077.577%2039.2913%2081.6653%2042.8663%2085.7963C43.6467%2086.7001%2044.3523%2087.6728%2045.4294%2089.0373Z%22%20fill%3D%22%2394a3b8%22%2F%3E%0A%3Cpath%20d%3D%22M45.4294%2049.6574C49.7395%2044.2098%2053.604%2039.3621%2057.4357%2034.4856C63.7103%2026.4986%2069.8405%2018.392%2076.2864%2010.5475C78.9741%207.27696%2082.2998%204.52502%2085.3833%201.58791C86.7071%200.326427%2088.4109%20-0.774937%2090.0065%200.720856C91.7786%202.38073%2090.6629%204.19232%2089.2846%205.57785C74.4514%2020.4826%2064.2741%2038.9343%2051.3705%2055.3092C47.5677%2060.1346%2044.3654%2060.7634%2039.6608%2056.6777C38.1526%2055.4129%2036.7389%2054.0397%2035.4308%2052.569C26.2532%2041.8805%2016.9876%2031.2622%208.06665%2020.3624C5.20239%2016.8635%203.23017%2012.6177%201.00124%208.62848C0.621879%207.94851%200.775416%206.15672%201.08521%206.0504C2.22264%205.65659%203.88641%205.22532%204.71077%205.7727C7.95308%207.92746%2011.3608%2010.075%2013.9593%2012.9097C20.2312%2019.7534%2026.0667%2026.9954%2032.111%2034.0491C35.6657%2038.1971%2039.2913%2042.2855%2042.8663%2046.4165C43.6467%2047.3202%2044.3523%2048.2929%2045.4294%2049.6574Z%22%20fill%3D%22%2394a3b8%22%2F%3E%0A%3C%2Fsvg%3E%0A")) no-repeat right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+/* Premium Checkbox */
+.premium-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    user-select: none;
+}
+
+.premium-checkbox-wrapper input {
+    position: absolute;
+    display: block;
+    width: 1px; height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+.premium-checkbox-wrapper input:focus-visible + .checkbox-custom {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    background: var(--color-bg-white);
+    border: 2px solid var(--color-border-medium);
+    border-radius: 6px;
+    position: relative;
+    transition: all var(--transition-fast);
+}
+
+.premium-checkbox-wrapper input:checked + .checkbox-custom {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.premium-checkbox-wrapper input:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-on-primary);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Labels */
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+}
+
+.form-group-premium {
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.form-group-premium:last-child {
+    margin-bottom: 0;
+}

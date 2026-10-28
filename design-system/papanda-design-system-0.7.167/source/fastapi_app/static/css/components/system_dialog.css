@@ -1,0 +1,47 @@
+/* Confirmations, prompts and choices reuse the record form's controls. */
+.record-form.system-dialog > .modal-content { max-width: 480px; }
+.system-dialog #confirmModalMessage,
+.system-dialog .modal-body > p {
+    margin: 0;
+    color: var(--color-text-body);
+    font: 400 16px/1.5 var(--font-ui);
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+.system-dialog .modal-body { flex: 0 1 auto; }
+.system-dialog .confirm-icon-wrapper { display: flex; justify-content: flex-start; margin-bottom: 12px; }
+.system-dialog .confirm-icon-wrapper .doodle-icon { --doodle-size: 28px; }
+.system-dialog .system-dialog-description { margin-bottom: 16px; white-space: pre-wrap; }
+.system-dialog .choice-message { margin-bottom: 16px; color: var(--color-text-body); font-size: 16px; font-weight: 400; }
+.system-dialog .choice-item {
+    gap: 12px; padding: 12px 16px; min-height: 44px;
+    border-radius: var(--radius-md); border-color: var(--color-border-medium);
+    color: var(--color-text-dark); font: 400 16px/1.5 var(--font-ui);
+    overflow-wrap: anywhere;
+}
+.system-dialog .choice-item:has(input:checked) { background: var(--color-primary-soft); border-color: var(--record-form-accent-text); color: var(--color-text-dark); }
+.system-dialog .choice-item input[type="radio"] {
+    appearance: auto; -webkit-appearance: radio;
+    width: 20px; height: 20px; margin: 0; accent-color: var(--record-form-accent-text);
+}
+.system-dialog .choice-item input[type="radio"]::after { content: none; }
+.system-dialog .choice-item input:focus-visible { outline: 2px solid var(--record-form-accent-text); outline-offset: 3px; }
+.system-dialog .choice-item:focus-within { border-color: var(--record-form-accent-text); }
+.system-dialog .modal-footer .btn { margin: 0; flex: 0 1 auto; }
+/* Native dialogs already occupy the top layer above their parent editors. */
+dialog.system-dialog {
+    position: fixed; inset: 0; margin: auto; padding: 0;
+    width: min(480px, calc(100vw - 32px)); max-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 32px); height: fit-content;
+    border: 1px solid var(--color-border-light); border-radius: var(--radius-xl);
+    color: var(--color-text-dark); background: var(--color-bg-white);
+    font-family: var(--font-ui); white-space: normal; overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+dialog.system-dialog::backdrop { background: rgba(15, 23, 42, .65); }
+dialog.system-dialog > .modal-content {
+    width: 100%; max-height: calc(100dvh - 34px); border: none; box-shadow: none;
+}
+@media (max-width: 640px) {
+    .system-dialog .modal-footer .btn { flex: 1 1 120px; }
+}

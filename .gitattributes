@@ -1,0 +1,2 @@
+# Keep the supplied kit byte-for-byte identical to its SHA-256 manifest.
+/design-system/** -text

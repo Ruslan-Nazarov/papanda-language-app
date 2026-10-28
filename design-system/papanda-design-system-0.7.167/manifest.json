@@ -1,0 +1,455 @@
+{
+  "name": "papanda design system",
+  "baselineVersion": "0.7.167",
+  "appVersion": "0.7.167",
+  "releaseDate": "2026-10-28",
+  "sourceGitHead": "28184a65dee613a2a8de3117283432a17163ff8a",
+  "includesWorkingTreeChanges": false,
+  "note": "Hashes describe exact payloads; manifest.json excludes itself.",
+  "files": {
+    "AGENT.md": {
+      "sha256": "165cf155719f0add785da2b39566a85844f877cd906d1dde397de1c1c0255d33",
+      "source": "docs/design-system/AGENT.md"
+    },
+    "LICENSE": {
+      "sha256": "68f0754c704c469c46dd8ad1e0c0d9b7402d2ae1c7b9dd311e691bc0405083fe",
+      "source": "LICENSE"
+    },
+    "README.md": {
+      "sha256": "8bb79ba8042279ff472f7c1cc2c20cf63059ce98b7dd81a36541ff6c60881015",
+      "source": "docs/design-system/README.md"
+    },
+    "audit.md": {
+      "sha256": "9914ba5298801c913ab99d42b9aa356c6c2b659cf439a7447b560cf45c5f7c3e",
+      "source": "docs/design-system/audit.md"
+    },
+    "confirmation.png": {
+      "sha256": "a727d057ffb5fecccd5c272b9a5251e811dfdae356a489741ed87cdc2e73ab31",
+      "source": "docs/design-system/confirmation.png"
+    },
+    "icons/README.md": {
+      "sha256": "af45ab028ffbd2e11fbf3c89a1f1559e3b5e6ddca09e95ade84289d6732ffdbe",
+      "source": "fastapi_app/static/vendor/doodle/README.md"
+    },
+    "icons/add.svg": {
+      "sha256": "34974f5e8d9e146a77dbf5b408fc1aa76cdcb48c256bb60dfd4c03bbc17f1e89",
+      "source": "fastapi_app/static/vendor/doodle/icons/add.svg"
+    },
+    "icons/align-center.svg": {
+      "sha256": "9ba44fa19d64ce7230fcb27e4632bc141a2220a3b7d7470ddc5cf85b96466979",
+      "source": "fastapi_app/static/vendor/doodle/icons/align-center.svg"
+    },
+    "icons/align-justify.svg": {
+      "sha256": "5f0a75293d605a8925e3ada2f510a61ee798e9ffc58eafb2c09fbd1c6f0fe1a5",
+      "source": "fastapi_app/static/vendor/doodle/icons/align-justify.svg"
+    },
+    "icons/align-left.svg": {
+      "sha256": "958169a158e934e38ffe55d3382847bdc1c11126bb69aa9743cc37b60cac5df5",
+      "source": "fastapi_app/static/vendor/doodle/icons/align-left.svg"
+    },
+    "icons/align-right.svg": {
+      "sha256": "3ee7453a04668c58954f72d2aa8fd8b86fccd27815965ea4d46770477759ef4d",
+      "source": "fastapi_app/static/vendor/doodle/icons/align-right.svg"
+    },
+    "icons/archive.svg": {
+      "sha256": "e9a13d9af9d0ed263ee225d42cfc65618389918d48ae43b1f657077019a1a13f",
+      "source": "fastapi_app/static/vendor/doodle/icons/archive.svg"
+    },
+    "icons/assistant.svg": {
+      "sha256": "5d53a211753c00e08be78bbe2fb73e858190986c5a2f5e26a105d0da552e1d01",
+      "source": "fastapi_app/static/vendor/doodle/icons/assistant.svg"
+    },
+    "icons/bell.svg": {
+      "sha256": "5d641074a9445b0a04ffcc5ab52f26a35d49d817196ed6d4a317279607d8ec92",
+      "source": "fastapi_app/static/vendor/doodle/icons/bell.svg"
+    },
+    "icons/calculator.svg": {
+      "sha256": "1c03a14d18dfa9151cc9286c0c0967eb2c21cc9e7c3375ee7992821e18bcac08",
+      "source": "fastapi_app/static/vendor/doodle/icons/calculator.svg"
+    },
+    "icons/calendar.svg": {
+      "sha256": "b8ef5fd414ebaca0571e14efdac4318121725f37949374fa1a83f96d6ce2a566",
+      "source": "fastapi_app/static/vendor/doodle/icons/calendar.svg"
+    },
+    "icons/camera.svg": {
+      "sha256": "a4a193739d491dcc3aa045cfef3bf7d6b6ba2e50b707b847eb8224597484e36c",
+      "source": "fastapi_app/static/vendor/doodle/icons/camera.svg"
+    },
+    "icons/chart.svg": {
+      "sha256": "b92f53fd48e1d31fcd3fa8c70a0b4bfc81d9e0d962abeff8dbd74a819a6d7488",
+      "source": "fastapi_app/static/vendor/doodle/icons/chart.svg"
+    },
+    "icons/check.svg": {
+      "sha256": "9512b15bd2eb763ac92a2a2c21cdbdaebeadeaf14ef669f3eb8483ce1e464986",
+      "source": "fastapi_app/static/vendor/doodle/icons/check.svg"
+    },
+    "icons/chronology.svg": {
+      "sha256": "19aff12d6a8e67ae829a1c180df5992ef23baef32194b5bdd5d9dd6f45db88dc",
+      "source": "fastapi_app/static/vendor/doodle/icons/chronology.svg"
+    },
+    "icons/clock.svg": {
+      "sha256": "6f80752588cafa42778f0d47e2c57ea43c84284eb830a52026888ca9a6943fe8",
+      "source": "fastapi_app/static/vendor/doodle/icons/clock.svg"
+    },
+    "icons/close.svg": {
+      "sha256": "34974f5e8d9e146a77dbf5b408fc1aa76cdcb48c256bb60dfd4c03bbc17f1e89",
+      "source": "fastapi_app/static/vendor/doodle/icons/close.svg"
+    },
+    "icons/collapse.svg": {
+      "sha256": "e76e1536a299d1d573169752886777ae60f308627c7416f8141be973b027f17c",
+      "source": "fastapi_app/static/vendor/doodle/icons/collapse.svg"
+    },
+    "icons/compass.svg": {
+      "sha256": "a4a358234cb274e302f0a1fa87371b51174a66fce8ac9e6bc8cebc475279cf44",
+      "source": "fastapi_app/static/vendor/doodle/icons/compass.svg"
+    },
+    "icons/copy.svg": {
+      "sha256": "06f9f17e8c14621bf93ba85f56022fd76d1523b24d57e0c843f61e8b9a483ab4",
+      "source": "fastapi_app/static/vendor/doodle/icons/copy.svg"
+    },
+    "icons/crown.svg": {
+      "sha256": "bf2bcdf2cca3f6a9500b8e01a45331a454a468831ab407ee01390d3112c60d78",
+      "source": "fastapi_app/static/vendor/doodle/icons/crown.svg"
+    },
+    "icons/delete.svg": {
+      "sha256": "2a2a27e0dc0bcb0afe7bfd13aea429c51560b317c54dcce7205dfd670293eb0b",
+      "source": "fastapi_app/static/vendor/doodle/icons/delete.svg"
+    },
+    "icons/document.svg": {
+      "sha256": "9ea5a7534a6a5888d27ef61f7e9c05fca61e0539aef4d883071f14afdaa14572",
+      "source": "fastapi_app/static/vendor/doodle/icons/document.svg"
+    },
+    "icons/down.svg": {
+      "sha256": "1a19bb6e0c246ddeaee19398d35fb2f5e006a48772566edb28d4b54e898f3e84",
+      "source": "fastapi_app/static/vendor/doodle/icons/down.svg"
+    },
+    "icons/download.svg": {
+      "sha256": "6851671399fd980543467b19f2a550995291fa95dfe20931d9499eeca18c7fe8",
+      "source": "fastapi_app/static/vendor/doodle/icons/download.svg"
+    },
+    "icons/edit.svg": {
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b",
+      "source": "fastapi_app/static/vendor/doodle/icons/edit.svg"
+    },
+    "icons/expand.svg": {
+      "sha256": "726636c1ebec31520b70c70487ba00c5feffc91daa80e9058745f1c8bc0d4565",
+      "source": "fastapi_app/static/vendor/doodle/icons/expand.svg"
+    },
+    "icons/eye.svg": {
+      "sha256": "66c79c6a47d4a8c5c469d8f1954b5ec5c7ce4af643f0345436147bdbd11f88be",
+      "source": "fastapi_app/static/vendor/doodle/icons/eye.svg"
+    },
+    "icons/flag.svg": {
+      "sha256": "4c0a487e655ee77de8f274a483a16c9ac9550956417577baf17c8ce5752f54a1",
+      "source": "fastapi_app/static/vendor/doodle/icons/flag.svg"
+    },
+    "icons/focus.svg": {
+      "sha256": "bcdc1b5ce6dc20f61aa7c938032d1e37557935eef83aeb5765b338be6f37e9ca",
+      "source": "fastapi_app/static/vendor/doodle/icons/focus.svg"
+    },
+    "icons/folder-add.svg": {
+      "sha256": "1b2e192e53196fc7b7b9f47a996f6635dce7aa6fabbf4deb7d4bb9770334d09b",
+      "source": "fastapi_app/static/vendor/doodle/icons/folder-add.svg"
+    },
+    "icons/folder.svg": {
+      "sha256": "fef7951155402974602900e1883e987de93d304474f47b9848ef89d2e5be733c",
+      "source": "fastapi_app/static/vendor/doodle/icons/folder.svg"
+    },
+    "icons/habit.svg": {
+      "sha256": "80518d28a2aa411a5e9695eb97fd295c895240057dbffaebc7ca553b8e9c112f",
+      "source": "fastapi_app/static/vendor/doodle/icons/habit.svg"
+    },
+    "icons/help.svg": {
+      "sha256": "3ca1a0d2067845342db1074338d47157e0602ee7ab02496067b76c7f5423e232",
+      "source": "fastapi_app/static/vendor/doodle/icons/help.svg"
+    },
+    "icons/history.svg": {
+      "sha256": "6f80752588cafa42778f0d47e2c57ea43c84284eb830a52026888ca9a6943fe8",
+      "source": "fastapi_app/static/vendor/doodle/icons/history.svg"
+    },
+    "icons/home.svg": {
+      "sha256": "eae9ef90b050fb43d2f843edd0b1dff7402057739efc08a97aa6d4bafd069364",
+      "source": "fastapi_app/static/vendor/doodle/icons/home.svg"
+    },
+    "icons/idea.svg": {
+      "sha256": "3245637ca31ecfe05a0c090339b5c28623e4cb23b70c503c01d611e52d6fc88d",
+      "source": "fastapi_app/static/vendor/doodle/icons/idea.svg"
+    },
+    "icons/image.svg": {
+      "sha256": "e1a0458f056b4b5710e9f9ba4d4d1c59938ccc8edcffa1252763d72574197a54",
+      "source": "fastapi_app/static/vendor/doodle/icons/image.svg"
+    },
+    "icons/info.svg": {
+      "sha256": "c3720e6710c7f232960ca7dfdf53cbce2d5af84d87c87046aaa741e696c9f568",
+      "source": "fastapi_app/static/vendor/doodle/icons/info.svg"
+    },
+    "icons/language.svg": {
+      "sha256": "9e217af25c9662c01d4f52c7e7b34d498314cd8f6cf4d9263fcd80e614b5d8c2",
+      "source": "fastapi_app/static/vendor/doodle/icons/language.svg"
+    },
+    "icons/link.svg": {
+      "sha256": "9a76f7fd90f92900535b06f3051916b8fbf8a39274e32cea5423964148631bfb",
+      "source": "fastapi_app/static/vendor/doodle/icons/link.svg"
+    },
+    "icons/list.svg": {
+      "sha256": "5f0a75293d605a8925e3ada2f510a61ee798e9ffc58eafb2c09fbd1c6f0fe1a5",
+      "source": "fastapi_app/static/vendor/doodle/icons/list.svg"
+    },
+    "icons/manifest.json": {
+      "sha256": "574fcb7f45ccf7240f9e1e4e14ddddb8ae34f4c9649abe70d171a02d62f28418",
+      "source": "fastapi_app/static/vendor/doodle/manifest.json"
+    },
+    "icons/microphone.svg": {
+      "sha256": "a42bd44b541c8c6407ca9bc83030bab576fa927a6c9da88d8e2d4c31dd9529d5",
+      "source": "fastapi_app/static/vendor/doodle/icons/microphone.svg"
+    },
+    "icons/minus.svg": {
+      "sha256": "17b2cb501da07a8dc8c20881753601af4d6427833fa4336bdd4e704c2dabab93",
+      "source": "fastapi_app/static/vendor/doodle/icons/minus.svg"
+    },
+    "icons/more.svg": {
+      "sha256": "edd65d70a6b2a42ceb3412835b603ce9b457af255932c61c37b2ba3410ae73f5",
+      "source": "fastapi_app/static/vendor/doodle/icons/more.svg"
+    },
+    "icons/next.svg": {
+      "sha256": "58b03660692178b2573c4330a5e541b4d7746fedfb0a7d4402a823dd22ac3c05",
+      "source": "fastapi_app/static/vendor/doodle/icons/next.svg"
+    },
+    "icons/note.svg": {
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b",
+      "source": "fastapi_app/static/vendor/doodle/icons/note.svg"
+    },
+    "icons/observation.svg": {
+      "sha256": "f4947063a662d8e31e884f623c3fdc23a7cd30a851cc88d3fabaf94486db4781",
+      "source": "fastapi_app/static/vendor/doodle/icons/observation.svg"
+    },
+    "icons/palette.svg": {
+      "sha256": "663405c4b0846a151e297941e601a39d1acbebdb6c90493efaa7886e4aae8eb8",
+      "source": "fastapi_app/static/vendor/doodle/icons/palette.svg"
+    },
+    "icons/pause.svg": {
+      "sha256": "d0e5849fc4801f0a0c102e8127e4aa863b5891dd03a7ea17b53664eafbc41758",
+      "source": "fastapi_app/static/vendor/doodle/icons/pause.svg"
+    },
+    "icons/pin.svg": {
+      "sha256": "5170bd55ce82146970eafa6cc58adccb3b1303ca5d21daeaa5c173b7d7b456eb",
+      "source": "fastapi_app/static/vendor/doodle/icons/pin.svg"
+    },
+    "icons/play.svg": {
+      "sha256": "3f64ba987c5d4b0ba08f35d0ddb64957c8483087e1c2a62d328bffb7fe80b633",
+      "source": "fastapi_app/static/vendor/doodle/icons/play.svg"
+    },
+    "icons/plugins.svg": {
+      "sha256": "1087b61ccb52c81db0109c40697d594f89ae08084b49cc7338fdb6df05cb163b",
+      "source": "fastapi_app/static/vendor/doodle/icons/plugins.svg"
+    },
+    "icons/previous.svg": {
+      "sha256": "c28aa3888e423d1245d90276dcf37b743949bccb7b204ac49499aae4ecd57a3b",
+      "source": "fastapi_app/static/vendor/doodle/icons/previous.svg"
+    },
+    "icons/quote.svg": {
+      "sha256": "e0c7e103601dc5234b594513540c095f3e4d8836e2438399c156a6cb89039055",
+      "source": "fastapi_app/static/vendor/doodle/icons/quote.svg"
+    },
+    "icons/read.svg": {
+      "sha256": "f7b0b1d11879b806047f8d4c00e07b40b4f6234570f401d4589066d09a6579db",
+      "source": "fastapi_app/static/vendor/doodle/icons/read.svg"
+    },
+    "icons/redo.svg": {
+      "sha256": "f6b921ea74fec19f82855c1888d2f03ad6b029805082b0e9aa60704de78dd3e8",
+      "source": "fastapi_app/static/vendor/doodle/icons/redo.svg"
+    },
+    "icons/refresh.svg": {
+      "sha256": "5d2b71e605d8b3d9da82aea935ad15e1cc9a89e0e31574ad434946fff7123ac4",
+      "source": "fastapi_app/static/vendor/doodle/icons/refresh.svg"
+    },
+    "icons/repeat.svg": {
+      "sha256": "5d2b71e605d8b3d9da82aea935ad15e1cc9a89e0e31574ad434946fff7123ac4",
+      "source": "fastapi_app/static/vendor/doodle/icons/repeat.svg"
+    },
+    "icons/restore.svg": {
+      "sha256": "2418a8d078b890cdb82b1b5f0d514747509fd723d7b25aac066568076f662767",
+      "source": "fastapi_app/static/vendor/doodle/icons/restore.svg"
+    },
+    "icons/save.svg": {
+      "sha256": "d08fb0e3a58f566aa78698ecc416fac07aba94292dfbdc413353c0d7c175616f",
+      "source": "fastapi_app/static/vendor/doodle/icons/save.svg"
+    },
+    "icons/search.svg": {
+      "sha256": "3ff17ab0f1593e6c7d986437be4a862d7b35c3f8d14db274d789a2347db35f19",
+      "source": "fastapi_app/static/vendor/doodle/icons/search.svg"
+    },
+    "icons/send.svg": {
+      "sha256": "744a0095beb84bdfac8c4dc0dffa1c9521f03315a7337914a4c8396d7b25f3f1",
+      "source": "fastapi_app/static/vendor/doodle/icons/send.svg"
+    },
+    "icons/settings.svg": {
+      "sha256": "f9299e07d47140adca5b1d8acbde172895a940ea76fc3748d8b4b2f4a7c2c67b",
+      "source": "fastapi_app/static/vendor/doodle/icons/settings.svg"
+    },
+    "icons/star.svg": {
+      "sha256": "c81c735877ee7cc8d525347a41167954ff3d4f3e640cd1e19cf62a9c91343689",
+      "source": "fastapi_app/static/vendor/doodle/icons/star.svg"
+    },
+    "icons/sticker.svg": {
+      "sha256": "31ce5e785d62a71afc5fdebe0bd82dfd8ad250d911abec666d803cf191be1dcf",
+      "source": "fastapi_app/static/vendor/doodle/icons/sticker.svg"
+    },
+    "icons/stop.svg": {
+      "sha256": "d43f44dd051d58f39035358ed2e298f6d035bf2f897833d2cc8278de7ef83175",
+      "source": "fastapi_app/static/vendor/doodle/icons/stop.svg"
+    },
+    "icons/table.svg": {
+      "sha256": "e7c5b684126e67d7823556172476790d5dd44de23d0305ccd35ea875e475545c",
+      "source": "fastapi_app/static/vendor/doodle/icons/table.svg"
+    },
+    "icons/tag.svg": {
+      "sha256": "7b9454c14245cc4f04d8bc85a0645dcb251d022fcfcb97cbf5849345c9e9596e",
+      "source": "fastapi_app/static/vendor/doodle/icons/tag.svg"
+    },
+    "icons/tasks.svg": {
+      "sha256": "26f2fe2b74f08ad801ca7b4983ce837cb291175838c05cdc4cdda437ee3d795d",
+      "source": "fastapi_app/static/vendor/doodle/icons/tasks.svg"
+    },
+    "icons/timer.svg": {
+      "sha256": "83358dca14471a9c205304d909a131ed32fb6d454a8504b64c5ed4f7e4172357",
+      "source": "fastapi_app/static/vendor/doodle/icons/timer.svg"
+    },
+    "icons/tree.svg": {
+      "sha256": "94a7d9e8ded49d5b39604775e814e7cf61aebdd79b394000769c5a84311c984e",
+      "source": "fastapi_app/static/vendor/doodle/icons/tree.svg"
+    },
+    "icons/trophy.svg": {
+      "sha256": "7e864d316ab77bc389a6ca67dffebd1ee3ee614bbf382b83fc65aae88ede4879",
+      "source": "fastapi_app/static/vendor/doodle/icons/trophy.svg"
+    },
+    "icons/undo.svg": {
+      "sha256": "13131927aa001f7e8ea727f5176eae25a1c9025f00e1621a6c20d5a7f5650db0",
+      "source": "fastapi_app/static/vendor/doodle/icons/undo.svg"
+    },
+    "icons/unlink.svg": {
+      "sha256": "88d29fbbe0a7c754fed4eae4caec578cb99d5b6ae7644441156605fbd68a01a2",
+      "source": "fastapi_app/static/vendor/doodle/icons/unlink.svg"
+    },
+    "icons/up.svg": {
+      "sha256": "36e8fe3404b33984e893b6cd17348523a40c930689e6ef7b25d0b12d98c264d9",
+      "source": "fastapi_app/static/vendor/doodle/icons/up.svg"
+    },
+    "icons/upload.svg": {
+      "sha256": "55684e9a34174d040469fcec538900cec2bac4f285e2c48196ba5847a1679c46",
+      "source": "fastapi_app/static/vendor/doodle/icons/upload.svg"
+    },
+    "icons/warning.svg": {
+      "sha256": "0e80bccc3c571c780a4696819b84ce8ed3faca9e247fd280e0f38ee545c41834",
+      "source": "fastapi_app/static/vendor/doodle/icons/warning.svg"
+    },
+    "icons/wink.svg": {
+      "sha256": "2fd43cb123b210ad611b8364a6ee89ca6ca615ea4d86393cffe0c20b4b54cb22",
+      "source": "fastapi_app/static/vendor/doodle/icons/wink.svg"
+    },
+    "icons/work.svg": {
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b",
+      "source": "fastapi_app/static/vendor/doodle/icons/work.svg"
+    },
+    "index.html": {
+      "sha256": "feac6c5f94e3e464a02b9b70bbf4a221d5919864da9d7defd06016524be23626",
+      "source": "docs/design-system/catalog.html"
+    },
+    "note-editor.png": {
+      "sha256": "dbe5161fbc0c4af67abe48306ad794211f8279820192a10d2e56a3117ace524d",
+      "source": "docs/design-system/note-editor.png"
+    },
+    "notifications.png": {
+      "sha256": "e1e49c9f20510003a552806448440fe8ec9746045effa4a596ea60d9d05f41bc",
+      "source": "docs/design-system/notifications.png"
+    },
+    "papanda.css": {
+      "sha256": "fc173e71822d8d28e8de67272ab1fceb78411e03763799402a418ddbbd0ceb66",
+      "source": [
+        "fastapi_app/static/css/base/variables.css",
+        "fastapi_app/static/css/base/typography.css",
+        "fastapi_app/static/css/components/forms.css",
+        "fastapi_app/static/css/components/buttons.css",
+        "fastapi_app/static/css/components/doodle_icons.css",
+        "fastapi_app/static/css/base/interaction.css",
+        "docs/design-system/family.css"
+      ]
+    },
+    "record-browser.png": {
+      "sha256": "e78cb832a7eb6d52d070559b097b7e63698a5bc431adce1200e015ec50960523",
+      "source": "docs/design-system/record-browser.png"
+    },
+    "reference.png": {
+      "sha256": "16dfb31c22a189f86949d5a2735fb263d7c33cb22f321255160bfc698d7146ae",
+      "source": "docs/design-system/reference.png"
+    },
+    "search.png": {
+      "sha256": "f5f2816c50b8811d3a45373a864600b9640b60f999afa369a2ad20f2c966282b",
+      "source": "docs/design-system/search.png"
+    },
+    "settings.png": {
+      "sha256": "d9c80214e4b469cda3969096dc0e6b35a4e149d628db5b0bbbd050c8e01cde31",
+      "source": "docs/design-system/settings.png"
+    },
+    "source/docs/design-system/family.css": {
+      "sha256": "131b92eddd265453dd796b6a83336160161ca77652d65e12b5fd0be7b6526830",
+      "source": "docs/design-system/family.css"
+    },
+    "source/fastapi_app/static/css/base/interaction.css": {
+      "sha256": "e2e63d7f74b62889210cf7d9b0acaf8dafa18d1d3983a401535feb82203765c3",
+      "source": "fastapi_app/static/css/base/interaction.css"
+    },
+    "source/fastapi_app/static/css/base/typography.css": {
+      "sha256": "515ea7683eba21160bd71db8aadc4e6078f257f51a11e0f9616c960434c1f5b8",
+      "source": "fastapi_app/static/css/base/typography.css"
+    },
+    "source/fastapi_app/static/css/base/variables.css": {
+      "sha256": "c3e077ce7da252ad71d7019014b13d370a30f0a09bc7b5e075a410ea596d62d1",
+      "source": "fastapi_app/static/css/base/variables.css"
+    },
+    "source/fastapi_app/static/css/components/button_icons.css": {
+      "sha256": "dd4f13e830621f2588880be946b5c62fe2429d4db2419956cbb66b9acf768f81",
+      "source": "fastapi_app/static/css/components/button_icons.css"
+    },
+    "source/fastapi_app/static/css/components/buttons.css": {
+      "sha256": "ea0ba8711349ad5fb326e3730f51e2db604895a16c412578d8fe79cd99045f7d",
+      "source": "fastapi_app/static/css/components/buttons.css"
+    },
+    "source/fastapi_app/static/css/components/doodle_icons.css": {
+      "sha256": "1bf263aef5b4d0a16c18cc757452c5512a957415c6215d907b9c24dae4a2cce5",
+      "source": "fastapi_app/static/css/components/doodle_icons.css"
+    },
+    "source/fastapi_app/static/css/components/forms.css": {
+      "sha256": "13d14322285eec15ab409739a1afa2e0a1cbef7ec75130bd19d4a5ea8a5624b7",
+      "source": "fastapi_app/static/css/components/forms.css"
+    },
+    "source/fastapi_app/static/css/components/modals.css": {
+      "sha256": "53e7655d99457d2bdbbb8f1d2183ff92db0e0957de55f9d03ce722de3433cfed",
+      "source": "fastapi_app/static/css/components/modals.css"
+    },
+    "source/fastapi_app/static/css/components/record_form.css": {
+      "sha256": "9425cc8844cc28990424d7595b5999af00eba43355e679f22096a5a80ddebb39",
+      "source": "fastapi_app/static/css/components/record_form.css"
+    },
+    "source/fastapi_app/static/css/components/system_dialog.css": {
+      "sha256": "9e248102e2e0927b39bd1cd009d4d19f83b01f97f18f357d3601175417e15f38",
+      "source": "fastapi_app/static/css/components/system_dialog.css"
+    },
+    "source/fastapi_app/static/css/components/widgets.css": {
+      "sha256": "993dd61146f155ed674407ec6912f87999a2bef3ad778d1feb6985dc51fc50bd",
+      "source": "fastapi_app/static/css/components/widgets.css"
+    },
+    "source/fastapi_app/templates/base.html": {
+      "sha256": "46e0c9362e138433e0a7d9dccbc7923ca48227562153c04e1c2013a704ee4b3c",
+      "source": "fastapi_app/templates/base.html"
+    },
+    "task-editor.png": {
+      "sha256": "358b078454be0e50a62ed6d9dd3f6087e7015f66a4399891c03b38916d5238d0",
+      "source": "docs/design-system/task-editor.png"
+    },
+    "tokens.json": {
+      "sha256": "7b6be75fa1648a1215966dd313ef067c7a4e93e026f889d7ec98f4be71f7fd7f",
+      "source": "docs/design-system/tokens.json"
+    }
+  }
+}

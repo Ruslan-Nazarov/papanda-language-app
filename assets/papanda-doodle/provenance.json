@@ -1,0 +1,17 @@
+{
+  "source": "design-system/papanda-design-system-0.7.167/icons",
+  "transform": "SVG → 96×96 transparent PNG, unchanged geometry; runtime tint by semantic role",
+  "sha256": {
+    "chart": "b92f53fd48e1d31fcd3fa8c70a0b4bfc81d9e0d962abeff8dbd74a819a6d7488",
+    "check": "9512b15bd2eb763ac92a2a2c21cdbdaebeadeaf14ef669f3eb8483ce1e464986",
+    "edit": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b",
+    "eye": "66c79c6a47d4a8c5c469d8f1954b5ec5c7ce4af643f0345436147bdbd11f88be",
+    "idea": "3245637ca31ecfe05a0c090339b5c28623e4cb23b70c503c01d611e52d6fc88d",
+    "language": "9e217af25c9662c01d4f52c7e7b34d498314cd8f6cf4d9263fcd80e614b5d8c2",
+    "microphone": "a42bd44b541c8c6407ca9bc83030bab576fa927a6c9da88d8e2d4c31dd9529d5",
+    "next": "58b03660692178b2573c4330a5e541b4d7746fedfb0a7d4402a823dd22ac3c05",
+    "read": "f7b0b1d11879b806047f8d4c00e07b40b4f6234570f401d4589066d09a6579db",
+    "star": "c81c735877ee7cc8d525347a41167954ff3d4f3e640cd1e19cf62a9c91343689",
+    "warning": "0e80bccc3c571c780a4696819b84ce8ed3faca9e247fd280e0f38ee545c41834"
+  }
+}

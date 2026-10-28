@@ -1,0 +1,156 @@
+/* Doodle Icons by Khushmeen Sidhu (CC0). Local, application-owned UI only. */
+.doodle-icon {
+    display: inline-block;
+    width: var(--doodle-size, 1em);
+    height: var(--doodle-size, 1em);
+    flex: 0 0 var(--doodle-size, 1em);
+    vertical-align: -0.12em;
+    color: var(--color-primary-dark);
+    background: currentColor;
+    mask: var(--doodle-image) center / contain no-repeat;
+    -webkit-mask: var(--doodle-image) center / contain no-repeat;
+    pointer-events: none;
+}
+.doodle-icon[hidden] { display: none !important; }
+/* Neutral controls use the approved orange outlines. Filled controls and
+   semantic status icons retain their foreground and state colors. */
+.doodle-icon:is(.doodle-delete, .doodle-warning, .doodle-check),
+:is(.btn-primary, .btn-save, .btn-danger, .btn-success, .is-recording, .toast-icon,
+    .btn-row-action.delete, .btn-row-action.done, [aria-pressed="true"], [role="checkbox"]) .doodle-icon {
+    color: inherit;
+}
+.rr-icon { color: var(--color-primary-dark); }
+:is(.btn-primary, .btn-save, .btn-danger, .btn-success) .rr-icon { color: inherit; }
+.app-action-icon.app-action-icon::before { color: var(--color-primary-dark); }
+:is(.btn-primary, .btn-save, .btn-danger, .btn-success).app-action-icon::before { color: inherit; }
+.doodle-add { transform: rotate(45deg); }
+.widget-icon { color: var(--color-primary-dark); }
+.widget-icon > .doodle-icon { --doodle-size: 24px; }
+:is(.btn-icon, .voice-input-button) > .doodle-icon { --doodle-size: 18px; }
+:is(.btn-row-action, .obs-icon-action) > .doodle-icon { --doodle-size: 16px; }
+.widget-navigation-icon > .doodle-icon { --doodle-size: 22px; }
+.note-editor-toolbar .doodle-icon { --doodle-size: 16px; }
+.sticker-timer-actions .doodle-icon { --doodle-size: 19px; }
+.observation-fullscreen-toggle .fullscreen-restore { display: none; }
+.observation-fullscreen-toggle[aria-pressed="true"] .fullscreen-expand { display: none; }
+.observation-fullscreen-toggle[aria-pressed="true"] .fullscreen-restore { display: inline-block; }
+.sticker-icon-mini, .sticker-icon-menu {
+    background: transparent !important; border: 0 !important; box-shadow: none !important;
+    transform: none !important; color: var(--color-primary-dark); position: relative;
+}
+.sticker-icon-mini::before, .sticker-icon-menu::before {
+    content: ''; display: block; width: 100%; height: 100%; background: currentColor;
+    mask: var(--icon-pack-sticker, url('../../vendor/doodle/icons/sticker.svg')) center / contain no-repeat;
+    -webkit-mask: var(--icon-pack-sticker, url('../../vendor/doodle/icons/sticker.svg')) center / contain no-repeat;
+}
+.sticker-icon-mini:has(.sticker-count)::before { opacity: .35; }
+.sticker-icon-mini .sticker-count { color: currentColor; transform: translate(-50%, -50%); }
+.sticker-icon-mini.inactive { opacity: .5; }
+.note-editor-toolbar .note-align-button::before {
+    color: var(--color-primary-dark);
+    background: currentColor; width: 17px; height: 17px;
+    mask: var(--doodle-image) center / contain no-repeat;
+    -webkit-mask: var(--doodle-image) center / contain no-repeat;
+}
+.doodle-delete { --doodle-image: var(--icon-pack-delete, url("../../vendor/doodle/icons/delete.svg")); }
+.doodle-archive { --doodle-image: var(--icon-pack-archive, url("../../vendor/doodle/icons/archive.svg")); }
+.doodle-restore { --doodle-image: var(--icon-pack-restore, url("../../vendor/doodle/icons/restore.svg")); }
+.doodle-save { --doodle-image: var(--icon-pack-save, url("../../vendor/doodle/icons/save.svg")); }
+.doodle-close { --doodle-image: var(--icon-pack-close, url("../../vendor/doodle/icons/close.svg")); }
+.doodle-add { --doodle-image: var(--icon-pack-add, url("../../vendor/doodle/icons/add.svg")); }
+.doodle-minus { --doodle-image: var(--icon-pack-minus, url("../../vendor/doodle/icons/minus.svg")); }
+.doodle-edit { --doodle-image: var(--icon-pack-edit, url("../../vendor/doodle/icons/edit.svg")); }
+.doodle-check { --doodle-image: var(--icon-pack-check, url("../../vendor/doodle/icons/check.svg")); }
+.doodle-search { --doodle-image: var(--icon-pack-search, url("../../vendor/doodle/icons/search.svg")); }
+.doodle-download { --doodle-image: var(--icon-pack-download, url("../../vendor/doodle/icons/download.svg")); }
+.doodle-upload { --doodle-image: var(--icon-pack-upload, url("../../vendor/doodle/icons/upload.svg")); }
+.doodle-refresh { --doodle-image: var(--icon-pack-refresh, url("../../vendor/doodle/icons/refresh.svg")); }
+.doodle-calendar { --doodle-image: var(--icon-pack-calendar, url("../../vendor/doodle/icons/calendar.svg")); }
+.doodle-next { --doodle-image: var(--icon-pack-next, url("../../vendor/doodle/icons/next.svg")); }
+.doodle-previous { --doodle-image: var(--icon-pack-previous, url("../../vendor/doodle/icons/previous.svg")); }
+.doodle-link { --doodle-image: var(--icon-pack-link, url("../../vendor/doodle/icons/link.svg")); }
+.doodle-unlink { --doodle-image: var(--icon-pack-unlink, url("../../vendor/doodle/icons/unlink.svg")); }
+.doodle-copy { --doodle-image: var(--icon-pack-copy, url("../../vendor/doodle/icons/copy.svg")); }
+.doodle-settings { --doodle-image: var(--icon-pack-settings, url("../../vendor/doodle/icons/settings.svg")); }
+.doodle-document { --doodle-image: var(--icon-pack-document, url("../../vendor/doodle/icons/document.svg")); }
+.doodle-list { --doodle-image: var(--icon-pack-list, url("../../vendor/doodle/icons/list.svg")); }
+.doodle-table { --doodle-image: var(--icon-pack-table, url("../../vendor/doodle/icons/table.svg")); }
+.doodle-sticker { --doodle-image: var(--icon-pack-sticker, url("../../vendor/doodle/icons/sticker.svg")); }
+.doodle-chart { --doodle-image: var(--icon-pack-chart, url("../../vendor/doodle/icons/chart.svg")); }
+.doodle-history { --doodle-image: var(--icon-pack-history, url("../../vendor/doodle/icons/history.svg")); }
+.doodle-help { --doodle-image: var(--icon-pack-help, url("../../vendor/doodle/icons/help.svg")); }
+.doodle-language { --doodle-image: var(--icon-pack-language, url("../../vendor/doodle/icons/language.svg")); }
+.doodle-quote { --doodle-image: var(--icon-pack-quote, url("../../vendor/doodle/icons/quote.svg")); }
+.doodle-send { --doodle-image: var(--icon-pack-send, url("../../vendor/doodle/icons/send.svg")); }
+.doodle-expand { --doodle-image: var(--icon-pack-expand, url("../../vendor/doodle/icons/expand.svg")); }
+.doodle-collapse { --doodle-image: var(--icon-pack-collapse, url("../../vendor/doodle/icons/collapse.svg")); }
+.doodle-focus { --doodle-image: var(--icon-pack-focus, url("../../vendor/doodle/icons/focus.svg")); }
+.doodle-more { --doodle-image: var(--icon-pack-more, url("../../vendor/doodle/icons/more.svg")); }
+.doodle-home { --doodle-image: var(--icon-pack-home, url("../../vendor/doodle/icons/home.svg")); }
+.doodle-tasks { --doodle-image: var(--icon-pack-tasks, url("../../vendor/doodle/icons/tasks.svg")); }
+.doodle-note { --doodle-image: var(--icon-pack-note, url("../../vendor/doodle/icons/note.svg")); }
+.doodle-chronology { --doodle-image: var(--icon-pack-chronology, url("../../vendor/doodle/icons/chronology.svg")); }
+.doodle-habit { --doodle-image: var(--icon-pack-habit, url("../../vendor/doodle/icons/habit.svg")); }
+.doodle-observation { --doodle-image: var(--icon-pack-observation, url("../../vendor/doodle/icons/observation.svg")); }
+.doodle-tree { --doodle-image: var(--icon-pack-tree, url("../../vendor/doodle/icons/tree.svg")); }
+.doodle-palette { --doodle-image: var(--icon-pack-palette, url("../../vendor/doodle/icons/palette.svg")); }
+.doodle-microphone { --doodle-image: var(--icon-pack-microphone, url("../../vendor/doodle/icons/microphone.svg")); }
+.doodle-camera { --doodle-image: var(--icon-pack-camera, url("../../vendor/doodle/icons/camera.svg")); }
+.doodle-read { --doodle-image: var(--icon-pack-read, url("../../vendor/doodle/icons/read.svg")); }
+.doodle-work { --doodle-image: var(--icon-pack-work, url("../../vendor/doodle/icons/work.svg")); }
+.doodle-folder { --doodle-image: var(--icon-pack-folder, url("../../vendor/doodle/icons/folder.svg")); }
+.doodle-folder-add { --doodle-image: var(--icon-pack-folder-add, url("../../vendor/doodle/icons/folder-add.svg")); }
+.doodle-pin { --doodle-image: var(--icon-pack-pin, url("../../vendor/doodle/icons/pin.svg")); }
+.doodle-tag { --doodle-image: var(--icon-pack-tag, url("../../vendor/doodle/icons/tag.svg")); }
+.doodle-repeat { --doodle-image: var(--icon-pack-repeat, url("../../vendor/doodle/icons/repeat.svg")); }
+.doodle-warning { --doodle-image: var(--icon-pack-warning, url("../../vendor/doodle/icons/warning.svg")); }
+.doodle-info { --doodle-image: var(--icon-pack-info, url("../../vendor/doodle/icons/info.svg")); }
+.doodle-bell { --doodle-image: var(--icon-pack-bell, url("../../vendor/doodle/icons/bell.svg")); }
+.doodle-plugins { --doodle-image: var(--icon-pack-plugins, url("../../vendor/doodle/icons/plugins.svg")); }
+.doodle-idea { --doodle-image: var(--icon-pack-idea, url("../../vendor/doodle/icons/idea.svg")); }
+.doodle-compass { --doodle-image: var(--icon-pack-compass, url("../../vendor/doodle/icons/compass.svg")); }
+.doodle-wink { --doodle-image: var(--icon-pack-wink, url("../../vendor/doodle/icons/wink.svg")); }
+.doodle-crown { --doodle-image: var(--icon-pack-crown, url("../../vendor/doodle/icons/crown.svg")); }
+.doodle-star { --doodle-image: var(--icon-pack-star, url("../../vendor/doodle/icons/star.svg")); }
+.doodle-flag { --doodle-image: var(--icon-pack-flag, url("../../vendor/doodle/icons/flag.svg")); }
+.doodle-trophy { --doodle-image: var(--icon-pack-trophy, url("../../vendor/doodle/icons/trophy.svg")); }
+.doodle-timer { --doodle-image: var(--icon-pack-timer, url("../../vendor/doodle/icons/timer.svg")); }
+.doodle-clock { --doodle-image: var(--icon-pack-clock, url("../../vendor/doodle/icons/clock.svg")); }
+.doodle-assistant { --doodle-image: var(--icon-pack-assistant, url("../../vendor/doodle/icons/assistant.svg")); }
+.doodle-calculator { --doodle-image: var(--icon-pack-calculator, url("../../vendor/doodle/icons/calculator.svg")); }
+.doodle-eye { --doodle-image: var(--icon-pack-eye, url("../../vendor/doodle/icons/eye.svg")); }
+.doodle-up { --doodle-image: var(--icon-pack-up, url("../../vendor/doodle/icons/up.svg")); }
+.doodle-down { --doodle-image: var(--icon-pack-down, url("../../vendor/doodle/icons/down.svg")); }
+.doodle-undo { --doodle-image: var(--icon-pack-undo, url("../../vendor/doodle/icons/undo.svg")); }
+.doodle-redo { --doodle-image: var(--icon-pack-redo, url("../../vendor/doodle/icons/redo.svg")); }
+.doodle-image { --doodle-image: var(--icon-pack-image, url("../../vendor/doodle/icons/image.svg")); }
+.doodle-play { --doodle-image: var(--icon-pack-play, url("../../vendor/doodle/icons/play.svg")); }
+.doodle-pause { --doodle-image: var(--icon-pack-pause, url("../../vendor/doodle/icons/pause.svg")); }
+.doodle-stop { --doodle-image: var(--icon-pack-stop, url("../../vendor/doodle/icons/stop.svg")); }
+.doodle-align-left { --doodle-image: var(--icon-pack-align-left, url("../../vendor/doodle/icons/align-left.svg")); }
+.doodle-align-center { --doodle-image: var(--icon-pack-align-center, url("../../vendor/doodle/icons/align-center.svg")); }
+.doodle-align-right { --doodle-image: var(--icon-pack-align-right, url("../../vendor/doodle/icons/align-right.svg")); }
+.doodle-align-justify { --doodle-image: var(--icon-pack-align-justify, url("../../vendor/doodle/icons/align-justify.svg")); }
+.note-align-button[data-align="left"] { --doodle-image: var(--icon-pack-align-left, url("../../vendor/doodle/icons/align-left.svg")); }
+.note-align-button[data-align="center"] { --doodle-image: var(--icon-pack-align-center, url("../../vendor/doodle/icons/align-center.svg")); }
+.note-align-button[data-align="right"] { --doodle-image: var(--icon-pack-align-right, url("../../vendor/doodle/icons/align-right.svg")); }
+.note-align-button[data-align="justify"] { --doodle-image: var(--icon-pack-align-justify, url("../../vendor/doodle/icons/align-justify.svg")); }
+
+.photo-icon-button > .doodle-icon { --doodle-size: 20px; }
+.photo-upload > .doodle-icon { --doodle-size: 18px; }
+.sticker-menu-action > .doodle-icon { --doodle-size: 18px; }
+.voice-status[data-state="done"] .voice-status-indicator::after,
+.premium-checkbox-wrapper input:checked + .checkbox-custom::after,
+.color-swatch.active::after {
+    content: ''; display: inline-block; width: 1em; height: 1em; background: currentColor;
+    mask: var(--icon-pack-check, url('../../vendor/doodle/icons/check.svg')) center / contain no-repeat;
+    -webkit-mask: var(--icon-pack-check, url('../../vendor/doodle/icons/check.svg')) center / contain no-repeat;
+}
+.color-swatch.active::after { inset: 50% auto auto 50%; transform: translate(-50%, -50%); }
+.photo-rotate > .doodle-icon { --doodle-size: 18px; }
+.notes-tools-toggle::after {
+    content: ''; display: inline-block; width: 1em; height: 1em; background: currentColor;
+    mask: var(--icon-pack-down, url('../../vendor/doodle/icons/down.svg')) center / contain no-repeat;
+    -webkit-mask: var(--icon-pack-down, url('../../vendor/doodle/icons/down.svg')) center / contain no-repeat;
+}
+.notes-tools-menu[open] > .notes-tools-toggle::after { content: ''; transform: rotate(180deg); }

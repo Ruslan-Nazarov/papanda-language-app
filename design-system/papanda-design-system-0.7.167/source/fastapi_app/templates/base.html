@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="{{ 'kk' if request.state.locale == 'kz' else request.state.locale }}" data-icon-pack="{{ (preferences | default({})).icon_pack | default('doodle') }}">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ _('ui.meta_description') }}" />
+    <title>{% block title %}papanda{% endblock %}</title>
+    <script>window.P_PREFERENCES = {{ preferences | default({}) | tojson }};</script>
+    {% set module_imports = sticker_module_imports() %}
+    {% set imports_updated = module_imports.update({'/static/js/modules/DoodleIcons.js': asset('js/modules/DoodleIcons.js')}) %}
+    <script type="importmap">{{ {'imports': module_imports} | tojson }}</script>
+
+    <link rel="shortcut icon" href="{{ asset('logo.ico') }}" />
+    {% if (preferences | default({})).experimental_selection_assistant | default(false) %}
+    <link rel="stylesheet" href="{{ asset('css/components/modals.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/components/selection_assistant.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/components/stickers.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/components/language_tutor.css') }}" />
+    {% endif %}
+
+    <!-- Centralized Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Indie+Flower&display=swap"
+        rel="stylesheet">
+
+    <!-- Flatpickr for styled date inputs -->
+    <link rel="stylesheet" href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}">
+    <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
+
+
+    <style>
+        /* Flatpickr papanda overrides */
+        .flatpickr-calendar {
+            border-radius: 16px !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid var(--color-border-light, #eee) !important;
+            font-family: 'Inter', system-ui, sans-serif !important;
+        }
+
+        .flatpickr-day {
+            border-radius: 8px !important;
+        }
+
+        .flatpickr-day.selected {
+            background: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--color-text-dark) !important;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+    <link rel="stylesheet" href="{{ asset('css/components/button_icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components/doodle_icons.css') }}">
+    {% if (preferences | default({})).icon_pack | default('doodle') != 'doodle' %}
+    <link rel="stylesheet" href="{{ url_for('icon_pack_css', pack_id=preferences.icon_pack) }}?v={{ app_version }}">
+    {% endif %}
+    {% include 'partials/head_analytics.html' ignore missing %}
+</head>
+
+<body style="margin: 0; background-color: var(--color-bg-app);">
+    {% block content %}{% endblock %}
+
+    {% if (preferences | default({})).experimental_selection_assistant | default(false) %}
+    {% include 'partials/selection_assistant.html' %}
+    {% endif %}
+
+    {% block language_tutor %}
+    {% if (preferences | default({})).experimental_selection_assistant | default(false) %}
+    {% include 'partials/language_tutor.html' %}
+    {% include 'partials/sticker_modal.html' %}
+    {% endif %}
+    {% endblock %}
+
+    {% block scripts %}{% endblock %}
+
+    {% include 'partials/language_statistics.html' %}
+    <link rel="stylesheet" href="{{ asset('css/language_statistics.css') }}">
+    <script type="module" src="{{ asset('js/modules/LanguageStatistics.js') }}"></script>
+
+    <!-- Auto-shutdown mechanism: keeps a WebSocket open to tell the server the app is active -->
+    <script type="module">
+        import { datePickerLocale, formatAppDate } from {{ asset('js/modules/localization.js')|tojson }};
+        window.formatAppDate = formatAppDate;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize custom styled date pickers
+            setTimeout(() => {
+                try {
+                    flatpickr('input[type="date"]:not([data-native-date])', {
+                        dateFormat: "Y-m-d",
+                        disableMobile: true,
+                        locale: datePickerLocale(),
+                        altInput: true,
+                        altFormat: "d.m.Y",
+                        allowInput: true
+                    });
+                    flatpickr('input[type="datetime-local"]', {
+                        enableTime: true,
+                        dateFormat: "Y-m-d\\TH:i",
+                        disableMobile: true,
+                        locale: datePickerLocale(),
+                        altInput: true,
+                        altFormat: "d.m.Y, H:i",
+                        allowInput: true,
+                        time_24hr: true
+                    });
+                } catch (e) { console.error("Flatpickr init error:", e); }
+            }, 100);
+        });
+
+        (function () {
+            let ws;
+            function connect() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/ping`;
+                ws = new WebSocket(wsUrl);
+                ws.onclose = () => {
+                    // Try to reconnect if the socket drops but the window is still open
+                    setTimeout(connect, 3000);
+                };
+            }
+            // Connect after a short delay to prioritize page load
+            setTimeout(connect, 1000);
+        })();
+    </script>
+
+    <!-- I18n JavaScript Initialization -->
+    <script>
+        window.currentLocale = "{{ request.state.locale }}";
+        window.translations = {{ get_js_translations()|from_json|tojson }};
+        window._ = function (key, fallback) {
+            let keys = key.split('.');
+            let current = window.translations;
+            for (let k of keys) {
+                if (current && typeof current === 'object' && k in current) {
+                    current = current[k];
+                } else {
+                    return fallback !== undefined ? fallback : key;
+                }
+            }
+            return typeof current === 'string' ? current : (fallback !== undefined ? fallback : key);
+        };
+
+        async function switchLanguage(lang) {
+            try {
+                await fetch('/api/set-locale', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ locale: lang })
+                });
+                window.location.reload();
+            } catch (e) {
+                console.error("Failed to switch language", e);
+            }
+        }
+
+    </script>
+
+    <script type="module" src="{{ asset('js/modules/ButtonIcons.js') }}"></script>
+    <script src="{{ asset('js/modules/VoiceInputService.js') }}" defer></script>
+    {% if (preferences | default({})).experimental_selection_assistant | default(false) %}
+    <script type="module" src="{{ asset('js/modules/SelectionAssistant.js') }}"></script>
+    {% endif %}
+    {% if (preferences | default({})).experimental_photo_graph | default(false) or (preferences | default({})).experimental_life_timeline | default(false) %}
+    <link rel="stylesheet" href="{{ asset('css/memory_safety.css') }}">
+    {% endif %}
+    {% if (preferences | default({})).experimental_photo_graph | default(false) %}
+    <link rel="stylesheet" href="{{ asset('css/photo_graph.css') }}">
+    <script type="module" src="{{ asset('js/photo_graph.js') }}"></script>
+    {% endif %}
+
+    {% include 'partials/analytics.html' ignore missing %}
+    {% if (preferences | default({})).experimental_reading | default(false) or (preferences | default({})).experimental_works | default(false) %}
+    <link rel="stylesheet" href="{{ asset('css/reading.css') }}">
+    <script type="module" src="{{ asset('js/reading.js') }}"></script>
+    {% endif %}
+    {% if (preferences | default({})).experimental_life_timeline | default(false) %}
+    <link rel="stylesheet" href="{{ asset('css/life_timeline.css') }}">
+    <script type="module" src="{{ asset('js/life_timeline.js') }}"></script>
+    {% endif %}
+</body>
+
+</html>

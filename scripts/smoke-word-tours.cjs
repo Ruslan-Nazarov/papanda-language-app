@@ -55,7 +55,7 @@ async function main() {
     await progress(0, 10);
     assert.equal((await state()).userWordProgress[learnedKey].is_learned, 0);
     assert.equal((await state()).userWordProgress[learnedKey].knowledge_stats?.en, undefined);
-    assert.equal(await page.$eval('[data-testid="word-show-count"]', el => el.textContent), '👁 2');
+    assert.equal(await page.$eval('[data-testid="word-show-count"]', el => el.getAttribute('aria-label')), 'Показов слова: 2');
     assert.equal(await page.$('[data-testid="word-undo"]'), null);
     assert.equal((await state()).wordTourSize, 10);
     assert.ok(!(await page.$eval('body', el => el.innerText)).includes('за заход'));

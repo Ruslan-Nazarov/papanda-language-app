@@ -5,10 +5,10 @@ import { getRoleColor, ROLE_TRANSLATIONS } from '../constants/sentencePresentati
 import { ACCENT } from '../constants/theme';
 
 export function StudyButton({ title, onPress, disabled, selected, compact, testID }: { title: string; onPress: () => void; disabled?: boolean; selected?: boolean; compact?: boolean; testID?: string }) {
+  const label = <Text style={[studyStyles.buttonText, selected && { color: '#FFF' }]}>{title}</Text>;
   return <TouchableOpacity testID={testID} accessibilityRole="button" accessibilityState={{ disabled: !!disabled, selected: !!selected }} disabled={disabled} onPress={onPress}
-    hitSlop={compact ? 6 : undefined}
-    style={[studyStyles.button, compact && studyStyles.compactButton, selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
-    <Text style={[studyStyles.buttonText, selected && { color: '#FFF' }]}>{title}</Text>
+    style={[compact ? studyStyles.compactTarget : studyStyles.button, !compact && selected && { backgroundColor: ACCENT }, disabled && { opacity: 0.45 }]}>
+    {compact ? <View style={[studyStyles.button, studyStyles.compactButton, selected && { backgroundColor: ACCENT }]}>{label}</View> : label}
   </TouchableOpacity>;
 }
 export function StudyTokens({ sentence, added = [], role }: { sentence: Sentence; added?: number[]; role?: SyntaxRole }) {
@@ -25,6 +25,7 @@ export const studyStyles = StyleSheet.create({
   small: { fontSize: 12, color: '#64748B', lineHeight: 18 },
   button: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: '#EEF2F6', alignSelf: 'flex-start' },
   compactButton: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, justifyContent: 'center' },
+  compactTarget: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' },
   buttonText: { fontSize: 14, fontWeight: '600', color: '#334155' },
   input: { borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 12, padding: 12, fontSize: 16, color: '#172033', backgroundColor: '#FFF', minHeight: 48 },
   token: { padding: 8, borderBottomWidth: 3, borderRadius: 6 },

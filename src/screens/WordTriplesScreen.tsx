@@ -1,7 +1,8 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useIsFocused } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated } from 'react-native';
+import TouchableOpacity from '../components/PapandaAction';
 import type { WordTriplesScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
@@ -16,7 +17,9 @@ import { auditNextWordInBackground } from '../services/wordAuditService';
 import { useCardTransition } from '../hooks/useCardTransition';
 import { usePronunciation } from '../hooks/usePronunciation';
 import PronunciationModal from '../components/PronunciationModal';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
+import { papanda } from '../design/papanda';
+import { usePapandaFonts } from '../design/usePapandaFonts';
+import PapandaIcon from '../components/PapandaIcon';
 
 
 const SWIPE_THRESHOLD = 72;
@@ -27,6 +30,9 @@ const isHorizontalSwipe = (gesture: { dx: number; dy: number }) =>
   Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.4;
 
 export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
+  const fontsLoaded = usePapandaFonts();
+  const styles = useMemo(() => createStyles(fontsLoaded), [fontsLoaded]);
+  const [associationFocused, setAssociationFocused] = useState(false);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const { words, activeLanguages, wordTourSize, markTripleKnown, recordTripleCardShow, saveWordAssociation, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
@@ -226,6 +232,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
   const currentWordKey = currentWord?.eng || currentWord?.word || '';
   const currentProgress = currentWordKey ? userWordProgress[currentWordKey] : undefined;
+  const isFavorite = currentProgress?.is_favorite ?? currentWord?.is_favorite ?? false;
   const knowledgeStats = {
     ...readWordStats(currentWord?.knowledge_stats),
     ...(currentProgress?.knowledge_stats || {}),
@@ -297,10 +304,10 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       {...panResponder.panHandlers}
     >
-      <ScrollView testID="words-scroll" keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.innerWrapper, { paddingTop: topPadding }]}>
+      <ScrollView testID="words-scroll" keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.innerWrapper, { paddingTop: topPadding }]}>
         {/* Header with comfortable breathing space */}
         <View style={[styles.topHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
           <View>
@@ -311,7 +318,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
             onPress={() => navigation.navigate('Dictionary')}
           >
-            <Text style={{fontSize: 24}}>📖</Text>
+            <PapandaIcon name="read" size={24} />
           </TouchableOpacity>
         </View>
 
@@ -323,32 +330,35 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
           ]}
         >
           <View style={styles.cardActions}>
-            <Text
+            <View
               testID="word-show-count"
               accessibilityLabel={`Показов слова: ${totalShows}`}
               style={styles.showCount}
             >
-              👁 {totalShows}
-            </Text>
+              <PapandaIcon name="eye" size={16} color={papanda.color.textSecondary} />
+              <Text style={styles.metaText}>{totalShows}</Text>
+            </View>
             <TouchableOpacity
               accessibilityRole="button" accessibilityLabel="Изменить отметку избранного" style={styles.favCardBtn}
+              accessibilityState={{ selected: isFavorite }}
               onPress={() => {
                 const wordKey = currentWord.eng || currentWord.word || '';
                 toggleWordFavorite(wordKey);
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={[styles.editCardBtnText, (userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
-                {(userWordProgress[currentWord.eng || currentWord.word || '']?.is_favorite ?? currentWord.is_favorite) ? '★' : '☆'}
-              </Text>
+              <PapandaIcon name="star" color={isFavorite ? papanda.color.accentHover : papanda.color.textSecondary} />
+              {isFavorite && <View style={styles.favoriteMark}><Text style={styles.favoriteMarkText}>✓</Text></View>}
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.statsCardBtn}
+              accessibilityRole="button" accessibilityLabel="Статистика слова"
               onPress={() => setIsStatsVisible(true)}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={styles.statsCardBtnText}>📊 Статистика</Text>
+              <PapandaIcon name="chart" size={16} />
+              <Text style={styles.statsCardBtnText}>Статистика</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -359,7 +369,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={styles.editCardBtnText}>✏️</Text>
+              <PapandaIcon name="edit" />
             </TouchableOpacity>
           </View>
 
@@ -374,7 +384,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                 setIsModalVisible(true);
               }}
             >
-              <Text style={styles.aiWarningIcon}>⚠️</Text>
+              <PapandaIcon name="warning" color={papanda.color.errorText} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.aiWarningTitle}>Возможна неточность перевода (ИИ)</Text>
                 {currentProgress.ai_verification.issues?.map((iss, i) => (
@@ -383,7 +393,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                   </Text>
                 ))}
               </View>
-              <Text style={styles.aiWarningEdit}>✏️</Text>
+              <PapandaIcon name="edit" size={16} />
             </TouchableOpacity>
           )}
 
@@ -419,7 +429,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     disabled={!translation}
                     onPress={composeSentence}
                   >
-                    <Text style={styles.langTranslation}>{translation || '—'}</Text>
+                    <Text style={[styles.langTranslation, lang !== 'kz' && styles.latinTranslation]}>{translation || '—'}</Text>
                   </TouchableOpacity>
 
                   {/* Pronunciation Button */}
@@ -431,7 +441,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                       onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Text style={styles.pronunciationBtnText}>📢</Text>
+                      <PapandaIcon name="microphone" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -444,7 +454,10 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     activeOpacity={0.7}
                     onPress={composeSentence}
                   >
-                    <Text style={styles.composeSentenceButtonText}>Составить предложение →</Text>
+                    <View style={styles.composeSentenceSurface}>
+                      <Text style={styles.composeSentenceButtonText}>Составить предложение</Text>
+                      <PapandaIcon name="next" size={14} />
+                    </View>
                   </TouchableOpacity>
                 )}
                 </View>
@@ -456,17 +469,23 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
           {/* Association Input */}
           <View style={styles.assocHeaderRow}>
-            <Text style={styles.assocLabel}>💡 Личная ассоциация:</Text>
+            <View style={styles.assocTitle}>
+              <PapandaIcon name="idea" size={18} />
+              <Text style={styles.assocLabel}>Личная ассоциация</Text>
+            </View>
             {!!associationText.trim() && (
               <Text style={styles.assocSavedBadge}>✓ есть ассоциация</Text>
             )}
           </View>
           <TextInput
-            style={[styles.input, !!associationText.trim() && styles.inputWithContent]}
+            accessibilityLabel="Личная ассоциация"
+            onFocus={() => setAssociationFocused(true)}
+            onBlur={() => setAssociationFocused(false)}
+            style={[styles.input, !!associationText.trim() && styles.inputWithContent, associationFocused && styles.inputFocused]}
             multiline
             placeholder="Что поможет вам запомнить это слово?"
             testID="word-association"
-            placeholderTextColor="#A0AEC0"
+            placeholderTextColor={papanda.color.textSecondary}
             value={associationText}
             onChangeText={text => {
               setAssociationText(text);
@@ -551,23 +570,35 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (fontsLoaded: boolean) => {
+  const ui = fontsLoaded ? 'Inter_400Regular' : undefined;
+  const medium = fontsLoaded ? 'Inter_500Medium' : undefined;
+  const strong = fontsLoaded ? 'Inter_600SemiBold' : undefined;
+  // Outfit has no Cyrillic glyphs. Explicit fallback prevents browser serif text.
+  const heading = fontsLoaded ? (Platform.OS === 'web'
+    ? 'Outfit_500Medium, Inter_500Medium, sans-serif' : 'Inter_500Medium') : undefined;
+  const display = fontsLoaded ? (Platform.OS === 'web'
+    ? 'Outfit_600SemiBold, Inter_600SemiBold, sans-serif' : 'Inter_600SemiBold') : undefined;
+  return StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA'
+    backgroundColor: papanda.color.canvas,
   },
   innerWrapper: {
     flexGrow: 1,
+    width: '100%',
+    maxWidth: papanda.learningColumnWidth,
+    alignSelf: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 14,
-    justifyContent: 'space-between',
+    paddingBottom: 24,
+    gap: 24,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#F8F9FA'
+    backgroundColor: papanda.color.canvas,
   },
   tourStartButton: {
     flex: 0,
@@ -579,135 +610,142 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1A202C',
-    letterSpacing: 0.3,
+    fontFamily: heading,
+    fontSize: 24,
+    fontWeight: '500',
+    color: papanda.color.text,
   },
   sessionCountText: {
-    fontSize: 13,
-    color: '#64748B',
-    marginTop: 2,
-    fontWeight: '600'
+    fontFamily: ui,
+    fontSize: 14,
+    color: papanda.color.textSecondary,
+    marginTop: 4,
   },
   info: {
+    fontFamily: ui,
     fontSize: 16,
-    color: '#718096',
-    textAlign: 'center'
+    color: papanda.color.textBody,
+    textAlign: 'center',
+    maxWidth: papanda.learningColumnWidth,
+    lineHeight: 24,
   },
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: papanda.color.surface,
     padding: 16,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
+    borderRadius: papanda.radius.surface,
+    shadowColor: papanda.color.text,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 16,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#ECEFF1',
+    borderColor: papanda.color.borderSubtle,
     position: 'relative',
   },
   cardActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
+    rowGap: 8,
     marginBottom: 2,
   },
   editCardBtn: {
-    padding: 4,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    minWidth: 44, minHeight: 44,
+    alignItems: 'center', justifyContent: 'center',
+    borderRadius: papanda.radius.control,
   },
   favCardBtn: {
-    padding: 4,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    minWidth: 44, minHeight: 44,
+    alignItems: 'center', justifyContent: 'center',
+    borderRadius: papanda.radius.control,
   },
+  favoriteMark: { position: 'absolute', right: 2, bottom: 4, backgroundColor: papanda.color.surface, borderRadius: 4 },
+  favoriteMarkText: { fontFamily: strong, fontSize: 12, lineHeight: 14, color: papanda.color.accentText },
   editCardBtnText: {
     fontSize: 16,
   },
   statsCardBtn: {
-    backgroundColor: ACCENT_LIGHT,
-    borderColor: ACCENT_BORDER,
-    borderWidth: 1,
+    flexDirection: 'row', gap: 4,
+    alignItems: 'center', justifyContent: 'center',
+    minHeight: 44,
     paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 14,
+    borderRadius: papanda.radius.control,
   },
   statsCardBtnText: {
-    color: ACCENT_DARK,
+    fontFamily: strong,
+    color: papanda.color.accentText,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   nativeWord: {
+    fontFamily: display,
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '600',
     textAlign: 'center',
-    color: '#1A202C',
-    marginVertical: 4,
+    color: papanda.color.text,
+    marginVertical: 12,
   },
   showCount: {
-    fontSize: 12,
-    color: '#64748B',
+    flexDirection: 'row', alignItems: 'center', gap: 4,
     marginRight: 'auto',
-    flexShrink: 1,
+    flexShrink: 0,
+    minWidth: 40,
   },
+  metaText: { fontFamily: ui, fontSize: 12, color: papanda.color.textSecondary },
   wordCenterContainer: {
     flex: 1,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 48,
-    paddingRight: 0,
+    paddingHorizontal: 8,
   },
   pronunciationBtn: {
-    marginLeft: 8,
-    padding: 8,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    minWidth: 44, minHeight: 44,
+    alignItems: 'center', justifyContent: 'center',
+    borderRadius: papanda.radius.control,
   },
   pronunciationBtnText: {
     fontSize: 16,
   },
   composeSentenceButton: {
     minHeight: 44,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
+    alignSelf: 'flex-end',
     justifyContent: 'center',
-    backgroundColor: ACCENT_LIGHT,
+    maxWidth: '100%',
+  },
+  composeSentenceSurface: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    minHeight: papanda.compactControl.visualHeightPx,
+    paddingHorizontal: 12, paddingVertical: 4,
+    backgroundColor: papanda.color.accentSoft,
     borderWidth: 1,
-    borderColor: ACCENT_BORDER,
-    borderRadius: 10,
-    marginTop: 6,
+    borderColor: papanda.color.accent,
+    borderRadius: papanda.radius.small,
   },
   composeSentenceButtonText: {
-    fontSize: 13,
+    fontFamily: strong,
+    fontSize: 14,
     fontWeight: '600',
-    color: ACCENT_DARK,
+    color: papanda.color.accentText,
     textAlign: 'center',
+    flexShrink: 1,
   },
   divider: {
     height: 1,
-    backgroundColor: '#EDF2F7',
-    marginVertical: 10
+    backgroundColor: papanda.color.borderSubtle,
+    marginVertical: 12,
   },
   langsContainer: {
     flexDirection: 'column',
-    gap: 10
+    gap: 8,
   },
   langBlock: {
-    backgroundColor: '#F8F9FA',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 14,
+    backgroundColor: papanda.color.surfaceSubtle,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: papanda.radius.control,
     borderWidth: 1,
     borderColor: '#E9ECEF',
     flexDirection: 'row',
@@ -715,6 +753,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   aiWarningBanner: {
+    minHeight: 44,
     backgroundColor: '#FEF3C7',
     borderColor: '#F59E0B',
     borderWidth: 1,
@@ -729,13 +768,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   aiWarningTitle: {
+    fontFamily: strong,
     fontSize: 12,
     fontWeight: '700',
     color: '#92400E',
     marginBottom: 2,
   },
   aiWarningIssue: {
-    fontSize: 11,
+    fontFamily: ui,
+    fontSize: 14,
     color: '#78350F',
     marginTop: 1,
   },
@@ -744,46 +785,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   sideBadge: {
-    position: 'absolute',
-    left: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#EDF2F7',
+    backgroundColor: papanda.color.surface,
     paddingHorizontal: 6,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: papanda.radius.small,
   },
   sideFlag: {
     fontSize: 12,
   },
   sideLangCode: {
-    fontSize: 11,
+    fontFamily: medium,
+    fontSize: 12,
     fontWeight: '700',
     color: '#64748B',
   },
 
   langTranslation: {
+    fontFamily: strong,
+    width: '100%',
+    flexShrink: 1,
     fontSize: 24,
-    color: ACCENT,
-    fontWeight: 'bold',
+    color: papanda.color.accentText,
+    fontWeight: '600',
     textAlign: 'center',
   },
+  latinTranslation: { fontFamily: fontsLoaded ? 'Outfit_600SemiBold' : undefined },
   assocHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    flexWrap: 'wrap', gap: 8,
+    marginBottom: 8,
   },
+  assocTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   assocLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#475569',
+    fontFamily: medium,
+    fontSize: 14,
+    fontWeight: '500',
+    color: papanda.color.textBody,
   },
   assocSavedBadge: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#16A34A',
+    fontFamily: medium,
+    fontSize: 12,
+    fontWeight: '500',
+    color: papanda.color.successText,
     backgroundColor: '#DCFCE7',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -791,22 +839,23 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 10,
+    borderColor: papanda.color.border,
+    borderRadius: papanda.radius.control,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    minHeight: 52,
-    maxHeight: 68,
+    minHeight: 80,
     textAlignVertical: 'top',
-    fontSize: 14,
-    backgroundColor: '#FAFAFA',
-    color: '#1E293B'
+    fontFamily: ui,
+    fontSize: 16,
+    lineHeight: 24,
+    backgroundColor: papanda.color.surface,
+    color: papanda.color.text,
   },
   inputWithContent: {
-    backgroundColor: '#FFFDF0',
-    borderColor: '#FEF08A',
-    color: '#1E293B',
+    backgroundColor: papanda.color.surface,
+    borderColor: papanda.color.border,
   },
+  inputFocused: { borderColor: papanda.focus.color, borderWidth: 2, paddingHorizontal: 11, paddingVertical: 7 },
   controls: {
     flexDirection: 'row',
     gap: 12,
@@ -820,6 +869,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   undoButtonText: {
+    fontFamily: strong,
     color: '#475569',
     fontSize: 14,
     fontWeight: '600',
@@ -828,7 +878,8 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     paddingVertical: 15,
-    borderRadius: 14,
+    minHeight: papanda.control.minHeightPx,
+    borderRadius: papanda.radius.control,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -837,9 +888,11 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   dictionaryBtn: {
+    minWidth: 44, minHeight: 44,
+    alignItems: 'center', justifyContent: 'center',
     padding: 8,
     backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 20,
+    borderRadius: papanda.radius.control,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -853,12 +906,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#64748B'
   },
   btnKnown: {
-    backgroundColor: '#28A745'
+    backgroundColor: papanda.color.accent,
   },
   buttonText: {
-    color: '#FFF',
+    fontFamily: strong,
+    color: papanda.color.onAccent,
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
@@ -880,15 +934,17 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   statsModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A202C',
+    fontFamily: heading,
+    fontSize: 18,
+    fontWeight: '500',
+    color: papanda.color.text,
     textAlign: 'center',
   },
   statsModalWord: {
+    fontFamily: strong,
     fontSize: 24,
     fontWeight: 'bold',
-    color: ACCENT,
+    color: papanda.color.accentText,
     textAlign: 'center',
     marginTop: 6,
     marginBottom: 18,
@@ -907,12 +963,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   statsSummaryValue: {
+    fontFamily: strong,
     color: '#1E293B',
     fontSize: 17,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   statsSummaryLabel: {
+    fontFamily: ui,
     color: '#64748B',
     fontSize: 11,
     marginTop: 3,
@@ -924,6 +982,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E2E8F0',
   },
   statsLanguagesTitle: {
+    fontFamily: medium,
     color: '#475569',
     fontSize: 13,
     fontWeight: '700',
@@ -942,11 +1001,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   statsLanguageName: {
+    fontFamily: medium,
+    flexShrink: 1,
     color: '#334155',
     fontSize: 13,
     fontWeight: '600',
   },
   statsLanguageStatus: {
+    fontFamily: medium,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -957,15 +1019,17 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   statsCloseBtn: {
-    backgroundColor: ACCENT,
-    borderRadius: 14,
+    backgroundColor: papanda.color.accent,
+    borderRadius: papanda.radius.control,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 20,
   },
   statsCloseBtnText: {
-    color: '#FFF',
+    fontFamily: strong,
+    color: papanda.color.onAccent,
     fontSize: 16,
     fontWeight: 'bold',
   },
 });
+};

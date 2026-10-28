@@ -712,7 +712,9 @@ const styles = StyleSheet.create({
   showCount: {
     fontSize: 12,
     color: '#64748B',
-    textAlign: 'center',
+    textAlign: 'left',
+    minWidth: 44,
+    flexShrink: 0,
     marginRight: 'auto',
   },
   divider: {

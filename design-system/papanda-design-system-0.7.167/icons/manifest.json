@@ -1,0 +1,325 @@
+{
+  "author": "Khushmeen Sidhu",
+  "license": "CC0-1.0",
+  "website": "https://khushmeen.com/icons.html",
+  "repository": "https://github.com/theJian/doodle-icons",
+  "commit": "bd2b5ea27202dca3f22e7ae1ca16649e4420de9e",
+  "icons": {
+    "delete": {
+      "source": "icons/interface/delete.svg",
+      "sha256": "2a2a27e0dc0bcb0afe7bfd13aea429c51560b317c54dcce7205dfd670293eb0b"
+    },
+    "archive": {
+      "source": "icons/interface/drawer.svg",
+      "sha256": "e9a13d9af9d0ed263ee225d42cfc65618389918d48ae43b1f657077019a1a13f"
+    },
+    "restore": {
+      "source": "icons/hand-gestures/rotate.svg",
+      "sha256": "2418a8d078b890cdb82b1b5f0d514747509fd723d7b25aac066568076f662767"
+    },
+    "save": {
+      "source": "icons/interface/floppy.svg",
+      "sha256": "d08fb0e3a58f566aa78698ecc416fac07aba94292dfbdc413353c0d7c175616f"
+    },
+    "close": {
+      "source": "icons/interface/cross.svg",
+      "sha256": "34974f5e8d9e146a77dbf5b408fc1aa76cdcb48c256bb60dfd4c03bbc17f1e89"
+    },
+    "add": {
+      "source": "icons/interface/cross.svg",
+      "sha256": "34974f5e8d9e146a77dbf5b408fc1aa76cdcb48c256bb60dfd4c03bbc17f1e89"
+    },
+    "minus": {
+      "source": "icons/interface/doc-remove.svg",
+      "sha256": "17b2cb501da07a8dc8c20881753601af4d6427833fa4336bdd4e704c2dabab93"
+    },
+    "edit": {
+      "source": "icons/interface/pencil.svg",
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b"
+    },
+    "check": {
+      "source": "icons/interface/tick.svg",
+      "sha256": "9512b15bd2eb763ac92a2a2c21cdbdaebeadeaf14ef669f3eb8483ce1e464986"
+    },
+    "search": {
+      "source": "icons/interface/search.svg",
+      "sha256": "3ff17ab0f1593e6c7d986437be4a862d7b35c3f8d14db274d789a2347db35f19"
+    },
+    "download": {
+      "source": "icons/interface/download.svg",
+      "sha256": "6851671399fd980543467b19f2a550995291fa95dfe20931d9499eeca18c7fe8"
+    },
+    "upload": {
+      "source": "icons/interface/upload.svg",
+      "sha256": "55684e9a34174d040469fcec538900cec2bac4f285e2c48196ba5847a1679c46"
+    },
+    "refresh": {
+      "source": "icons/interface/sync.svg",
+      "sha256": "5d2b71e605d8b3d9da82aea935ad15e1cc9a89e0e31574ad434946fff7123ac4"
+    },
+    "calendar": {
+      "source": "icons/interface/calendar.svg",
+      "sha256": "b8ef5fd414ebaca0571e14efdac4318121725f37949374fa1a83f96d6ce2a566"
+    },
+    "next": {
+      "source": "icons/arrows/arrow-single-right.svg",
+      "sha256": "58b03660692178b2573c4330a5e541b4d7746fedfb0a7d4402a823dd22ac3c05"
+    },
+    "previous": {
+      "source": "icons/arrows/arrow-single-left.svg",
+      "sha256": "c28aa3888e423d1245d90276dcf37b743949bccb7b204ac49499aae4ecd57a3b"
+    },
+    "link": {
+      "source": "icons/interface/link.svg",
+      "sha256": "9a76f7fd90f92900535b06f3051916b8fbf8a39274e32cea5423964148631bfb"
+    },
+    "unlink": {
+      "source": "icons/interface/unlink.svg",
+      "sha256": "88d29fbbe0a7c754fed4eae4caec578cb99d5b6ae7644441156605fbd68a01a2"
+    },
+    "copy": {
+      "source": "icons/interface/copy.svg",
+      "sha256": "06f9f17e8c14621bf93ba85f56022fd76d1523b24d57e0c843f61e8b9a483ab4"
+    },
+    "settings": {
+      "source": "icons/interface/setting-2.svg",
+      "sha256": "f9299e07d47140adca5b1d8acbde172895a940ea76fc3748d8b4b2f4a7c2c67b"
+    },
+    "document": {
+      "source": "icons/files/file-text.svg",
+      "sha256": "9ea5a7534a6a5888d27ef61f7e9c05fca61e0539aef4d883071f14afdaa14572"
+    },
+    "list": {
+      "source": "icons/interface/list.svg",
+      "sha256": "5f0a75293d605a8925e3ada2f510a61ee798e9ffc58eafb2c09fbd1c6f0fe1a5"
+    },
+    "table": {
+      "source": "icons/interface/grid.svg",
+      "sha256": "e7c5b684126e67d7823556172476790d5dd44de23d0305ccd35ea875e475545c"
+    },
+    "sticker": {
+      "source": "icons/interface/note.svg",
+      "sha256": "31ce5e785d62a71afc5fdebe0bd82dfd8ad250d911abec666d803cf191be1dcf"
+    },
+    "chart": {
+      "source": "icons/interface/analytics.svg",
+      "sha256": "b92f53fd48e1d31fcd3fa8c70a0b4bfc81d9e0d962abeff8dbd74a819a6d7488"
+    },
+    "history": {
+      "source": "icons/interface/clock.svg",
+      "sha256": "6f80752588cafa42778f0d47e2c57ea43c84284eb830a52026888ca9a6943fe8"
+    },
+    "help": {
+      "source": "icons/interface/question.svg",
+      "sha256": "3ca1a0d2067845342db1074338d47157e0602ee7ab02496067b76c7f5423e232"
+    },
+    "language": {
+      "source": "icons/interface/globe.svg",
+      "sha256": "9e217af25c9662c01d4f52c7e7b34d498314cd8f6cf4d9263fcd80e614b5d8c2"
+    },
+    "quote": {
+      "source": "icons/interface/message-2.svg",
+      "sha256": "e0c7e103601dc5234b594513540c095f3e4d8836e2438399c156a6cb89039055"
+    },
+    "send": {
+      "source": "icons/interface/send.svg",
+      "sha256": "744a0095beb84bdfac8c4dc0dffa1c9521f03315a7337914a4c8396d7b25f3f1"
+    },
+    "expand": {
+      "source": "icons/interface/maximize.svg",
+      "sha256": "726636c1ebec31520b70c70487ba00c5feffc91daa80e9058745f1c8bc0d4565"
+    },
+    "collapse": {
+      "source": "icons/interface/minimize.svg",
+      "sha256": "e76e1536a299d1d573169752886777ae60f308627c7416f8141be973b027f17c"
+    },
+    "focus": {
+      "source": "icons/interface/target.svg",
+      "sha256": "bcdc1b5ce6dc20f61aa7c938032d1e37557935eef83aeb5765b338be6f37e9ca"
+    },
+    "more": {
+      "source": "icons/interface/menu.svg",
+      "sha256": "edd65d70a6b2a42ceb3412835b603ce9b457af255932c61c37b2ba3410ae73f5"
+    },
+    "home": {
+      "source": "icons/interface/home.svg",
+      "sha256": "eae9ef90b050fb43d2f843edd0b1dff7402057739efc08a97aa6d4bafd069364"
+    },
+    "tasks": {
+      "source": "icons/interface/checklist.svg",
+      "sha256": "26f2fe2b74f08ad801ca7b4983ce837cb291175838c05cdc4cdda437ee3d795d"
+    },
+    "note": {
+      "source": "icons/interface/pencil.svg",
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b"
+    },
+    "chronology": {
+      "source": "icons/files/file-notes.svg",
+      "sha256": "19aff12d6a8e67ae829a1c180df5992ef23baef32194b5bdd5d9dd6f45db88dc"
+    },
+    "habit": {
+      "source": "icons/interface/tree.svg",
+      "sha256": "80518d28a2aa411a5e9695eb97fd295c895240057dbffaebc7ca553b8e9c112f"
+    },
+    "observation": {
+      "source": "icons/health/microscope.svg",
+      "sha256": "f4947063a662d8e31e884f623c3fdc23a7cd30a851cc88d3fabaf94486db4781"
+    },
+    "tree": {
+      "source": "icons/interface/tree-2.svg",
+      "sha256": "94a7d9e8ded49d5b39604775e814e7cf61aebdd79b394000769c5a84311c984e"
+    },
+    "palette": {
+      "source": "icons/objects/paint-brush.svg",
+      "sha256": "663405c4b0846a151e297941e601a39d1acbebdb6c90493efaa7886e4aae8eb8"
+    },
+    "microphone": {
+      "source": "icons/interface/mic-2.svg",
+      "sha256": "a42bd44b541c8c6407ca9bc83030bab576fa927a6c9da88d8e2d4c31dd9529d5"
+    },
+    "camera": {
+      "source": "icons/interface/camera.svg",
+      "sha256": "a4a193739d491dcc3aa045cfef3bf7d6b6ba2e50b707b847eb8224597484e36c"
+    },
+    "read": {
+      "source": "icons/interface/bookmark.svg",
+      "sha256": "f7b0b1d11879b806047f8d4c00e07b40b4f6234570f401d4589066d09a6579db"
+    },
+    "work": {
+      "source": "icons/interface/pencil.svg",
+      "sha256": "729b94c32dc76639fa5981226b18876f9f84c16e214f2ba47e686c52e9a8798b"
+    },
+    "folder": {
+      "source": "icons/interface/folder.svg",
+      "sha256": "fef7951155402974602900e1883e987de93d304474f47b9848ef89d2e5be733c"
+    },
+    "folder-add": {
+      "source": "icons/interface/folder-add.svg",
+      "sha256": "1b2e192e53196fc7b7b9f47a996f6635dce7aa6fabbf4deb7d4bb9770334d09b"
+    },
+    "pin": {
+      "source": "icons/interface/pin.svg",
+      "sha256": "5170bd55ce82146970eafa6cc58adccb3b1303ca5d21daeaa5c173b7d7b456eb"
+    },
+    "tag": {
+      "source": "icons/e-commerce/tag.svg",
+      "sha256": "7b9454c14245cc4f04d8bc85a0645dcb251d022fcfcb97cbf5849345c9e9596e"
+    },
+    "repeat": {
+      "source": "icons/interface/sync.svg",
+      "sha256": "5d2b71e605d8b3d9da82aea935ad15e1cc9a89e0e31574ad434946fff7123ac4"
+    },
+    "warning": {
+      "source": "icons/interface/caution.svg",
+      "sha256": "0e80bccc3c571c780a4696819b84ce8ed3faca9e247fd280e0f38ee545c41834"
+    },
+    "info": {
+      "source": "icons/interface/info.svg",
+      "sha256": "c3720e6710c7f232960ca7dfdf53cbce2d5af84d87c87046aaa741e696c9f568"
+    },
+    "bell": {
+      "source": "icons/interface/bell.svg",
+      "sha256": "5d641074a9445b0a04ffcc5ab52f26a35d49d817196ed6d4a317279607d8ec92"
+    },
+    "plugins": {
+      "source": "icons/interface/puzzle.svg",
+      "sha256": "1087b61ccb52c81db0109c40697d594f89ae08084b49cc7338fdb6df05cb163b"
+    },
+    "idea": {
+      "source": "icons/interface/bulb.svg",
+      "sha256": "3245637ca31ecfe05a0c090339b5c28623e4cb23b70c503c01d611e52d6fc88d"
+    },
+    "compass": {
+      "source": "icons/interface/navigation.svg",
+      "sha256": "a4a358234cb274e302f0a1fa87371b51174a66fce8ac9e6bc8cebc475279cf44"
+    },
+    "wink": {
+      "source": "icons/emojis/wink-emoji.svg",
+      "sha256": "2fd43cb123b210ad611b8364a6ee89ca6ca615ea4d86393cffe0c20b4b54cb22"
+    },
+    "crown": {
+      "source": "icons/objects/crown.svg",
+      "sha256": "bf2bcdf2cca3f6a9500b8e01a45331a454a468831ab407ee01390d3112c60d78"
+    },
+    "star": {
+      "source": "icons/interface/star.svg",
+      "sha256": "c81c735877ee7cc8d525347a41167954ff3d4f3e640cd1e19cf62a9c91343689"
+    },
+    "flag": {
+      "source": "icons/interface/flag.svg",
+      "sha256": "4c0a487e655ee77de8f274a483a16c9ac9550956417577baf17c8ce5752f54a1"
+    },
+    "trophy": {
+      "source": "icons/interface/trophy.svg",
+      "sha256": "7e864d316ab77bc389a6ca67dffebd1ee3ee614bbf382b83fc65aae88ede4879"
+    },
+    "timer": {
+      "source": "icons/interface/stopwatch.svg",
+      "sha256": "83358dca14471a9c205304d909a131ed32fb6d454a8504b64c5ed4f7e4172357"
+    },
+    "clock": {
+      "source": "icons/interface/clock.svg",
+      "sha256": "6f80752588cafa42778f0d47e2c57ea43c84284eb830a52026888ca9a6943fe8"
+    },
+    "assistant": {
+      "source": "icons/misc/bot.svg",
+      "sha256": "5d53a211753c00e08be78bbe2fb73e858190986c5a2f5e26a105d0da552e1d01"
+    },
+    "calculator": {
+      "source": "icons/interface/calculator.svg",
+      "sha256": "1c03a14d18dfa9151cc9286c0c0967eb2c21cc9e7c3375ee7992821e18bcac08"
+    },
+    "eye": {
+      "source": "icons/interface/unhide.svg",
+      "sha256": "66c79c6a47d4a8c5c469d8f1954b5ec5c7ce4af643f0345436147bdbd11f88be"
+    },
+    "up": {
+      "source": "icons/arrows/chevrons-up.svg",
+      "sha256": "36e8fe3404b33984e893b6cd17348523a40c930689e6ef7b25d0b12d98c264d9"
+    },
+    "down": {
+      "source": "icons/arrows/chevrons-down.svg",
+      "sha256": "1a19bb6e0c246ddeaee19398d35fb2f5e006a48772566edb28d4b54e898f3e84"
+    },
+    "undo": {
+      "source": "icons/interface/backward.svg",
+      "sha256": "13131927aa001f7e8ea727f5176eae25a1c9025f00e1621a6c20d5a7f5650db0"
+    },
+    "redo": {
+      "source": "icons/interface/forward.svg",
+      "sha256": "f6b921ea74fec19f82855c1888d2f03ad6b029805082b0e9aa60704de78dd3e8"
+    },
+    "image": {
+      "source": "icons/interface/photo.svg",
+      "sha256": "e1a0458f056b4b5710e9f9ba4d4d1c59938ccc8edcffa1252763d72574197a54"
+    },
+    "play": {
+      "source": "icons/interface/play.svg",
+      "sha256": "3f64ba987c5d4b0ba08f35d0ddb64957c8483087e1c2a62d328bffb7fe80b633"
+    },
+    "pause": {
+      "source": "icons/interface/pause.svg",
+      "sha256": "d0e5849fc4801f0a0c102e8127e4aa863b5891dd03a7ea17b53664eafbc41758"
+    },
+    "stop": {
+      "source": "icons/interface/square.svg",
+      "sha256": "d43f44dd051d58f39035358ed2e298f6d035bf2f897833d2cc8278de7ef83175"
+    },
+    "align-left": {
+      "source": "icons/interface/left-align.svg",
+      "sha256": "958169a158e934e38ffe55d3382847bdc1c11126bb69aa9743cc37b60cac5df5"
+    },
+    "align-center": {
+      "source": "icons/interface/center-align.svg",
+      "sha256": "9ba44fa19d64ce7230fcb27e4632bc141a2220a3b7d7470ddc5cf85b96466979"
+    },
+    "align-right": {
+      "source": "icons/interface/right-align.svg",
+      "sha256": "3ee7453a04668c58954f72d2aa8fd8b86fccd27815965ea4d46770477759ef4d"
+    },
+    "align-justify": {
+      "source": "icons/interface/list.svg",
+      "sha256": "5f0a75293d605a8925e3ada2f510a61ee798e9ffc58eafb2c09fbd1c6f0fe1a5"
+    }
+  }
+}

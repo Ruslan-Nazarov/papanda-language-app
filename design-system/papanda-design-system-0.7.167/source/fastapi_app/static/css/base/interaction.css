@@ -1,0 +1,38 @@
+/* Common keyboard and motion behavior for the shared interface. */
+:where(button, a, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+}
+.modal-close:focus-visible, .modal-dismiss:focus-visible,
+.form-input:focus-visible, .form-select:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+}
+.btn:disabled {
+    opacity: .55;
+    cursor: default;
+    box-shadow: none;
+}
+.modal-header { gap: 12px; flex-shrink: 0; }
+.modal-header :is(h2, h3) { min-width: 0; overflow-wrap: anywhere; }
+.modal-close { flex-shrink: 0; }
+.modal-footer { flex-wrap: wrap; }
+.modal-content { min-width: 0; }
+.scroll-top-btn .doodle-icon { color: inherit; }
+@media (hover: none) {
+    .row-actions { opacity: 1; }
+}
+@media (pointer: coarse) {
+    .btn-icon, .modal-close, .header-category-control {
+        min-width: 44px; min-height: 44px;
+    }
+    .day-pill-item span, .radio-tab { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .modal, .modal-content, .btn, .modal-close, .modal-dismiss,
+    .premium-card, .premium-list-item, .footer-btn, .scroll-top-btn,
+    .recurrence-glass-menu, .search-result-item {
+        animation: none !important;
+        transition: none !important;
+    }
+}

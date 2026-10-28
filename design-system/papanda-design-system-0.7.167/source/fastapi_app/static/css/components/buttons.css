@@ -1,0 +1,197 @@
+/* --- UNIFIED BUTTON SYSTEM --- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    min-height: 44px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    border: none;
+    user-select: none;
+    white-space: nowrap;
+}
+
+/* Primary (Action) */
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: 0 4px 14px 0 rgba(242, 153, 74, 0.39);
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+    box-shadow: 0 6px 20px rgba(242, 153, 74, 0.23);
+}
+
+/* Secondary (Glass/Cancel) */
+.btn-secondary {
+    background: var(--color-bg-subtle);
+    color: var(--color-text-body);
+    border: 1.5px solid var(--color-border-light);
+}
+
+.btn-secondary:hover {
+    background: white;
+    border-color: var(--color-border-medium);
+    color: var(--color-text-dark);
+}
+
+/* Danger (Delete/Archive) */
+.btn-danger {
+    background: var(--color-error-soft);
+    color: var(--color-error-dark);
+}
+
+.btn-danger:hover {
+    background: var(--color-error-dark);
+    color: white;
+}
+
+/* Small Variant */
+.btn-sm {
+    min-height: 36px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+}
+
+/* Icon Only Button */
+.btn-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-faint);
+}
+
+.btn-icon:hover {
+    background: var(--color-bg-subtle);
+    color: var(--color-accent-text);
+}
+
+/* Success (Activate/Confirm) */
+.btn-success {
+    background: #e6fcf5;
+    color: var(--color-success-dark);
+    border: 1.5px solid #c3fae8;
+}
+
+.btn-success:hover {
+    background: var(--color-success-dark);
+    color: white;
+    border-color: var(--color-success-dark);
+}
+
+/* Text Action Link Button */
+.btn-text-action {
+    background: transparent;
+    border: none;
+    color: var(--color-accent-text);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-text-action:hover {
+    background: var(--color-primary-light, #fff4e6);
+    color: var(--color-accent-text);
+}
+
+/* Badge System */
+.badge-premium {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-success {
+    background: #e6fcf5;
+    color: var(--color-success-dark);
+}
+
+.btn:active, .btn-text-action:active {
+    filter: brightness(0.97);
+}
+
+/* Shared save action, including the compact sticker editor button. */
+.btn.btn-save,
+#stickerDetailModal .btn.btn-save {
+    min-height: 44px;
+    padding: 10px 28px;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    box-shadow: 0 4px 14px rgba(242, 153, 74, 0.28);
+    transition: background-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.btn-save::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    background: currentColor;
+    mask: var(--icon-pack-save, url("../../vendor/doodle/icons/save.svg")) center / contain no-repeat;
+}
+
+.btn.btn-save.btn-sm {
+    min-height: 36px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.btn.btn-save.btn-save-icon,
+#stickerDetailModal .btn.btn-save-icon {
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+    margin-left: auto;
+    box-shadow: none;
+}
+
+.btn.btn-save:hover:not(:disabled),
+#stickerDetailModal .btn.btn-save:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+    color: var(--color-on-primary);
+}
+
+.btn.btn-save:focus-visible,
+#stickerDetailModal .btn.btn-save:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+}
+
+.btn.btn-save:disabled,
+#stickerDetailModal .btn.btn-save:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn.btn-save { transition: none; }
+}

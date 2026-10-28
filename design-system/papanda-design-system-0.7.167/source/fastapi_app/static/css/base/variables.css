@@ -1,0 +1,99 @@
+:root {
+    /* --- CORE COLORS --- */
+    --color-primary: #F2994A;
+    --color-primary-dark: #D87D2D;
+    --color-primary-soft: #FFF3E0;
+    --color-on-primary: #1E293B;
+    --color-accent-text: #9A4D13;
+    --color-focus: #9A4D13;
+    --color-primary-glow: rgba(242, 153, 74, 0.15);
+
+    --color-bg-app: #FFF5EC;
+    --color-bg-white: #FFFFFF;
+    --color-bg-subtle: #FDFBF9;
+
+    --color-text-dark: #1E293B;
+    --color-text-body: #475569;
+    --color-text-muted: #64748B;
+    --color-text-faint: #94A3B8;
+
+    --color-border-light: #F1F5F9;
+    --color-border-medium: #E2E8F0;
+
+    /* --- STATUS --- */
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+
+    /* --- EFFECTS --- */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.12);
+
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-blur: blur(16px);
+    --glass-border: rgba(255, 255, 255, 0.3);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* --- WIDGET TITLES --- */
+    --widget-title-weight: 500;
+    --widget-title-size: 1.125rem;
+
+    /* --- TYPOGRAPHY BASE FAMILIES --- */
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-family-display: 'Outfit', sans-serif;
+    --font-family-mono: 'Fira Code', 'JetBrains Mono', 'Courier New', Courier, monospace;
+    --font-family-serif: 'Merriweather', 'Georgia', serif;
+    --font-family-handwriting: 'Indie Flower', cursive, sans-serif;
+
+    /* --- SEMANTIC TYPOGRAPHY ROLES --- */
+    --font-ui: var(--font-family-sans);
+    --font-heading: var(--font-family-display);
+    --font-reading: var(--font-family-sans);
+    --font-editor: var(--font-family-sans);
+    --font-study: var(--font-family-sans);
+
+    /* --- TYPOGRAPHY SCALE --- */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 2rem;
+
+    /* --- RESTORED / ALIAS COLORS --- */
+    --color-indigo: #6366f1;
+    --color-blue: #3b82f6;
+    --color-blue-glow: rgba(59, 130, 246, 0.15);
+    
+    --color-danger: var(--color-error);
+    --color-error-light: #fca5a5;
+    --color-error-soft: #fee2e2;
+    --color-error-dark: #b91c1c;
+    
+    --color-success-light: #86efac;
+    --color-success-dark: #15803d;
+    
+    --color-primary-medium: #fba158;
+    
+    --color-white: #ffffff;
+    --color-border: var(--color-border-medium);
+    --color-text-medium: var(--color-text-muted);
+    --color-text-disabled: #cbd5e1;
+    
+    --color-bg-surface: var(--color-bg-white);
+    --color-bg-canvas: var(--color-bg-app);
+    --color-bg-card: var(--color-bg-white);
+    --color-bg-page: var(--color-bg-app);
+    
+    --color-sticker-default: #e2e8f0;
+    --color-overlay-light: rgba(255, 255, 255, 0.7);
+}

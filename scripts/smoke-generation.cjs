@@ -131,7 +131,7 @@ async function main() {
     await page.waitForSelector('[data-testid="word-sentence-en"]', { visible: true });
     const word = await page.$eval('[data-testid="word-sentence-en"]', el => el.textContent);
     await page.waitForSelector('[data-testid="word-compose-en"]', { visible: true });
-    assert.equal(await page.$eval('[data-testid="word-compose-en"]', el => el.textContent), 'Составить предложение →');
+    assert.equal(await page.$eval('[data-testid="word-compose-en"]', el => el.textContent), 'Составить предложение');
     for (const width of [320, 430]) {
       await page.setViewport({ width, height: 932, hasTouch: true, isMobile: true });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Word actions must fit a mobile screen');

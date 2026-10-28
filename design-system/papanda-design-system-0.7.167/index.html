@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>papanda — компоненты общего стиля</title>
+<link rel="stylesheet" href="papanda.css">
+<main class="p-page">
+    <h1>Тёплое рабочее пространство</h1>
+    <p class="p-intro">Общие компоненты семейства papanda. Компоновка и предметные функции могут различаться.</p>
+    <nav class="p-nav" aria-label="Примеры компонентов">
+        <button type="button" aria-current="page" data-section="work">Рабочий экран</button>
+        <button type="button" data-section="states">Состояния</button>
+    </nav>
+    <section id="work" class="p-grid" aria-label="Рабочий экран">
+        <form class="p-card" id="exampleForm" novalidate>
+            <h2><span class="doodle-icon doodle-edit" aria-hidden="true"></span> Новая запись</h2>
+            <div class="p-field">
+                <label class="form-label" for="entryTitle">Название</label>
+                <input class="form-input" id="entryTitle" required aria-describedby="entryError" placeholder="Например, подготовить материалы">
+                <p class="p-error" id="entryError" role="alert" hidden>Добавьте название записи.</p>
+            </div>
+            <div class="p-field">
+                <label class="form-label" for="entryCategory">Категория</label>
+                <select class="form-select" id="entryCategory"><option>Работа</option><option>Личное</option></select>
+            </div>
+            <div class="p-field">
+                <label class="form-label" for="entryText">Текст</label>
+                <textarea class="form-input" id="entryText" rows="3">Сохранить мысли и подготовить материалы к проекту.</textarea>
+            </div>
+            <label class="p-check"><input type="checkbox"> Закрепить запись</label>
+            <div class="p-actions">
+                <button class="btn btn-primary btn-save" type="submit" id="saveExample">Сохранить</button>
+                <button class="btn btn-secondary" type="reset">Сбросить</button>
+            </div>
+            <p class="p-meta" id="saveStatus" role="status"></p>
+        </form>
+        <section class="p-card" aria-labelledby="recentTitle">
+            <h2 id="recentTitle">Последние записи</h2>
+            <ul class="p-list">
+                <li class="p-row"><span><strong>Материалы к проекту</strong><small>Работа · сегодня</small></span><button class="btn btn-secondary btn-sm" type="button" id="openExample">Открыть</button></li>
+                <li class="p-row"><span><strong>План на неделю</strong><small>Личное · вчера</small></span><button class="btn btn-danger btn-sm" type="button" id="deleteExample">Удалить</button></li>
+            </ul>
+            <p class="p-meta">Белая поверхность, радиус 24 px, текст интерфейса 16 px и спокойные метаданные 14 px.</p>
+        </section>
+        <section class="p-card" aria-labelledby="tableTitle">
+            <h2 id="tableTitle">План работ</h2>
+            <div class="p-table-scroll" tabindex="0" role="region" aria-label="Таблица плана работ">
+                <table class="p-table"><thead><tr><th scope="col">Название</th><th scope="col">Срок</th><th scope="col">Состояние</th></tr></thead><tbody><tr><td>Подготовить материалы</td><td>Сегодня</td><td>В работе</td></tr><tr><td>Обсудить идеи</td><td>Завтра</td><td>Запланировано</td></tr></tbody></table>
+            </div>
+        </section>
+    </section>
+    <section id="states" class="p-grid" aria-label="Состояния" hidden>
+        <section class="p-card">
+            <h2>Действия и сообщения</h2>
+            <div class="p-actions"><button class="btn btn-primary" type="button">Основное</button><button class="btn btn-secondary" type="button">Вторичное</button><button class="btn btn-primary" type="button" disabled>Недоступно</button></div>
+            <div class="p-status" role="status"><span class="doodle-icon doodle-check" aria-hidden="true"></span><span>Изменения сохранены.</span></div>
+            <div class="p-status p-status--error" role="status"><span class="doodle-icon doodle-warning" aria-hidden="true"></span><span>Не удалось сохранить. Текст остался в редакторе.</span></div>
+        </section>
+        <section class="p-card"><h2>Пока нет записей</h2><p class="p-intro">Добавьте первую запись, чтобы начать работу.</p><button class="btn btn-primary" type="button" id="firstExample">Добавить запись</button></section>
+    </section>
+    <p class="p-meta">Демонстрация работает локально на вымышленных данных. Поля используют Inter при его наличии и системную замену в остальных случаях.</p>
+</main>
+<dialog class="p-dialog" id="exampleDialog" aria-labelledby="dialogTitle">
+    <h2 id="dialogTitle">Материалы к проекту</h2>
+    <p id="dialogText">Сохранить мысли и подготовить материалы к следующей встрече.</p>
+    <form method="dialog" class="p-actions"><button class="btn btn-secondary" id="dialogCancel" value="cancel">Закрыть</button><button class="btn btn-danger" id="dialogConfirm" value="confirm" hidden>Удалить</button></form>
+</dialog>
+<script>
+const sections = [...document.querySelectorAll('[data-section]')];
+function showSection(id) {
+    for (const button of sections) {
+        const current = button.dataset.section === id;
+        button.toggleAttribute('aria-current', current);
+        if (current) button.setAttribute('aria-current', 'page');
+        document.getElementById(button.dataset.section).hidden = !current;
+    }
+}
+for (const button of sections) button.addEventListener('click', () => showSection(button.dataset.section));
+const form = document.getElementById('exampleForm'), title = document.getElementById('entryTitle');
+const error = document.getElementById('entryError'), status = document.getElementById('saveStatus'), save = document.getElementById('saveExample');
+form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const invalid = !title.value.trim();
+    error.hidden = !invalid; title.setAttribute('aria-invalid', String(invalid));
+    if (invalid) { title.focus(); return; }
+    save.disabled = true; save.textContent = 'Сохраняем…'; status.textContent = '';
+    await new Promise(resolve => setTimeout(resolve, 450));
+    save.disabled = false; save.textContent = 'Сохранить'; status.textContent = 'Запись сохранена в демонстрации.';
+});
+form.addEventListener('reset', () => { error.hidden = true; title.removeAttribute('aria-invalid'); status.textContent = ''; });
+const dialog = document.getElementById('exampleDialog');
+function openDialog(deleting) {
+    document.getElementById('dialogTitle').textContent = deleting ? 'Удалить запись?' : 'Материалы к проекту';
+    document.getElementById('dialogText').textContent = deleting ? 'Запись исчезнет из списка.' : 'Сохранить мысли и подготовить материалы к следующей встрече.';
+    document.getElementById('dialogConfirm').hidden = !deleting;
+    document.getElementById('dialogCancel').textContent = deleting ? 'Отмена' : 'Закрыть';
+    dialog.returnValue = ''; dialog.showModal(); document.getElementById('dialogCancel').focus();
+}
+document.getElementById('openExample').onclick = () => openDialog(false);
+document.getElementById('deleteExample').onclick = () => openDialog(true);
+dialog.addEventListener('close', () => { if (dialog.returnValue === 'confirm') status.textContent = 'Удаление подтверждено в демонстрации.'; });
+document.getElementById('firstExample').onclick = () => { showSection('work'); title.focus(); };
+</script>
+</html>

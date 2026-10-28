@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Typography Utility Classes
+   ========================================================================== */
+
+/* --- Font Families --- */
+.font-ui { font-family: var(--font-ui); }
+.font-heading { font-family: var(--font-heading); }
+.font-reading { font-family: var(--font-reading); }
+.font-editor { font-family: var(--font-editor); }
+.font-handwriting { font-family: var(--font-family-handwriting); }
+.font-study { font-family: var(--font-study); }
+
+/* --- Font Sizes --- */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+
+/* --- Font Weights --- */
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* --- Dynamic Themes (for <body> or specific containers) --- */
+
+/* Reading Font Themes */
+body.theme-reading-sans {
+    --font-reading: var(--font-family-sans);
+}
+body.theme-reading-serif {
+    --font-reading: var(--font-family-serif);
+}
+
+/* Editor Font Themes */
+body.theme-editor-mono {
+    --font-editor: var(--font-family-mono);
+}
+body.theme-editor-sans {
+    --font-editor: var(--font-family-sans);
+}
+
+/* Apply default font to body */
+body {
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+input, textarea, select, button {
+    font-family: inherit;
+    font-size: inherit;
+}
