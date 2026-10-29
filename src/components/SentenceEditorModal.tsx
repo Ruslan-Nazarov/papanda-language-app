@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { useSentenceEditor } from '../hooks/useSentenceEditor';
 import { STRICT_ORDER, ROLE_TRANSLATIONS, getRoleColor } from '../constants/sentencePresentation';
-import { ACCENT } from '../constants/theme';
+import { ACCENT, UI } from '../constants/theme';
 
 type Props = { editor: ReturnType<typeof useSentenceEditor> };
 
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   modalHeader: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#1E293B' },
   mainInput: { width: '100%', borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFF', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16, minHeight: 80, textAlignVertical: 'top' },
   button: { flex: 1, backgroundColor: ACCENT, padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
+  buttonText: { color: UI.onAccent, fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
   tokenEditorCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
   tokenEditorHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   tokenEditorText: { fontSize: 20, fontWeight: 'bold', color: '#0F172A' },

@@ -81,11 +81,16 @@ async function main() {
     await page.goto(url, { waitUntil: 'networkidle0' });
     await tab('Word Triples');
     await page.waitForSelector(select('word-compose-kz'));
-    await page.waitForFunction(() => document.fonts.check('16px Inter_400Regular') && document.fonts.check('24px Outfit_500Medium'));
+    assert.ok(await page.$eval('[data-testid="word-sentence-kz"]', el => !/Inter|Outfit/.test(getComputedStyle(el).fontFamily)), 'Reading text uses the system font from first paint');
     assert.ok((await page.$eval('body', el => el.innerText)).includes('presentarsi'));
     for (const width of [320, 390, 1440]) {
       await page.setViewport({ width, height: 844 });
+      if (!await fits()) await screenshot(`overflow-${width}`);
       assert.equal(await fits(), true, `${width}px: no horizontal overflow`);
+      assert.ok(await page.$$eval('[role="tab"]', tabs => {
+        const boxes = tabs.map(tab => tab.getBoundingClientRect());
+        return boxes.length === 5 && boxes.every(box => box.height >= 44 && Math.abs(box.width - boxes[0].width) <= 1);
+      }), `${width}px: five equally sized navigation targets`);
       assert.ok(await page.$eval(select('word-compose-kz'), el => {
         const r = el.getBoundingClientRect(); const s = el.firstElementChild.getBoundingClientRect();
         return r.height >= 44 && s.height <= 36 && r.width < 280;
@@ -176,7 +181,7 @@ async function main() {
     await page.evaluate(() => [...document.querySelectorAll('[role="button"]')].find(el => el.textContent === 'Закрыть').click());
     await page.waitForSelector(select('word-form-modal'), { hidden: true });
     assert.deepEqual(errors, []);
-    console.log('Papanda pilot passed: catalogue, 320/390/1440px, bundled fonts, compact touch targets, keyboard focus, association persistence, reduced viewport, long/large text, empty state, loading, 402 and retry.');
+    console.log('Papanda pilot passed: catalogue, 320/390/1440px, system reading font, bundled outline icons, compact touch targets, keyboard focus, association persistence, reduced viewport, long/large text, empty state, loading, 402 and retry.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

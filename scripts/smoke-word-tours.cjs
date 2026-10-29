@@ -51,7 +51,7 @@ async function main() {
     await tab('Word Triples');
     await progress(0, 10);
     assert.equal(await page.$('[data-testid="word-undo"]'), null);
-    await click('✓ Выучено');
+    await page.click('[data-testid="word-mark-learned"]');
     await progress(1, 10);
     const learnedKey = Object.entries((await state()).userWordProgress).find(([, value]) => value.knowledge_stats?.en === true)[0];
     await click('↶ Отменить «Выучено»');
@@ -71,7 +71,7 @@ async function main() {
     await page.touchscreen.touchEnd();
     await progress(1, 10);
     for (let done = 2; done <= 10; done++) {
-      await click('✓ Выучено');
+      await page.click('[data-testid="word-mark-learned"]');
       if (done < 10) await progress(done, 10); else await complete();
     }
     assert.equal(await shows(), 12, 'Completing ten cards after undo must not display an extra card');
@@ -84,7 +84,7 @@ async function main() {
     await click('↶ Отменить «Выучено»');
     await progress(9, 10);
     assert.equal(Object.values((await state()).userWordProgress).filter(value => value.knowledge_stats?.en === true).length, learnedBeforeUndo - 1);
-    await click('✓ Выучено');
+    await page.click('[data-testid="word-mark-learned"]');
     await complete();
     assert.equal(Object.values((await state()).userWordProgress).filter(value => value.knowledge_stats?.en === true).length, learnedBeforeUndo);
     assert.equal(await shows(), 13, 'Undo at tour completion must only show the restored card');
@@ -102,7 +102,7 @@ async function main() {
     await progress(0, 5);
     const start = await shows();
     for (let done = 1; done <= 5; done++) {
-      await click('✓ Выучено');
+      await page.click('[data-testid="word-mark-learned"]');
       if (done < 5) await progress(done, 5); else await complete();
     }
     assert.equal(await shows(), start + 4, 'A five-card tour must stop before its sixth card');

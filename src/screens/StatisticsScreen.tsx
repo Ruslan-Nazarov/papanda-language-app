@@ -24,7 +24,7 @@ import {
   calculateFamiliarWordsEfficiency,
   WORD_MEMORY
 } from '../utils/statistics';
-import { ACCENT, ACCENT_DARK } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, UI } from '../constants/theme';
 
 const LANG_COLORS: Record<string, string> = {
   en: '#6366F1', it: '#10B981', de: '#EAB308', es: '#EC4899', fr: '#F97316', kz: '#0EA5E9', la: '#8B5CF6'
@@ -35,21 +35,20 @@ const ACTIVITY_DAYS = 14;
 const formatDay = (d: Date) => `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 
 interface SectionProps {
-  icon: string;
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
   help?: string;
 }
 
-function Section({ icon, title, children, defaultOpen = true, help }: SectionProps) {
+function Section({ title, children, defaultOpen = true, help }: SectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [showHelp, setShowHelp] = useState(false);
   return (
     <View style={styles.card}>
       <TouchableOpacity style={styles.cardHeader} activeOpacity={0.7} onPress={() => setOpen(o => !o)}>
         <View style={styles.cardTitleRow}>
-          <Text style={styles.cardHeaderIcon}>{icon}</Text>
+
           <Text style={styles.cardHeaderTitle}>{title}</Text>
         </View>
         {help && (
@@ -71,7 +70,7 @@ function Section({ icon, title, children, defaultOpen = true, help }: SectionPro
         <Modal visible={showHelp} transparent animationType="fade" onRequestClose={() => setShowHelp(false)}>
           <TouchableOpacity style={styles.helpOverlay} activeOpacity={1} onPress={() => setShowHelp(false)}>
             <View style={styles.helpCard}>
-              <Text style={styles.helpTitle}>{icon}  {title}</Text>
+              <Text style={styles.helpTitle}>{title}</Text>
               <Text style={styles.helpText}>{help}</Text>
               <TouchableOpacity style={styles.helpClose} onPress={() => setShowHelp(false)}>
                 <Text style={styles.helpCloseText}>Понятно</Text>
@@ -218,7 +217,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* Activity */}
       <Section
-        icon="📅"
         title={`Активность за ${ACTIVITY_DAYS} дней`}
         help={'Количество учтённых показов слов за каждый день. В разделе «Слова» показ засчитывается при открытии карточки, в тренировке — после ответа «Знаю» или «Не знаю». В тренажёре предложений учитывается каждое найденное в словаре слово: повтор одного слова внутри предложения считается один раз.\n\nЭто число показов, а не уникальных слов и не правильных ответов. Повторные показы учитываются снова. Самостоятельный разбор и чтение своего текста в этот график не входят; их результаты видны в «Навыках разбора». Ранее накопленная история сохранена.'}
       >
@@ -243,7 +241,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* Knowledge by language */}
       <Section
-        icon="🌍"
         title="Знание по языкам"
         help="Сколько слов отмечено как знакомые по каждому языку. В тренировке ответ «Знаю» меняет отметку только для языка вопроса. В разделе «Слова» кнопка «Выучено» применяется ко всем активным языкам карточки. Одно слово может быть отмечено как знакомое на одном языке и незнакомое на другом. Это ваша самооценка, а не проверка перевода."
       >
@@ -265,7 +262,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* Repetition */}
       <Section
-        icon="🔁"
         title="По количеству повторений"
         help="Распределение начатых слов по тому, сколько раз ты их видел (в среднем по языкам, которые учишь). Цель — около 80 показов на слово: примерно столько повторений нужно, чтобы слово надёжно осело в долговременной памяти. Слова, которые ни разу не показывались, вынесены отдельной строкой."
       >
@@ -277,7 +273,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* Efficiency */}
       <Section
-        icon="🎯"
         title="Результаты тренировок"
         help="Здесь учитываются ответы в завершённых тренировках слов. «Знаю» — вы отметили, что вспомнили перевод; «Не знаю» — что не вспомнили. Процент — число ответов «Знаю», делённое на число всех ответов. Повторный ответ на то же слово считается отдельно. Несколько тренировок в один день объединяются. Показаны последние 10 дней с ответами. Это ваша самооценка: состав и сложность слов могут меняться, поэтому процент сам по себе не доказывает рост знаний."
       >
@@ -314,7 +309,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* iMW */}
       <Section
-        icon="🧠"
         title="Оценка закрепления"
         defaultOpen={false}
         help={
@@ -341,7 +335,6 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 
       {/* Frequent words */}
       <Section
-        icon="🔥"
         title="Частые слова"
         defaultOpen={false}
         help="Слова, которые встречались тебе чаще всего — по суммарному числу показов во всех разделах. Обычно это самая частотная лексика, которую ты уже почти не путаешь."
@@ -375,9 +368,9 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F6F8' },
-  scroll: { padding: 16, paddingBottom: 48 },
-  screenTitle: { fontSize: 24, fontWeight: 'bold', color: '#1A202C', marginBottom: 16 },
+  container: { flex: 1, backgroundColor: UI.canvas },
+  scroll: { width: '100%', maxWidth: UI.column, alignSelf: 'center', padding: 16, paddingBottom: 48 },
+  screenTitle: { ...UI.heading, color: '#1A202C', marginBottom: 16 },
 
   tilesRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   tile: {
@@ -395,7 +388,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16
   },
   cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  cardHeaderIcon: { fontSize: 18 },
   cardHeaderTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', flex: 1 },
   cardChevron: { fontSize: 16, color: '#94A3B8' },
   cardBody: { paddingHorizontal: 16, paddingBottom: 16 },
@@ -409,11 +401,11 @@ const styles = StyleSheet.create({
   helpOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', alignItems: 'center', justifyContent: 'center', padding: 28 },
   helpCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, maxWidth: 420, width: '100%' },
   helpTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A202C', marginBottom: 10 },
-  helpText: { fontSize: 14, color: '#475569', lineHeight: 21 },
+  helpText: { ...UI.reading, color: UI.body },
   helpClose: { marginTop: 18, alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 10, backgroundColor: ACCENT },
-  helpCloseText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
+  helpCloseText: { color: UI.onAccent, fontWeight: 'bold', fontSize: 14 },
 
-  sectionNote: { fontSize: 12, color: '#94A3B8', marginTop: 10, lineHeight: 17 },
+  sectionNote: { fontSize: 13, color: UI.muted, marginTop: 10, lineHeight: 17 },
   emptyText: { fontSize: 13, color: '#64748B', fontStyle: 'italic', textAlign: 'center', paddingVertical: 14 },
 
   barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },

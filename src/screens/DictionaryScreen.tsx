@@ -9,7 +9,7 @@ import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { isWordLearned } from '../utils/statistics';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER, UI } from '../constants/theme';
 
 export default function DictionaryScreen({ navigation }: DictionaryScreenProps) {
   const insets = useSafeAreaInsets();
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: UI.canvas,
   },
   headerTitleRow: {
     flexDirection: 'row',
@@ -197,8 +197,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...UI.heading,
     color: '#212529',
   },
   addBtn: {
@@ -224,11 +223,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   searchIcon: {
     fontSize: 16,
@@ -236,7 +230,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: '#1A202C',
     padding: 0,
   },
@@ -245,7 +239,7 @@ const styles = StyleSheet.create({
   },
   clearBtnText: {
     fontSize: 14,
-    color: '#A0AEC0',
+    color: UI.muted,
     fontWeight: 'bold',
   },
   list: {
@@ -256,11 +250,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 14,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
     borderWidth: 1,
     borderColor: '#EDF2F7',
   },
@@ -305,13 +294,13 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: ACCENT,
+    color: ACCENT_DARK,
   },
   assocBox: {
     marginTop: 10,
-    backgroundColor: '#FFFDF0',
+    backgroundColor: UI.subtle,
     borderWidth: 1,
-    borderColor: '#FEF08A',
+    borderColor: UI.border,
     borderRadius: 10,
     padding: 10,
   },
@@ -332,9 +321,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   assocContent: {
-    fontSize: 13,
-    color: '#4A5568',
-    lineHeight: 18,
+    ...UI.reading,
+    color: UI.body,
   },
   assocEmpty: {
     color: '#A0AEC0',

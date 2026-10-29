@@ -68,7 +68,7 @@ async function main() {
     await page.type(input, 'Два смысла');
     await page.click('[aria-label="Изменить отметку избранного"]');
     assert.equal(await page.$eval(input, el => el.value), 'Два смысла', 'Favourite must not erase the association draft');
-    await clickText('✓ Выучено');
+    await page.click('[data-testid="word-mark-learned"]');
     await page.waitForFunction(() => document.querySelector('[data-testid="word-tour-progress"]')?.textContent === 'Пройдено: 1 / 10');
     // Swipe the word itself: fixed screen coordinates can land on a language
     // badge after a layout change and start desktop text selection instead.
@@ -100,7 +100,7 @@ async function main() {
     await clickText('Закрыть');
 
     // Import replaces the mounted training session, including its undo history.
-    await clickText('✓ Выучено');
+    await page.click('[data-testid="word-mark-learned"]');
     await tab('Settings');
     const backupPath = path.join(root, 'review-fixture.json');
     fs.writeFileSync(backupPath, JSON.stringify({ app: 'papanda', version: 1, data: {

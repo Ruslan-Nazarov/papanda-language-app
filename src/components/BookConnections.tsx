@@ -6,7 +6,7 @@ import type { RootStackParamList } from '../navigation/types';
 import type { BookLocation, BookPassage } from '../models/book';
 import type { SyntaxRole, Token } from '../models/types';
 import { bookTopics, hasLanguageBook, selectBookPassages, bookSnippet } from '../services/bookService';
-import { ACCENT_DARK } from '../constants/theme';
+import { ACCENT_DARK, UI } from '../constants/theme';
 
 export function BookRuleLink({ language, role, sentence = '', tokens = [], onConsult }: { language: string; role: SyntaxRole; sentence?: string; tokens?: Token[]; onConsult?: () => void }) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -50,7 +50,7 @@ const s = StyleSheet.create({
   compactCard: { backgroundColor: 'transparent', borderWidth: 0, borderTopWidth: 1, borderColor: '#E4E7EC', borderRadius: 0, padding: 0, marginVertical: 4 },
   compactToggle: { minHeight: 44, justifyContent: 'center' },
   compactTitle: { fontSize: 14, fontWeight: '500', color: '#667085' },
-  card: { backgroundColor: '#FFFBF2', borderWidth: 1, borderColor: '#E8D9BC', borderRadius: 12, padding: 12, marginVertical: 10 },
+  card: { backgroundColor: UI.surface, borderWidth: 1, borderColor: UI.border, borderRadius: 12, padding: 12, marginVertical: 10 },
   toggle: { paddingVertical: 5, gap: 4 }, title: { fontSize: 15, fontWeight: '700', color: '#172033' },
   small: { fontSize: 12, lineHeight: 18, color: '#64748B' }, links: { marginTop: 8 },
   ruleLink: { paddingVertical: 10 }, link: { fontSize: 14, lineHeight: 21, fontWeight: '600', color: ACCENT_DARK },

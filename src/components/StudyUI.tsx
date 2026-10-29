@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import type { Sentence, SyntaxRole } from '../models/types';
 import { getRoleColor, ROLE_TRANSLATIONS } from '../constants/sentencePresentation';
-import { ACCENT } from '../constants/theme';
+import { ACCENT, UI } from '../constants/theme';
 import CompactAction from './CompactAction';
 
 export function StudyButton({ title, onPress, disabled, selected, compact, testID }: { title: string; onPress: () => void; disabled?: boolean; selected?: boolean; compact?: boolean; testID?: string }) {
-  const label = <Text style={[studyStyles.buttonText, selected && { color: '#FFF' }]}>{title}</Text>;
+  const label = <Text style={[studyStyles.buttonText, selected && { color: UI.onAccent }]}>{title}</Text>;
   if (compact) return <CompactAction testID={testID} disabled={disabled} onPress={onPress}
     accessibilityState={{ disabled: !!disabled, selected: !!selected }}
     style={disabled && { opacity: 0.45 }}
@@ -24,12 +24,12 @@ export function StudyTokens({ sentence, added = [], role }: { sentence: Sentence
 }
 export const studyStyles = StyleSheet.create({
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 8 },
-  card: { backgroundColor: '#FFF', borderRadius: 16, padding: 16, marginVertical: 8, borderColor: '#E2E8F0', borderWidth: 1, gap: 10 },
-  title: { fontSize: 20, fontWeight: '700', color: '#172033' },
-  text: { fontSize: 15, lineHeight: 23, color: '#334155' },
-  small: { fontSize: 12, color: '#64748B', lineHeight: 18 },
-  button: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: '#EEF2F6', alignSelf: 'flex-start' },
-  compactButton: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
+  card: { backgroundColor: '#FFF', borderRadius: UI.radius, padding: 16, marginVertical: 8, borderColor: '#E2E8F0', borderWidth: 1, gap: 10 },
+  title: { fontSize: 18, lineHeight: 26, fontWeight: '600', color: '#172033' },
+  text: { ...UI.reading, color: '#334155' },
+  small: { ...UI.caption, color: UI.muted },
+  button: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: '#EEF2F6', alignSelf: 'flex-start' },
+  compactButton: { minHeight: 32, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   buttonText: { fontSize: 14, fontWeight: '600', color: '#334155' },
   input: { borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 12, padding: 12, fontSize: 16, color: '#172033', backgroundColor: '#FFF', minHeight: 48 },
   token: { padding: 8, borderBottomWidth: 3, borderRadius: 6 },

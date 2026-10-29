@@ -25,7 +25,7 @@ import { buildWordLookup, cleanDictionaryForm, getWordTranslation } from '../uti
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 import { computeSentenceRevealGroups, tokenRevealIndices } from '../utils/sentenceGroups';
 import { sentenceFingerprint } from '../utils/sentenceValidation';
-import { ACCENT, ACCENT_DARK } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, UI } from '../constants/theme';
 import { createQueueOrder, selectTrainerQueue, trainerPool } from '../utils/sentenceQueue';
 import BookConnections from '../components/BookConnections';
 import { selectBookPassages, parseBookURL } from '../services/bookService';
@@ -637,65 +637,40 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     const secondaryClause = clauseIndex >= 1;
     const badgeNumber = tokenBadgeNumbers.get(index) ?? (groupIndex >= 0 ? groupIndex + 1 : 1);
 
-    const card = isRevealed ? (
-          <TouchableOpacity
-            testID={`trainer-block-${index}`}
-            accessibilityRole="button"
-            accessibilityLabel={`Объяснить форму слова: ${token.text}`}
-            activeOpacity={0.85}
-            onPress={(e) => {
-              e.stopPropagation();
-              handleTokenPress(token);
-            }}
-            onLongPress={() => noteSource && navigation.push('NoteEditor', { language: selectedLanguageCode, source: { ...noteSource, token: token.text } })}
-            accessibilityHint="Удерживайте, чтобы создать заметку к слову"
-            style={[
-              styles.wordCard,
-              { borderColor: getRoleColor(token.role) },
-              compact && { minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
-              token.is_in_my_dict && { backgroundColor: '#FFFDF0' } // Gentle yellow background for dict words
-            ]}
-          >
-            <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
-              <Text style={styles.orderBadgeText}>{badgeNumber}</Text>
-            </View>
-            {token.parts && token.parts.length > 0 ? (
-              <Text style={styles.wordText}>
-                {token.parts.map((part, i) => {
-                  const displayPart = (index === 0 && i === 0 && part.length > 0)
-                    ? part.charAt(0).toUpperCase() + part.slice(1)
-                    : part;
-                  return (
-                    <Text
-                      key={i}
-                      style={
-                        i === 0
-                          ? styles.wordRoot
-                          : [styles.wordAffix, { color: AFFIX_COLORS[(i - 1) % AFFIX_COLORS.length] }]
-                      }
-                    >
-                      {displayPart}
-                    </Text>
-                  );
-                })}
-              </Text>
-            ) : (
-              <Text style={styles.wordText}>
-                {(index === 0 && token.text) ? token.text.charAt(0).toUpperCase() + token.text.slice(1) : token.text}
-              </Text>
-            )}
+    // Hidden and revealed blocks share their measured content. Revealing a word
+    // changes its visibility, never the surrounding layout or reading position.
+    const card = (
+        <TouchableOpacity
+          testID={`trainer-block-${index}`}
+          accessibilityRole="button"
+          accessibilityLabel={isRevealed ? `Объяснить форму слова: ${token.text}` : `Раскрыть блок ${index + 1}`}
+          accessibilityHint={isRevealed ? 'Удерживайте, чтобы создать заметку к слову' : undefined}
+          activeOpacity={0.85}
+          onPress={event => { event.stopPropagation(); isRevealed ? handleTokenPress(token) : revealBlock(index); }}
+          onLongPress={isRevealed ? () => noteSource && navigation.push('NoteEditor', { language: selectedLanguageCode, source: { ...noteSource, token: token.text } }) : undefined}
+          style={[styles.wordCard, { borderColor: isRevealed ? getRoleColor(token.role) : UI.border },
+            compact && { minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
+            !isRevealed && styles.hiddenCard]}
+        >
+          {isRevealed && <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
+            <Text style={styles.orderBadgeText}>{badgeNumber}</Text>
+          </View>}
+          <View aria-hidden={!isRevealed} accessibilityElementsHidden={!isRevealed}
+            importantForAccessibility={isRevealed ? 'auto' : 'no-hide-descendants'}
+            pointerEvents="none" style={{ opacity: isRevealed ? 1 : 0 }}>
+            {token.parts && token.parts.length > 0 ? <Text style={styles.wordText}>
+              {token.parts.map((part, i) => <Text key={i} style={i === 0 ? styles.wordRoot : [styles.wordAffix, { color: AFFIX_COLORS[(i - 1) % AFFIX_COLORS.length] }]}>
+                {index === 0 && i === 0 && part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part}
+              </Text>)}
+            </Text> : <Text style={styles.wordText}>{index === 0 && token.text ? token.text.charAt(0).toUpperCase() + token.text.slice(1) : token.text}</Text>}
             {!compact && <>
-              {showTranslations && <Text style={styles.translationText}>{token.translation}</Text>}
+              <Text aria-hidden={!showTranslations} style={[styles.translationText, { opacity: showTranslations ? 1 : 0 }]}>{token.translation}</Text>
               <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
-              {renderDictionaryAction(token)}
             </>}
-          </TouchableOpacity>
-    ) : (
-          <TouchableOpacity testID={`trainer-block-${index}`} accessibilityRole="button"
-            accessibilityLabel={`Раскрыть блок ${index + 1}`} activeOpacity={0.65}
-            onPress={() => revealBlock(index)} style={styles.hiddenCard}>
-            <View style={styles.hiddenMark} />
-          </TouchableOpacity>
+          </View>
+          {!isRevealed && <View style={styles.hiddenMark} />}
+          {isRevealed && !compact && renderDictionaryAction(token)}
+        </TouchableOpacity>
     );
 
     return secondaryClause ? (
@@ -811,7 +786,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
             style={{flex: 1}}
             contentContainerStyle={styles.exerciseContent}
           >
-            <Pressable testID="trainer-step-surface" accessible={false} style={{ flex: 1 }} onPress={handleReveal}>
+            <Pressable testID="trainer-step-surface" accessible={false} style={{ flex: 1, paddingBottom: 32 }} onPress={handleReveal}>
               <View style={styles.sentenceSurface}>
                 <View style={styles.sentenceMeta}>
                   <Text testID="trainer-position" style={styles.positionText}>{targetSentenceId ? 'Из словаря' : `${safeIndex + 1} / ${filteredSentences.length}`}</Text>
@@ -846,7 +821,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
                     style={styles.aiButton}
                   >
                     {isAiLoading ? (
-                      <ActivityIndicator size="small" color="#EAB308" />
+                      <ActivityIndicator size="small" color={ACCENT_DARK} />
                     ) : (
                       <>
                         <Ionicons name="sparkles" size={16} color="#EAB308" style={{marginRight: 8}} />
@@ -876,7 +851,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
                 style={styles.retryButton}
                 onPress={() => void generateSentences(selectedLanguageCode, GENERATION_BATCH)}
               >
-                <Ionicons name="sparkles" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                <Ionicons name="sparkles" size={18} color={UI.onAccent} style={{ marginRight: 8 }} />
                 <Text style={styles.retryButtonText}>Сгенерировать предложения</Text>
               </TouchableOpacity>
             </>
@@ -1081,48 +1056,48 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  sentenceSurface: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E8EC', borderRadius: 18, padding: 14 },
+  sentenceSurface: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E8EC', borderRadius: UI.radius, padding: 16 },
   sentenceMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: -8, marginBottom: 6 },
-  translationToggle: { paddingHorizontal: 10, paddingVertical: 6, alignItems: 'center', backgroundColor: '#FFF4E8', borderWidth: 1, borderColor: '#F7C99F', borderRadius: 8 },
+  translationToggle: { paddingHorizontal: 10, paddingVertical: 6, alignItems: 'center', backgroundColor: UI.surface, borderWidth: 1, borderColor: UI.border, borderRadius: 8 },
   translationToggleText: { fontSize: 14, color: '#B54708', fontWeight: '600' },
   headingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   exerciseContent: { flexGrow: 1, paddingBottom: 16 },
   sentenceText: { fontSize: 22, lineHeight: 32, color: '#172033' },
-  sentenceTranslation: { fontSize: 15, lineHeight: 22, color: '#697586', marginTop: 14 },
+  sentenceTranslation: { ...UI.reading, color: UI.muted, marginTop: 14 },
   exerciseHeading: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 22, gap: 8 },
   exerciseLabel: { fontSize: 16, fontWeight: '700', color: '#344054' },
   exerciseProgress: { fontSize: 12, color: '#697586' },
   explanationRow: { alignItems: 'flex-start', marginTop: 12 },
   menuHeading: { fontSize: 18, fontWeight: '700', color: '#172033', padding: 15 },
-  container: { flex: 1, paddingHorizontal: 16, paddingBottom: 8, backgroundColor: '#FAFAF8' },
-  header: { flex: 1, fontSize: 22, fontWeight: '700', color: '#172033', letterSpacing: -0.6 },
-  languageToolbar: { height: 48, marginBottom: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#E4E7EC' },
+  container: { flex: 1, paddingHorizontal: 16, paddingBottom: 8, backgroundColor: UI.canvas },
+  header: { flex: 1, ...UI.heading, color: UI.text },
+  languageToolbar: { minHeight: 48, marginBottom: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#E4E7EC' },
   sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', columnGap: 4, rowGap: 10, paddingTop: 12, paddingBottom: 10 },
   tokenContainer: { maxWidth: '100%' },
-  hiddenCard: { backgroundColor: '#F0F1EF', borderWidth: 1, borderColor: '#E1E5E1', borderRadius: 10, minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  hiddenMark: { width: 16, height: 3, borderRadius: 2, backgroundColor: '#C3C8C2' },
+  hiddenCard: { backgroundColor: UI.subtle },
+  hiddenMark: { position: 'absolute', alignSelf: 'center', top: '50%', width: 16, height: 3, borderRadius: 2, backgroundColor: '#AAB3BE' },
   wordCard: { minHeight: 68, justifyContent: 'center', backgroundColor: '#FFFFFF', paddingHorizontal: 12, paddingTop: 14, paddingBottom: 10, borderRadius: 10, borderWidth: 1, alignItems: 'flex-start', minWidth: 88, maxWidth: '100%' },
   // Outer ring for words of a 2nd+ clause in a complex sentence — reads as a double frame.
   clauseFrame: { borderWidth: 2, borderRadius: 13, padding: 3, alignSelf: 'flex-start', maxWidth: '100%' },
   orderBadge: { position: 'absolute', top: -7, right: 8, width: 16, height: 16, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   orderBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '700' },
-  wordText: { fontSize: 18, fontWeight: '600' },
+  wordText: { fontSize: 18, lineHeight: 26, fontWeight: '600', flexShrink: 1 },
   wordRoot: { fontWeight: '600', color: '#111827' },
   wordAffix: { fontWeight: '800' },
   translationText: { fontSize: 14, color: '#666', marginTop: 4 },
-  roleText: { fontSize: 11, fontWeight: '600', marginTop: 5 },
+  roleText: { fontSize: 13, lineHeight: 19, fontWeight: '500', marginTop: 5 },
   addToDictionaryBtn: { position: 'absolute', bottom: -6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', borderWidth: 1, alignItems: 'center', justifyContent: 'center', zIndex: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1, elevation: 2 },
   addToDictionaryBtnAdded: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
   addToDictionaryText: { fontSize: 14, color: ACCENT_DARK, fontWeight: '800', lineHeight: 16 },
   addToDictionaryTextAdded: { color: '#15803D' },
   controls: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, borderTopWidth: 1, borderTopColor: '#E7E9EC', gap: 10 },
   button: { minHeight: 48, flex: 1, backgroundColor: ACCENT, padding: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  navigationButton: { width: 48, minHeight: 48, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ECEEEC', borderRadius: 14 },
+  navigationButton: { width: 48, minHeight: 48, justifyContent: 'center', alignItems: 'center', backgroundColor: UI.subtle, borderRadius: 10 },
   navigationText: { color: ACCENT_DARK, fontSize: 14, fontWeight: '700' },
   positionText: { color: '#697586', fontSize: 12, fontWeight: '600' },
   disabledButton: { opacity: 0.4 },
   optionsButton: { marginLeft: 8, width: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
-  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 13, textAlign: 'center' },
+  buttonText: { color: UI.onAccent, fontWeight: '600', fontSize: 15, textAlign: 'center' },
 
   // Table Mode Styles
   tableContainer: { width: '100%', marginTop: 20, backgroundColor: '#FFF', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0', paddingBottom: 10 },
@@ -1162,21 +1137,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     marginTop: 20,
-    shadowColor: ACCENT,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 3
   },
   retryButtonText: {
-    color: '#FFF',
+    color: UI.onAccent,
     fontSize: 15,
     fontWeight: 'bold'
   },
 });
 
 const markdownStyles = StyleSheet.create({
-  body: { fontSize: 15, lineHeight: 24, color: '#334155' },
+  body: { ...UI.reading, color: UI.body },
   heading1: { fontSize: 20, fontWeight: 'bold', color: '#1E293B', marginVertical: 10 },
   heading2: { fontSize: 18, fontWeight: 'bold', color: '#1E293B', marginVertical: 8 },
   strong: { fontWeight: 'bold', color: '#0F172A' },

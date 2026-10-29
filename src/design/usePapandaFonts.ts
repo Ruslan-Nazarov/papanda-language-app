@@ -1,16 +1,9 @@
 import { useFonts } from 'expo-font';
-import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
-import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
-import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
-import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
-import { Outfit_500Medium } from '@expo-google-fonts/outfit/500Medium';
-import { Outfit_600SemiBold } from '@expo-google-fonts/outfit/600SemiBold';
+import { Ionicons } from '@expo/vector-icons';
 
-// Packaged fonts work offline; a loading failure leaves system fonts available.
+// Text uses the platform UI font, including Cyrillic and Kazakh. Load bundled
+// icons before showing the app so controls never change geometry.
 export function usePapandaFonts() {
-  const [loaded] = useFonts({
-    Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold,
-    Outfit_500Medium, Outfit_600SemiBold,
-  });
-  return loaded;
+  const [loaded, error] = useFonts(Ionicons.font);
+  return loaded || !!error;
 }

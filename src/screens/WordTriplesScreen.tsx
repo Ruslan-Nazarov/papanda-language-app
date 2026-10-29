@@ -1,6 +1,6 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useIsFocused } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated } from 'react-native';
 import TouchableOpacity from '../components/PapandaAction';
 import type { WordTriplesScreenProps } from '../navigation/types';
@@ -18,7 +18,6 @@ import { useCardTransition } from '../hooks/useCardTransition';
 import { usePronunciation } from '../hooks/usePronunciation';
 import PronunciationModal from '../components/PronunciationModal';
 import { papanda } from '../design/papanda';
-import { usePapandaFonts } from '../design/usePapandaFonts';
 import PapandaIcon from '../components/PapandaIcon';
 import CompactAction from '../components/CompactAction';
 
@@ -31,8 +30,6 @@ const isHorizontalSwipe = (gesture: { dx: number; dy: number }) =>
   Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.4;
 
 export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
-  const fontsLoaded = usePapandaFonts();
-  const styles = useMemo(() => createStyles(fontsLoaded), [fontsLoaded]);
   const [associationFocused, setAssociationFocused] = useState(false);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
@@ -248,11 +245,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   callbacks.current.handleSwipe = handleSwipe;
   callbacks.current.resetCardPosition = resetCardPosition;
 
-  const cardRotation = cardTranslateX.interpolate({
-    inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
-    outputRange: ['-7deg', '0deg', '7deg'],
-    extrapolate: 'clamp',
-  });
   const cardOpacity = cardTranslateX.interpolate({
     inputRange: [-SWIPE_EXIT_DISTANCE, -SWIPE_EXIT_DISTANCE / 2, 0, SWIPE_EXIT_DISTANCE / 2, SWIPE_EXIT_DISTANCE],
     outputRange: [0.15, 0.85, 1, 0.85, 0.15],
@@ -327,7 +319,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
         <Animated.View
           style={[
             styles.card,
-            { transform: [{ translateX: cardTranslateX }, { rotate: cardRotation }], opacity: cardOpacity },
+            { transform: [{ translateX: cardTranslateX }], opacity: cardOpacity },
           ]}
         >
           <View style={styles.cardActions}>
@@ -427,7 +419,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     disabled={!translation}
                     onPress={composeSentence}
                   >
-                    <Text style={[styles.langTranslation, lang !== 'kz' && styles.latinTranslation]}>{translation || '—'}</Text>
+                    <Text style={styles.langTranslation}>{translation || '—'}</Text>
                   </TouchableOpacity>
 
                   {/* Pronunciation Button */}
@@ -492,8 +484,16 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
         {/* Bottom Actions */}
         <View style={styles.controls}>
-          <TouchableOpacity style={[styles.button, styles.btnKnown]} activeOpacity={0.8} onPress={handleMarkLearned}>
-            <Text style={styles.buttonText}>✓ Выучено</Text>
+          <TouchableOpacity
+            testID="word-mark-learned"
+            accessibilityRole="button"
+            accessibilityLabel="Выучено"
+            accessibilityHint="Отметить переводы как выученные и перейти к следующему слову"
+            style={styles.learnedButton}
+            activeOpacity={0.7}
+            onPress={handleMarkLearned}
+          >
+            <PapandaIcon name="check" size={24} color={papanda.color.textBody} />
           </TouchableOpacity>
         </View>
         {previousWordButton}
@@ -566,16 +566,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   );
 }
 
-const createStyles = (fontsLoaded: boolean) => {
-  const ui = fontsLoaded ? 'Inter_400Regular' : undefined;
-  const medium = fontsLoaded ? 'Inter_500Medium' : undefined;
-  const strong = fontsLoaded ? 'Inter_600SemiBold' : undefined;
-  // Outfit has no Cyrillic glyphs. Explicit fallback prevents browser serif text.
-  const heading = fontsLoaded ? (Platform.OS === 'web'
-    ? 'Outfit_500Medium, Inter_500Medium, sans-serif' : 'Inter_500Medium') : undefined;
-  const display = fontsLoaded ? (Platform.OS === 'web'
-    ? 'Outfit_600SemiBold, Inter_600SemiBold, sans-serif' : 'Inter_600SemiBold') : undefined;
-  return StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: papanda.color.canvas,
@@ -587,7 +578,7 @@ const createStyles = (fontsLoaded: boolean) => {
     alignSelf: 'center',
     paddingHorizontal: 16,
     paddingBottom: 24,
-    gap: 24,
+    gap: 16,
   },
   centerContainer: {
     flex: 1,
@@ -606,19 +597,17 @@ const createStyles = (fontsLoaded: boolean) => {
     paddingVertical: 8,
   },
   headerTitle: {
-    fontFamily: heading,
-    fontSize: 24,
-    fontWeight: '500',
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '600',
     color: papanda.color.text,
   },
   sessionCountText: {
-    fontFamily: ui,
     fontSize: 14,
     color: papanda.color.textSecondary,
     marginTop: 4,
   },
   info: {
-    fontFamily: ui,
     fontSize: 16,
     color: papanda.color.textBody,
     textAlign: 'center',
@@ -629,11 +618,6 @@ const createStyles = (fontsLoaded: boolean) => {
     backgroundColor: papanda.color.surface,
     padding: 16,
     borderRadius: papanda.radius.surface,
-    shadowColor: papanda.color.text,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    elevation: 3,
     borderWidth: 1,
     borderColor: papanda.color.borderSubtle,
     position: 'relative',
@@ -658,7 +642,7 @@ const createStyles = (fontsLoaded: boolean) => {
     borderRadius: papanda.radius.control,
   },
   favoriteMark: { position: 'absolute', right: 2, bottom: 4, backgroundColor: papanda.color.surface, borderRadius: 4 },
-  favoriteMarkText: { fontFamily: strong, fontSize: 12, lineHeight: 14, color: papanda.color.accentText },
+  favoriteMarkText: { fontSize: 12, lineHeight: 14, color: papanda.color.accentText },
   statsCardBtn: {
     flexDirection: 'row', gap: 4,
     alignItems: 'center', justifyContent: 'center',
@@ -667,14 +651,13 @@ const createStyles = (fontsLoaded: boolean) => {
     borderRadius: papanda.radius.control,
   },
   statsCardBtnText: {
-    fontFamily: strong,
     color: papanda.color.accentText,
     fontSize: 12,
     fontWeight: '600',
   },
   nativeWord: {
-    fontFamily: display,
-    fontSize: 28,
+    fontSize: 24,
+    lineHeight: 32,
     fontWeight: '600',
     textAlign: 'center',
     color: papanda.color.text,
@@ -686,11 +669,11 @@ const createStyles = (fontsLoaded: boolean) => {
     flexShrink: 0,
     minWidth: 40,
   },
-  metaText: { fontFamily: ui, fontSize: 12, color: papanda.color.textSecondary },
+  metaText: { fontSize: 12, color: papanda.color.textSecondary },
   wordCenterContainer: {
     flex: 1,
     minHeight: 44,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
     paddingHorizontal: 8,
   },
@@ -706,13 +689,12 @@ const createStyles = (fontsLoaded: boolean) => {
   composeSentenceSurface: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingHorizontal: 12, paddingVertical: 4,
-    backgroundColor: papanda.color.accentSoft,
+    backgroundColor: papanda.color.surface,
     borderWidth: 1,
-    borderColor: papanda.color.accent,
+    borderColor: papanda.color.border,
     borderRadius: papanda.radius.small,
   },
   composeSentenceButtonText: {
-    fontFamily: strong,
     fontSize: 14,
     fontWeight: '600',
     color: papanda.color.accentText,
@@ -729,9 +711,10 @@ const createStyles = (fontsLoaded: boolean) => {
     gap: 8,
   },
   langBlock: {
-    backgroundColor: papanda.color.surfaceSubtle,
+    backgroundColor: papanda.color.surface,
+    minHeight: 64,
     paddingVertical: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     borderRadius: papanda.radius.control,
     borderWidth: 1,
     borderColor: '#E9ECEF',
@@ -752,14 +735,12 @@ const createStyles = (fontsLoaded: boolean) => {
     gap: 8,
   },
   aiWarningTitle: {
-    fontFamily: strong,
     fontSize: 12,
     fontWeight: '700',
     color: '#92400E',
     marginBottom: 2,
   },
   aiWarningIssue: {
-    fontFamily: ui,
     fontSize: 14,
     color: '#78350F',
     marginTop: 1,
@@ -768,7 +749,8 @@ const createStyles = (fontsLoaded: boolean) => {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: papanda.color.surface,
+    backgroundColor: papanda.color.surfaceSubtle,
+    minWidth: 46,
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: papanda.radius.small,
@@ -777,22 +759,20 @@ const createStyles = (fontsLoaded: boolean) => {
     fontSize: 12,
   },
   sideLangCode: {
-    fontFamily: medium,
     fontSize: 12,
     fontWeight: '700',
     color: '#64748B',
   },
 
   langTranslation: {
-    fontFamily: strong,
     width: '100%',
     flexShrink: 1,
-    fontSize: 24,
-    color: papanda.color.accentText,
+    fontSize: 22,
+    lineHeight: 30,
+    color: papanda.color.text,
     fontWeight: '600',
-    textAlign: 'center',
+    textAlign: 'left',
   },
-  latinTranslation: { fontFamily: fontsLoaded ? 'Outfit_600SemiBold' : undefined },
   assocHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -802,13 +782,11 @@ const createStyles = (fontsLoaded: boolean) => {
   },
   assocTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   assocLabel: {
-    fontFamily: medium,
     fontSize: 14,
     fontWeight: '500',
     color: papanda.color.textBody,
   },
   assocSavedBadge: {
-    fontFamily: medium,
     fontSize: 12,
     fontWeight: '500',
     color: papanda.color.successText,
@@ -825,7 +803,6 @@ const createStyles = (fontsLoaded: boolean) => {
     paddingVertical: 8,
     minHeight: 80,
     textAlignVertical: 'top',
-    fontFamily: ui,
     fontSize: 16,
     lineHeight: 24,
     backgroundColor: papanda.color.surface,
@@ -838,8 +815,15 @@ const createStyles = (fontsLoaded: boolean) => {
   inputFocused: { borderColor: papanda.focus.color, borderWidth: 2, paddingHorizontal: 11, paddingVertical: 7 },
   controls: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'center',
     marginTop: 8,
+  },
+  learnedButton: {
+    width: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: papanda.radius.control,
   },
   undoButton: {
     minHeight: 44,
@@ -849,7 +833,6 @@ const createStyles = (fontsLoaded: boolean) => {
     justifyContent: 'center',
   },
   undoButtonText: {
-    fontFamily: strong,
     color: '#475569',
     fontSize: 14,
     fontWeight: '600',
@@ -861,11 +844,6 @@ const createStyles = (fontsLoaded: boolean) => {
     minHeight: papanda.control.minHeightPx,
     borderRadius: papanda.radius.control,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
   },
   dictionaryBtn: {
     minWidth: 44, minHeight: 44,
@@ -873,11 +851,6 @@ const createStyles = (fontsLoaded: boolean) => {
     padding: 8,
     backgroundColor: 'rgba(255,255,255,0.8)',
     borderRadius: papanda.radius.control,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2
   },
   btnPrev: {
     backgroundColor: '#94A3B8'
@@ -889,7 +862,6 @@ const createStyles = (fontsLoaded: boolean) => {
     backgroundColor: papanda.color.accent,
   },
   buttonText: {
-    fontFamily: strong,
     color: papanda.color.onAccent,
     fontSize: 16,
     fontWeight: '600',
@@ -905,23 +877,16 @@ const createStyles = (fontsLoaded: boolean) => {
     width: '100%',
     maxWidth: 420,
     backgroundColor: '#FFF',
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 10,
+    borderRadius: 12,
+    padding: 16,
   },
   statsModalTitle: {
-    fontFamily: heading,
     fontSize: 18,
     fontWeight: '500',
     color: papanda.color.text,
     textAlign: 'center',
   },
   statsModalWord: {
-    fontFamily: strong,
     fontSize: 24,
     fontWeight: 'bold',
     color: papanda.color.accentText,
@@ -943,16 +908,15 @@ const createStyles = (fontsLoaded: boolean) => {
     paddingHorizontal: 8,
   },
   statsSummaryValue: {
-    fontFamily: strong,
     color: '#1E293B',
     fontSize: 17,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   statsSummaryLabel: {
-    fontFamily: ui,
     color: '#64748B',
-    fontSize: 11,
+    fontSize: 13,
+    lineHeight: 19,
     marginTop: 3,
     textAlign: 'center',
   },
@@ -962,7 +926,6 @@ const createStyles = (fontsLoaded: boolean) => {
     backgroundColor: '#E2E8F0',
   },
   statsLanguagesTitle: {
-    fontFamily: medium,
     color: '#475569',
     fontSize: 13,
     fontWeight: '700',
@@ -981,14 +944,12 @@ const createStyles = (fontsLoaded: boolean) => {
     paddingVertical: 10,
   },
   statsLanguageName: {
-    fontFamily: medium,
     flexShrink: 1,
     color: '#334155',
     fontSize: 13,
     fontWeight: '600',
   },
   statsLanguageStatus: {
-    fontFamily: medium,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -1006,10 +967,8 @@ const createStyles = (fontsLoaded: boolean) => {
     marginTop: 20,
   },
   statsCloseBtnText: {
-    fontFamily: strong,
     color: papanda.color.onAccent,
     fontSize: 16,
     fontWeight: 'bold',
   },
 });
-};

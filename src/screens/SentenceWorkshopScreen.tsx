@@ -15,7 +15,7 @@ import { generateSentenceBatch } from '../services/sentenceGeneration';
 import { useStudyTask } from '../hooks/useStudyTask';
 import StructureExercise, { StructureProgress } from '../components/StructureExercise';
 import { StudyButton, StudyTokens, studyStyles as s } from '../components/StudyUI';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, UI } from '../constants/theme';
 
 type Mode = 'Самостоятельно' | 'Нарастающее' | 'Развитие' | 'Языки' | 'Мой текст';
 const modes: Mode[] = ['Самостоятельно', 'Нарастающее', 'Развитие', 'Языки', 'Мой текст'];
@@ -113,7 +113,7 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
       useStore.getState().saveReadingText({ ...reading, cards: { ...reading.cards, [reading.position]: result } });
     });
   };
-  return <View testID="workshop-screen" style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: Math.max(insets.top, 16) }}>
+  return <View testID="workshop-screen" style={{ flex: 1, backgroundColor: UI.canvas, paddingTop: Math.max(insets.top, 16) }}>
     <View style={{ paddingHorizontal: 16 }}><StudyButton title="Назад" onPress={() => navigation.goBack()} /></View>
     <ScrollView ref={scroll} contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 16) + 24, maxWidth: 850, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
       {choosing ? <>
@@ -254,15 +254,15 @@ export default function SentenceWorkshopScreen({ navigation, route }: NativeStac
 }
 
 const ui = StyleSheet.create({
-  eyebrow: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, color: ACCENT_DARK, marginTop: 8 },
-  heading: { fontSize: 28, lineHeight: 34, fontWeight: '800', color: '#172033', marginTop: 12, marginBottom: 10 },
+  eyebrow: { fontSize: 13, fontWeight: '600', letterSpacing: 1.2, color: ACCENT_DARK, marginTop: 8 },
+  heading: { ...UI.heading, color: '#172033', marginTop: 12, marginBottom: 10 },
   intro: { fontSize: 16, lineHeight: 24, color: '#475569', marginBottom: 20 },
-  choice: { backgroundColor: '#FFF', borderRadius: 18, padding: 18, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 12, gap: 10 },
+  choice: { backgroundColor: '#FFF', borderRadius: UI.radius, padding: 16, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 12, gap: 10 },
   choiceHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   number: { color: ACCENT_DARK, backgroundColor: ACCENT_LIGHT, borderRadius: 9, padding: 8, fontSize: 13, fontWeight: '800' },
   choiceTitle: { flex: 1, fontSize: 18, lineHeight: 24, fontWeight: '700', color: '#172033' },
   arrow: { color: ACCENT, fontSize: 24 },
   hint: { fontSize: 12, lineHeight: 18, fontWeight: '600', color: '#64748B' },
-  language: { backgroundColor: ACCENT_LIGHT, borderColor: ACCENT_BORDER, borderWidth: 1, borderRadius: 14, padding: 12, gap: 8, marginBottom: 12 },
+  language: { backgroundColor: UI.surface, borderColor: UI.border, borderWidth: 1, borderRadius: 14, padding: 12, gap: 8, marginBottom: 12 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#172033', marginTop: 20, marginBottom: 6 },
 });

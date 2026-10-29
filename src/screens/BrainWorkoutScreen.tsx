@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { buildWorkoutQueue, QueueItem } from '../utils/workout';
 import { localDateKey } from '../utils/date';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
@@ -13,9 +13,10 @@ import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordTranslation } from '../utils/words';
 import { usePronunciation } from '../hooks/usePronunciation';
+import PapandaIcon from '../components/PapandaIcon';
 import PronunciationModal from '../components/PronunciationModal';
 import { readWordStats } from '../utils/statistics';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER, UI } from '../constants/theme';
 
 
 
@@ -250,7 +251,7 @@ export default function BrainWorkoutScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyIcon}>🎉</Text>
+          <PapandaIcon name="check" size={28} />
           <Text style={styles.header}>{workoutReviewOnly ? "Повторение на сегодня завершено" : "Все слова выучены!"}</Text>
           {workoutReviewOnly && <TouchableOpacity onPress={() => useStore.getState().setWorkoutReviewOnly(false)}><Text>Вернуться к обычной тренировке</Text></TouchableOpacity>}
           <Text style={styles.emptySub}>{workoutReviewOnly ? 'Все запланированные слова уже показаны. Можно перейти к обычной тренировке.' : 'Нет доступных слов для текущего набора языков и фильтров. Измените фильтр или языки в настройках.'}</Text>
@@ -261,11 +262,6 @@ export default function BrainWorkoutScreen() {
 
   const targetTranslation = getWordTranslation(currentWord, currentLang);
   const activeLangObj = LANGUAGES.find(l => l.code === currentLang);
-  const cardRotation = cardTranslateX.interpolate({
-    inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
-    outputRange: ['-8deg', '0deg', '8deg'],
-    extrapolate: 'clamp',
-  });
   const cardOpacity = cardTranslateX.interpolate({
     inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
     outputRange: [0.15, 1, 0.15],
@@ -276,7 +272,7 @@ export default function BrainWorkoutScreen() {
   callbacks.current.resetCardPosition = resetCardPosition;
 
   return (
-    <View style={[styles.container, { paddingTop: topPadding }]}>
+    <ScrollView style={styles.screen} contentContainerStyle={[styles.container, { paddingTop: topPadding }]}>
       {/* Top Header & Progress */}
       <View style={styles.headerSection}>
         <View style={styles.langBadge}>
@@ -306,7 +302,7 @@ export default function BrainWorkoutScreen() {
             styles.cardMotion,
             {
               opacity: cardOpacity,
-              transform: [{ translateX: cardTranslateX }, { rotate: cardRotation }],
+              transform: [{ translateX: cardTranslateX }],
             },
           ]}
         >
@@ -340,7 +336,6 @@ export default function BrainWorkoutScreen() {
                   e.stopPropagation();
                   toggleWordFavorite(currentWordKey);
                 }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Text style={[styles.favCardBtnText, isFavorite ? {color: '#F59E0B'} : {color: '#D1D5DB'}]}>
                   {isFavorite ? '★' : '☆'}
@@ -348,20 +343,14 @@ export default function BrainWorkoutScreen() {
               </TouchableOpacity>
 
               <View style={styles.cardToolbarActions}>
-                {isCurrentLanguageLearned && (
-                  <View style={styles.learnedBadge}>
-                    <Text style={styles.learnedBadgeText}>✓ Выучено</Text>
-                  </View>
-                )}
                 <TouchableOpacity
                   style={styles.statsCardBtn}
                   onPress={(e) => {
                     e.stopPropagation();
                     setIsStatsVisible(true);
                   }}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Text style={styles.statsCardBtnText}>📊 Статистика</Text>
+                  <Text style={styles.statsCardBtnText}>Статистика</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editCardBtn}
@@ -370,13 +359,17 @@ export default function BrainWorkoutScreen() {
                     setEditingWord(currentWord);
                     setIsModalVisible(true);
                   }}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Text style={styles.editCardBtnText}>✏️</Text>
+                  <PapandaIcon name="edit" />
                 </TouchableOpacity>
               </View>
             </View>
 
+                {isCurrentLanguageLearned && (
+                  <View style={styles.learnedBadge}>
+                    <Text style={styles.learnedBadgeText}>✓ Выучено</Text>
+                  </View>
+                )}
             <Text style={styles.targetForeignWord}>{targetTranslation || 'Перевод удалён'}</Text>
             {!targetTranslation && <TouchableOpacity accessibilityRole="button" onPress={event => {
               event.stopPropagation();
@@ -400,13 +393,13 @@ export default function BrainWorkoutScreen() {
                         handlePronunciation(targetTranslation, currentLang, currentWord.ru || currentWord.meaning || '');
                       }}
                     >
-                      <Text style={styles.workoutPronunciationBtnText}>📢</Text>
+                      <PapandaIcon name="microphone" />
                     </TouchableOpacity>
                   )}
                 </View>
                 {!!currentWord.personal_association && (
                   <View style={styles.assocNote}>
-                    <Text style={styles.assocNoteTitle}>💡 Ассоциация:</Text>
+                    <Text style={styles.assocNoteTitle}>Ассоциация</Text>
                     <Text style={styles.assocNoteText}>{currentWord.personal_association}</Text>
                   </View>
                 )}
@@ -416,7 +409,7 @@ export default function BrainWorkoutScreen() {
               </View>
             ) : (
               <View style={styles.tapToRevealContainer}>
-                <Text style={styles.tapToRevealIcon}>👆</Text>
+                <PapandaIcon name="eye" size={24} />
                 <Text style={styles.tapToRevealText}>Нажмите на карточку, чтобы увидеть перевод</Text>
               </View>
             )}
@@ -542,7 +535,7 @@ export default function BrainWorkoutScreen() {
       <Modal visible={resultModalVisible} transparent={true} animationType="fade" onRequestClose={closeResult}>
         <View style={styles.modalOverlay}>
           <View style={styles.resultModalCard}>
-            <Text style={styles.resultIcon}>🎉</Text>
+            <PapandaIcon name="check" size={28} />
             <Text style={styles.resultTitle}>Тренировка завершена!</Text>
 
             <View style={styles.resultStatsRow}>
@@ -566,21 +559,27 @@ export default function BrainWorkoutScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: UI.canvas },
   container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-    paddingHorizontal: 18,
+    flexGrow: 1,
+    width: '100%',
+    maxWidth: UI.column,
+    alignSelf: 'center',
+    backgroundColor: UI.canvas,
+    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 24,
     justifyContent: 'space-between',
   },
   headerSection: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
@@ -589,7 +588,7 @@ const styles = StyleSheet.create({
     backgroundColor: ACCENT_LIGHT,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: ACCENT_BORDER,
   },
@@ -621,16 +620,11 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFF',
-    borderRadius: 22,
-    padding: 24,
+    borderRadius: UI.radius,
+    padding: 16,
     minHeight: 280,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.09,
-    shadowRadius: 14,
-    elevation: 6,
     borderWidth: 1,
     borderColor: '#ECEFF1',
     position: 'relative',
@@ -650,56 +644,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  editCardBtn: {
-    padding: 4,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
+  editCardBtn: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   editCardBtnText: {
     fontSize: 16,
   },
-  favCardBtn: {
-    padding: 4,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
+  favCardBtn: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   favCardBtnText: {
     fontSize: 18,
   },
-  learnedBadge: {
-    backgroundColor: '#DCFCE7',
-    borderColor: '#86EFAC',
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 14,
-  },
+  learnedBadge: { alignSelf: 'flex-start', paddingVertical: 4 },
   learnedBadgeText: {
     color: '#15803D',
     fontSize: 12,
     fontWeight: '700',
   },
-  statsCardBtn: {
-    backgroundColor: ACCENT_LIGHT,
-    borderColor: ACCENT_BORDER,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 14,
-  },
+  statsCardBtn: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8, borderRadius: 10 },
   statsCardBtnText: {
     color: ACCENT_DARK,
     fontSize: 12,
     fontWeight: '700',
   },
   targetForeignWord: {
-    fontSize: 32,
+    fontSize: 26,
+    lineHeight: 34,
     fontWeight: 'bold',
-    color: ACCENT,
+    color: UI.text,
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -726,10 +695,13 @@ const styles = StyleSheet.create({
   answerBox: {
     alignItems: 'center',
     width: '100%',
+    minHeight: 120,
+    justifyContent: 'center',
   },
   nativeRu: {
     flexShrink: 1,
-    fontSize: 28,
+    fontSize: 24,
+    lineHeight: 32,
     fontWeight: 'bold',
     color: '#1A202C',
     textAlign: 'center',
@@ -764,9 +736,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   assocNote: {
-    backgroundColor: '#FFFDF0',
+    backgroundColor: UI.subtle,
     borderWidth: 1,
-    borderColor: '#FEF08A',
+    borderColor: UI.border,
     borderRadius: 12,
     padding: 12,
     marginTop: 8,
@@ -779,18 +751,20 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   assocNoteText: {
-    fontSize: 14,
-    color: '#4A5568',
+    ...UI.reading,
+    color: UI.body,
   },
   meaningText: {
     fontSize: 13,
-    color: '#A0AEC0',
+    color: UI.muted,
     marginTop: 8,
     textAlign: 'center',
   },
   tapToRevealContainer: {
     alignItems: 'center',
     paddingVertical: 16,
+    minHeight: 120,
+    justifyContent: 'center',
   },
   tapToRevealIcon: {
     fontSize: 28,
@@ -798,7 +772,7 @@ const styles = StyleSheet.create({
   },
   tapToRevealText: {
     fontSize: 14,
-    color: '#A0AEC0',
+    color: UI.muted,
     fontWeight: '500',
   },
   bottomZone: {
@@ -838,23 +812,19 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 14,
+    gap: 8,
   },
   actionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 4,
+    minHeight: 48,
+    paddingVertical: 12,
+    borderRadius: 10,
   },
   btnUnknown: {
-    backgroundColor: '#DC3545',
+    backgroundColor: UI.subtle,
   },
   btnSnooze: {
     backgroundColor: '#E2E8F0',
@@ -863,17 +833,17 @@ const styles = StyleSheet.create({
     color: '#475569',
   },
   btnKnown: {
-    backgroundColor: '#28A745',
+    backgroundColor: ACCENT,
   },
   btnIcon: {
-    color: '#FFF',
+    color: UI.onAccent,
     fontSize: 20,
     fontWeight: 'bold',
-    marginRight: 8,
+    marginRight: 4,
   },
   btnText: {
-    color: '#FFF',
-    fontSize: 18,
+    color: UI.onAccent,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   emptyCard: {
@@ -881,11 +851,6 @@ const styles = StyleSheet.create({
     padding: 30,
     borderRadius: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 4,
   },
   emptyIcon: {
     fontSize: 48,
@@ -934,14 +899,9 @@ const styles = StyleSheet.create({
   resultModalCard: {
     width: '100%',
     backgroundColor: '#FFF',
-    borderRadius: 24,
+    borderRadius: UI.radius,
     padding: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 10,
   },
   resultIcon: {
     fontSize: 54,
@@ -999,7 +959,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resultOkBtnText: {
-    color: '#FFF',
+    color: UI.onAccent,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -1007,13 +967,8 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 420,
     backgroundColor: '#FFF',
-    borderRadius: 24,
+    borderRadius: UI.radius,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 10,
   },
   statsModalTitle: {
     fontSize: 20,
@@ -1050,7 +1005,8 @@ const styles = StyleSheet.create({
   },
   statsSummaryLabel: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: 13,
+    lineHeight: 19,
     marginTop: 3,
     textAlign: 'center',
   },
@@ -1100,7 +1056,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   statsCloseBtnText: {
-    color: '#FFF',
+    color: UI.onAccent,
     fontSize: 16,
     fontWeight: 'bold',
   },

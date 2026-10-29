@@ -2,7 +2,7 @@ import React, { memo, useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import type { BookBlock, BookCell } from '../models/book';
-import { ACCENT_DARK } from '../constants/theme';
+import { ACCENT_DARK, UI } from '../constants/theme';
 
 export function BookMarkdown({ children, fontSize = 17 }: { children: string; fontSize?: number }) {
   const style = useMemo(() => ({ body: { fontSize, lineHeight: Math.round(fontSize * 1.55), color: '#334155' },
@@ -78,15 +78,15 @@ const TableContent = memo(function TableContent({ block, fontSize }: { block: Ex
 });
 
 export const BookBlockContent = memo(function BookBlockContent({ block, fontSize }: { block: BookBlock; fontSize: number }) {
-  if (block.kind === 'heading') return <Text accessibilityRole="header" style={[s.heading, { fontSize: fontSize + (block.level === 1 ? 7 : 3) }]}>{block.text}</Text>;
+  if (block.kind === 'heading') return <Text accessibilityRole="header" style={[s.heading, { fontSize: fontSize + (block.level === 1 ? 7 : 3), lineHeight: Math.round((fontSize + (block.level === 1 ? 7 : 3)) * 1.4) }]}>{block.text}</Text>;
   if (block.kind === 'table') return <TableContent block={block} fontSize={fontSize} />;
   return <BookMarkdown fontSize={fontSize}>{block.markdown}</BookMarkdown>;
 });
 const s = StyleSheet.create({
-  heading: { color: '#172033', fontWeight: '700', marginTop: 16, marginBottom: 10, lineHeight: 32 },
+  heading: { color: '#172033', fontWeight: '700', marginTop: 16, marginBottom: 10 },
   tableWrap: { marginVertical: 8, gap: 8 }, switch: { paddingVertical: 10, alignSelf: 'flex-start' },
   link: { color: ACCENT_DARK, fontSize: 14, fontWeight: '600' }, hint: { fontSize: 13, color: '#64748B', lineHeight: 19 },
-  tableSection: { borderLeftWidth: 3, borderLeftColor: '#E7AF45', backgroundColor: '#FFF7E8', padding: 12, borderRadius: 8 },
+  tableSection: { borderLeftWidth: 3, borderLeftColor: ACCENT_DARK, backgroundColor: UI.subtle, padding: 12, borderRadius: 8 },
   tableCard: { borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 12, padding: 12, backgroundColor: '#FFF', marginBottom: 8 },
   field: { paddingVertical: 5 }, fieldTitle: { fontSize: 13, color: '#64748B', fontWeight: '600', marginBottom: 4 },
   gridCell: { padding: 10, borderWidth: 0.5, borderColor: '#CBD5E1' },

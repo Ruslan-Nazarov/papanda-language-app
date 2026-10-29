@@ -56,6 +56,10 @@ async function main() {
     const hidden = () => page.$$eval('[aria-label^="Раскрыть блок"]', els => els.length);
     const revealLabel = () => page.$eval('[data-testid="trainer-reveal"]', el => el.textContent);
     const translationLabel = () => page.$eval('[data-testid="trainer-translation"]', el => el.textContent);
+    const blockRects = () => page.$$eval('[data-testid^="trainer-block-"]', els => els.map(el => {
+      const { x, y, width, height } = el.getBoundingClientRect();
+      return [x, y, width, height].map(value => Math.round(value));
+    }));
     const tapBackground = async () => {
       const point = await page.$eval('[data-testid="trainer-step-surface"]', el => {
         const r = el.getBoundingClientRect();
@@ -91,15 +95,19 @@ async function main() {
     await page.waitForSelector('[data-testid="trainer-block-0"]');
     const first = await page.$eval('[data-testid="trainer-sentence-text"]', el => el.textContent);
     const count = await hidden();
+    const beforeReveal = await blockRects();
     assert.ok(count >= 2);
     assert.ok(!(await body()).includes('Найдите'));
     assert.ok(!(await body()).includes('свайп для смены'));
     await page.tap('[data-testid="trainer-block-1"]');
     await page.waitForFunction(() => !document.querySelector('[data-testid="trainer-block-1"]').getAttribute('aria-label').startsWith('Раскрыть'));
     assert.equal(await hidden(), count - 1, 'Tap must reveal only that block, even if two words share a role');
+    assert.deepEqual(await blockRects(), beforeReveal, 'Revealing a block must preserve every block position and size');
     assert.ok(await page.$('[data-testid="trainer-block-0"][aria-label="Раскрыть блок 1"]'));
     await page.click('[data-testid="trainer-translation"]');
     assert.equal(await hidden(), count - 1, 'Translation toggle must not also advance the exercise');
+    const translatedRects = await blockRects();
+    assert.deepEqual(translatedRects.map(rect => rect.slice(2)), beforeReveal.map(rect => rect.slice(2)), 'Translation must preserve block dimensions');
     await page.click('[data-testid="trainer-next"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent !== first, {}, first);
     assert.equal(await page.$eval('[data-testid="trainer-translation"]', el => el.textContent), 'Перевод');
@@ -190,13 +198,15 @@ async function main() {
     await assertClauseFrames();
     for (const [width, height] of [[320, 640], [390, 740]]) {
       await page.setViewport({ width, height, hasTouch: true, isMobile: true });
+      await page.$eval('[data-testid="trainer-block-9"]', el => el.scrollIntoView({ block: 'center' }));
       assert.ok(await page.$eval('[data-testid="trainer-block-9"]', el => {
         const r = el.getBoundingClientRect();
         const footer = document.querySelector('[data-testid="trainer-reveal"]').getBoundingClientRect();
         return r.left >= 0 && r.right <= innerWidth && r.bottom < footer.top;
-      }), 'All ten closed cards must fit above the fixed actions');
+      }), 'Long exercises must scroll to the last block above the fixed actions');
       await page.screenshot({ path: path.join(root, `trainer-long-${width}.png`) });
     }
+    await page.$eval('[data-testid="trainer-block-0"]', el => el.scrollIntoView({ block: 'start' }));
     await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await page.$$eval('[data-testid^="trainer-block-"]', els => els.length), 10, 'All cards remain present throughout the exercise');
     assert.ok(await page.$('[data-testid="trainer-block-3"][aria-label="Объяснить форму слова: drinks"]'), 'First step reveals the predicate, not the first word');

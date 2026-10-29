@@ -5,7 +5,7 @@ import { Word } from '../models/types';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
 import { getWordTranslation } from '../utils/words';
-import { ACCENT } from '../constants/theme';
+import { ACCENT, UI } from '../constants/theme';
 
 interface EditWordModalProps {
   visible: boolean;
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     backgroundColor: ACCENT,
   },
   modalSaveText: {
-    color: '#FFF',
+    color: UI.onAccent,
     fontWeight: 'bold',
   },
   aiSuggestionBox: {

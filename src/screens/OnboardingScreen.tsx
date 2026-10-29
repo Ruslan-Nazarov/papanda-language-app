@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SyntaxRole, Token } from '../models/types';
 import { computeSentenceRevealGroups } from '../utils/sentenceGroups';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER } from '../constants/theme';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER, UI } from '../constants/theme';
 
 const ROLE_RU: Record<SyntaxRole, string> = {
   Subject: 'Подлежащее',
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   pageContent: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 12, paddingBottom: 24, justifyContent: 'center' },
 
   heroCard: {
-    backgroundColor: '#FBE7D5',
+    backgroundColor: UI.subtle,
     borderRadius: 24,
     paddingVertical: 18,
     marginBottom: 18,
@@ -397,5 +397,5 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: 28, paddingTop: 4 },
   primaryButton: { backgroundColor: ACCENT, paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
   primaryButtonMuted: { backgroundColor: '#94A3B8' },
-  primaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  primaryButtonText: { color: UI.onAccent, fontWeight: 'bold', fontSize: 16 },
 });

@@ -45,16 +45,13 @@
 
 ## Papanda design system
 
-- Follow `DESIGN_SYSTEM.md` and the pinned kit in
-  `design-system/papanda-design-system-0.7.167/` for subsequent UI changes.
-  Read its `README.md`, `AGENT.md`, `tokens.json`, catalogue and reference images.
-  Preserve the warm canvas, white surfaces, orange action with dark text,
-  Inter/Outfit typography, shared radii, Doodle icons and labelled states.
-- `src/design/papanda.ts` provides token roles; use the bundled Doodle sources
-  and preserve their manifests and licences. Record local extensions in
-  `DESIGN_SYSTEM.md`; do not silently change shared rules or add a brand accent.
-- The first pilot is `WordTriplesScreen`. Wait for the owner's assessment before
-  migrating other screens. Preserve exercise behaviour and progress handling.
-  Keep compact controls visually small with touch targets of at least 44 px.
-  Check mobile wrapping, keyboard focus/input, empty/loading/error states and
-  font scaling. Do not treat browser viewport resizing as a native keyboard test.
+- Follow the current local reading theme in DESIGN_SYSTEM.md (owner direction,
+  29 October 2026). The pinned kit in design-system/ is an unchanged reference.
+  Use a neutral grey canvas, white surfaces, orange action with dark text,
+  system typography, modest radii and the existing Ionicons outline set.
+- Shared roles live in src/constants/theme.ts and src/design/papanda.ts.
+  Keep source-kit manifests and licences; record local decisions in DESIGN_SYSTEM.md.
+- Preserve exercise behaviour and progress handling, including double clause
+  frames. Keep hidden/revealed block geometry stable, compact touch targets at
+  least 44 px, readable line heights, text scaling and mobile wrapping.
+  Browser viewport resizing does not test a native keyboard.

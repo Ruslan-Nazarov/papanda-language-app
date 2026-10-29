@@ -7,7 +7,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { ACCENT } from './src/constants/theme';
+import { ACCENT_DARK, ACCENT_LIGHT, UI } from './src/constants/theme';
+import PapandaIcon from './src/components/PapandaIcon';
+import { usePapandaFonts } from './src/design/usePapandaFonts';
 
 import WordTriplesScreen from './src/screens/WordTriplesScreen';
 import SentenceTrainerScreen from './src/screens/SentenceTrainerScreen';
@@ -30,16 +32,15 @@ const ONBOARDING_KEY = 'papanda-onboarded';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const TAB_EMOJI: Record<string, string> = {
-  Statistics: '📊',
-  'Word Triples': '📚',
-  'Sentence Trainer': '💬',
-  'Brain Workout': '⚡',
-  Settings: '⚙️',
-};
+const TABS = {
+  Statistics: { icon: 'chart', label: 'Прогресс' },
+  'Word Triples': { icon: 'read', label: 'Слова' },
+  'Sentence Trainer': { icon: 'language', label: 'Разбор' },
+  'Brain Workout': { icon: 'workout', label: 'Повтор' },
+  Settings: { icon: 'settings', label: 'Настройки' },
+} as const;
 
-// The dialectical sentence breakdown is the core of papanda, so it sits in the
-// centre of the tab bar as a larger, raised button and is the first screen.
+// The sentence trainer stays in the centre and remains the first screen.
 const CENTER_TAB = 'Sentence Trainer';
 
 class ErrorBoundary extends React.Component<
@@ -99,45 +100,35 @@ function MainTabs() {
     <Tab.Navigator
       initialRouteName={CENTER_TAB}
       screenOptions={({ route }) => {
-        const isCenter = route.name === CENTER_TAB;
+        const tab = TABS[route.name];
         return {
-          tabBarShowLabel: false,
+          tabBarShowLabel: true,
+          tabBarLabel: tab.label,
+          tabBarLabelPosition: 'below-icon',
+          tabBarLabelStyle: tabStyles.label,
           tabBarAccessibilityLabel: route.name,
-          tabBarIcon: ({ focused }) =>
-            isCenter ? (
-              <View
-                style={[
-                  tabStyles.centerButton,
-                  { backgroundColor: focused ? ACCENT : '#334155' },
-                ]}
-              >
-                <Text allowFontScaling={false} style={tabStyles.centerEmoji}>{TAB_EMOJI[route.name]}</Text>
-              </View>
-            ) : (
-              <Text allowFontScaling={false} style={[tabStyles.emoji, { opacity: focused ? 1 : 0.5 }]}>
-                {TAB_EMOJI[route.name] ?? '📌'}
-              </Text>
-            ),
-          tabBarActiveTintColor: ACCENT,
-          tabBarInactiveTintColor: '#8E8E93',
-          tabBarIconStyle: isCenter ? tabStyles.centerIcon : tabStyles.icon,
+          tabBarIcon: ({ focused }) => <View style={[tabStyles.icon, focused && tabStyles.activeIcon]}>
+            <PapandaIcon name={tab.icon} size={22} color={focused ? ACCENT_DARK : UI.muted} />
+          </View>,
+          tabBarActiveTintColor: ACCENT_DARK,
+          tabBarInactiveTintColor: UI.muted,
+          tabBarIconStyle: tabStyles.iconSlot,
           headerShown: false,
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
-            borderTopColor: '#E2E8F0',
+            borderTopColor: UI.border,
             borderTopWidth: 1,
             paddingTop: 6,
             paddingBottom: bottomInset,
-            height: 64 + bottomInset,
-            elevation: 8,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 4,
+            minHeight: 64 + bottomInset,
+            height: 'auto',
+            elevation: 0,
+            shadowOpacity: 0,
           },
           tabBarItemStyle: {
+            minWidth: 0,
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'stretch',
           },
         };
       }}
@@ -158,6 +149,7 @@ function MainTabs() {
 }
 
 export default function App() {
+  const fontsReady = usePapandaFonts();
   const hydration = useHydrationState();
   const bookHydration = useBookHydrationState();
   const progressRevision = useStore(state => state.progressRevision);
@@ -192,7 +184,7 @@ export default function App() {
               <Text style={boundaryStyles.buttonText}>Повторить загрузку</Text>
             </TouchableOpacity>
           </View>
-        ) : onboarded === null || !hydration.ready || !bookHydration.ready ? (
+        ) : !fontsReady || onboarded === null || !hydration.ready || !bookHydration.ready ? (
           <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
         ) : onboarded === false ? (
           <OnboardingScreen onDone={finishOnboarding} />
@@ -223,34 +215,19 @@ export default function App() {
 }
 
 const tabStyles = StyleSheet.create({
-  icon: { width: 40, height: 40 },
-  centerIcon: { width: 56, height: 56 },
-  emoji: { fontSize: 24, lineHeight: 32, includeFontPadding: false, textAlign: 'center' },
-  centerButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Platform.OS === 'android' ? 10 : 14,
-    borderWidth: 4,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  centerEmoji: { fontSize: 26, lineHeight: 34, includeFontPadding: false, textAlign: 'center' },
+  iconSlot: { width: 44, height: 30 },
+  icon: { width: 44, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  activeIcon: { backgroundColor: ACCENT_LIGHT },
+  label: { fontSize: 10, lineHeight: 16, fontWeight: '500', marginTop: 2 },
 });
 
 const boundaryStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA', alignItems: 'center', justifyContent: 'center', padding: 28 },
   emoji: { fontSize: 44, marginBottom: 12 },
   title: { fontSize: 20, fontWeight: 'bold', color: '#1A202C', marginBottom: 8 },
-  sub: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 20, marginBottom: 20 },
-  button: { backgroundColor: ACCENT, paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12 },
-  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 15 },
+  sub: { ...UI.reading, color: UI.muted, textAlign: 'center', marginBottom: 20 },
+  button: { backgroundColor: ACCENT_LIGHT, paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
+  buttonText: { color: ACCENT_DARK, fontWeight: '600', fontSize: 15 },
   details: { marginTop: 20, maxHeight: 220, alignSelf: 'stretch' },
   detailsText: { fontSize: 11, color: '#94A3B8', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 });

@@ -1,24 +1,19 @@
 import React from 'react';
-import { Image } from 'react-native';
-import { papanda } from '../design/papanda';
+import { Ionicons } from '@expo/vector-icons';
+import { UI } from '../constants/theme';
 
 const sources = {
-  chart: require('../../assets/papanda-doodle/chart.png'),
-  check: require('../../assets/papanda-doodle/check.png'),
-  edit: require('../../assets/papanda-doodle/edit.png'),
-  eye: require('../../assets/papanda-doodle/eye.png'),
-  idea: require('../../assets/papanda-doodle/idea.png'),
-  language: require('../../assets/papanda-doodle/language.png'),
-  microphone: require('../../assets/papanda-doodle/microphone.png'),
-  next: require('../../assets/papanda-doodle/next.png'),
-  read: require('../../assets/papanda-doodle/read.png'),
-  star: require('../../assets/papanda-doodle/star.png'),
-  warning: require('../../assets/papanda-doodle/warning.png'),
+  chart: 'bar-chart-outline', check: 'checkmark-outline', edit: 'create-outline',
+  eye: 'eye-outline', idea: 'bulb-outline', language: 'chatbubble-ellipses-outline',
+  microphone: 'volume-medium-outline', next: 'arrow-forward-outline',
+  read: 'book-outline', star: 'star-outline', warning: 'alert-circle-outline',
+  workout: 'layers-outline', settings: 'settings-outline',
 } as const;
 
-/** PNG derivatives retain the supplied Doodle geometry on native and web. */
-export default function PapandaIcon({ name, size = 20, color = papanda.color.accentHover }: {
+/** One outline set; original Doodle assets and licences remain in the kit. */
+export default function PapandaIcon({ name, size = 20, color = UI.muted }: {
   name: keyof typeof sources; size?: number; color?: string;
 }) {
-  return <Image source={sources[name]} accessible={false} style={{ width: size, height: size, tintColor: color }} resizeMode="contain" />;
+  return <Ionicons name={sources[name]} size={size} color={color} accessible={false}
+    style={{ width: size, height: size, lineHeight: size }} />;
 }

@@ -9,7 +9,7 @@ import { useBookStore } from '../store/bookStore';
 import { BookBlockContent } from '../components/BookContent';
 import { BookSections } from '../components/BookSections';
 import { StudyButton } from '../components/StudyUI';
-import { ACCENT_DARK } from '../constants/theme';
+import { ACCENT_DARK, UI } from '../constants/theme';
 
 export default function BookScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, 'Book'>) {
   const insets = useSafeAreaInsets();
@@ -145,15 +145,15 @@ export default function BookScreen({ route, navigation }: NativeStackScreenProps
   </View>;
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F8FAFC' }, top: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', paddingHorizontal: 12, gap: 6, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
-  library: { padding: 18, gap: 14, width: '100%', maxWidth: 780, alignSelf: 'center' }, hero: { backgroundColor: '#FFF7E8', padding: 20, borderRadius: 18, gap: 10 },
-  title: { fontSize: 26, lineHeight: 34, fontWeight: '700', color: '#172033' }, eyebrow: { fontSize: 11, color: '#64748B', fontWeight: '700', letterSpacing: 0.7 },
-  author: { fontSize: 13, color: '#64748B', marginBottom: 12 }, body: { fontSize: 15, lineHeight: 23, color: '#334155' }, small: { fontSize: 12, lineHeight: 18, color: '#64748B' },
+  root: { flex: 1, backgroundColor: UI.canvas }, top: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', paddingHorizontal: 12, gap: 6, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
+  library: { padding: 18, gap: 14, width: '100%', maxWidth: 680, alignSelf: 'center' }, hero: { backgroundColor: UI.surface, borderWidth: 1, borderColor: UI.border, padding: 16, borderRadius: UI.radius, gap: 10 },
+  title: { ...UI.heading, color: '#172033' }, eyebrow: { fontSize: 13, color: '#64748B', fontWeight: '700', letterSpacing: 0.7 },
+  author: { fontSize: 13, color: '#64748B', marginBottom: 12 }, body: { ...UI.reading, color: '#334155' }, small: { fontSize: 12, lineHeight: 18, color: '#64748B' },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, panel: { padding: 12, borderRadius: 12, backgroundColor: '#FFF', gap: 10 }, bookmark: { flexDirection: 'row', gap: 8 },
   chapter: { backgroundColor: '#FFF', padding: 18, borderRadius: 14, borderWidth: 1, borderColor: '#E2E8F0', gap: 8 }, chapterTitle: { fontSize: 19, lineHeight: 27, color: '#172033', fontWeight: '600' },
   link: { color: ACCENT_DARK, fontSize: 14, lineHeight: 22, fontWeight: '600' }, search: { borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFF', color: '#172033', borderRadius: 12, padding: 14, fontSize: 16 },
   readerBar: { paddingHorizontal: 18, paddingVertical: 10, gap: 5, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }, readerTitle: { color: '#172033', fontSize: 18, lineHeight: 25, fontWeight: '700' },
-  reader: { paddingHorizontal: 18, paddingTop: 20, width: '100%', maxWidth: 780, alignSelf: 'center' }, block: { marginBottom: 8, paddingHorizontal: 8 }, target: { backgroundColor: '#FFF7E8', borderRadius: 10 },
+  reader: { paddingHorizontal: 18, paddingTop: 20, width: '100%', maxWidth: 780, alignSelf: 'center' }, block: { marginBottom: 8, paddingHorizontal: 8 }, target: { backgroundColor: UI.subtle, borderRadius: 10 },
   fontButton: { paddingVertical: 12, paddingHorizontal: 8 }, fontText: { fontSize: 16, color: ACCENT_DARK, fontWeight: '600' },
   source: { color: '#64748B', fontSize: 11, lineHeight: 17, marginVertical: 12 }, endCard: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 14, padding: 16, gap: 12, marginTop: 20 },
   notice: { color: '#92400E', fontSize: 14, lineHeight: 21, backgroundColor: '#FFF7E8', borderRadius: 10, padding: 14 },

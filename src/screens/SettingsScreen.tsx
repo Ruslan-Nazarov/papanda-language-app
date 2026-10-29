@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES, getLanguageLabel } from '../constants/languages';
 import { exportProgressToFile, previewProgressFromFile } from '../services/backupService';
-import { ACCENT, ACCENT_LIGHT } from '../constants/theme';
+import { ACCENT, ACCENT_LIGHT, UI } from '../constants/theme';
 import appConfig from '../../app.json';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
@@ -312,12 +312,12 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FA', padding: 20 },
-  header: { fontSize: 28, fontWeight: 'bold', marginBottom: 16, color: '#1A202C' },
-  scroll: { paddingBottom: 40 },
+  container: { flex: 1, backgroundColor: UI.canvas, padding: 16 },
+  header: { ...UI.heading, marginBottom: 16, color: '#1A202C' },
+  scroll: { width: '100%', maxWidth: UI.column, alignSelf: 'center', paddingBottom: 40 },
   section: { marginBottom: 28 },
   sectionTitle: { fontSize: 16, color: '#4A5568', marginBottom: 4, fontWeight: '700' },
-  sectionSub: { fontSize: 13, color: '#A0AEC0', marginBottom: 12 },
+  sectionSub: { ...UI.caption, color: UI.muted, marginBottom: 12 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -328,17 +328,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
-    elevation: 1,
   },
   rowActive: { borderColor: ACCENT, backgroundColor: ACCENT_LIGHT },
   rowText: { fontSize: 15, fontWeight: '600', color: '#2D3748' },
   check: { color: ACCENT, fontWeight: 'bold', fontSize: 16 },
   orderControls: { flexDirection: 'row', gap: 8 },
-  orderBtn: { padding: 6, backgroundColor: '#EDF2F7', borderRadius: 8, minWidth: 38, alignItems: 'center' },
+  orderBtn: { minHeight: 44, justifyContent: 'center', padding: 6, backgroundColor: '#EDF2F7', borderRadius: 8, minWidth: 38, alignItems: 'center' },
   orderBtnText: { fontSize: 16 },
   disabledText: { opacity: 0.2 },
   resetRow: {
@@ -363,8 +358,10 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 8,
     minWidth: 50,
+    minHeight: 44,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   optionChipActive: {
@@ -377,6 +374,6 @@ const styles = StyleSheet.create({
     color: '#4A5568',
   },
   optionChipTextActive: {
-    color: '#FFF',
+    color: UI.onAccent,
   }
 });
