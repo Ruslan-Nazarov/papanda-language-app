@@ -111,7 +111,7 @@ async function main() {
     await page.click('[data-testid="trainer-next"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent !== first, {}, first);
     assert.equal(await page.$eval('[data-testid="trainer-translation"]', el => el.textContent), 'Перевод');
-    assert.equal(await page.$eval('[data-testid="trainer-position"]', el => el.textContent), '2 / 2');
+    assert.equal(await page.$eval('[data-testid="trainer-position"]', el => el.textContent), '2 / 3');
     await page.click('[data-testid="trainer-previous"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent === first, {}, first);
     assert.equal(await hidden(), count);
@@ -148,7 +148,7 @@ async function main() {
       await page.screenshot({ path: path.join(root, `trainer-${width}.png`) });
       await openMenu();
       const stats = await page.$eval('[data-testid="trainer-cache-stats"]', el => el.innerText);
-      for (const text of ['В кеше: 3', 'Создано за сеанс: 2', 'В очереди разбора: 2', 'Кеш всех языков: 4']) assert.ok(stats.includes(text), stats);
+      for (const text of ['В кеше: 3', 'Создано за сеанс: 2', 'В очереди разбора: 3', 'Кеш всех языков: 4']) assert.ok(stats.includes(text), stats);
       await page.screenshot({ path: path.join(root, `trainer-menu-${width}.png`) });
       await closeMenu();
     }

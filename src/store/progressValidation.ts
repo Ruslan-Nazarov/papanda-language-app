@@ -73,14 +73,6 @@ const schema = shape({ userWordProgress: dictionary(progress) }, {
     selected: array(integer), expected: array(integer), result: value => typeof value === 'string' && ['correct','incorrect','disputed'].includes(value),
     hintLevel: value => integer(value) && (value as number) <= 2, createdAt: timestamp,
   })),
-  readingTexts: value => Array.isArray(value) && value.length <= 10 && value.every(item =>
-    shape({ id: string, title: string, language: string, segments: array(string), position: integer, cards: dictionary(sentence) })(item) &&
-    LANGUAGES.some(language => language.label === item.language) &&
-    item.segments.length > 0 && item.segments.length <= 20 && item.segments.every((s: string) => s.trim() && s.length <= 600) &&
-    item.segments.join('\n').length <= 6000 && item.position < item.segments.length &&
-    Object.entries(item.cards).every(([key, card]) => /^\d+$/.test(key) && Number(key) < item.segments.length &&
-      (card as { sentence: string; language: string }).sentence === item.segments[Number(key)] && (card as { language: string }).language === item.language)) &&
-    new Set(value.map(item => item.id)).size === value.length,
   // Accepted only for migrating profiles/backups from the removed card-report feature.
   sentenceReports: dictionary(shape({ sentence, reason: string, reportedAt: timestamp }, { tokenIndex: integer })),
   customWords: array(word), customSentences: array(sentence), generatedSentences: array(sentence),
@@ -90,6 +82,7 @@ const schema = shape({ userWordProgress: dictionary(progress) }, {
     record(value) && (value.correct as number) <= (value.total as number)),
   imwSnapshots: array(shape({ date: day, imw: number, byLang: dictionary(number) })),
   wordTourSize: value => integer(value) && (value as number) >= 1 && (value as number) <= 100,
+  sentenceWorkoutCount: value => integer(value) && (value as number) >= 1 && (value as number) <= 100,
   workoutWordCount: value => integer(value) && (value as number) >= 1 && (value as number) <= 100,
   workoutLearnedWordCount: value => integer(value) && (value as number) <= 100,
   workoutFavoritesOnly: boolean, hasSeenSnoozeHint: boolean,

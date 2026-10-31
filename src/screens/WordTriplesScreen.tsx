@@ -1,7 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useIsFocused } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated } from 'react-native';
+import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated, ActivityIndicator, Alert } from 'react-native';
 import TouchableOpacity from '../components/PapandaAction';
 import type { WordTriplesScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,13 +13,12 @@ import { getWordTranslation } from '../utils/words';
 import { readWordStats } from '../utils/statistics';
 import { pickWordCard } from '../utils/wordCards';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
-import { auditNextWordInBackground } from '../services/wordAuditService';
+import { auditNextWordInBackground, auditWordManually } from '../services/wordAuditService';
 import { useCardTransition } from '../hooks/useCardTransition';
 import { usePronunciation } from '../hooks/usePronunciation';
 import PronunciationModal from '../components/PronunciationModal';
 import { papanda } from '../design/papanda';
 import PapandaIcon from '../components/PapandaIcon';
-import CompactAction from '../components/CompactAction';
 
 
 const SWIPE_THRESHOLD = 72;
@@ -52,6 +51,16 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [history, setHistory] = useState<{word: Word, undo?: KnowledgeUndo}[]>([]);
+  const [isAuditingWord, setIsAuditingWord] = useState(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
+  const manualAuditAbortRef = React.useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      manualAuditAbortRef.current?.abort();
+    };
+  }, []);
+
   const isTourComplete = sessionCount >= wordTourSize || (sessionCount > 0 && !currentWord);
   const { isPronunciationModalVisible, setIsPronunciationModalVisible, pronunciationExplanation,
     setPronunciationExplanation, isPronunciationLoading, handlePronunciation,
@@ -97,6 +106,9 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   ).current;
 
   const pickRandomWord = () => {
+    manualAuditAbortRef.current?.abort();
+    setIsAuditingWord(false);
+    setAuditError(null);
     const { words, activeLanguages } = useStore.getState();
     const chosen = pickWordCard(words, activeLanguages, currentWord?.eng || currentWord?.word);
     if (!chosen) {
@@ -142,6 +154,9 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   }, [words, currentWord, activeLanguages, wordTourSize, isFocused, isTourComplete]);
 
   const advanceTour = () => {
+    manualAuditAbortRef.current?.abort();
+    setIsAuditingWord(false);
+    setAuditError(null);
     const nextCount = sessionCount + 1;
     setSessionCount(nextCount);
     if (nextCount >= wordTourSize) {
@@ -154,6 +169,9 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
   const startNewTour = () => {
     if (!transition.beginAction()) return;
+    manualAuditAbortRef.current?.abort();
+    setIsAuditingWord(false);
+    setAuditError(null);
     setSessionCount(0);
     setHistory([]);
     cardTranslateX.setValue(0);
@@ -194,6 +212,9 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
   const handlePrev = () => {
     if (!transition.beginAction()) return;
+    manualAuditAbortRef.current?.abort();
+    setIsAuditingWord(false);
+    setAuditError(null);
     if (history.length > 0) {
       if (currentWord && associationText !== (currentWord.personal_association || '')) {
         saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
@@ -212,6 +233,50 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
       setAssociationText(latestWord?.personal_association || '');
       setPronunciationExplanation(null);
     }
+  };
+
+  const runManualAudit = async () => {
+    if (!currentWord || isAuditingWord) return;
+    manualAuditAbortRef.current?.abort();
+    const controller = new AbortController();
+    manualAuditAbortRef.current = controller;
+    setIsAuditingWord(true);
+    setAuditError(null);
+
+    try {
+      await auditWordManually(currentWord, activeLanguages, controller.signal);
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        const message = err instanceof Error ? err.message : 'Не удалось проверить слово.';
+        setAuditError(message);
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsAuditingWord(false);
+      }
+    }
+  };
+
+  const handleAuditButtonPress = () => {
+    if (isAuditingWord) return;
+    const aiStatus = currentProgress?.ai_verification?.status;
+    if (aiStatus === 'flagged') {
+      setEditingWord(currentWord);
+      setIsModalVisible(true);
+      return;
+    }
+    if (aiStatus === 'verified') {
+      Alert.alert(
+        'Слово проверено',
+        'ИИ проверил написание и перевод — ошибок не обнаружено.\n\nЗапустить проверку повторно?',
+        [
+          { text: 'Отмена', style: 'cancel' },
+          { text: 'Проверить снова', onPress: () => void runManualAudit() },
+        ]
+      );
+      return;
+    }
+    void runManualAudit();
   };
 
   const resetCardPosition = transition.reset;
@@ -353,6 +418,56 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             </TouchableOpacity>
 
             <TouchableOpacity
+              testID="word-request-audit"
+              style={[
+                styles.statsCardBtn,
+                currentProgress?.ai_verification?.status === 'verified' && styles.auditCardBtnVerified,
+                currentProgress?.ai_verification?.status === 'flagged' && styles.auditCardBtnFlagged,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                currentProgress?.ai_verification?.status === 'verified'
+                  ? 'Слово проверено ИИ: ошибок не найдено'
+                  : currentProgress?.ai_verification?.status === 'flagged'
+                  ? 'Обнаружена возможная неточность перевода'
+                  : 'Запросить проверку написания и перевода'
+              }
+              disabled={isAuditingWord}
+              onPress={handleAuditButtonPress}
+            >
+              {isAuditingWord ? (
+                <ActivityIndicator size="small" color={papanda.color.accentText} />
+              ) : (
+                <PapandaIcon
+                  name={currentProgress?.ai_verification?.status === 'flagged' ? 'warning' : 'verify'}
+                  size={16}
+                  color={
+                    currentProgress?.ai_verification?.status === 'verified'
+                      ? '#059669'
+                      : currentProgress?.ai_verification?.status === 'flagged'
+                      ? papanda.color.errorText
+                      : papanda.color.textSecondary
+                  }
+                />
+              )}
+              <Text
+                style={[
+                  styles.statsCardBtnText,
+                  currentProgress?.ai_verification?.status === 'verified' && styles.auditCardBtnTextVerified,
+                  currentProgress?.ai_verification?.status === 'flagged' && styles.auditCardBtnTextFlagged,
+                ]}
+              >
+                {isAuditingWord
+                  ? 'Проверка...'
+                  : currentProgress?.ai_verification?.status === 'verified'
+                  ? 'Проверено'
+                  : currentProgress?.ai_verification?.status === 'flagged'
+                  ? 'Неточность'
+                  : 'Проверить'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editCardBtn}
               onPress={() => {
                 setEditingWord(currentWord);
@@ -365,7 +480,33 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
           <Text style={styles.nativeWord}>{currentWord.ru}</Text>
 
-          {currentProgress?.ai_verification?.status === 'flagged' && (
+          {isAuditingWord && (
+            <View style={styles.aiCheckingBanner} testID="word-audit-loading">
+              <ActivityIndicator size="small" color={papanda.color.accentText} />
+              <Text style={styles.aiCheckingText}>ИИ проверяет написание и перевод...</Text>
+            </View>
+          )}
+
+          {Boolean(auditError) && !isAuditingWord && (
+            <View style={styles.aiErrorBanner} testID="word-audit-error">
+              <PapandaIcon name="warning" color={papanda.color.errorText} size={16} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.aiErrorText}>{auditError}</Text>
+              </View>
+              <TouchableOpacity onPress={() => void runManualAudit()}>
+                <Text style={styles.aiRetryText}>Повторить</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {currentProgress?.ai_verification?.status === 'verified' && !isAuditingWord && (
+            <View style={styles.aiVerifiedBanner} testID="word-audit-verified">
+              <PapandaIcon name="verify" color="#059669" size={16} />
+              <Text style={styles.aiVerifiedText}>Проверено ИИ: написание и перевод точны</Text>
+            </View>
+          )}
+
+          {currentProgress?.ai_verification?.status === 'flagged' && !isAuditingWord && (
             <TouchableOpacity
               style={styles.aiWarningBanner}
               activeOpacity={0.8}
@@ -401,8 +542,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
               };
 
               return (
-                <View key={lang}>
-                <View style={styles.langBlock}>
+                <View key={lang} style={styles.langBlock}>
                   {/* Subtle Language Indicator on the Left Side */}
                   <View style={styles.sideBadge}>
                     <Text style={styles.sideFlag}>{langFlag}</Text>
@@ -422,36 +562,48 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
                     <Text style={styles.langTranslation}>{translation || '—'}</Text>
                   </TouchableOpacity>
 
-                  {/* Pronunciation Button */}
+                  {/* Action Buttons: Sentence composition & Pronunciation explanation */}
                   {translation && (
-                    <TouchableOpacity
-                      accessibilityLabel="Разбор произношения" accessibilityRole="button"
-                      style={styles.pronunciationBtn}
-                      activeOpacity={0.7}
-                      onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
-                    >
-                      <PapandaIcon name="microphone" />
-                    </TouchableOpacity>
+                    <View style={styles.langActions}>
+                      <TouchableOpacity
+                        testID={`word-compose-${lang}`}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Составить предложение со словом ${translation}`}
+                        style={styles.langActionBtn}
+                        activeOpacity={0.7}
+                        onPress={composeSentence}
+                      >
+                        <PapandaIcon name="language" />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        accessibilityLabel="Разбор произношения"
+                        accessibilityRole="button"
+                        style={styles.langActionBtn}
+                        activeOpacity={0.7}
+                        onPress={() => handlePronunciation(translation, lang, currentWord?.ru || currentWord?.meaning || '')}
+                      >
+                        <PapandaIcon name="microphone" />
+                      </TouchableOpacity>
+                    </View>
                   )}
-                </View>
-                {translation && (
-                  <CompactAction
-                    testID={`word-compose-${lang}`}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Составить предложение со словом ${translation}`}
-                    style={styles.composeSentenceButton}
-                    surfaceStyle={styles.composeSentenceSurface}
-                    activeOpacity={0.7}
-                    onPress={composeSentence}
-                  >
-                    <Text style={styles.composeSentenceButtonText}>Составить предложение</Text>
-                    <PapandaIcon name="next" size={14} />
-                  </CompactAction>
-                )}
                 </View>
               );
             })}
           </View>
+
+          {!currentProgress?.ai_verification && !isAuditingWord && (
+            <TouchableOpacity
+              testID="word-request-audit-link"
+              accessibilityRole="button"
+              accessibilityLabel="Запросить проверку написания и перевода"
+              style={styles.requestAuditLink}
+              onPress={() => void runManualAudit()}
+            >
+              <PapandaIcon name="verify" size={16} color={papanda.color.accentText} />
+              <Text style={styles.requestAuditLinkText}>Запросить проверку (ИИ)</Text>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.divider} />
 
@@ -677,29 +829,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 8,
   },
-  pronunciationBtn: {
-    minWidth: 44, minHeight: 44,
-    alignItems: 'center', justifyContent: 'center',
+  langActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginRight: 2,
+  },
+  langActionBtn: {
+    minWidth: 40,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: papanda.radius.control,
   },
-  composeSentenceButton: {
-    alignSelf: 'flex-end',
-    maxWidth: '100%',
-  },
-  composeSentenceSurface: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 12, paddingVertical: 4,
-    backgroundColor: papanda.color.surface,
-    borderWidth: 1,
-    borderColor: papanda.color.border,
-    borderRadius: papanda.radius.small,
-  },
-  composeSentenceButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: papanda.color.accentText,
-    textAlign: 'center',
-    flexShrink: 1,
+  pronunciationBtn: {
+    minWidth: 40,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: papanda.radius.control,
   },
   divider: {
     height: 1,
@@ -744,6 +892,98 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#78350F',
     marginTop: 1,
+  },
+  auditCardBtnVerified: {
+    backgroundColor: '#ECFDF5',
+  },
+  auditCardBtnFlagged: {
+    backgroundColor: '#FEF3C7',
+  },
+  auditCardBtnTextVerified: {
+    color: '#059669',
+    fontWeight: '700',
+  },
+  auditCardBtnTextFlagged: {
+    color: '#B45309',
+    fontWeight: '700',
+  },
+  aiVerifiedBanner: {
+    minHeight: 40,
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  aiVerifiedText: {
+    fontSize: 13,
+    color: '#065F46',
+    fontWeight: '600',
+    flex: 1,
+  },
+  aiCheckingBanner: {
+    minHeight: 40,
+    backgroundColor: '#F8FAFC',
+    borderColor: '#E2E8F0',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  aiCheckingText: {
+    fontSize: 13,
+    color: papanda.color.textSecondary,
+    flex: 1,
+  },
+  aiErrorBanner: {
+    minHeight: 40,
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  aiErrorText: {
+    fontSize: 13,
+    color: '#991B1B',
+    flex: 1,
+  },
+  aiRetryText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#B91C1C',
+    textDecorationLine: 'underline',
+  },
+  requestAuditLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 4,
+    borderRadius: 8,
+    backgroundColor: '#F8FAFC',
+    alignSelf: 'center',
+  },
+  requestAuditLinkText: {
+    fontSize: 13,
+    color: papanda.color.accentText,
+    fontWeight: '600',
   },
   sideBadge: {
     flexDirection: 'row',

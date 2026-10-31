@@ -6,7 +6,7 @@ export const DISCUSSION_QUESTION_LIMIT = 2000;
 const HISTORY_CHARACTER_LIMIT = 12000;
 
 /** Keep complete recent turns; the full conversation remains visible in the UI. */
-function recentHistory(history: DiscussionMessage[]): DiscussionMessage[] {
+export function recentHistory(history: DiscussionMessage[]): DiscussionMessage[] {
   let start = history.length;
   let size = 0;
   while (start >= 2) {

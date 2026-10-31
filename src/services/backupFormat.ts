@@ -5,7 +5,7 @@ import type { PersistedProgress } from '../store/progressTypes';
 import { parseBookProgress, type BookProgress } from '../store/bookProgress';
 
 export const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
-export interface BackupPreview { data: PersistedProgress; book?: BookProgress; exportedAt?: string; customWords: number; sentences: number; progressWords: number; conflicts: number; readingTexts: number; structureAttempts: number; notes: number; noteDrafts: number }
+export interface BackupPreview { data: PersistedProgress; book?: BookProgress; exportedAt?: string; customWords: number; sentences: number; progressWords: number; conflicts: number; structureAttempts: number; notes: number; noteDrafts: number }
 export function previewBackup(raw: string): BackupPreview {
   let bytes = 0;
   for (const char of raw) {
@@ -26,6 +26,6 @@ export function previewBackup(raw: string): BackupPreview {
   for (const word of original.customWords ?? []) { const key = getWordKey(word); if (seen.has(key)) conflicts++; seen.add(key); }
   return { data, book, exportedAt: typeof file.exportedAt === 'string' ? file.exportedAt : undefined,
     customWords: data.customWords.length, sentences: data.customSentences.length + data.generatedSentences.length,
-    progressWords: Object.keys(data.userWordProgress).length, conflicts, readingTexts: data.readingTexts.length, structureAttempts: data.structureAttempts.length,
+    progressWords: Object.keys(data.userWordProgress).length, conflicts, structureAttempts: data.structureAttempts.length,
     notes: data.languageNotes.length, noteDrafts: data.noteDrafts.length };
 }

@@ -160,11 +160,10 @@ async function main() {
     assert.equal(await fits(), true);
     await screenshot('workout-320');
 
-    // Trainer: compact translation, loading, legacy 402, retry, and closing.
+    // Trainer: loading, legacy 402, retry, and closing.
     await page.setViewport({ width: 390, height: 844 });
     await tab('Sentence Trainer');
-    await page.waitForSelector(select('trainer-translation'));
-    assert.ok(await page.$eval(select('trainer-translation'), el => el.getBoundingClientRect().height >= 44 && el.firstElementChild.getBoundingClientRect().height <= 36));
+    await page.waitForSelector(select('trainer-reveal'));
     await page.click(select('trainer-reveal'));
     await page.click('[aria-label="Объяснить форму слова: танысты"]');
     await page.waitForFunction(() => document.body.innerText.includes('Разбираем форму'));

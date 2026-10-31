@@ -1,11 +1,13 @@
 import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Word } from '../models/types';
-import { useStore } from '../store/useStore';
+import { useStore, type WordAiVerification } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
 import { getWordTranslation } from '../utils/words';
 import { ACCENT, UI } from '../constants/theme';
+import PapandaIcon from './PapandaIcon';
+import { auditWordTranslations } from '../services/wordAuditService';
 
 interface EditWordModalProps {
   visible: boolean;
@@ -15,12 +17,13 @@ interface EditWordModalProps {
 }
 
 export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNote }: EditWordModalProps) {
-  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress } = useStore(useShallow(state => ({
+  const { words, activeLanguages, updateWordDetails, addCustomWord, userWordProgress, setWordAiVerification } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
     updateWordDetails: state.updateWordDetails,
     addCustomWord: state.addCustomWord,
     userWordProgress: state.userWordProgress,
+    setWordAiVerification: state.setWordAiVerification,
   })));
   const [tempWord, setTempWord] = useState<{
     ru: string;
@@ -32,6 +35,10 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
     translations: {}
   });
 
+  const [localAiVerification, setLocalAiVerification] = useState<WordAiVerification | null | undefined>(undefined);
+  const [isCheckingAi, setIsCheckingAi] = useState(false);
+  const [aiCheckMessage, setAiCheckMessage] = useState<string | null>(null);
+
   const wordKey = wordToEdit?.eng || wordToEdit?.word || '';
   // A token tap can hand us a draft Word for a form that isn't in the dictionary
   // yet (via WordFormModal) — treat that the same as
@@ -39,6 +46,7 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
   const existsInStore = Boolean(wordKey) && words.some(w => (w.eng || w.word) === wordKey);
   const isAddingNew = !wordToEdit || !existsInStore;
   const aiVerification = wordKey && existsInStore ? userWordProgress[wordKey]?.ai_verification : undefined;
+  const effectiveVerification = localAiVerification !== undefined ? localAiVerification : aiVerification;
   const sourceLanguage = wordToEdit?.source_language;
   const editableLanguages = useMemo(() => [...new Set([
     ...(sourceLanguage && activeLanguages.includes(sourceLanguage) ? [sourceLanguage] : []), ...activeLanguages,
@@ -46,6 +54,9 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
 
   useEffect(() => {
     if (visible) {
+      setLocalAiVerification(undefined);
+      setIsCheckingAi(false);
+      setAiCheckMessage(null);
       if (wordToEdit) {
         const trans: Record<string, string> = {};
         editableLanguages.forEach(l => {
@@ -148,11 +159,58 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
       if (Object.keys(details).length > 0) {
         updateWordDetails(wordKey, details);
       }
+      if (localAiVerification && wordKey) {
+        setWordAiVerification(wordKey, localAiVerification);
+      }
 
       // Translation edits invalidate the old verdict in the store. Saving an
       // association or an unchanged form is not a linguistic verification.
     }
     onClose();
+  };
+
+  const handleModalAudit = async () => {
+    if (isCheckingAi) return;
+    const russian = tempWord.ru.trim();
+    const hasTranslation = editableLanguages.some(lang => tempWord.translations[lang]?.trim());
+    if (!russian && !hasTranslation) {
+      Alert.alert('Заполните поля', 'Введите слово на русском и хотя бы один перевод перед проверкой.');
+      return;
+    }
+
+    setIsCheckingAi(true);
+    setAiCheckMessage(null);
+
+    const draftWord: Word = {
+      id: wordToEdit?.id || 'draft',
+      word: tempWord.translations[wordToEdit?.source_language || editableLanguages[0]] || russian,
+      ru: russian,
+      translations: tempWord.translations,
+      source_language: wordToEdit?.source_language || editableLanguages[0],
+      personal_association: tempWord.personal_association,
+      count: wordToEdit?.count || 0,
+      is_learned: wordToEdit?.is_learned || 0,
+      knowledge_stats: wordToEdit?.knowledge_stats || {},
+      show_stats: wordToEdit?.show_stats || {},
+      is_favorite: wordToEdit?.is_favorite || false,
+    };
+
+    try {
+      const result = await auditWordTranslations(draftWord, editableLanguages, undefined, true);
+      if (result) {
+        setLocalAiVerification(result);
+        if (result.status === 'verified') {
+          setAiCheckMessage('✓ Проверено ИИ: написание и перевод точны!');
+        } else {
+          setAiCheckMessage(null);
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Не удалось проверить слово.';
+      Alert.alert('Ошибка проверки', msg);
+    } finally {
+      setIsCheckingAi(false);
+    }
   };
 
   return (
@@ -162,10 +220,16 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
           <Text style={styles.modalTitle}>{isAddingNew ? 'Новое слово' : 'Редактировать слово'}</Text>
 
           <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-            {aiVerification?.status === 'flagged' && aiVerification.issues && aiVerification.issues.length > 0 && (
+            {Boolean(aiCheckMessage) && (
+              <View style={styles.aiSuccessBox}>
+                <Text style={styles.aiSuccessText}>{aiCheckMessage}</Text>
+              </View>
+            )}
+
+            {effectiveVerification?.status === 'flagged' && effectiveVerification.issues && effectiveVerification.issues.length > 0 && (
               <View style={styles.aiSuggestionBox}>
                 <Text style={styles.aiSuggestionTitle}>💡 Замечания и подсказки ИИ:</Text>
-                {aiVerification.issues.map((iss, i) => (
+                {effectiveVerification.issues.map((iss, i) => (
                   <View key={i} style={styles.aiIssueRow}>
                     <Text style={styles.aiIssueText}>
                       • {iss.lang.toUpperCase()}: {iss.issue}
@@ -226,9 +290,26 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
           </ScrollView>
 
           {onCreateNote && <TouchableOpacity accessibilityRole="button" testID="word-create-note" onPress={onCreateNote}
-            style={{ minHeight: 44, justifyContent: 'center', marginBottom: 8 }}>
+            style={{ minHeight: 44, justifyContent: 'center', marginBottom: 4 }}>
             <Text style={{ color: ACCENT, fontSize: 14, fontWeight: '600' }}>Создать заметку к слову</Text>
           </TouchableOpacity>}
+          <TouchableOpacity
+            testID="modal-request-audit"
+            accessibilityRole="button"
+            accessibilityLabel="Запросить проверку написания и перевода у ИИ"
+            style={styles.modalAuditBtn}
+            disabled={isCheckingAi}
+            onPress={() => void handleModalAudit()}
+          >
+            {isCheckingAi ? (
+              <ActivityIndicator size="small" color={ACCENT} />
+            ) : (
+              <PapandaIcon name="verify" size={16} color={ACCENT} />
+            )}
+            <Text style={styles.modalAuditBtnText}>
+              {isCheckingAi ? 'Проверка ИИ...' : 'Запросить проверку (ИИ)'}
+            </Text>
+          </TouchableOpacity>
           <View style={styles.modalButtons}>
             <TouchableOpacity style={[styles.modalBtn, styles.modalCancel]} onPress={onClose}>
               <Text style={styles.modalCancelText}>Отмена</Text>
@@ -348,5 +429,37 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#B45309',
+  },
+  aiSuccessBox: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
+  },
+  aiSuccessText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#065F46',
+  },
+  modalAuditBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    minHeight: 40,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 8,
+  },
+  modalAuditBtnText: {
+    color: ACCENT,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

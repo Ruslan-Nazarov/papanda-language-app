@@ -18,9 +18,13 @@ const MIN_AUDIT_INTERVAL_MS = 12000; // at least 12 seconds between background a
 export async function auditWordTranslations(
   word: Word,
   activeLanguages: string[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  throwOnError = false
 ): Promise<WordAiVerification | null> {
-  if (!isGeminiConfigured()) return null;
+  if (!isGeminiConfigured()) {
+    if (throwOnError) throw new Error('ИИ-проверка сейчас недоступна: сервис ИИ не настроен.');
+    return null;
+  }
 
   const validActiveTranslations = activeLanguages
     .map(langCode => {
@@ -34,12 +38,18 @@ export async function auditWordTranslations(
     })
     .filter(t => Boolean(t.translation));
 
-  if (validActiveTranslations.length === 0) return null;
+  if (validActiveTranslations.length === 0) {
+    if (throwOnError) throw new Error('Нет переводов для проверки на выбранных языках.');
+    return null;
+  }
 
   const russianWord = word.ru || word.word || '';
-  if (!russianWord) return null;
+  if (!russianWord) {
+    if (throwOnError) throw new Error('Слово на русском языке не заполнено.');
+    return null;
+  }
 
-  const prompt = `Ты — эксперт-лингвист и лексикограф. Проверь правильность перевода слова с русского языка на иностранные языки.
+  const prompt = `Ты — эксперт-лингвист и лексикограф. Проверь правильность написания и перевода слова с русского языка на иностранные языки.
 Слово на русском: "${russianWord}"
 ${word.meaning ? `Контекст / пояснение: "${word.meaning}"` : ''}
 
@@ -47,22 +57,23 @@ ${word.meaning ? `Контекст / пояснение: "${word.meaning}"` : ''
 ${validActiveTranslations.map(t => `- ${t.langName} (код: ${t.langCode}): "${t.translation}"`).join('\n')}
 
 Критерии проверки:
-1. Соответствует ли перевод русскому значению (с учётом контекста)?
-2. Нет ли явных опечаток или искажений?
-3. Является ли форма начальной словарной формой (инфинитив для глаголов, им. падеж ед. число для сущ.)?
+1. Правильно ли написано русское слово (нет ли орфографических ошибок)? Если в русском слове ошибка или опечатка, укажи замечание с кодом "lang": "ru".
+2. Соответствует ли каждый иностранный перевод русскому значению (с учётом контекста)?
+3. Нет ли явных опечаток или искажений в иностранных переводах (включая диакритику и буквы алфавита)?
+4. Является ли форма начальной словарной формой (инфинитив для глаголов, им. падеж ед. число для сущ.)?
 
 Ответь строго в формате JSON:
 {
   "isValid": true | false,
   "issues": [
     {
-      "lang": "код языка (например kz, it, de, es, fr)",
+      "lang": "код языка (например ru, kz, it, de, es, fr)",
       "issue": "краткое описание проблемы на русском (до 10 слов)",
       "suggestion": "рекомендуемый правильный вариант"
     }
   ]
 }
-Если переводы верны, верни: {"isValid": true, "issues": []}`;
+Если слово и все переводы верны, верни строго: {"isValid": true, "issues": []}`;
 
   try {
     const text = await generateGeminiText(prompt, {
@@ -74,10 +85,31 @@ ${validActiveTranslations.map(t => `- ${t.langName} (код: ${t.langCode}): "${
     const verification = parseWordAudit(JSON.parse(text));
     return verification ? { ...verification, checkedLanguages: validActiveTranslations.map(item => item.langCode) } : null;
   } catch (err) {
+    if (throwOnError) throw err;
     // Background audit should fail silently
     console.warn('[WordAudit] Check error:', err);
     return null;
   }
+}
+
+/**
+ * Manually requests an audit for a specific word, updating the store and returning the verification.
+ */
+export async function auditWordManually(
+  word: Word,
+  activeLanguages: string[],
+  signal?: AbortSignal
+): Promise<WordAiVerification> {
+  const verification = await auditWordTranslations(word, activeLanguages, signal, true);
+  if (!verification) {
+    throw new Error('Не удалось получить результат проверки от ИИ.');
+  }
+
+  const key = word.eng || word.word || '';
+  if (key) {
+    useStore.getState().setWordAiVerification(key, verification);
+  }
+  return verification;
 }
 
 /**

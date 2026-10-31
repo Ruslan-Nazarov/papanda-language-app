@@ -9,6 +9,10 @@ it('rejects structurally invalid AI verdicts before they reach the dictionary sc
   }
   assert.equal(parseWordAudit({ isValid: true, issues: [] })?.status, 'verified');
   assert.equal(parseWordAudit({ isValid: true, issues: [{ lang: 'it', issue: 'ошибка' }] })?.status, 'flagged');
+  const ruFlagged = parseWordAudit({ isValid: false, issues: [{ lang: 'ru', issue: 'опечатка в слове', suggestion: 'определение' }] });
+  assert.equal(ruFlagged?.status, 'flagged');
+  assert.equal(ruFlagged?.issues?.[0]?.lang, 'ru');
+  assert.equal(ruFlagged?.issues?.[0]?.suggestion, 'определение');
 });
 
 it('audits available translations, rotates past failed words and rechecks newly selected languages', () => {

@@ -35,3 +35,27 @@ export const getRoleColor = (role: SyntaxRole) => {
     default: return '#CBD5E1'; // Gray
   }
 };
+
+const INDEFINITE_ARTICLES = new Set([
+  'a', 'an',
+  'un', 'uno', 'una', "un'",
+  'unos', 'unas',
+  'ein', 'eine', 'einen', 'einem', 'eines', 'einer',
+  'des',
+]);
+
+export const formatArticleGloss = (text: string, translation?: string): string => {
+  const normText = (text || '').normalize('NFC').replace(/[’‘]/gu, "'").trim().toLocaleLowerCase();
+  const normTrans = (translation || '').trim().toLocaleLowerCase();
+  if (INDEFINITE_ARTICLES.has(normText) || normTrans.includes('неопред')) {
+    return 'неопред.';
+  }
+  return 'опред.';
+};
+
+export const formatTokenTranslation = (token: { text: string; role?: SyntaxRole; label?: string; translation: string }): string => {
+  if (token.role === 'Article' || token.label === 'Article') {
+    return formatArticleGloss(token.text, token.translation);
+  }
+  return token.translation;
+};

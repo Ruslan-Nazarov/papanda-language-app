@@ -30,7 +30,7 @@ const generateBatch = async (code: string, candidates: DictionaryCandidate[], co
   let errors: string[] = [];
   for (let round = 0; round < MAX_GENERATION_ROUNDS && accepted.size < count; round++) {
     // Keep useful partial batches without spending another pipeline on optional cards.
-    if (round > 0 && !required?.lemma && accepted.size > 0 && [...chainIds].every(id => accepted.has(id))) break;
+    if (round > 0 && !required?.lemma && chainIds.size > 0 && [...chainIds].every(id => accepted.has(id))) break;
     const previousChain = new Map<string, Sentence>();
     if (round > 0 && [...chainIds].some(id => !accepted.has(id))) {
       // A valid base can still be unsuitable for its planned expansion (e.g.

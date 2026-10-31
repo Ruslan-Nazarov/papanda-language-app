@@ -78,7 +78,7 @@ export default function StructureExercise({ sentence, onNext, checkpoint, onChec
     {translation && <Text style={s.text}>{sentence.literalTranslation || 'Перевод не задан.'}</Text>}
   </View>;
 }
-export function StructureProgress({ language }: { language?: string }) {
+export function StructureProgress({ language, onOpenWorkshop }: { language?: string; onOpenWorkshop?: () => void }) {
   const attempts = useStore(state => state.structureAttempts);
   const rows = structureSummary(attempts, language);
   return <View style={s.card}>
@@ -87,5 +87,6 @@ export function StructureProgress({ language }: { language?: string }) {
     {!rows.length && <Text style={s.text}>Статистика появится после самостоятельного разбора.</Text>}
     {rows.map(row => <Text key={row.language + row.role} style={s.text}>{row.language} · {ROLE_TRANSLATIONS[row.role]}: самостоятельно {row.independent}, с подсказкой {row.assisted}, ошибок {row.errors}.</Text>)}
     {!!rows[0] && (rows[0].errors > 0 || rows[0].assisted > 0) && <Text style={s.text}>Стоит повторить: {ROLE_TRANSLATIONS[rows[0].role].toLowerCase()}. Следующее упражнение подбирается с этой ролью.</Text>}
+    {onOpenWorkshop && <StudyButton title="Тренировки предложений →" onPress={onOpenWorkshop} />}
   </View>;
 }

@@ -87,7 +87,7 @@ it('manual cards, legacy custom cards and saved Workshop steps survive AI cache,
   useStore.getState().importProgress(data);
   const pool = trainerPool(useStore.getState().sentences, 50);
   const ids = selectTrainerQueue(pool.pool, createQueueOrder()).map(card => card.id).sort();
-  assert.deepEqual(ids, ['ai-new', 'legacy', 'workshop']);
+  assert.deepEqual(ids, ['ai-new', 'ai-old', 'legacy', 'workshop']);
   assert.equal(useStore.getState().sentences.find(card => card.id === 'workshop')?.chainStep, undefined);
   assert.equal(data.customSentences[1].chainStep, 2, 'source data is not mutated');
 });

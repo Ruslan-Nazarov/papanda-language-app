@@ -3,6 +3,7 @@ import type { DictionaryCandidate } from '../services/sentencePrompts';
 import type { SentenceDraft, SentenceTask } from '../services/sentenceCurriculum';
 import { makeGeneratedSentence } from './sentences';
 import { abortableDelay } from '../services/generationControl';
+import { formatArticleGloss } from '../constants/sentencePresentation';
 
 const VALID_ROLES = new Set<SyntaxRole>(['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
   'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction', 'Preposition', 'Particle', 'Article', 'Other']);
@@ -227,15 +228,15 @@ const validateWithDictionaryIndex = (
     if (task?.id === 'task-1' && context?.requiredWord && !findLemmaSpan(tokens, context.requiredWord).length) {
       fail(`task-1: отсутствует запрошенное слово «${context.requiredWord}».`); continue;
     }
-    if (context && code === 'en') {
+    if (context) {
       // Function words need grammatical explanations in the trainer. A model's
       // literal «этот», «один» or «делает» teaches the wrong lexical meaning.
       for (const [index, token] of tokens.entries()) {
         if (token.role === 'Article') {
-          if (normalize(token.text) === 'the') token.translation = 'определённый артикль';
-          if (['a', 'an'].includes(normalize(token.text))) token.translation = 'неопределённый артикль';
+          token.translation = formatArticleGloss(token.text, token.translation);
+
         }
-        if (['do', 'does', 'did', 'have', 'has', 'had'].includes(normalize(token.text)) && token.role === 'Predicate' &&
+        if (code === 'en' && ['do', 'does', 'did', 'have', 'has', 'had'].includes(normalize(token.text)) && token.role === 'Predicate' &&
           tokens.some((other, otherIndex) => otherIndex !== index && other.clauseIndex === token.clauseIndex &&
             other.role === 'Predicate' && /^verb$/iu.test(other.label))) {
           token.translation = 'вспомогательный глагол';

@@ -41,11 +41,6 @@ export function structureSummary(attempts: StructureAttempt[], language?: string
   }
   return [...groups.values()].sort((a,b) => (b.errors + b.assisted) / b.total - (a.errors + a.assisted) / a.total);
 }
-export function recommendStructureCard(sentences: Sentence[], attempts: StructureAttempt[], language: string, excludeId?: string) {
-  const weak = structureSummary(attempts, language).filter(row => row.errors || row.assisted);
-  const candidates = sentences.filter(s => s.language === language && s.id !== excludeId && studyGroups(s).length);
-  return candidates.find(s => weak[0] && s.words.some(w => w.role === weak[0].role)) ?? candidates[0];
-}
 export function addedTokenIndices(previous: Sentence, next: Sentence): number[] {
   // Match occurrences in order; repeated words must not swallow new occurrences.
   const pending = previous.words.map(w => w.text.replace(/[.!?,;:]+$/u, '').toLocaleLowerCase());
@@ -54,15 +49,4 @@ export function addedTokenIndices(previous: Sentence, next: Sentence): number[] 
     if (index < 0) return [i];
     pending.splice(index, 1); return [];
   });
-}
-export function validateReadingSegments(value: string): string[] {
-  const segments = value.split(/\n+/).map(line => line.trim()).filter(Boolean);
-  if (!segments.length) throw new Error('Введите хотя бы одно предложение.');
-  if (segments.length > 20 || segments.join('\n').length > 6000) throw new Error('Один текст: до 20 предложений и 6000 символов.');
-  if (segments.some(line => line.length > 600)) throw new Error('Одно предложение: до 600 символов. Разделите длинный фрагмент.');
-  return segments;
-}
-export function suggestReadingSegments(text: string): string {
-  // This is a proposal only: the learner reviews line boundaries before saving.
-  return text.trim().replace(/([.!?…][»”"']*)\s+(?=[\p{Lu}«“"'])/gu, '$1\n');
 }

@@ -1,7 +1,7 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Sentence } from '../src/models/types';
-import { createQueueOrder, selectTrainerQueue, trainerPool, trimGeneratedCache } from '../src/utils/sentenceQueue';
+import { createQueueOrder, selectTrainerQueue, selectWorkoutBatch, trainerPool, trimGeneratedCache } from '../src/utils/sentenceQueue';
 
 const card = (id: string, extra: Partial<Sentence> = {}): Sentence => ({ id, language: 'English', sentence: id, words: [], ...extra });
 
@@ -46,4 +46,45 @@ it('cached workshop chains cannot hide standalone generated cards or seed fallba
   assert.equal(fallback.generated.length, 0);
   const old = card('old', { source: 'generated', createdAt: 50 });
   assert.deepEqual(trainerPool([series, seed, manual, old], 100).pool.map(item => item.id), ['old', 'saved']);
+});
+
+it('selectWorkoutBatch selects specified batch size and wraps around on offset', () => {
+  const cards = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'].map(id => card(id));
+  const batch1 = selectWorkoutBatch(cards, 5, 0);
+  assert.equal(batch1.length, 5);
+  assert.deepEqual(batch1.map(c => c.id), ['s1', 's2', 's3', 's4', 's5']);
+
+  const batch2 = selectWorkoutBatch(cards, 5, 5);
+  assert.equal(batch2.length, 5);
+  assert.deepEqual(batch2.map(c => c.id), ['s6', 's7', 's1', 's2', 's3']);
+});
+
+it('selectWorkoutBatch handles pool smaller than target count without duplication', () => {
+  const cards = ['s1', 's2', 's3'].map(id => card(id));
+  const batch = selectWorkoutBatch(cards, 5, 0);
+  assert.equal(batch.length, 3);
+  assert.deepEqual(batch.map(c => c.id), ['s1', 's2', 's3']);
+  assert.deepEqual(selectWorkoutBatch([], 5), []);
+  assert.deepEqual(selectWorkoutBatch(cards, 0), []);
+});
+
+it('trainerPool keeps cached AI cards alongside fresh session cards and prioritizes session cards in queue', () => {
+  const order = createQueueOrder();
+  const cached = ['c1', 'c2', 'c3', 'c4', 'c5'].map(id => card(id, { source: 'generated', createdAt: 50 }));
+  const initialPool = trainerPool(cached, 100);
+  const initialQueue = selectTrainerQueue(initialPool.pool, order, () => 0.5, 100);
+  assert.deepEqual(initialQueue.map(c => c.id), ['c1', 'c2', 'c3', 'c4', 'c5']);
+
+  const session = ['n1', 'n2', 'n3', 'n4'].map(id => card(id, { source: 'generated', createdAt: 150 }));
+  const updatedPool = trainerPool([...cached, ...session], 100);
+  const updatedQueue = selectTrainerQueue(updatedPool.pool, order, () => 0.5, 100);
+  assert.equal(updatedQueue.length, 9);
+  assert.deepEqual(updatedQueue.slice(0, 4).map(c => c.id), ['n1', 'n2', 'n3', 'n4']);
+  // A 5-sentence workout takes the 4 fresh cards plus 1 from cache.
+  const workout1 = selectWorkoutBatch(updatedQueue, 5, 0);
+  assert.deepEqual(workout1.map(c => c.id), ['n1', 'n2', 'n3', 'n4', 'c1']);
+  // Next workout while new cards are still generating takes unseen cards from cache.
+  const seen = new Set(workout1.map(c => c.id));
+  const workout2 = selectWorkoutBatch(updatedQueue, 5, 5, seen);
+  assert.deepEqual(workout2.map(c => c.id), ['c2', 'c3', 'c4', 'c5', 'n1']);
 });

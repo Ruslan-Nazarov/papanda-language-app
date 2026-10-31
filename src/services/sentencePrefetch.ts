@@ -38,9 +38,11 @@ export async function prefetchSentencesInBackground(): Promise<void> {
       if (cachedCount < PREFETCH_THRESHOLD) {
         try {
           const context = generationContext(langCode);
-          const freshWords = useStore.getState().words;
-          const previous = useStore.getState().sentences.filter(sentence => sentence.language === langObj.label).map(sentence => sentence.sentence);
-          const batch = await generateSentenceBatch(langCode, freshWords, PREFETCH_BATCH_SIZE, undefined, previous);
+          const freshState = useStore.getState();
+          const freshWords = freshState.words;
+          const batchSize = Math.min(20, Math.max(5, freshState.sentenceWorkoutCount ?? PREFETCH_BATCH_SIZE));
+          const previous = freshState.sentences.filter(sentence => sentence.language === langObj.label).map(sentence => sentence.sentence);
+          const batch = await generateSentenceBatch(langCode, freshWords, batchSize, undefined, previous);
           checkAborted(context.signal);
           if (batch && batch.length > 0) {
             addGeneratedSentences(batch);

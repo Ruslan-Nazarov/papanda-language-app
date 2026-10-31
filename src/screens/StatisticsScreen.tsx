@@ -192,7 +192,7 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
       {!hideDailyReview && <ReviewPlan now={nowMs} onStart={() => navigation.navigate('Brain Workout')} />}
-      <StructureProgress />
+      <StructureProgress onOpenWorkshop={() => (navigation as any).navigate('SentenceWorkshop')} />
       {/* Summary tiles */}
       <View style={styles.tilesRow}>
         <View style={styles.tile}>

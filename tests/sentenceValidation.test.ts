@@ -165,7 +165,20 @@ export const reviewedTrain = () => ({ ...train, taskId: 'task-1', literalTransla
       literalTranslation: 'Читает ли ребёнок книгу?', review: { natural: true, taskFit: true, analysisReliable: true },
     }], 'en', 'English', [], { tasks: [{ ...planSentenceBatch(1)[0], focus: 'question' }], drafts: [{ taskId: 'task-1', sentence }] });
     assert.deepEqual(result.sentences[0].words.filter(word => ['Does', 'the', 'a'].includes(word.text))
-      .map(word => word.translation), ['вспомогательный глагол', 'определённый артикль', 'неопределённый артикль']);
+      .map(word => word.translation), ['вспомогательный глагол', 'опред.', 'неопред.']);
+    const itSentence = 'Il fuoco brucia una legna.';
+    const itWords = [
+      { ...tok('Il', 'Article'), translation: 'соотв. неперев. артикль' },
+      tok('fuoco', 'Subject'),
+      tok('brucia', 'Predicate'),
+      { ...tok('una', 'Article'), translation: 'соотв. неперев. артикль' },
+      tok('legna', 'Object'),
+    ];
+    const itResult = validateGeneratedSentences([{ taskId: 'task-1', sentence: itSentence, words: itWords,
+      literalTranslation: 'Огонь сжигает дрова.', review: { natural: true, taskFit: true, analysisReliable: true },
+    }], 'it', 'Italiano', [], { tasks: planSentenceBatch(1), drafts: [{ taskId: 'task-1', sentence: itSentence }] });
+    assert.deepEqual(itResult.sentences[0].words.filter(word => ['Il', 'una'].includes(word.text))
+      .map(word => word.translation), ['опред.', 'неопред.']);
   });
   it('rejects Kazakh question translation with sentence-final «ли» and isolated negative participle gloss', () => {
     const question = 'Қыз кітап оқыды ма?';

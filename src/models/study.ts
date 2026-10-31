@@ -1,4 +1,4 @@
-import type { Sentence, SyntaxRole } from './types';
+import type { SyntaxRole } from './types';
 
 export interface StructureAttempt {
   id: string;
@@ -11,14 +11,6 @@ export interface StructureAttempt {
   result: 'correct' | 'incorrect' | 'disputed';
   hintLevel: number;
   createdAt: string;
-}
-export interface ReadingText {
-  id: string;
-  title: string;
-  language: string;
-  segments: string[];
-  position: number;
-  cards: Record<string, Sentence>;
 }
 export interface MarkerHint {
   clauseIndex: number;

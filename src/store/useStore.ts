@@ -1,4 +1,4 @@
-import type { StructureAttempt, ReadingText } from '../models/study';
+import type { StructureAttempt } from '../models/study';
 import { cancelGenerations } from '../services/generationControl';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -45,8 +45,6 @@ interface AppState extends PersistedProgress {
   undoWordKnowledge: (wordKey: string, undo: KnowledgeUndo) => void;
   recordStructureAttempt: (attempt: StructureAttempt) => void;
   disputeStructureAttempt: (id: string) => void;
-  saveReadingText: (text: ReadingText) => void;
-  removeReadingText: (id: string) => void;
   words: Word[];
   sentences: Sentence[];
   targetSentenceInfo: TargetSentenceInfo | null;
@@ -76,6 +74,7 @@ interface AppState extends PersistedProgress {
   resetStatistics: () => void;
   addWorkoutSnapshot: (snapshot: WorkoutSnapshot) => void;
   setWordTourSize: (count: number) => void;
+  setSentenceWorkoutCount: (count: number) => void;
   setWorkoutWordCount: (count: number) => void;
   setWorkoutLearnedWordCount: (count: number) => void;
   setWorkoutFavoritesOnly: (onlyFavorites: boolean) => void;
@@ -174,13 +173,6 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     undoWordKnowledge: (key, undo) => updateProgress(key, progress => undoKnowledge(progress, undo, get().activeLanguages)),
     recordStructureAttempt: attempt => set(state => ({ structureAttempts: [...state.structureAttempts.filter(a => a.id !== attempt.id), attempt].slice(-500) })),
     disputeStructureAttempt: id => set(state => ({ structureAttempts: state.structureAttempts.map(a => a.id === id ? { ...a, result: 'disputed' as const } : a) })),
-    saveReadingText: text => set(state => {
-      const next = [...state.readingTexts.filter(t => t.id !== text.id), text];
-      if (next.length > 10) throw new Error('Уже сохранено 10 текстов. Удалите ненужный текст перед добавлением нового.');
-      const validated = parseProgress({ ...state, readingTexts: next });
-      return { readingTexts: validated.readingTexts };
-    }),
-    removeReadingText: id => set(state => ({ readingTexts: state.readingTexts.filter(t => t.id !== id) })),
     setWorkoutReviewOnly: workoutReviewOnly => set({ workoutReviewOnly }),
     initializeStore: () => set(deriveCatalog(get())),
     recordImwSnapshot: () => set(state => {
@@ -296,6 +288,10 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     setWordTourSize: count => {
       if (!Number.isSafeInteger(count) || count < 1 || count > 100) return;
       set({ wordTourSize: count });
+    },
+    setSentenceWorkoutCount: count => {
+      if (!Number.isSafeInteger(count) || count < 1 || count > 100) return;
+      set({ sentenceWorkoutCount: count });
     },
     setWorkoutWordCount: count => {
       if (!Number.isSafeInteger(count) || count < 1 || count > 100) return;

@@ -45,4 +45,3 @@ export function developmentExamples(code: string): Sentence[] {
     };
   });
 }
-export const comparisonExamples = () => LANGUAGES.map(l => developmentExamples(l.code)[3]);

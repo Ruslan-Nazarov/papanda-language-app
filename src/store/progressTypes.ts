@@ -1,4 +1,4 @@
-import type { StructureAttempt, ReadingText } from '../models/study';
+import type { StructureAttempt } from '../models/study';
 import type { Sentence, Word } from '../models/types';
 import type { DailyShows, ImwSnapshot, WorkoutSnapshot } from '../utils/statistics';
 import type { LanguageNote } from '../models/notes';
@@ -40,7 +40,6 @@ export interface PersistedProgress {
   languageNotes: LanguageNote[];
   noteDrafts: LanguageNote[];
   structureAttempts: StructureAttempt[];
-  readingTexts: ReadingText[];
   userWordProgress: Record<string, UserWordProgress>;
   customSentences: Sentence[];
   generatedSentences: Sentence[];
@@ -50,6 +49,7 @@ export interface PersistedProgress {
   workoutSnapshots: WorkoutSnapshot[];
   imwSnapshots: ImwSnapshot[];
   wordTourSize: number;
+  sentenceWorkoutCount: number;
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
@@ -60,10 +60,10 @@ export const createDefaultProgress = (): PersistedProgress => ({
   sentenceLessons: {},
   experiments: {},
   languageNotes: [], noteDrafts: [],
-  structureAttempts: [], readingTexts: [],
+  structureAttempts: [],
   userWordProgress: {}, customSentences: [], generatedSentences: [], customWords: [],
   activeLanguages: ['en', 'kz', 'it'], dailyShows: {}, workoutSnapshots: [], imwSnapshots: [],
-  wordTourSize: 10, workoutWordCount: 10, workoutLearnedWordCount: 5,
+  wordTourSize: 10, sentenceWorkoutCount: 5, workoutWordCount: 10, workoutLearnedWordCount: 5,
   workoutFavoritesOnly: false, hasSeenSnoozeHint: false,
 });
 
@@ -71,7 +71,7 @@ export const pickPersistedFields = (state: PersistedProgress): PersistedProgress
   sentenceLessons: state.sentenceLessons,
   experiments: state.experiments,
   languageNotes: state.languageNotes, noteDrafts: state.noteDrafts,
-  structureAttempts: state.structureAttempts, readingTexts: state.readingTexts,
+  structureAttempts: state.structureAttempts,
   userWordProgress: state.userWordProgress,
   customSentences: state.customSentences,
   generatedSentences: state.generatedSentences,
@@ -81,6 +81,7 @@ export const pickPersistedFields = (state: PersistedProgress): PersistedProgress
   workoutSnapshots: state.workoutSnapshots,
   imwSnapshots: state.imwSnapshots,
   wordTourSize: state.wordTourSize,
+  sentenceWorkoutCount: state.sentenceWorkoutCount ?? 5,
   workoutWordCount: state.workoutWordCount,
   workoutLearnedWordCount: state.workoutLearnedWordCount,
   workoutFavoritesOnly: state.workoutFavoritesOnly,

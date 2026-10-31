@@ -18,7 +18,7 @@ export type RootStackParamList = {
   Notes: { language?: string; source?: NoteSource; contextOnly?: boolean; attach?: boolean } | undefined;
   NoteEditor: { noteId?: string; language?: string; source?: NoteSource; initialBody?: string } | undefined;
   Book: { language?: string; chapterId?: string; blockId?: string } | undefined;
-  SentenceWorkshop: { sentenceId?: string; language?: string; mode?: 'Самостоятельно' | 'Нарастающее' | 'Развитие' | 'Языки' | 'Мой текст' } | undefined;
+  SentenceWorkshop: { language?: string } | undefined;
 };
 
 export type WordTriplesScreenProps = CompositeScreenProps<

@@ -7,7 +7,7 @@ const sources = {
   eye: 'eye-outline', idea: 'bulb-outline', language: 'chatbubble-ellipses-outline',
   microphone: 'volume-medium-outline', next: 'arrow-forward-outline',
   read: 'book-outline', star: 'star-outline', warning: 'alert-circle-outline',
-  workout: 'layers-outline', settings: 'settings-outline',
+  workout: 'layers-outline', settings: 'settings-outline', verify: 'shield-checkmark-outline',
 } as const;
 
 /** One outline set; original Doodle assets and licences remain in the kit. */

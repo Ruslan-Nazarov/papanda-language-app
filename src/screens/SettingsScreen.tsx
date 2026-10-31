@@ -17,13 +17,14 @@ import appConfig from '../../app.json';
 
 const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 const WORD_TOUR_COUNT_OPTIONS = [5, 10, 15, 20, 30, 50];
+const SENTENCE_WORKOUT_COUNT_OPTIONS = [3, 5, 7, 10, 15, 20];
 const ONBOARDING_KEY = 'papanda-onboarded';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount, wordTourSize, setWordTourSize } = useStore(useShallow(state => ({
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount, wordTourSize, setWordTourSize, sentenceWorkoutCount, setSentenceWorkoutCount } = useStore(useShallow(state => ({
     activeLanguages: state.activeLanguages,
     setLanguages: state.setLanguages,
     resetStatistics: state.resetStatistics,
@@ -33,6 +34,8 @@ export default function SettingsScreen() {
     setWorkoutLearnedWordCount: state.setWorkoutLearnedWordCount,
     wordTourSize: state.wordTourSize,
     setWordTourSize: state.setWordTourSize,
+    sentenceWorkoutCount: state.sentenceWorkoutCount,
+    setSentenceWorkoutCount: state.setSentenceWorkoutCount,
   })));
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -209,6 +212,27 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Sentence Workout Options */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Разбор предложений</Text>
+          <Text style={styles.sectionSub}>Количество предложений за тренировку. По умолчанию — 5.</Text>
+          <View style={styles.optionsRow}>
+            {SENTENCE_WORKOUT_COUNT_OPTIONS.map(count => (
+              <TouchableOpacity
+                key={'sentence-workout-' + count}
+                accessibilityRole="button"
+                accessibilityLabel={'Предложений за тренировку: ' + count}
+                accessibilityState={{ selected: sentenceWorkoutCount === count }}
+                aria-selected={sentenceWorkoutCount === count}
+                style={[styles.optionChip, sentenceWorkoutCount === count && styles.optionChipActive]}
+                onPress={() => setSentenceWorkoutCount(count)}
+              >
+                <Text style={[styles.optionChipText, sentenceWorkoutCount === count && styles.optionChipTextActive]}>{count}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Brain Workout Options */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Настройки тренировки (Brain Workout)</Text>
@@ -298,7 +322,7 @@ export default function SettingsScreen() {
           <View style={{ backgroundColor: '#FFF', padding: 24, borderRadius: 16 }}>
             <Text style={styles.sectionTitle}>{showRestore ? 'Восстановить прежний прогресс?' : 'Проверка резервной копии'}</Text>
             <Text style={styles.sectionSub}>{showRestore ? 'Текущие изменения будут заменены состоянием до последнего импорта.' :
-              'Слов: ' + (preview?.customWords ?? 0) + ' · Предложений: ' + (preview?.sentences ?? 0) + '\nТекстов: ' + (preview?.readingTexts ?? 0) + ' · Ответов разбора: ' + (preview?.structureAttempts ?? 0) + '\nЗаметок: ' + (preview?.notes ?? 0) + ' · Черновиков: ' + (preview?.noteDrafts ?? 0) + '\nЗаписей прогресса: ' + (preview?.progressWords ?? 0) +
+              'Слов: ' + (preview?.customWords ?? 0) + ' · Предложений: ' + (preview?.sentences ?? 0) + '\nОтветов разбора: ' + (preview?.structureAttempts ?? 0) + '\nЗаметок: ' + (preview?.notes ?? 0) + ' · Черновиков: ' + (preview?.noteDrafts ?? 0) + '\nЗаписей прогресса: ' + (preview?.progressWords ?? 0) +
               (preview?.book ? '\nЗакладок книги: ' + preview.book.bookmarks.length + ' · Позиция и размер текста сохранены.' : '\nКнига отсутствует в этой копии; текущие закладки и позиция сохранятся.') +
               '\nСовпадающих ключей: ' + (preview?.conflicts ?? 0) + '. Последняя пользовательская запись заменит совпадающую, без дублей.\nТекущий прогресс будет заменён. Сначала сохраним точку восстановления на этом устройстве.'}</Text>
             {backupMessage ? <Text>{backupMessage}</Text> : null}

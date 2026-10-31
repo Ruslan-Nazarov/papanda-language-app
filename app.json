@@ -34,8 +34,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "854c0887-6193-42c8-99bc-7baa1cc522b4"
+        "projectId": "da0db182-905f-4679-a231-605434a15cc4"
       }
-    }
+    },
+    "owner": "runazs-team"
   }
 }

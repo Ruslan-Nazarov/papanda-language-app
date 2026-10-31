@@ -103,9 +103,9 @@ export default function BookScreen({ route, navigation }: NativeStackScreenProps
         <View style={s.endCard}>
           <Text style={s.readerTitle}>От правила к предложению</Text>
           <Text style={s.body}>Найдите сказуемое, затем подлежащее и уточняющие части. Проверяйте роль по форме и связи слов.</Text>
-          {practiceCode ? <StudyButton title="Практика этого языка" onPress={() => navigation.push('SentenceWorkshop', { language: practiceCode, mode: 'Самостоятельно' })} /> :
-            <Text style={s.small}>{chapter.language === 'ru' ? 'Отдельного тренажёра русского языка пока нет. Сопоставляйте эти правила с переводами примеров.' : 'Выберите язык в мастерской и примените порядок разбора.'}</Text>}
-          {!practiceCode && chapter.language !== 'ru' && <StudyButton title="Открыть мастерскую" onPress={() => navigation.push('SentenceWorkshop', undefined)} />}
+          {practiceCode ? <StudyButton title="От короткого к полному" onPress={() => navigation.push('SentenceWorkshop', { language: practiceCode })} /> :
+            <Text style={s.small}>{chapter.language === 'ru' ? 'Отдельного тренажёра русского языка пока нет. Сопоставляйте эти правила с переводами примеров.' : 'Откройте упражнение «От короткого к полному» и примените порядок разбора.'}</Text>}
+          {!practiceCode && chapter.language !== 'ru' && <StudyButton title="От короткого к полному" onPress={() => navigation.push('SentenceWorkshop', undefined)} />}
           <View style={s.row}>
             <StudyButton title="Предыдущая глава" disabled={index <= 0} onPress={() => open({ chapterId: chapterList[index - 1].id })} />
             <StudyButton title="Следующая глава" disabled={index < 0 || index === chapterList.length - 1} onPress={() => open({ chapterId: chapterList[index + 1].id })} />

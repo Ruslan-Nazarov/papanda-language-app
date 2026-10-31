@@ -117,3 +117,25 @@ it('export and import do not retain caller-owned references', () => {
   valid.activeLanguages.push('invalid');
   assert.equal(useStore.getState().activeLanguages.includes('invalid'), false);
 });
+
+it('defaults sentenceWorkoutCount to 5 and preserves user configuration in export/import', () => {
+  const store = useStore.getState();
+  assert.equal(store.sentenceWorkoutCount, 5);
+  store.setSentenceWorkoutCount(7);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 7);
+  const backup = store.exportProgress();
+  assert.equal(backup.sentenceWorkoutCount, 7);
+
+  store.setSentenceWorkoutCount(10);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 10);
+  assert.equal(store.importProgress(backup).ok, true);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 7);
+
+  // Rejects invalid values
+  store.setSentenceWorkoutCount(-1);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 7);
+  store.setSentenceWorkoutCount(101);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 7);
+  store.setSentenceWorkoutCount(5);
+  assert.equal(useStore.getState().sentenceWorkoutCount, 5);
+});
