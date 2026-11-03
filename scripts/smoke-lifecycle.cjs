@@ -89,16 +89,7 @@ async function main() {
     await page.waitForSelector('[role="tab"]');
     assert.equal((await state()).wordTourSize, 5);
 
-    // Association survives closing the app without answering or advancing.
-    const learned = Object.fromEntries(require('../src/data/words.json').map(word => [word.eng || word.word, { knowledge_stats: { en: true }, is_learned: 1 }]));
     const custom = { eng: 'lifecycle-word', word: 'quux', ru: 'Пример', count: 0, is_learned: 0, translations: { en: 'quux' }, is_favorite: true };
-    await seed({ userWordProgress: learned, activeLanguages: ['en'], customWords: [custom] });
-    await tab('Word Triples');
-    await page.type('[data-testid="word-association"]', 'Не потерять при закрытии');
-    await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.userWordProgress['lifecycle-word']?.personal_association === 'Не потерять при закрытии');
-    await page.reload({ waitUntil: 'networkidle0' });
-    await tab('Word Triples');
-    await page.waitForFunction(() => document.querySelector('[data-testid="word-association"]')?.value === 'Не потерять при закрытии');
 
     // Clearing a translation in the current quiz cannot record a blank answer.
     await seed({ userWordProgress: {}, activeLanguages: ['en'], customWords: [custom], workoutWordCount: 1, workoutLearnedWordCount: 0, workoutFavoritesOnly: true });
@@ -148,7 +139,7 @@ async function main() {
     });
     await page.waitForFunction(() => document.querySelector('[data-testid="statistics-today"]')?.textContent === '24');
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('PASS: failed writes/retry, book backup/read recovery, association cold start, empty quiz card, saved sentence queue, next-day statistics.');
+    console.log('PASS: failed writes/retry, book backup/read recovery, empty quiz card, saved sentence queue, next-day statistics.');
   } catch (error) {
     if (page) { console.error((await page.$eval('body', el => el.innerText)).slice(-4000)); await page.screenshot({ path: path.join(root, 'lifecycle-failure.png') }); }
     throw error;

@@ -1,7 +1,6 @@
-import ReviewPlan from '../components/ReviewPlan';
-import { activeExperimentRun } from '../models/experiments';
 import { useScreenClock } from '../hooks/useScreenClock';
 import { StructureProgress } from '../components/StructureExercise';
+import SentenceStatistics from '../components/SentenceStatistics';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../navigation/types';
 import { useShallow } from 'zustand/react/shallow';
@@ -98,7 +97,6 @@ function BarRow({ label, value, max, color, valueText }: { label: string; value:
 }
 
 export default function StatisticsScreen({ navigation }: BottomTabScreenProps<MainTabParamList, 'Statistics'>) {
-  const hideDailyReview = useStore(state => !!activeExperimentRun(state.experiments['hide-daily-review']));
   const nowMs = useScreenClock();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
@@ -191,8 +189,8 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
-      {!hideDailyReview && <ReviewPlan now={nowMs} onStart={() => navigation.navigate('Brain Workout')} />}
-      <StructureProgress onOpenWorkshop={() => (navigation as any).navigate('SentenceWorkshop')} />
+      <SentenceStatistics now={nowMs} />
+      <StructureProgress />
       {/* Summary tiles */}
       <View style={styles.tilesRow}>
         <View style={styles.tile}>

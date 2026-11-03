@@ -33,7 +33,6 @@ export default function DictionaryScreen({ navigation }: DictionaryScreenProps) 
     return words.filter(w => {
       const ruMatch = w.ru?.toLowerCase().includes(query);
       const originalMatch = (w.source_language ? getWordTranslation(w, w.source_language) : getWordTranslation(w, 'en')).toLowerCase().includes(query);
-      const assocMatch = w.personal_association?.toLowerCase().includes(query);
 
       // Check active languages translations
       const transMatch = activeLanguages.some(lang => {
@@ -41,7 +40,7 @@ export default function DictionaryScreen({ navigation }: DictionaryScreenProps) 
         return trans.toLowerCase().includes(query);
       });
 
-      return ruMatch || originalMatch || assocMatch || transMatch;
+      return ruMatch || originalMatch || transMatch;
     });
   }, [words, searchQuery, activeLanguages]);
 
@@ -117,13 +116,6 @@ export default function DictionaryScreen({ navigation }: DictionaryScreenProps) 
           </View>
         )}
 
-        {/* Personal Association */}
-        {!!item.personal_association && (
-          <View style={styles.assocBox}>
-            <Text style={styles.assocTitle}>💡 Личная ассоциация:</Text>
-            <Text style={styles.assocContent}>{item.personal_association}</Text>
-          </View>
-        )}
       </View>
     );
   };
@@ -146,7 +138,7 @@ export default function DictionaryScreen({ navigation }: DictionaryScreenProps) 
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Поиск по слову, переводу или ассоциации..."
+          placeholder="Поиск по слову или переводу..."
           placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}

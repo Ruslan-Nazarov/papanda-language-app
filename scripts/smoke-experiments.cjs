@@ -28,7 +28,7 @@ async function main() {
       void request.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"error":"Offline check","retryable":false}' });
     });
     await page.evaluateOnNewDocument(() => localStorage.setItem('papanda-onboarded', '1'));
-    const id = 'hide-daily-review';
+    const id = 'sentence-lessons';
     const selector = testId => `[data-testid="${testId}"]`;
     const click = async testId => {
       const css = selector(testId);
@@ -51,7 +51,7 @@ async function main() {
 
     await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
     await tab('Statistics');
-    await reviewVisible(true);
+    await reviewVisible(false);
     await tab('Settings');
     await click('settings-experiments');
     await page.waitForSelector(selector(`experiment-note-${id}`), { visible: true });
@@ -70,7 +70,7 @@ async function main() {
     await waitRun(1, false);
     await click('experiments-back');
     await tab('Statistics');
-    await reviewVisible(true);
+    await reviewVisible(false);
     await tab('Settings');
     await click('settings-experiments');
     await click(`experiment-toggle-${id}`);
@@ -97,7 +97,7 @@ async function main() {
       await page.screenshot({ path: path.join(root, `experiments-${width}.png`) });
     }
     assert.deepEqual(errors, []);
-    console.log('Experiments UI passed: start/stop/restart, review visibility, notes and history after reload, 320/430px.');
+    console.log('Experiments UI passed: start/stop/restart, removed review stays absent, notes and history after reload, 320/430px.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

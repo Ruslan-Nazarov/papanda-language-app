@@ -27,9 +27,9 @@ export const WORD_MEMORY = {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-/** Most recent show of a word for a specific language (falls back to the word-level date). */
+/** Use the word-level date only for legacy profiles with no per-language dates. */
 export const getWordLastShown = (word: Word, lang: string): string | undefined =>
-  word.last_shown_by_lang?.[lang] || word.last_shown;
+  word.last_shown_by_lang ? word.last_shown_by_lang[lang] : word.last_shown;
 
 /**
  * Memory weight of one (word, language) pair in [0..1]:

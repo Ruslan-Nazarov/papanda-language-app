@@ -3,7 +3,7 @@ const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
 const cwd = path.resolve(__dirname, '..');
-const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours', 'statistics', 'lifecycle', 'notes', 'discussion', 'experiments', 'sentence-lessons', 'papanda-design'];
+const scripts = ['onboarding', 'web', 'workshop', 'book', 'review', 'trainer', 'generation', 'word-entry', 'word-tours', 'word-selection', 'statistics', 'lifecycle', 'notes', 'discussion', 'experiments', 'sentence-lessons', 'papanda-design'];
 const bundle = process.env.SMOKE_BUNDLE_DIR || 'dist-audit';
 for (const name of scripts) {
   console.log(`\nUI check: ${name}`);

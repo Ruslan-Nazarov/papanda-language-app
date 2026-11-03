@@ -87,8 +87,53 @@ async function main() {
     await page.waitForSelector('[aria-modal="true"]', { hidden: true });
     await page.click('[aria-label="Как считается: Оценка закрепления"]');
     await page.waitForFunction(() => document.body.innerText.includes('Непоказанные слова тоже учитываются'));
+    await page.evaluate(() => [...document.querySelector('[aria-modal="true"]').querySelectorAll('div')].filter(el => el.textContent === 'Понятно').at(-1).click());
+    await page.waitForSelector('[aria-modal="true"]', { hidden: true });
+
+    // Count completed reveals, including repeats, rather than passive card visits.
+    const card = { id: 'statistics-sentence', source: 'generated', createdAt: Date.now(), language: 'English', sentence: 'She read.',
+      words: [
+        { text: 'She', label: 'Pronoun', role: 'Subject', clauseIndex: 0, translation: 'она', is_in_my_dict: false },
+        { text: 'read', label: 'Verb (Past)', role: 'Predicate', clauseIndex: 0, translation: 'читала', is_in_my_dict: false },
+      ] };
+    await seed({ userWordProgress: {}, activeLanguages: ['en'], generatedSentences: [card] });
+    assert.ok((await page.$eval('[data-testid="sentence-statistics"]', el => el.textContent)).includes('Полностью раскройте'));
+    assert.ok(!(await page.$eval('body', el => el.innerText)).includes('Повторение на сегодня'));
+    await page.click('[role="tab"][aria-label="Sentence Trainer"]');
+    await page.waitForSelector('[data-testid="trainer-reveal"]');
+    const count = () => page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state.sentenceAnalyses.length);
+    const reveal = () => page.$eval('[data-testid="trainer-reveal"]', el => el.click());
+    assert.equal(await count(), 0);
+    await reveal();
+    assert.equal(await count(), 0);
+    await reveal();
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.sentenceAnalyses.length === 1);
+    await reveal(); // Translation is part of the same analysis.
+    assert.equal(await count(), 1);
+    await reveal(); // Restart.
+    await page.$eval('[data-testid="trainer-block-1"]', el => el.click());
+    assert.equal(await count(), 1);
+    await page.$eval('[data-testid="trainer-block-0"]', el => el.click());
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.sentenceAnalyses.length === 2);
+    await page.reload({ waitUntil: 'networkidle0' });
+    await page.click('[role="tab"][aria-label="Statistics"]');
+    await page.waitForSelector('[data-testid="sentence-statistics-summary"]');
+    const text = await page.$eval('[data-testid="sentence-statistics"]', el => el.textContent);
+    assert.ok(text.includes('Разборов: 2'));
+    assert.ok(text.includes('Разных предложений: 1'));
+    assert.ok(text.includes('Прошедшее время'));
+    assert.ok(text.includes('read'));
+    for (const width of [320, 430]) {
+      await page.setViewport({ width, height: 740 });
+      await page.$eval('[data-testid="sentence-statistics"]', el => el.scrollIntoView({ block: 'start' }));
+      assert.ok(await page.$eval('[data-testid="sentence-statistics"]', el => {
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.left >= 0 && rect.right <= innerWidth && el.scrollWidth <= el.clientWidth;
+      }));
+      await page.screenshot({ path: path.join(root, `sentence-statistics-${width}.png`) });
+    }
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log(`Statistics UI passed: ${words.length} words, ten exposures = ${snapshot.imw}, 320/430px.`);
+    console.log(`Statistics UI passed: ${words.length} words, ten exposures = ${snapshot.imw}; completed/partial/repeated sentence reveals, reload, 320/430px.`);
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

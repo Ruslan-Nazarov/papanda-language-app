@@ -67,6 +67,6 @@ eas-*-local.json
 /book/
 /docs/
 /tests/
-/.git/
+/.git
 /.agents/
 /.codex/

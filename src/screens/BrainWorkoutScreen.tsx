@@ -4,18 +4,20 @@ import { useShallow } from 'zustand/react/shallow';
 import { buildWorkoutQueue, QueueItem } from '../utils/workout';
 import { localDateKey } from '../utils/date';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal, PanResponder, Animated, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
+import { auditWordManually } from '../services/wordAuditService';
 import { getWordTranslation } from '../utils/words';
 import { usePronunciation } from '../hooks/usePronunciation';
 import PapandaIcon from '../components/PapandaIcon';
 import PronunciationModal from '../components/PronunciationModal';
 import { readWordStats } from '../utils/statistics';
+import { canStudyWord } from '../utils/wordStudy';
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER, UI } from '../constants/theme';
 
 
@@ -29,13 +31,12 @@ export default function BrainWorkoutScreen() {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, workoutLearnedWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, undoWordKnowledge, userWordProgress, snoozeWord, hasSeenSnoozeHint, setHasSeenSnoozeHint } = useStore(useShallow(state => ({
+  const { words, activeLanguages, markWordKnown, incrementShowCount, workoutWordCount, addWorkoutSnapshot, recordImwSnapshot, workoutFavoritesOnly, setWorkoutFavoritesOnly, toggleWordFavorite, undoWordKnowledge, userWordProgress, snoozeWord, hasSeenSnoozeHint, setHasSeenSnoozeHint } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
     markWordKnown: state.markWordKnown,
     incrementShowCount: state.incrementShowCount,
     workoutWordCount: state.workoutWordCount,
-    workoutLearnedWordCount: state.workoutLearnedWordCount,
     addWorkoutSnapshot: state.addWorkoutSnapshot,
     recordImwSnapshot: state.recordImwSnapshot,
     workoutFavoritesOnly: state.workoutFavoritesOnly,
@@ -47,15 +48,21 @@ export default function BrainWorkoutScreen() {
     hasSeenSnoozeHint: state.hasSeenSnoozeHint,
     setHasSeenSnoozeHint: state.setHasSeenSnoozeHint,
   })));
-  const workoutReviewOnly = useStore(state => state.workoutReviewOnly);
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const queueScope = JSON.stringify([activeLanguages, workoutFavoritesOnly, workoutWordCount]);
+  const initializedScope = React.useRef<string | null>(null);
   // Bumped to force a fresh workout queue (finishing a session, closing the result modal).
   const [regenNonce, setRegenNonce] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const actionLocked = React.useRef(false);
+  React.useLayoutEffect(() => { actionLocked.current = false; }, [queue, currentIndex]);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState({ known: 0, unknown: 0 });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
+  const [isAuditingWord, setIsAuditingWord] = useState(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
+  const manualAuditAbortRef = React.useRef<AbortController | null>(null);
 
   const { isPronunciationModalVisible, setIsPronunciationModalVisible, pronunciationExplanation,
     setPronunciationExplanation, isPronunciationLoading, handlePronunciation,
@@ -71,7 +78,7 @@ export default function BrainWorkoutScreen() {
   const [isStatsVisible, setIsStatsVisible] = useState(false);
   const transition = useCardTransition({
     enabled: isFocused && !resultModalVisible && !isModalVisible && !isStatsVisible && !isPronunciationModalVisible,
-    scope: JSON.stringify([activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount, regenNonce, workoutReviewOnly]),
+    scope: JSON.stringify([queueScope, regenNonce]),
     cardKey: JSON.stringify([queue[currentIndex]?.word.eng || queue[currentIndex]?.word.word, queue[currentIndex]?.langCode, currentIndex]),
     onSwipe: direction => handleAnswer(direction === 'right'),
     canSwipe: () => Boolean(currentWord && currentLang && getWordTranslation(currentWord, currentLang)),
@@ -111,23 +118,80 @@ export default function BrainWorkoutScreen() {
 
   // Generate workout queue
   useEffect(() => {
+    if (!isFocused) return;
+    const scope = JSON.stringify([queueScope, regenNonce]);
+    if (initializedScope.current === scope && queue.length > 0) return;
+    initializedScope.current = scope;
     setQueue(buildWorkoutQueue(useStore.getState()));
     setCurrentIndex(0);
     setShowAnswer(false);
     setHistory([]);
     setScore({ known: 0, unknown: 0 });
+    setResultModalVisible(false);
     setPronunciationExplanation(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [words.length, activeLanguages, workoutFavoritesOnly, workoutWordCount, workoutLearnedWordCount, regenNonce, workoutReviewOnly]);
+  }, [queueScope, regenNonce, isFocused]);
 
   const currentItem = queue[currentIndex];
   // Always use the freshest word data from the store in case it was edited
-  const currentWord = currentItem ? (words.find(w => (w.eng || w.word) === (currentItem.word.eng || currentItem.word.word)) || currentItem.word) : undefined;
+  const currentStoredWord = currentItem ? words.find(w => (w.eng || w.word) === (currentItem.word.eng || currentItem.word.word)) : undefined;
+  const currentWord = currentStoredWord ?? currentItem?.word;
   const currentLang = currentItem?.langCode;
+  const cardContext = JSON.stringify([queueScope, regenNonce, currentIndex, currentItem?.word.eng, currentLang]);
+  const activeCardContext = React.useRef<string | null>(null);
+  activeCardContext.current = isFocused ? cardContext : null;
 
   // Always read the latest favorite status directly from the store
   const currentWordKey = currentWord?.eng || currentWord?.word || '';
   const currentProgress = currentWordKey ? userWordProgress[currentWordKey] : undefined;
+  const aiStatus = currentProgress?.ai_verification?.status;
+  const auditInput = JSON.stringify([currentWord?.ru, currentWord?.meaning,
+    activeLanguages.map(lang => [lang, currentWord && getWordTranslation(currentWord, lang)])]);
+  React.useLayoutEffect(() => {
+    setIsAuditingWord(false);
+    setAuditError(null);
+    return () => {
+      manualAuditAbortRef.current?.abort();
+      manualAuditAbortRef.current = null;
+    };
+  }, [cardContext, auditInput, isFocused, resultModalVisible, isModalVisible]);
+
+  const runManualAudit = async () => {
+    if (!currentStoredWord || activeCardContext.current !== cardContext || resultModalVisible || isModalVisible
+      || manualAuditAbortRef.current) return;
+    const controller = new AbortController();
+    manualAuditAbortRef.current = controller;
+    setIsAuditingWord(true);
+    setAuditError(null);
+    try {
+      await auditWordManually(currentStoredWord, activeLanguages, controller.signal);
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        setAuditError(err instanceof Error ? err.message : 'Не удалось проверить слово.');
+      }
+    } finally {
+      if (manualAuditAbortRef.current === controller) {
+        manualAuditAbortRef.current = null;
+        setIsAuditingWord(false);
+      }
+    }
+  };
+
+  const handleAuditButtonPress = () => {
+    if (isAuditingWord) return;
+    if (aiStatus === 'flagged') {
+      setEditingWord(currentWord ?? null);
+      setIsModalVisible(true);
+    } else if (aiStatus === 'verified') {
+      Alert.alert('Слово проверено', 'ИИ проверил написание и перевод — ошибок не обнаружено.\n\nЗапустить проверку повторно?', [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Проверить снова', onPress: () => void runManualAudit() },
+      ]);
+    } else {
+      void runManualAudit();
+    }
+  };
+
   const isFavorite = currentWord ? (currentProgress?.is_favorite ?? currentWord.is_favorite) : false;
   const knowledgeStats = {
     ...readWordStats(currentWord?.knowledge_stats),
@@ -143,8 +207,11 @@ export default function BrainWorkoutScreen() {
   const lastShown = currentProgress?.last_shown ?? currentWord?.last_shown;
 
   const advanceWorkout = (known = score.known, unknown = score.unknown) => {
-    if (currentIndex < queue.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    const latestWords = useStore.getState().words;
+    const nextIndex = queue.findIndex((item, index) => index > currentIndex && latestWords.some(word =>
+      (word.eng || word.word) === (item.word.eng || item.word.word) && canStudyWord(word, [item.langCode])));
+    if (nextIndex >= 0) {
+      setCurrentIndex(nextIndex);
       setShowAnswer(false);
       setPronunciationExplanation(null);
     } else {
@@ -159,16 +226,14 @@ export default function BrainWorkoutScreen() {
   };
 
   const handleAnswer = (knew: boolean) => {
-    if (!transition.beginAction() || !currentWord || !currentLang || !getWordTranslation(currentWord, currentLang) || resultModalVisible) return;
+    if (actionLocked.current || !transition.beginAction() || !currentStoredWord || !currentLang || !canStudyWord(currentStoredWord, [currentLang]) || resultModalVisible) return;
+    actionLocked.current = true;
 
     const wordKey = currentWord.eng || currentWord.word || '';
-    setHistory(prev => [...prev, {
-      index: currentIndex,
-      knew,
-      undo: captureKnowledgeUndo(currentWord, [currentLang], knew),
-    }]);
-
+    const undo = captureKnowledgeUndo(currentWord, [currentLang], knew);
     markWordKnown(wordKey, currentLang, knew);
+    undo.reviewsApplied = useStore.getState().userWordProgress[wordKey]?.review_by_lang;
+    setHistory(prev => [...prev, { index: currentIndex, knew, undo }]);
     incrementShowCount(wordKey, currentLang);
 
     if (knew) {
@@ -181,14 +246,16 @@ export default function BrainWorkoutScreen() {
   };
 
   const executeSnooze = React.useCallback(() => {
-    if (!transition.beginAction() || !currentWord || !currentLang) return;
+    // A native confirmation may outlive the card or the session that opened it.
+    if (activeCardContext.current !== cardContext || actionLocked.current || !transition.beginAction() || !currentStoredWord || !currentLang) return;
+    actionLocked.current = true;
     const wordKey = currentWord.eng || currentWord.word || '';
 
     // Snooze for 7 days
     snoozeWord(wordKey, currentLang, 7);
 
     advanceWorkout();
-  }, [currentWord, currentLang, currentIndex, queue.length, score, snoozeWord, addWorkoutSnapshot, recordImwSnapshot]);
+  }, [cardContext, currentStoredWord, currentWord, currentLang, currentIndex, queue.length, score, snoozeWord, addWorkoutSnapshot, recordImwSnapshot]);
 
   const handleSnooze = React.useCallback(() => {
     if (!transition.beginAction()) return;
@@ -213,8 +280,9 @@ export default function BrainWorkoutScreen() {
   }, [hasSeenSnoozeHint, executeSnooze, setHasSeenSnoozeHint]);
 
   const handlePrevStep = () => {
-    if (!transition.beginAction()) return;
+    if (actionLocked.current || !transition.beginAction()) return;
     if (history.length > 0) {
+      actionLocked.current = true;
       const lastAction = history[history.length - 1];
       const wordKey = queue[lastAction.index].word.eng || queue[lastAction.index].word.word || '';
 
@@ -236,25 +304,29 @@ export default function BrainWorkoutScreen() {
   const resetCardPosition = transition.reset;
   const handleSwipe = transition.animate;
 
+  useEffect(() => {
+    if (isFocused && queue.length && !resultModalVisible && currentItem
+      && (!currentStoredWord || !canStudyWord(currentStoredWord, [currentItem.langCode]))) advanceWorkout();
+  }, [isFocused, queue, currentIndex, words, resultModalVisible]);
+
   if (queue.length === 0 || !currentWord || !currentLang) {
     return (
       <View style={[styles.container, { paddingTop: topPadding }]}>
         <View style={styles.headerSection}>
           <TouchableOpacity
             style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]}
-            disabled={workoutReviewOnly}
             onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
           >
             <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
-              {workoutReviewOnly ? 'План на сегодня' : workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
+              {workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.emptyCard}>
           <PapandaIcon name="check" size={28} />
-          <Text style={styles.header}>{workoutReviewOnly ? "Повторение на сегодня завершено" : "Все слова выучены!"}</Text>
-          {workoutReviewOnly && <TouchableOpacity onPress={() => useStore.getState().setWorkoutReviewOnly(false)}><Text>Вернуться к обычной тренировке</Text></TouchableOpacity>}
-          <Text style={styles.emptySub}>{workoutReviewOnly ? 'Все запланированные слова уже показаны. Можно перейти к обычной тренировке.' : 'Нет доступных слов для текущего набора языков и фильтров. Измените фильтр или языки в настройках.'}</Text>
+          <Text style={styles.header}>Нет доступных слов</Text>
+          <Text style={styles.emptySub}>{'Нет доступных слов для текущего набора языков и фильтров. Измените фильтр или языки в настройках.'}</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => setRegenNonce(n => n + 1)}><Text>Проверить снова</Text></TouchableOpacity>
         </View>
       </View>
     );
@@ -281,16 +353,15 @@ export default function BrainWorkoutScreen() {
 
         <TouchableOpacity
           style={[styles.favoriteToggleBtn, workoutFavoritesOnly && styles.favoriteToggleBtnActive]}
-          disabled={workoutReviewOnly}
             onPress={() => setWorkoutFavoritesOnly(!workoutFavoritesOnly)}
         >
           <Text style={[styles.favoriteToggleText, workoutFavoritesOnly && styles.favoriteToggleTextActive]}>
-            {workoutReviewOnly ? 'План на сегодня' : workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
+            {workoutFavoritesOnly ? '★ Только избранные' : '☆ Все слова'}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.progressPill}>
-          <Text style={styles.progressText}>{currentIndex + 1} / {queue.length}</Text>
+          <Text testID="workout-position" style={styles.progressText}>{currentIndex + 1} / {queue.length}</Text>
         </View>
       </View>
 
@@ -353,6 +424,27 @@ export default function BrainWorkoutScreen() {
                   <Text style={styles.statsCardBtnText}>Статистика</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  testID="workout-request-audit"
+                  accessibilityRole="button"
+                  accessibilityLabel={aiStatus === 'verified' ? 'Слово проверено ИИ: ошибок не найдено'
+                    : aiStatus === 'flagged' ? 'Обнаружена возможная неточность перевода'
+                    : 'Запросить проверку написания и перевода'}
+                  accessibilityState={{ disabled: isAuditingWord, busy: isAuditingWord }}
+                  style={styles.statsCardBtn}
+                  disabled={isAuditingWord}
+                  onPress={event => {
+                    event.stopPropagation();
+                    handleAuditButtonPress();
+                  }}
+                >
+                  {isAuditingWord && <ActivityIndicator size="small" color={ACCENT_DARK} />}
+                  <Text style={[styles.statsCardBtnText, aiStatus === 'verified' && styles.auditVerified,
+                    aiStatus === 'flagged' && styles.auditWarning]}>
+                    {isAuditingWord ? 'Проверка…' : aiStatus === 'verified' ? 'Проверено'
+                      : aiStatus === 'flagged' ? 'Неточность' : 'Проверить'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   accessibilityRole="button" accessibilityLabel="Редактировать слово" style={styles.editCardBtn}
                   onPress={(e) => {
                     e.stopPropagation();
@@ -365,12 +457,37 @@ export default function BrainWorkoutScreen() {
               </View>
             </View>
 
+            {isAuditingWord && <Text testID="workout-audit-loading" style={styles.auditMessage}>
+              ИИ проверяет написание и перевод…
+            </Text>}
+            {auditError && !isAuditingWord && <View testID="workout-audit-error" style={styles.auditNotice}>
+              <Text accessibilityLiveRegion="polite" style={[styles.auditMessage, styles.auditWarning]}>{auditError}</Text>
+              <TouchableOpacity accessibilityRole="button" style={styles.statsCardBtn} onPress={event => {
+                event.stopPropagation();
+                void runManualAudit();
+              }}><Text style={styles.statsCardBtnText}>Повторить</Text></TouchableOpacity>
+            </View>}
+            {aiStatus === 'verified' && !isAuditingWord && <Text testID="workout-audit-verified"
+              accessibilityLiveRegion="polite" style={[styles.auditMessage, styles.auditVerified]}>
+              Проверено ИИ: написание и перевод точны
+            </Text>}
+            {aiStatus === 'flagged' && !isAuditingWord && <TouchableOpacity testID="workout-audit-flagged"
+              accessibilityRole="button" style={styles.auditNotice} onPress={event => {
+                event.stopPropagation();
+                setEditingWord(currentWord);
+                setIsModalVisible(true);
+              }}>
+              <Text accessibilityLiveRegion="polite" style={[styles.auditMessage, styles.auditWarning]}>
+                Возможна неточность перевода (ИИ) · Открыть редактор
+              </Text>
+            </TouchableOpacity>}
+
                 {isCurrentLanguageLearned && (
                   <View style={styles.learnedBadge}>
                     <Text style={styles.learnedBadgeText}>✓ Выучено</Text>
                   </View>
                 )}
-            <Text style={styles.targetForeignWord}>{targetTranslation || 'Перевод удалён'}</Text>
+            <Text testID="workout-prompt" style={styles.targetForeignWord}>{targetTranslation || 'Перевод удалён'}</Text>
             {!targetTranslation && <TouchableOpacity accessibilityRole="button" onPress={event => {
               event.stopPropagation();
               if (transition.beginAction()) advanceWorkout();
@@ -397,12 +514,6 @@ export default function BrainWorkoutScreen() {
                     </TouchableOpacity>
                   )}
                 </View>
-                {!!currentWord.personal_association && (
-                  <View style={styles.assocNote}>
-                    <Text style={styles.assocNoteTitle}>Ассоциация</Text>
-                    <Text style={styles.assocNoteText}>{currentWord.personal_association}</Text>
-                  </View>
-                )}
                 {!!currentWord.meaning && (
                   <Text style={styles.meaningText}>Контекст: {currentWord.meaning}</Text>
                 )}
@@ -467,7 +578,6 @@ export default function BrainWorkoutScreen() {
         </View>
       </View>
 
-      {workoutReviewOnly && <TouchableOpacity onPress={() => useStore.getState().setWorkoutReviewOnly(false)} style={{ padding: 12 }}><Text>План на сегодня · Вернуться к обычной тренировке</Text></TouchableOpacity>}
       <EditWordModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -664,6 +774,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  auditNotice: { width: '100%', alignItems: 'center', minHeight: 44, justifyContent: 'center' },
+  auditMessage: { fontSize: 13, lineHeight: 19, color: UI.muted, textAlign: 'center', marginVertical: 4 },
+  auditVerified: { color: '#059669' },
+  auditWarning: { color: '#B45309' },
   targetForeignWord: {
     fontSize: 26,
     lineHeight: 34,

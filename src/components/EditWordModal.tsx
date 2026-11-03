@@ -1,5 +1,5 @@
 import { useShallow } from 'zustand/react/shallow';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Word } from '../models/types';
 import { useStore, type WordAiVerification } from '../store/useStore';
@@ -27,17 +27,15 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
   })));
   const [tempWord, setTempWord] = useState<{
     ru: string;
-    personal_association: string;
     translations: Record<string, string>;
   }>({
     ru: '',
-    personal_association: '',
     translations: {}
   });
 
-  const [localAiVerification, setLocalAiVerification] = useState<WordAiVerification | null | undefined>(undefined);
+  const [localAiVerification, setLocalAiVerification] = useState<{ input: string; verification: WordAiVerification }>();
   const [isCheckingAi, setIsCheckingAi] = useState(false);
-  const [aiCheckMessage, setAiCheckMessage] = useState<string | null>(null);
+  const auditController = useRef<AbortController | null>(null);
 
   const wordKey = wordToEdit?.eng || wordToEdit?.word || '';
   // A token tap can hand us a draft Word for a form that isn't in the dictionary
@@ -46,17 +44,23 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
   const existsInStore = Boolean(wordKey) && words.some(w => (w.eng || w.word) === wordKey);
   const isAddingNew = !wordToEdit || !existsInStore;
   const aiVerification = wordKey && existsInStore ? userWordProgress[wordKey]?.ai_verification : undefined;
-  const effectiveVerification = localAiVerification !== undefined ? localAiVerification : aiVerification;
   const sourceLanguage = wordToEdit?.source_language;
   const editableLanguages = useMemo(() => [...new Set([
     ...(sourceLanguage && activeLanguages.includes(sourceLanguage) ? [sourceLanguage] : []), ...activeLanguages,
   ])], [sourceLanguage, activeLanguages]);
+  const draftInput = JSON.stringify([tempWord.ru.trim(), editableLanguages.map(lang => [lang, (tempWord.translations[lang] || '').trim()])]);
+  const savedInput = JSON.stringify([getWordTranslation(wordToEdit, 'ru'), editableLanguages.map(lang => [lang, getWordTranslation(wordToEdit, lang)])]);
+  const currentVerification = localAiVerification?.input === draftInput ? localAiVerification.verification : undefined;
+  const effectiveVerification = currentVerification ?? (draftInput === savedInput ? aiVerification : undefined);
+  useLayoutEffect(() => {
+    setIsCheckingAi(false);
+    return () => { auditController.current?.abort(); auditController.current = null; };
+  }, [visible, wordKey, draftInput]);
 
   useEffect(() => {
     if (visible) {
       setLocalAiVerification(undefined);
       setIsCheckingAi(false);
-      setAiCheckMessage(null);
       if (wordToEdit) {
         const trans: Record<string, string> = {};
         editableLanguages.forEach(l => {
@@ -65,26 +69,22 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
 
         setTempWord({
           ru: getWordTranslation(wordToEdit, 'ru'),
-          personal_association: wordToEdit.personal_association || '',
           translations: trans
         });
       } else {
         const trans: Record<string, string> = {};
         editableLanguages.forEach(l => { trans[l] = ''; });
-        setTempWord({ ru: '', personal_association: '', translations: trans });
+        setTempWord({ ru: '', translations: trans });
       }
     }
   }, [visible, wordToEdit, editableLanguages]);
 
-  // Only the fields that actually changed vs. `original` — so saving (e.g. just to
-  // add a personal association) doesn't freeze every translation as a permanent
-  // per-word override and block future corrections to the shipped dictionary data.
+  // Only save changed fields so unchanged translations can receive dictionary corrections.
   const buildChangedDetails = (original: Word, onlyFilled = false) => {
     const details: {
       word?: string;
       ru?: string;
       translations?: Record<string, string>;
-      personal_association?: string;
     } = {};
 
     const newRu = tempWord.ru.trim();
@@ -103,11 +103,6 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
     });
     if (Object.keys(changedTranslations).length > 0) {
       details.translations = changedTranslations;
-    }
-
-    const newAssoc = tempWord.personal_association.trim();
-    if ((!onlyFilled || newAssoc) && newAssoc !== (original.personal_association || '')) {
-      details.personal_association = newAssoc;
     }
 
     return details;
@@ -143,7 +138,6 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
           // `eng` is a legacy persistence key, independent of displayed words.
           eng: `user:${filledLanguage}:${id}`,
           ru: tempWord.ru.trim(),
-          personal_association: tempWord.personal_association.trim(),
           translations: Object.fromEntries(Object.entries(tempWord.translations).map(([lang, value]) => [lang, value.trim()])),
           source_language: filledLanguage,
           count: 0,
@@ -159,18 +153,17 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
       if (Object.keys(details).length > 0) {
         updateWordDetails(wordKey, details);
       }
-      if (localAiVerification && wordKey) {
-        setWordAiVerification(wordKey, localAiVerification);
+      if (currentVerification && wordKey) {
+        setWordAiVerification(wordKey, currentVerification);
       }
 
-      // Translation edits invalidate the old verdict in the store. Saving an
-      // association or an unchanged form is not a linguistic verification.
+      // Translation edits invalidate the old verdict in the store.
     }
     onClose();
   };
 
   const handleModalAudit = async () => {
-    if (isCheckingAi) return;
+    if (!visible || auditController.current) return;
     const russian = tempWord.ru.trim();
     const hasTranslation = editableLanguages.some(lang => tempWord.translations[lang]?.trim());
     if (!russian && !hasTranslation) {
@@ -179,15 +172,16 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
     }
 
     setIsCheckingAi(true);
-    setAiCheckMessage(null);
+    const controller = new AbortController();
+    auditController.current = controller;
 
     const draftWord: Word = {
       id: wordToEdit?.id || 'draft',
       word: tempWord.translations[wordToEdit?.source_language || editableLanguages[0]] || russian,
       ru: russian,
+      meaning: wordToEdit?.meaning,
       translations: tempWord.translations,
       source_language: wordToEdit?.source_language || editableLanguages[0],
-      personal_association: tempWord.personal_association,
       count: wordToEdit?.count || 0,
       is_learned: wordToEdit?.is_learned || 0,
       knowledge_stats: wordToEdit?.knowledge_stats || {},
@@ -196,20 +190,17 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
     };
 
     try {
-      const result = await auditWordTranslations(draftWord, editableLanguages, undefined, true);
-      if (result) {
-        setLocalAiVerification(result);
-        if (result.status === 'verified') {
-          setAiCheckMessage('✓ Проверено ИИ: написание и перевод точны!');
-        } else {
-          setAiCheckMessage(null);
-        }
+      const result = await auditWordTranslations(draftWord, editableLanguages, controller.signal, true);
+      if (result && !controller.signal.aborted && auditController.current === controller) {
+        setLocalAiVerification({ input: draftInput, verification: result });
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Не удалось проверить слово.';
-      Alert.alert('Ошибка проверки', msg);
+      if (!controller.signal.aborted && auditController.current === controller) {
+        const msg = err instanceof Error ? err.message : 'Не удалось проверить слово.';
+        Alert.alert('Ошибка проверки', msg);
+      }
     } finally {
-      setIsCheckingAi(false);
+      if (auditController.current === controller) { auditController.current = null; setIsCheckingAi(false); }
     }
   };
 
@@ -220,9 +211,9 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
           <Text style={styles.modalTitle}>{isAddingNew ? 'Новое слово' : 'Редактировать слово'}</Text>
 
           <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-            {Boolean(aiCheckMessage) && (
+            {currentVerification?.status === 'verified' && (
               <View style={styles.aiSuccessBox}>
-                <Text style={styles.aiSuccessText}>{aiCheckMessage}</Text>
+                <Text style={styles.aiSuccessText}>✓ Проверено ИИ: написание и перевод точны!</Text>
               </View>
             )}
 
@@ -279,14 +270,6 @@ export default function EditWordModal({ visible, onClose, wordToEdit, onCreateNo
               placeholder="Например: яблоко"
             />
 
-            <Text style={styles.inputLabel}>Личная ассоциация</Text>
-            <TextInput
-              style={[styles.modalInput, { minHeight: 60 }]}
-              multiline
-              value={tempWord.personal_association}
-              onChangeText={(text) => setTempWord({...tempWord, personal_association: text})}
-              placeholder="Что поможет вам запомнить это слово?"
-            />
           </ScrollView>
 
           {onCreateNote && <TouchableOpacity accessibilityRole="button" testID="word-create-note" onPress={onCreateNote}

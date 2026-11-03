@@ -37,9 +37,8 @@ async function main() {
       await new Promise(resolve=>setTimeout(resolve,200));
     };
     const body=()=>page.$eval('[data-testid="workshop-screen"]',el=>el.innerText);
-    await page.click('[data-testid="sentence-options"]');
-    await page.waitForSelector('[data-testid="trainer-cache-stats"]', { visible: true });
-    await page.click('[data-testid="growing-sentence-entry"]');
+    await page.waitForSelector('[data-testid="trainer-workshop-header"]', { visible: true });
+    await page.click('[data-testid="trainer-workshop-header"]');
     await page.waitForSelector('[data-testid="workshop-screen"]');
     assert.ok((await body()).includes('От короткого к полному'));
     assert.ok((await body()).includes('Предложение по нарастающей'));

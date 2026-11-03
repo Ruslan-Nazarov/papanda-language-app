@@ -4,6 +4,7 @@ import type { SentenceDraft, SentenceTask } from '../services/sentenceCurriculum
 import { makeGeneratedSentence } from './sentences';
 import { abortableDelay } from '../services/generationControl';
 import { formatArticleGloss } from '../constants/sentencePresentation';
+import { getTokenFormParts } from './tokenForms';
 
 const VALID_ROLES = new Set<SyntaxRole>(['Predicate', 'Subject', 'Attribute', 'Attribute_Subject', 'Object',
   'Attribute_Object', 'Circumstance', 'Adverbial', 'Conjunction', 'Preposition', 'Particle', 'Article', 'Other']);
@@ -11,7 +12,6 @@ const surface = (value: string) => value.normalize('NFC').replace(/[’‘]/gu, 
 const normalize = (value: string) => surface(value).trim().toLocaleLowerCase().replace(/\s+/g, ' ');
 const edgePunctuation = /^[.,;:!?¿¡"«»„“”()…—–]+|[.,;:!?¿¡"«»„“”()…—–]+$/gu;
 const separator = /[\s.,;:!?¿¡"«»„“”()…—–]/u;
-const OPAQUE_ENGLISH_FORMS = new Set(['does', 'did', 'has', 'had', 'is', 'was', 'were', 'are', 'am', 'have']);
 
 export const sentenceFingerprint = (label: string, text: string): string =>
   `${normalize(label)}:${normalize(text).replace(/[.,;:!?¿¡"«»„“”()]/gu, '').replace(/\s+/g, ' ').trim()}${text.includes('?') ? '?' : ''}`;
@@ -162,9 +162,7 @@ const validateWithDictionaryIndex = (
       const role: SyntaxRole = code === 'it' && normalize(text) === 'non' && raw.role === 'Particle' ? 'Predicate' : raw.role;
       const parts = Array.isArray(raw.parts) && raw.parts.length > 0 && raw.parts.every((p: unknown) => typeof p === 'string' && p.trim()) &&
         surface(raw.parts.join('')) === surface(text) ? raw.parts : [text];
-      // The written surface can be divided into arbitrary character slices;
-      // common irregular auxiliaries have no trustworthy visible stem boundary.
-      const safeParts = code === 'en' && OPAQUE_ENGLISH_FORMS.has(normalize(text)) ? [text] : parts;
+      const safeParts = getTokenFormParts({ ...raw, text, parts }, code);
       tokens.push({ text, label: typeof raw.label === 'string' ? raw.label : text, role, parts: safeParts,
         translation: raw.translation, dictionary_form: typeof raw.dictionary_form === 'string' ? raw.dictionary_form.trim() : text,
         is_in_my_dict: false, dictionary_word: null, ...(raw.clauseIndex !== undefined ? { clauseIndex: raw.clauseIndex } : {}) });

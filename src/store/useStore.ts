@@ -15,6 +15,8 @@ import { applyWordProgress, baseStaticWords, deriveCatalog, mergeSentences } fro
 import { createDefaultProgress, pickPersistedFields, PersistedProgress, UserWordProgress, WordAiVerification } from './progressTypes';
 import { parseProgress } from './progressValidation';
 import { effectiveWordProgress, undoKnowledge, type KnowledgeUndo } from '../utils/wordProgress';
+import { nextWordReview } from '../utils/wordStudy';
+import { snapshotSentenceAnalysis } from '../utils/sentenceStatistics';
 import type { LanguageNote, NoteSource } from '../models/notes';
 import { linkNoteSource, prepareLanguageNote } from '../utils/notes';
 import { activeExperimentRun, EXPERIMENTS, type ExperimentId } from '../models/experiments';
@@ -30,6 +32,7 @@ interface TargetSentenceInfo {
 }
 
 interface AppState extends PersistedProgress {
+  recordSentenceAnalysis: (sentence: Sentence, presentationId: string) => void;
   startSentenceLesson: (code: string, count?: 3 | 5) => void;
   updateSentenceLesson: (code: string, lessonId: string, position: number, checkpoint: ExerciseCheckpoint) => void;
   advanceSentenceLesson: (code: string, lessonId: string, position: number, skip?: boolean) => void;
@@ -48,8 +51,6 @@ interface AppState extends PersistedProgress {
   words: Word[];
   sentences: Sentence[];
   targetSentenceInfo: TargetSentenceInfo | null;
-  workoutReviewOnly: boolean;
-  setWorkoutReviewOnly: (enabled: boolean) => void;
 
   // Actions
   initializeStore: () => void;
@@ -150,7 +151,11 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
 
   const defaults = createDefaultProgress();
   return {
-    ...defaults, ...deriveCatalog(defaults), targetSentenceInfo: null, workoutReviewOnly: false, progressRevision: 0,
+    ...defaults, ...deriveCatalog(defaults), targetSentenceInfo: null, progressRevision: 0,
+    recordSentenceAnalysis: (sentence, presentationId) => set(state => {
+      if (!sentence.words.length || state.sentenceAnalyses.some(item => item.id === presentationId)) return {};
+      return { sentenceAnalyses: [...state.sentenceAnalyses, snapshotSentenceAnalysis(sentence, presentationId)].slice(-500) };
+    }),
     saveNoteDraft: note => {
       const draft = prepareLanguageNote(note, true);
       set(state => ({ noteDrafts: [...state.noteDrafts.filter(item => item.id !== draft.id), draft] }));
@@ -173,7 +178,6 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     undoWordKnowledge: (key, undo) => updateProgress(key, progress => undoKnowledge(progress, undo, get().activeLanguages)),
     recordStructureAttempt: attempt => set(state => ({ structureAttempts: [...state.structureAttempts.filter(a => a.id !== attempt.id), attempt].slice(-500) })),
     disputeStructureAttempt: id => set(state => ({ structureAttempts: state.structureAttempts.map(a => a.id === id ? { ...a, result: 'disputed' as const } : a) })),
-    setWorkoutReviewOnly: workoutReviewOnly => set({ workoutReviewOnly }),
     initializeStore: () => set(deriveCatalog(get())),
     recordImwSnapshot: () => set(state => {
       if (!state.words.length || !state.activeLanguages.length) return {};
@@ -189,6 +193,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
     markWordKnown: (key, lang, known) => updateProgress(key, progress => {
       const knowledge = { ...progress.knowledge_stats, [lang]: known };
       return { ...progress, knowledge_stats: knowledge,
+        review_by_lang: { ...progress.review_by_lang, [lang]: nextWordReview(progress.review_by_lang?.[lang], known) },
         is_learned: get().activeLanguages.every(code => knowledge[code] === true) ? 1 : 0 };
     }),
     snoozeWord: (key, lang, days) => {
@@ -204,6 +209,8 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       ...progress, is_learned: 1, knowledge_stats: {
         ...progress.knowledge_stats, ...Object.fromEntries(get().activeLanguages.map(lang => [lang, true])),
       },
+      review_by_lang: { ...progress.review_by_lang, ...Object.fromEntries(get().activeLanguages.map(lang =>
+        [lang, nextWordReview(progress.review_by_lang?.[lang], true)])) },
     })),
     saveWordAssociation: (key, association) => updateProgress(key, progress => ({ ...progress, personal_association: association })),
     setWordAiVerification: (key, verification) => updateProgress(key, progress => ({ ...progress, ai_verification: verification })),
@@ -280,8 +287,8 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
         personal_association: progress.personal_association, is_favorite: progress.is_favorite, ai_verification: progress.ai_verification,
       }]));
       const customWords = state.customWords.map(word => ({ ...word, count: 0, is_learned: 0,
-        knowledge_stats: {}, show_stats: {}, last_shown: undefined, last_shown_by_lang: undefined, snoozed_until_by_lang: undefined }));
-      const next = { ...state, structureAttempts: [], sentenceLessons: {}, userWordProgress, customWords, dailyShows: {}, workoutSnapshots: [], imwSnapshots: [] };
+        knowledge_stats: {}, show_stats: {}, review_by_lang: undefined, last_shown: undefined, last_shown_by_lang: undefined, snoozed_until_by_lang: undefined }));
+      const next = { ...state, sentenceAnalyses: [], structureAttempts: [], sentenceLessons: {}, userWordProgress, customWords, dailyShows: {}, workoutSnapshots: [], imwSnapshots: [] };
       return { ...pickPersistedFields(next), ...deriveCatalog(next), progressRevision: state.progressRevision + 1 };
     }),
     addWorkoutSnapshot: snapshot => set(state => ({ workoutSnapshots: [...state.workoutSnapshots, snapshot].slice(-200) })),
@@ -361,7 +368,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       try {
         const progress = parseProgress(data);
         cancelGenerations();
-        set({ ...progress, ...deriveCatalog(progress), targetSentenceInfo: null, workoutReviewOnly: false,
+        set({ ...progress, ...deriveCatalog(progress), targetSentenceInfo: null,
           progressRevision: get().progressRevision + 1 });
         return { ok: true };
       } catch (error) {

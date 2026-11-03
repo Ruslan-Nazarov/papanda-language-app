@@ -43,7 +43,7 @@ export const reviewedTrain = () => ({ ...train, taskId: 'task-1', literalTransla
   it('does not confuse a lemma with surface morphemes', () => {
     const result = validate([{ sentence: 'She is happier.', words: [tok('She', 'Subject'), tok('is', 'Predicate'),
       { ...tok('happier', 'Predicate', 'happy'), parts: ['happy', 'er'] }] }]);
-    assert.deepEqual(result.sentences[0].words[2].parts, ['happier']);
+    assert.deepEqual(result.sentences[0].words[2].parts, ['happi', 'er']);
     assert.equal(result.sentences[0].words[2].dictionary_form, 'happy');
   });
   it('ignores forged dictionary references and recognises inflected expressions', () => {

@@ -1,7 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useIsFocused } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Platform, PanResponder, Modal, Animated, ActivityIndicator, Alert } from 'react-native';
 import TouchableOpacity from '../components/PapandaAction';
 import type { WordTriplesScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,9 +9,10 @@ import { useStore } from '../store/useStore';
 import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
-import { getWordTranslation } from '../utils/words';
+import { getWordKey, getWordTranslation } from '../utils/words';
 import { readWordStats } from '../utils/statistics';
-import { pickWordCard } from '../utils/wordCards';
+import { buildWordTour } from '../utils/wordCards';
+import { canStudyWord } from '../utils/wordStudy';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
 import { auditNextWordInBackground, auditWordManually } from '../services/wordAuditService';
 import { useCardTransition } from '../hooks/useCardTransition';
@@ -29,27 +30,29 @@ const isHorizontalSwipe = (gesture: { dx: number; dy: number }) =>
   Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.4;
 
 export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
-  const [associationFocused, setAssociationFocused] = useState(false);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
-  const { words, activeLanguages, wordTourSize, markTripleKnown, recordTripleCardShow, saveWordAssociation, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
+  const { words, activeLanguages, wordTourSize, markTripleKnown, recordTripleCardShow, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
     wordTourSize: state.wordTourSize,
     markTripleKnown: state.markTripleKnown,
     recordTripleCardShow: state.recordTripleCardShow,
-    saveWordAssociation: state.saveWordAssociation,
     undoWordKnowledge: state.undoWordKnowledge,
     toggleWordFavorite: state.toggleWordFavorite,
     userWordProgress: state.userWordProgress,
     setTargetSentenceInfo: state.setTargetSentenceInfo,
   })));
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [associationText, setAssociationText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
+  const tourKeys = React.useRef<string[] | null>(null);
+  const tourScope = JSON.stringify([activeLanguages, wordTourSize]);
+  const previousScope = React.useRef(tourScope);
+  const actionLocked = React.useRef(false);
+  React.useLayoutEffect(() => { actionLocked.current = false; }, [sessionCount, currentWord?.eng, currentWord?.word, tourScope]);
   const [history, setHistory] = useState<{word: Word, undo?: KnowledgeUndo}[]>([]);
   const [isAuditingWord, setIsAuditingWord] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
@@ -105,53 +108,63 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     })
   ).current;
 
-  const pickRandomWord = () => {
+  const showTourWord = (index: number) => {
     manualAuditAbortRef.current?.abort();
     setIsAuditingWord(false);
     setAuditError(null);
     const { words, activeLanguages } = useStore.getState();
-    const chosen = pickWordCard(words, activeLanguages, currentWord?.eng || currentWord?.word);
+    let chosen: Word | undefined;
+    // Remove unavailable pending cards without rebuilding or revisiting the tour.
+    while (tourKeys.current && index < tourKeys.current.length) {
+      chosen = words.find(word => getWordKey(word) === tourKeys.current![index]);
+      if (chosen && canStudyWord(chosen, activeLanguages)) break;
+      tourKeys.current.splice(index, 1);
+      chosen = undefined;
+    }
     if (!chosen) {
       setCurrentWord(null);
       return;
     }
 
     setCurrentWord(chosen);
-    setAssociationText(chosen.personal_association || '');
     recordTripleCardShow(chosen.eng || chosen.word || '');
     setPronunciationExplanation(null);
   };
 
+  const resetTour = () => {
+    const state = useStore.getState();
+    tourKeys.current = buildWordTour(state.words, state.activeLanguages, state.wordTourSize).map(getWordKey);
+    setHistory([]);
+    setSessionCount(0);
+    showTourWord(0);
+  };
+
   // Sync currentWord with any edits made in the modal/store. The store replaces
   // word objects on every change, so a reference check is enough — no deep compare.
-  const previousLanguages = React.useRef(activeLanguages);
-  const previousTourSize = React.useRef(wordTourSize);
   useEffect(() => {
-    if (previousLanguages.current !== activeLanguages || previousTourSize.current !== wordTourSize) {
-      previousLanguages.current = activeLanguages;
-      previousTourSize.current = wordTourSize;
+    if (previousScope.current !== tourScope) {
+      previousScope.current = tourScope;
+      tourKeys.current = null;
       setHistory([]);
       setSessionCount(0);
-      if (isFocused) pickRandomWord();
+      if (isFocused) resetTour();
       else setCurrentWord(null);
       return;
     }
     if (!isFocused || isTourComplete) return;
-    if (!currentWord) {
-      pickRandomWord();
+    if (!tourKeys.current) {
+      resetTour();
       return;
     }
+    if (!currentWord) return;
     const wordKey = currentWord.eng || currentWord.word;
     const latestWord = words.find(w => (w.eng || w.word) === wordKey);
-    if (!latestWord || !activeLanguages.every(lang => getWordTranslation(latestWord, lang))) {
-      pickRandomWord();
+    if (!latestWord || !canStudyWord(latestWord, activeLanguages)) {
+      showTourWord(sessionCount);
     } else if (latestWord !== currentWord) {
       setCurrentWord(latestWord);
-      if (latestWord.personal_association !== currentWord.personal_association) {
-        setAssociationText(latestWord.personal_association || '');
-      }
     }
-  }, [words, currentWord, activeLanguages, wordTourSize, isFocused, isTourComplete]);
+  }, [words, currentWord, tourScope, isFocused, isTourComplete]);
 
   const advanceTour = () => {
     manualAuditAbortRef.current?.abort();
@@ -163,7 +176,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
       setCurrentWord(null);
       setPronunciationExplanation(null);
     } else {
-      pickRandomWord();
+      showTourWord(nextCount);
     }
   };
 
@@ -172,18 +185,14 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     manualAuditAbortRef.current?.abort();
     setIsAuditingWord(false);
     setAuditError(null);
-    setSessionCount(0);
-    setHistory([]);
     cardTranslateX.setValue(0);
-    pickRandomWord();
+    resetTour();
   };
 
   const handleNext = () => {
-    if (!transition.beginAction()) return;
+    if (actionLocked.current || !transition.beginAction()) return;
     if (!currentWord || isTourComplete) return;
-    if (currentWord && associationText !== currentWord.personal_association) {
-      saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
-    }
+    actionLocked.current = true;
 
     if (currentWord) {
       setHistory(prev => [...prev, { word: currentWord }].slice(-100));
@@ -193,32 +202,25 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   };
 
   const handleMarkLearned = () => {
-    if (!transition.beginAction()) return;
+    if (actionLocked.current || !transition.beginAction()) return;
     if (currentWord && !isTourComplete) {
-      if (associationText !== currentWord.personal_association) {
-        saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
-      }
-
+      actionLocked.current = true;
       const wordKey = currentWord.eng || currentWord.word || '';
-      setHistory(prev => [...prev, {
-        word: currentWord,
-        undo: captureKnowledgeUndo(currentWord, activeLanguages, true),
-      }].slice(-100));
-
+      const undo = captureKnowledgeUndo(currentWord, activeLanguages, true);
       markTripleKnown(wordKey);
+      undo.reviewsApplied = useStore.getState().userWordProgress[wordKey]?.review_by_lang;
+      setHistory(prev => [...prev, { word: currentWord, undo }].slice(-100));
       advanceTour();
     }
   };
 
   const handlePrev = () => {
-    if (!transition.beginAction()) return;
+    if (actionLocked.current || !transition.beginAction()) return;
     manualAuditAbortRef.current?.abort();
     setIsAuditingWord(false);
     setAuditError(null);
     if (history.length > 0) {
-      if (currentWord && associationText !== (currentWord.personal_association || '')) {
-        saveWordAssociation(currentWord.eng || currentWord.word || '', associationText);
-      }
+      actionLocked.current = true;
       const lastAction = history[history.length - 1];
       const wordKey = lastAction.word.eng || lastAction.word.word || '';
 
@@ -230,7 +232,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
       const latestWord = useStore.getState().words.find(word => (word.eng || word.word) === wordKey);
       setCurrentWord(latestWord ?? null);
-      setAssociationText(latestWord?.personal_association || '');
       setPronunciationExplanation(null);
     }
   };
@@ -355,6 +356,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
         <Text style={styles.info}>Нет доступных слов для выбранной комбинации языков!</Text>
         {previousWordButton}
+        <TouchableOpacity onPress={startNewTour} accessibilityRole="button"><Text>Проверить снова</Text></TouchableOpacity>
       </View>
     );
   }
@@ -370,7 +372,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
         <View style={[styles.topHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
           <View>
             <Text style={styles.headerTitle}>Слова</Text>
-            <Text testID="word-tour-progress" style={styles.sessionCountText}>Пройдено: {sessionCount} / {wordTourSize}</Text>
+            <Text testID="word-tour-progress" style={styles.sessionCountText}>Пройдено: {sessionCount} / {tourKeys.current?.length ?? wordTourSize}</Text>
           </View>
           <TouchableOpacity
             style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
@@ -592,46 +594,6 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             })}
           </View>
 
-          {!currentProgress?.ai_verification && !isAuditingWord && (
-            <TouchableOpacity
-              testID="word-request-audit-link"
-              accessibilityRole="button"
-              accessibilityLabel="Запросить проверку написания и перевода"
-              style={styles.requestAuditLink}
-              onPress={() => void runManualAudit()}
-            >
-              <PapandaIcon name="verify" size={16} color={papanda.color.accentText} />
-              <Text style={styles.requestAuditLinkText}>Запросить проверку (ИИ)</Text>
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.divider} />
-
-          {/* Association Input */}
-          <View style={styles.assocHeaderRow}>
-            <View style={styles.assocTitle}>
-              <PapandaIcon name="idea" size={18} />
-              <Text style={styles.assocLabel}>Личная ассоциация</Text>
-            </View>
-            {!!associationText.trim() && (
-              <Text style={styles.assocSavedBadge}>✓ есть ассоциация</Text>
-            )}
-          </View>
-          <TextInput
-            accessibilityLabel="Личная ассоциация"
-            onFocus={() => setAssociationFocused(true)}
-            onBlur={() => setAssociationFocused(false)}
-            style={[styles.input, !!associationText.trim() && styles.inputWithContent, associationFocused && styles.inputFocused]}
-            multiline
-            placeholder="Что поможет вам запомнить это слово?"
-            testID="word-association"
-            placeholderTextColor={papanda.color.textSecondary}
-            value={associationText}
-            onChangeText={text => {
-              setAssociationText(text);
-              saveWordAssociation(currentWordKey, text);
-            }}
-          />
         </Animated.View>
 
         {/* Bottom Actions */}
@@ -967,23 +929,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#B91C1C',
     textDecorationLine: 'underline',
-  },
-  requestAuditLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginTop: 4,
-    borderRadius: 8,
-    backgroundColor: '#F8FAFC',
-    alignSelf: 'center',
-  },
-  requestAuditLinkText: {
-    fontSize: 13,
-    color: papanda.color.accentText,
-    fontWeight: '600',
   },
   sideBadge: {
     flexDirection: 'row',

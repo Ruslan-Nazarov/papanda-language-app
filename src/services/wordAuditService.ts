@@ -1,4 +1,4 @@
-import { generationContext } from './generationControl';
+import { abortError, checkAborted, generationContext } from './generationControl';
 import { parseWordAudit, selectWordAuditCandidate } from '../utils/wordAudit';
 import { Word } from '../models/types';
 import { useStore, WordAiVerification } from '../store/useStore';
@@ -11,6 +11,9 @@ let lastAuditTime = 0;
 let lastAuditKey: string | undefined;
 const MIN_AUDIT_INTERVAL_MS = 12000; // at least 12 seconds between background audits
 
+const auditInput = (word: Word, languages: string[]) => JSON.stringify([
+  word.ru, word.meaning, languages.map(lang => [lang, getWordTranslation(word, lang)]),
+]);
 
 /**
  * Validates active translations of a word against Russian meaning using Gemini.
@@ -100,16 +103,30 @@ export async function auditWordManually(
   activeLanguages: string[],
   signal?: AbortSignal
 ): Promise<WordAiVerification> {
-  const verification = await auditWordTranslations(word, activeLanguages, signal, true);
-  if (!verification) {
-    throw new Error('Не удалось получить результат проверки от ИИ.');
-  }
-
+  const context = generationContext('word-audit');
+  const revision = useStore.getState().progressRevision;
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  signal?.addEventListener('abort', abort, { once: true });
+  context.signal.addEventListener('abort', abort, { once: true });
+  if (signal?.aborted || context.signal.aborted) abort();
   const key = word.eng || word.word || '';
-  if (key) {
-    useStore.getState().setWordAiVerification(key, verification);
+  const input = auditInput(word, activeLanguages);
+  try {
+    checkAborted(controller.signal);
+    const verification = await auditWordTranslations(word, activeLanguages, controller.signal, true);
+    checkAborted(controller.signal);
+    const state = useStore.getState();
+    const current = state.words.find(item => (item.eng || item.word) === key);
+    // Edits and restored profiles invalidate the result, even if a backend ignores abort.
+    if (state.progressRevision !== revision || !current || auditInput(current, activeLanguages) !== input) throw abortError();
+    if (!verification) throw new Error('Не удалось получить результат проверки от ИИ.');
+    state.setWordAiVerification(key, verification);
+    return verification;
+  } finally {
+    signal?.removeEventListener('abort', abort);
+    context.signal.removeEventListener('abort', abort);
   }
-  return verification;
 }
 
 /**
@@ -139,7 +156,7 @@ export async function auditNextWordInBackground(): Promise<void> {
     const verification = await auditWordTranslations(candidate, activeLanguages, context.signal);
     if (context.signal.aborted) return;
     const current = useStore.getState().words.find(word => (word.eng || word.word) === (candidate.eng || candidate.word));
-    if (verification && current && current.ru === candidate.ru && activeLanguages.every(lang => getWordTranslation(current, lang) === getWordTranslation(candidate, lang))) {
+    if (verification && current && auditInput(current, activeLanguages) === auditInput(candidate, activeLanguages)) {
       const key = candidate.eng || candidate.word || '';
       setWordAiVerification(key, verification);
     }

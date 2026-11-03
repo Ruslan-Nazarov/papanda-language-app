@@ -89,10 +89,10 @@ it('word lookup cannot confuse Italian sale with English sale or a custom persis
   assert.equal(lookup.has('user:de:salz'), false);
 });
 
-it('word cards avoid immediate repeats while allowing the last eligible word', () => {
+it('word cards do not refill an exhausted selection with the previous word', () => {
   const second = { ...sample, eng: 'second' };
   assert.equal(pickWordCard([sample, second], ['en'], sample.eng, Date.now(), () => 0), second);
-  assert.equal(pickWordCard([sample], ['en'], sample.eng), sample);
+  assert.equal(pickWordCard([sample], ['en'], sample.eng), null);
   assert.equal(pickWordCard([sample], []), null);
   assert.equal(pickWordCard([{ ...sample, knowledge_stats: { en: true } }], ['en']), null);
 });

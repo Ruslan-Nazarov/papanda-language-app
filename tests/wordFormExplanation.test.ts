@@ -18,9 +18,12 @@ const context: WordFormContext = {
 
 it('explains the displayed inflected form with its lemma and full sentence context', async () => {
   globalThis.fetch = async (_, init) => {
-    const prompt = JSON.parse(init!.body as string).prompt as string;
+    const { prompt, generationConfig } = JSON.parse(init!.body as string);
     const payload = JSON.parse(prompt.slice(prompt.indexOf('{')));
     assert.deepEqual(payload, { context });
+    assert.match(prompt, /похожее по написанию слово или форму/);
+    assert.match(prompt, /краткий контраст формы/);
+    assert.equal(generationConfig.maxOutputTokens, 1536);
     return Response.json({ text: 'cuoco → cuochi: множественное число, -i; h сохраняет звук /k/.' });
   };
   assert.match(await explainWordForm(context), /cuoco → cuochi/);

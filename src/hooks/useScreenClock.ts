@@ -3,7 +3,7 @@ import { AppState } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 
 /** Tabs stay mounted: refresh date-dependent views on return and at local midnight. */
-export function useScreenClock(): number {
+export function useScreenClock(refreshMs = Infinity): number {
   const focused = useIsFocused();
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -14,7 +14,7 @@ export function useScreenClock(): number {
       const current = new Date();
       setNow(current.getTime());
       const midnight = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1);
-      timer = setTimeout(refresh, Math.max(1000, midnight.getTime() - current.getTime()));
+      timer = setTimeout(refresh, Math.max(1000, Math.min(refreshMs, midnight.getTime() - current.getTime())));
     };
     refresh();
     const subscription = AppState.addEventListener('change', state => {
@@ -22,6 +22,6 @@ export function useScreenClock(): number {
       else clearTimeout(timer);
     });
     return () => { clearTimeout(timer); subscription.remove(); };
-  }, [focused]);
+  }, [focused, refreshMs]);
   return now;
 }

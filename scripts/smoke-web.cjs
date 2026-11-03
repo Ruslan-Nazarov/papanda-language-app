@@ -262,11 +262,8 @@ async function main() {
     await clickText('Заменить прогресс');
     await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.workoutWordCount === 20);
     await page.click('[role="tab"][aria-label="Statistics"]');
-    await clickText('Повторить сегодня');
-    await page.waitForFunction(() => document.body.innerText.includes('План на сегодня'));
-    assert.ok((await page.$eval('body', el => el.innerText)).includes('book'));
-    await page.screenshot({ path: path.join(root, 'review-plan.png') });
-    await clickText('План на сегодня · Вернуться к обычной тренировке');
+    assert.ok(!(await page.$eval('body', el => el.innerText)).includes('Повторение на сегодня'));
+    await page.waitForSelector('[data-testid="sentence-statistics"]');
     await page.reload({ waitUntil: 'networkidle0' });
     await page.click('[role="tab"][aria-label="Settings"]');
     await clickText('↩ Вернуть состояние до импорта');

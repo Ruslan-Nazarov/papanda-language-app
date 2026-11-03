@@ -8,10 +8,7 @@ import { parseProgress } from '../src/store/progressValidation';
 import { previewBackup, MAX_BACKUP_BYTES } from '../src/services/backupFormat';
 import { importWithRestorePoint, restoreBeforeImport } from '../src/services/progressRestore';
 import { baseStaticWords, baseStaticSentences } from '../src/store/catalog';
-import { buildReviewPlan, isDueForReview } from '../src/utils/reviewPlan';
-import { buildWorkoutQueue } from '../src/utils/workout';
 import { sentenceFingerprint, tokensMatchSentence } from '../src/utils/sentenceValidation';
-import type { Word } from '../src/models/types';
 
 beforeEach(() => { useStore.getState().importProgress(createDefaultProgress()); });
 
@@ -90,21 +87,6 @@ it('serializes imports while a recovery write is pending', async () => {
     await assert.rejects(importWithRestorePoint(createDefaultProgress()), /Дождитесь/);
     release(); await first;
   } finally { AsyncStorage.setItem = original; }
-});
-
-const now = new Date(2026, 9, 9, 12).getTime();
-const due: Word = { eng: 'book', ru: 'книга', count: 4, is_learned: 0, show_stats: { en: 4 }, knowledge_stats: { en: false }, last_shown_by_lang: { en: '2026-09-01' } };
-it('review plan excludes new, snoozed, untranslated and already shown today entries', () => {
-  const words = [due,
-    { ...due, eng: 'today', last_shown_by_lang: { en: new Date(now).toISOString() } },
-    { ...due, eng: 'snoozed', snoozed_until_by_lang: { en: new Date(now + 86400000).toISOString() } },
-    { ...due, eng: 'fresh', show_stats: {} },
-    { ...due, eng: 'user:la:test', word: 'test', source_language: 'la' },
-  ];
-  assert.deepEqual(buildReviewPlan(words, ['en'], now).map(item => item.word.eng), ['book']);
-  const queue = buildWorkoutQueue({ words, activeLanguages: ['en'], workoutWordCount: 10, workoutLearnedWordCount: 5, workoutFavoritesOnly: false, workoutReviewOnly: true }, now);
-  assert.deepEqual(queue.map(item => item.word.eng), ['book']);
-  assert.equal(isDueForReview(due, 'it', now), false);
 });
 
 it('restores previously hidden cards from legacy backups without keeping reports', () => {

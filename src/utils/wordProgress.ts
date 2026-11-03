@@ -1,4 +1,4 @@
-import type { Word } from '../models/types';
+import type { Word, WordReview } from '../models/types';
 import type { UserWordProgress } from '../store/progressTypes';
 import { readWordStats } from './statistics';
 
@@ -14,6 +14,7 @@ export function effectiveWordProgress(word: Word | undefined, progress: UserWord
     last_shown: word?.last_shown,
     last_shown_by_lang: word?.last_shown_by_lang,
     snoozed_until_by_lang: word?.snoozed_until_by_lang,
+    review_by_lang: word?.review_by_lang,
     ...progress,
   };
 }
@@ -21,22 +22,32 @@ export function effectiveWordProgress(word: Word | undefined, progress: UserWord
 export interface KnowledgeUndo {
   before: Record<string, boolean | undefined>;
   applied: boolean;
+  reviewsBefore?: Record<string, WordReview | undefined>;
+  reviewsApplied?: Record<string, WordReview | undefined>;
 }
 
 export function captureKnowledgeUndo(word: Word, languages: string[], applied: boolean): KnowledgeUndo {
   const knowledge = readWordStats(word.knowledge_stats);
   return { before: Object.fromEntries(languages.map(lang => [lang,
-    typeof knowledge[lang] === 'boolean' ? knowledge[lang] : undefined])), applied };
+    typeof knowledge[lang] === 'boolean' ? knowledge[lang] : undefined])), applied,
+    reviewsBefore: Object.fromEntries(languages.map(lang => [lang, word.review_by_lang?.[lang]])) };
 }
 
 /** Undo only this answer. Visits, edits, favourites and other languages survive. */
 export function undoKnowledge(progress: UserWordProgress, undo: KnowledgeUndo, languages: string[]): UserWordProgress {
   const knowledge = { ...progress.knowledge_stats };
+  const reviews = { ...progress.review_by_lang };
   for (const [lang, before] of Object.entries(undo.before)) {
     if (knowledge[lang] !== undo.applied) continue;
+    if (undo.reviewsApplied && JSON.stringify(reviews[lang]) !== JSON.stringify(undo.reviewsApplied[lang])) continue;
     if (before === undefined) delete knowledge[lang];
     else knowledge[lang] = before;
+    if (undo.reviewsBefore) {
+      const review = undo.reviewsBefore[lang];
+      if (review) reviews[lang] = review;
+      else delete reviews[lang];
+    }
   }
-  return { ...progress, knowledge_stats: knowledge,
+  return { ...progress, knowledge_stats: knowledge, review_by_lang: reviews,
     is_learned: languages.length > 0 && languages.every(lang => knowledge[lang] === true) ? 1 : 0 };
 }

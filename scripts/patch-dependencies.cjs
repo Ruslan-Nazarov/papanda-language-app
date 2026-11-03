@@ -43,6 +43,5 @@ patch('sprintf-js', 'src/sprintf.js', '                match = parse_tree[i] // 
                     match[7] = String(Math.max(minPrecision, Math.min(Number(match[7]), maxPrecision)))
                 }`);
 
-// GHSA-86w9-cpqp-85rv: validate the nested AlgorithmIdentifier element count too.
-patch('node-forge', 'lib/rsa.js', '            obj.value.length !== 2) {',
-  "            obj.value.length !== 2 ||\n            obj.value[0].value.length !== ('parameters' in capture ? 2 : 1)) {");
+// node-forge >=1.4.2 includes the upstream RSA fix; dependencySecurity.test.ts
+// continues to check malformed DigestInfo without modifying the installed package.

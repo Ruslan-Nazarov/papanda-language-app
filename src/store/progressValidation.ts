@@ -45,6 +45,8 @@ const verification = shape({ status: value => value === 'verified' || value === 
 const statsFields = {
   count: integer, is_learned: value => value === 0 || value === 1,
   knowledge_stats: dictionary(boolean), show_stats: dictionary(integer),
+  review_by_lang: dictionary(shape({ streak: value => integer(value) && (value as number) <= 6,
+    lapses: integer, answeredAt: timestamp, dueAt: timestamp })),
   last_shown: timestamp, last_shown_by_lang: dictionary(timestamp),
   snoozed_until_by_lang: dictionary(timestamp), personal_association: string, is_favorite: boolean,
 } satisfies Record<string, Check>;
@@ -64,6 +66,10 @@ const word: Check = value => wordFields(value) && record(value) &&
   ((typeof value.eng === 'string' && value.eng.trim().length > 0) || (typeof value.word === 'string' && value.word.trim().length > 0));
 const languages = new Set(LANGUAGES.map(language => language.code));
 const schema = shape({ userWordProgress: dictionary(progress) }, {
+  sentenceAnalyses: value => Array.isArray(value) && value.length <= 500 && value.every(shape({
+    id: string, language: string, sentence: string, createdAt: timestamp,
+    labels: array(shape({ label: string, count: value => integer(value) && (value as number) > 0, examples: array(string) })),
+  })) && new Set(value.map(item => item.id)).size === value.length,
   sentenceLessons: value => record(value) && Object.entries(value).every(([code, item]) => isSentenceLessonProgress(item, sentence, code)),
   experiments: dictionary(isExperimentProgress),
   languageNotes: value => Array.isArray(value) && value.every(note => isLanguageNote(note) && !!note.body.trim()) && new Set(value.map(note => note.id)).size === value.length,

@@ -2007,10 +2007,12 @@
         "text": "киімдер",
         "is_in_my_dict": true,
         "dictionary_word": "киімдер",
+        "dictionary_form": "киім",
         "role": "Object",
         "label": "Object",
         "parts": [
-          "киімдер"
+          "киім",
+          "дер"
         ],
         "translation": "одежду"
       },
@@ -2499,10 +2501,12 @@
         "text": "киімдер",
         "is_in_my_dict": true,
         "dictionary_word": "киімдер",
+        "dictionary_form": "киім",
         "role": "Object",
         "label": "Object",
         "parts": [
-          "киімдер"
+          "киім",
+          "дер"
         ],
         "translation": "одежду"
       },
@@ -3241,7 +3245,7 @@
         "translation": "рабочий"
       },
       {
-        "text": "терезеңі",
+        "text": "терезені",
         "is_in_my_dict": true,
         "dictionary_word": "терезе",
         "role": "Object",
@@ -8123,8 +8127,8 @@
         "role": "Predicate",
         "label": "Verb (Past)",
         "parts": [
-          "stop",
-          "ped"
+          "stopp",
+          "ed"
         ],
         "translation": "остановил"
       },

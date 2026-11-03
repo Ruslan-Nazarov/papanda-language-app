@@ -102,21 +102,6 @@ async function main() {
     assert.equal(await page.$eval('[aria-label="Открыть словарь"]', el => getComputedStyle(el).outlineWidth), '2px');
     await page.keyboard.press('Tab');
     assert.ok(await page.evaluate(() => document.activeElement !== document.body));
-    await page.focus(select('word-association'));
-    await page.type(select('word-association'), 'Танысу — знакомлюсь с новым человеком.');
-    await page.waitForFunction(() => JSON.parse(localStorage.getItem('papanda-storage')).state.userWordProgress['pilot-fixture'].personal_association?.includes('новым человеком'));
-    await page.setViewport({ width: 390, height: 480 });
-    await page.$eval(select('word-association'), el => el.scrollIntoView({ block: 'center' }));
-    assert.ok(await page.$eval(select('word-association'), el => {
-      const r = el.getBoundingClientRect(); return r.top >= 0 && r.bottom < innerHeight;
-    }));
-    await screenshot('words-reduced-viewport');
-    await page.setViewport({ width: 390, height: 844 });
-    await page.reload({ waitUntil: 'networkidle0' });
-    await tab('Word Triples');
-    await page.waitForSelector(select('word-association'));
-    assert.match(await page.$eval(select('word-association'), el => el.value), /новым человеком/);
-
     // Long Cyrillic/Kazakh names, large text, and an empty learning queue.
     await page.evaluate(() => {
       const saved = JSON.parse(localStorage.getItem('papanda-storage'));
@@ -180,7 +165,7 @@ async function main() {
     await page.evaluate(() => [...document.querySelectorAll('[role="button"]')].find(el => el.textContent === 'Закрыть').click());
     await page.waitForSelector(select('word-form-modal'), { hidden: true });
     assert.deepEqual(errors, []);
-    console.log('Papanda pilot passed: catalogue, 320/390/1440px, system reading font, bundled outline icons, compact touch targets, keyboard focus, association persistence, reduced viewport, long/large text, empty state, loading, 402 and retry.');
+    console.log('Papanda pilot passed: catalogue, 320/390/1440px, system reading font, bundled outline icons, compact touch targets, keyboard focus, long/large text, empty state, loading, 402 and retry.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

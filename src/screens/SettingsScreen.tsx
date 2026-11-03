@@ -19,19 +19,89 @@ const WORKOUT_COUNT_OPTIONS = [5, 7, 10, 15, 20];
 const WORD_TOUR_COUNT_OPTIONS = [5, 10, 15, 20, 30, 50];
 const SENTENCE_WORKOUT_COUNT_OPTIONS = [3, 5, 7, 10, 15, 20];
 const ONBOARDING_KEY = 'papanda-onboarded';
+const WORD_STUDY_HELP = [
+  {
+    title: 'Какие слова появляются чаще',
+    text: 'Приоритет получают слова, которые вы не вспомнили или ещё не отметили знакомыми. Повторные ответы «Не знаю» повышают их приоритет. Добавляются новые слова и знакомые для проверки памяти. Сначала выбираются слова, срок повторения которых уже наступил. Состав тура подбирается автоматически.',
+  },
+  {
+    title: '«Слова»: знакомство и закрепление',
+    text: 'Карточка показывает переводы сразу на всех активных языках. Кнопка «Выучено» отмечает слово знакомым на всех этих языках. Переход к следующей карточке без этой отметки оставляет слово в изучении. Если слово знакомо на всех активных языках, оно исключается из «Слов», но остаётся доступным для проверки в «Повторе».',
+  },
+  {
+    title: '«Повтор»: вспомните перевод',
+    text: 'Вопрос задаётся на одном языке. Попробуйте вспомнить перевод, затем откройте ответ и выберите «Знаю» или «Не знаю». Ответ меняет отметку и расписание только для языка вопроса. Если вы учите несколько языков, для слова выбирается один из тех, которым нужна практика.',
+  },
+  {
+    title: 'Когда повторять снова',
+    text: 'После «Не знаю» следующий повтор назначается через 10 минут, а серия успешных ответов начинается заново. После успешных ответов в срок интервалы растут: 1, 3, 7, 14, 30 и 60 дней. Повторный ответ «Знаю» раньше назначенного срока не увеличивает уже начатую серию. Простое открытие перевода не считается успешным ответом и не переносит уже назначенный повтор. В обычном туре недавние слова могут появиться раньше срока, если других доступных слов не хватает.',
+  },
+  {
+    title: 'Почему в туре нет повторов',
+    text: 'Список карточек составляется в начале тура. Каждое слово встречается один раз, в «Повторе» — даже при нескольких активных языках. Одинаково написанные слова на одном языке также не дублируются. Если доступных слов меньше выбранного размера тура, тур будет короче. Добавление слов в словарь не начинает текущий тур заново. Возврат назад явно открывает предыдущую карточку; затем вы продолжаете ту же последовательность.',
+  },
+  {
+    title: '«Реже» и план повторения',
+    text: 'Кнопка «Реже» откладывает слово на 7 дней для языка вопроса. Отсрочка действует в обоих режимах: «Слова» временно скрывает всю карточку, если отложен хотя бы один из её активных языков.',
+  },
+  {
+    title: 'Показы и отмена ответа',
+    text: 'В «Словах» показ учитывается при открытии карточки, в «Повторе» — после ответа «Знаю» или «Не знаю». Число показов и ваша отметка о знании — разные вещи. Отмена ответа восстанавливает прежнюю отметку и расписание, сохраняя уже учтённые показы, изменения перевода и избранное. Знание и расписание хранятся отдельно для каждого языка и входят в резервную копию.',
+  },
+];
+const STATISTICS_HELP = [
+  {
+    title: 'Слов в базе',
+    text: 'Количество словарных записей: встроенные слова и добавленные вами. Это размер вашего словаря, а не число уже изученных слов.',
+  },
+  {
+    title: 'Просмотрено',
+    text: 'Сколько разных слов встретилось хотя бы один раз хотя бы на одном из активных языков. Повторные показы одного слова не увеличивают это число.',
+  },
+  {
+    title: 'Выучено полностью и знание по языкам',
+    text: '«Выучено полностью» — слова, отмеченные знакомыми на всех активных языках. «Знание по языкам» показывает такие отметки отдельно для каждого языка. В «Повторе» ответ «Знаю» относится только к языку вопроса, а «Выучено» в «Словах» — ко всем активным языкам. Это ваша самооценка. При смене активных языков эти показатели пересчитываются.',
+  },
+  {
+    title: 'Показов сегодня и активность за 14 дней',
+    text: 'Это количество учтённых показов, включая повторные. В «Словах» показ считается при открытии карточки, в «Повторе» — после ответа «Знаю» или «Не знаю». В тренажёре предложений учитывается каждое найденное в словаре слово; повтор одного слова внутри предложения считается один раз. Карточка «Слов» с несколькими языками даёт один общий показ. Самостоятельный разбор и чтение своего текста в этот график не входят. День определяется по местному времени устройства.',
+  },
+  {
+    title: 'По количеству повторений',
+    text: 'Группы показывают, сколько слов имеют 1–5, 6–15, 16–40, 41–80 или больше 80 показов. Для слова берётся среднее число показов по тем активным языкам, на которых оно уже встречалось. Слова без показов на активных языках вынесены отдельно. Большое число показов само по себе не означает, что вы помните перевод.',
+  },
+  {
+    title: 'Результаты тренировок',
+    text: 'Учитываются ответы в завершённых тренировках «Повтора». Процент равен числу ответов «Знаю», делённому на все ответы «Знаю» и «Не знаю», и умноженному на 100. Например, 7 ответов «Знаю» из 10 — это 70%. Несколько тренировок за день объединяются; показаны последние 10 дней с ответами. Итоговый процент считается по всем ответам этих дней. Состав и сложность слов могут меняться, поэтому сравнивайте и сами задания, и результаты.',
+  },
+  {
+    title: 'Оценка закрепления — iMW',
+    text: 'Условный индекс от 0 до 100 по всему словарю и всем активным языкам. Он учитывает число показов, отметку «Знаю» и давность занятий. Непоказанные слова дают нулевой вклад, без отметки «Знаю» вклад вдвое меньше, после перерыва он постепенно снижается. Поэтому после нескольких тренировок большой базы индекс может оставаться небольшим. Число 80 в расчёте — настройка шкалы показов, а не обязательное число повторений для запоминания. Индекс не измеряет владение всем языком и не определяет срок следующего повторения: расписание зависит от ваших ответов.',
+  },
+  {
+    title: 'Частые слова',
+    text: 'До 15 слов с наибольшим суммарным числом ваших показов во всех разделах. Это частота встреч именно в приложении, а не частотность слова в языке. В списке могут быть и хорошо знакомые, и трудные для вас слова.',
+  },
+  {
+    title: 'Разбор предложений',
+    text: 'Частота грамматических форм по меткам слов в последних 500 завершённых разборах. Учитывается полное раскрытие карточки или завершённое самостоятельное упражнение без пропусков и спорных ответов. Повторный полный разбор считается снова. Доступен выбор языка, число разборов за сегодня и примеры форм. Это частота встреч, а не оценка знаний. Сбор начинается с обновления; история входит в резервную копию.',
+  },
+  {
+    title: 'Навыки разбора предложения',
+    text: 'Отдельный учёт заданий на поиск сказуемого, подлежащего и других частей предложения. Результаты разделяются на самостоятельные правильные ответы, ответы с помощью и ошибки. Спорные ответы исключаются из расчёта. Эти задания не прибавляются к результатам тренировок слов.',
+  },
+];
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 16);
-  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, workoutLearnedWordCount, setWorkoutLearnedWordCount, wordTourSize, setWordTourSize, sentenceWorkoutCount, setSentenceWorkoutCount } = useStore(useShallow(state => ({
+  const { activeLanguages, setLanguages, resetStatistics, workoutWordCount, setWorkoutWordCount, wordTourSize, setWordTourSize, sentenceWorkoutCount, setSentenceWorkoutCount } = useStore(useShallow(state => ({
     activeLanguages: state.activeLanguages,
     setLanguages: state.setLanguages,
     resetStatistics: state.resetStatistics,
     workoutWordCount: state.workoutWordCount,
     setWorkoutWordCount: state.setWorkoutWordCount,
-    workoutLearnedWordCount: state.workoutLearnedWordCount,
-    setWorkoutLearnedWordCount: state.setWorkoutLearnedWordCount,
     wordTourSize: state.wordTourSize,
     setWordTourSize: state.setWordTourSize,
     sentenceWorkoutCount: state.sentenceWorkoutCount,
@@ -39,6 +109,8 @@ export default function SettingsScreen() {
   })));
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [showWordHelp, setShowWordHelp] = useState(false);
+  const [showStatisticsHelp, setShowStatisticsHelp] = useState(false);
 
   const [preview, setPreview] = useState<BackupPreview | null>(null);
   const [restoreDate, setRestoreDate] = useState<string | null>(null);
@@ -235,7 +307,7 @@ export default function SettingsScreen() {
 
         {/* Brain Workout Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Настройки тренировки (Brain Workout)</Text>
+          <Text style={styles.sectionTitle}>Повтор</Text>
 
           <Text style={styles.sectionSub}>Количество слов за одну сессию</Text>
           <View style={[styles.optionsRow, {marginBottom: 20}]}>
@@ -252,20 +324,51 @@ export default function SettingsScreen() {
             ))}
           </View>
 
-          <Text style={styles.sectionSub}>Сколько из них — уже выученные слова (для повторения)</Text>
-          <View style={styles.optionsRow}>
-            {[0, 1, 2, 3, 5].map(count => (
-              <TouchableOpacity
-                key={`learned-${count}`}
-                style={[styles.optionChip, workoutLearnedWordCount === count && styles.optionChipActive]}
-                onPress={() => setWorkoutLearnedWordCount(count)}
-              >
-                <Text style={[styles.optionChipText, workoutLearnedWordCount === count && styles.optionChipTextActive]}>
-                  {count}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Text style={styles.sectionSub}>Чаще появляются слова, которые вы не знаете или не вспомнили. Новые слова и знакомые для проверки добавляются автоматически. В одном туре каждое слово встречается один раз.</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Справка</Text>
+          <TouchableOpacity
+            testID="settings-word-help"
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showWordHelp }}
+            style={styles.row}
+            onPress={() => setShowWordHelp(value => !value)}
+          >
+            <Text style={[styles.rowText, { flex: 1 }]}>Как работают «Слова» и «Повтор»</Text>
+            <Text style={styles.check}>{showWordHelp ? '−' : '+'}</Text>
+          </TouchableOpacity>
+          {showWordHelp && (
+            <View style={styles.helpCard}>
+              {WORD_STUDY_HELP.map(item => (
+                <View key={item.title}>
+                  <Text style={styles.sectionTitle}>{item.title}</Text>
+                  <Text style={styles.helpText}>{item.text}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          <TouchableOpacity
+            testID="settings-statistics-help"
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showStatisticsHelp }}
+            style={styles.row}
+            onPress={() => setShowStatisticsHelp(value => !value)}
+          >
+            <Text style={[styles.rowText, { flex: 1 }]}>Что означает статистика</Text>
+            <Text style={styles.check}>{showStatisticsHelp ? '−' : '+'}</Text>
+          </TouchableOpacity>
+          {showStatisticsHelp && (
+            <View style={styles.helpCard}>
+              {STATISTICS_HELP.map(item => (
+                <View key={item.title}>
+                  <Text style={styles.sectionTitle}>{item.title}</Text>
+                  <Text style={styles.helpText}>{item.text}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -342,6 +445,8 @@ const styles = StyleSheet.create({
   section: { marginBottom: 28 },
   sectionTitle: { fontSize: 16, color: '#4A5568', marginBottom: 4, fontWeight: '700' },
   sectionSub: { ...UI.caption, color: UI.muted, marginBottom: 12 },
+  helpCard: { backgroundColor: UI.surface, padding: 16, borderRadius: 12, gap: 20 },
+  helpText: { ...UI.reading, color: UI.body },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

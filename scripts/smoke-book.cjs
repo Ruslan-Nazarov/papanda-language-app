@@ -171,21 +171,11 @@ async function main() {
     await click(continueText); await wait();
     assert.equal((await saved()).lastLocation.blockId, bookmark.blockId);
     await page.screenshot({ path:path.join(root, 'book-search-resume.png') });
-    await click('Практика этого языка');
-    await page.waitForSelector('[data-testid="workshop-screen"]');
-    assert.ok((await page.$eval('[data-testid="workshop-screen"]', el => el.innerText)).includes('The little boy'));
-    const ruleLink = await page.$eval('[data-testid="workshop-screen"]', el => [...el.querySelectorAll('[role="button"]')].find(b => b.textContent.startsWith('Книга:'))?.textContent);
-    await click(ruleLink, '[data-testid="workshop-screen"]');
-    await page.waitForFunction(() => [...document.querySelectorAll('[data-testid="book-reader"]')].some(el => el.getBoundingClientRect().height > 0));
-    await click('Назад');
-    await page.waitForSelector('[aria-label="Слово 4: reads"]');
-    await page.click('[aria-label="Слово 4: reads"]');
-    await click('Проверить выбор', '[data-testid="workshop-screen"]');
-    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('papanda-storage')).state.structureAttempts.at(-1).hintLevel), 2, 'Reading the rule counts as assistance');
+    assert.ok(!(await page.$eval('[data-testid="book-reader"]', el => el.innerText)).includes('Практика этого языка'),
+      'The book does not duplicate the trainer workshop entry');
     await overflow();
     assert.deepEqual(errors, []);
     assert.ok(requests.every(body => !body.includes('Пожалуйста, разбери')), 'Offline reading never requests an AI explanation');
-    await click('Назад', '[data-testid="workshop-screen"]');
     await click('Назад');
     await page.click('[role="tab"][aria-label="Sentence Trainer"]');
     await page.click('[data-testid="trainer-ai-explain"]');
@@ -210,7 +200,7 @@ async function main() {
     assert.ok(requests.some(body => body.includes('BOOK_SOURCE_CONTEXT') && body.includes('Пожалуйста, разбери')));
     await overflow();
     assert.deepEqual(errors, []);
-    console.log(`Book UI passed: ${verified} chapters at 320px, section sheet with current position, section jumps, dismiss/resume and short/landscape layouts, card/table modes, search anchor, bookmarks, resume, font size, book → practice → rule → assisted answer, layered AI explanation and clickable citation. No runtime errors.`);
+    console.log(`Book UI passed: ${verified} chapters at 320px, section sheet with current position, section jumps, dismiss/resume and short/landscape layouts, card/table modes, search anchor, bookmarks, resume, font size, layered AI explanation and clickable citation. No runtime errors.`);
   } catch (error) {
     if (page) {
       console.error('Failed screen:', (await page.$eval('body', el => el.innerText)).slice(-4000));

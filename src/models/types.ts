@@ -1,4 +1,10 @@
 import type { MarkerHint } from './study';
+export interface WordReview {
+  streak: number;
+  lapses: number;
+  answeredAt: string;
+  dueAt: string;
+}
 export interface Word {
   id?: string;
   word?: string; // from mock
@@ -17,6 +23,7 @@ export interface Word {
   last_shown_by_lang?: Record<string, string>; // ISO date string per language code
   knowledge_stats?: string | Record<string, boolean>; // JSON string from DB, parsed to object
   show_stats?: string | Record<string, number>; // JSON string from DB, parsed to object
+  review_by_lang?: Record<string, WordReview>;
   snoozed_until_by_lang?: Record<string, string>; // ISO date string per language code
   personal_association?: string; // user's personal context/meaning
   is_favorite?: boolean;

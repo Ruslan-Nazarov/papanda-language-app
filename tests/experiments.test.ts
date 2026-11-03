@@ -6,7 +6,7 @@ import { createDefaultProgress } from '../src/store/progressTypes';
 import { activeExperimentRun, type ExperimentRun } from '../src/models/experiments';
 import { previewBackup } from '../src/services/backupFormat';
 
-const id = 'hide-daily-review';
+const id = 'sentence-lessons';
 beforeEach(() => { assert.equal(useStore.getState().importProgress(createDefaultProgress()).ok, true); });
 
 it('starts, stops and restarts without duplicating active runs or overwriting history', () => {

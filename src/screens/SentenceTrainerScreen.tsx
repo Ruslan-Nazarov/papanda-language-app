@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView, Modal, Platform, ActivityIndicator, Alert, PanResponder, Animated, LayoutAnimation, UIManager, InteractionManager, KeyboardAvoidingView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
-import { Token, Word } from '../models/types';
+import { Sentence, Token, Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import { Ionicons } from '@expo/vector-icons';
 import SentenceExplanation from '../components/SentenceExplanation';
@@ -24,7 +24,8 @@ import { buildWordLookup, cleanDictionaryForm, getWordTranslation } from '../uti
 import { SESSION_START, sessionRefreshedLangs } from '../services/sentenceSession';
 import { computeSentenceRevealGroups, tokenRevealIndices } from '../utils/sentenceGroups';
 import { sentenceFingerprint } from '../utils/sentenceValidation';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, ACCENT_BORDER, UI } from '../constants/theme';
+import { getTokenFormParts, getTokenFormSegments } from '../utils/tokenForms';
+import { ACCENT, ACCENT_DARK, UI } from '../constants/theme';
 import { createQueueOrder, selectTrainerQueue, selectWorkoutBatch, trainerPool } from '../utils/sentenceQueue';
 import BookConnections from '../components/BookConnections';
 import { selectBookPassages, parseBookURL } from '../services/bookService';
@@ -387,6 +388,15 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 
   const safeIndex = currentFilteredIndex < workoutSentences.length ? currentFilteredIndex : 0;
   const currentSentence = (targetSentenceId ? allSentencesForLanguage.find(sentence => sentence.id === targetSentenceId) : undefined) ?? workoutSentences[safeIndex];
+  const analysisPresentation = useRef<{ sentence: Sentence; id: string } | null>(null);
+  useEffect(() => { analysisPresentation.current = null; }, [currentSentence]);
+  const recordCompletedAnalysis = () => {
+    if (!currentSentence) return;
+    if (analysisPresentation.current?.sentence !== currentSentence) {
+      analysisPresentation.current = { sentence: currentSentence, id: `analysis-${Date.now()}-${Math.random().toString(36).slice(2)}` };
+    }
+    useStore.getState().recordSentenceAnalysis(currentSentence, analysisPresentation.current.id);
+  };
   const noteSource: NoteSource | undefined = currentSentence ? {
     sentenceId: currentSentence.id, text: currentSentence.sentence,
     translation: currentSentence.literalTranslation,
@@ -414,6 +424,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
   }, [currentSentence, targetSentenceId]);
 
   const startNextWorkout = () => {
+    analysisPresentation.current = null;
     setWorkoutCompleteModalVisible(false);
     setTargetSentenceId(null);
     const seen = new Set(seenIdsByLang.current[selectedLanguageCode] ?? []);
@@ -434,6 +445,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
   };
 
   const restartCurrentWorkout = () => {
+    analysisPresentation.current = null;
     setWorkoutCompleteModalVisible(false);
     setTargetSentenceId(null);
     setCurrentFilteredIndex(0);
@@ -444,6 +456,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 
   const moveToNextSentence = () => {
     if (!transition.beginAction()) return;
+    analysisPresentation.current = null;
     if (!lockedWorkoutIds.current && workoutSentences.length > 0) {
       lockedWorkoutIds.current = workoutSentences.map(sentence => sentence.id);
     }
@@ -471,6 +484,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 
   const moveToPrevSentence = () => {
     if (!transition.beginAction()) return;
+    analysisPresentation.current = null;
     setTargetSentenceId(null);
     if (workoutSentences.length <= 1) {
       setRevealedTokens(new Set());
@@ -570,7 +584,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     setWordFormContext({
       sentence: currentSentence.sentence,
       language: LANGUAGES.find(language => language.code === selectedLanguageCode)?.label || selectedLanguageCode,
-      token,
+      token: { ...token, parts: getTokenFormParts(token, selectedLanguageCode) },
     });
     setIsWordModalVisible(true);
   };
@@ -601,7 +615,9 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     if (!currentSentence) return;
     LayoutAnimation.configureNext(REVEAL_ANIMATION);
     const indices = tokenRevealIndices(currentSentence.words, index);
-    setRevealedTokens(previous => previous === null ? null : new Set([...previous, ...indices]));
+    const next = revealedTokens === null ? null : new Set([...revealedTokens, ...indices]);
+    setRevealedTokens(next);
+    if (next === null || currentSentence.words.every((_, i) => next.has(i))) recordCompletedAnalysis();
   };
 
   const allBlocksRevealed = !!currentSentence?.words.length &&
@@ -614,13 +630,17 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     const nextGroup = orderedGroups.find(group => group.tokenIndices.some(index => !revealedTokens?.has(index)));
     if (allBlocksRevealed) {
       if (!showTranslations) {
+        recordCompletedAnalysis();
         setShowTranslations(true);
       } else {
+        analysisPresentation.current = null;
         setRevealedTokens(new Set());
         setShowTranslations(false);
       }
     } else if (nextGroup) {
-      setRevealedTokens(previous => new Set([...(previous ?? []), ...nextGroup.tokenIndices]));
+      const next = new Set([...(revealedTokens ?? []), ...nextGroup.tokenIndices]);
+      setRevealedTokens(next);
+      if (currentSentence.words.every((_, i) => next.has(i))) recordCompletedAnalysis();
     }
   };
 
@@ -697,6 +717,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
   // Both layouts share the same card and clause frame, so reveal behavior and
   // the method's visual cues cannot drift between cards and table rows.
   const renderTokenCard = (token: Token, index: number, compact = false) => {
+    const formSegments = getTokenFormSegments(token, selectedLanguageCode);
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
     const isRevealed = revealedTokens === null || revealedTokens.has(index);
     // In a complex (multi-clause) sentence, wrap words of the 2nd+ clause in a
@@ -727,11 +748,11 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
           <View aria-hidden={!isRevealed} accessibilityElementsHidden={!isRevealed}
             importantForAccessibility={isRevealed ? 'auto' : 'no-hide-descendants'}
             pointerEvents="none" style={{ opacity: isRevealed ? 1 : 0 }}>
-            {token.parts && token.parts.length > 0 ? <Text style={styles.wordText}>
-              {token.parts.map((part, i) => <Text key={i} style={i === 0 ? styles.wordRoot : [styles.wordAffix, { color: AFFIX_COLORS[(i - 1) % AFFIX_COLORS.length] }]}>
-                {index === 0 && i === 0 && part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part}
+            <Text style={styles.wordText}>
+              {formSegments.map((part, i) => <Text key={i} style={part.affixIndex === null ? styles.wordRoot : [styles.wordAffix, { color: AFFIX_COLORS[part.affixIndex % AFFIX_COLORS.length] }]}>
+                {part.text}
               </Text>)}
-            </Text> : <Text style={styles.wordText}>{index === 0 && token.text ? token.text.charAt(0).toUpperCase() + token.text.slice(1) : token.text}</Text>}
+            </Text>
             {!compact && <>
               <Text aria-hidden={!showTranslations} numberOfLines={2} ellipsizeMode="tail" style={[styles.translationText, { opacity: showTranslations ? 1 : 0 }]}>{formatTokenTranslation(token)}</Text>
               <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
@@ -790,12 +811,11 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
         <TouchableOpacity
           testID="trainer-workshop-header"
           accessibilityRole="button"
-          accessibilityLabel="Тренировки предложений"
-          style={styles.headerWorkoutButton}
+          accessibilityLabel="Тренировка: от короткого к полному"
+          style={styles.optionsButton}
           onPress={() => navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode })}
         >
-          <Ionicons name="sparkles" size={15} color={ACCENT_DARK} style={{ marginRight: 4 }} />
-          <Text style={styles.headerWorkoutText}>Тренировки</Text>
+          <Ionicons name="layers-outline" size={21} color={ACCENT_DARK} />
         </TouchableOpacity>
         <TouchableOpacity testID="trainer-notes" accessibilityRole="button" accessibilityLabel="Мои заметки"
           style={styles.optionsButton} onPress={() => navigation.navigate('Notes', {
@@ -845,42 +865,6 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
               </Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-      </View>
-
-      {/* Quick Sentence Training Hub */}
-      <View testID="sentence-training-hub" style={styles.trainingHubCard}>
-        <View style={styles.trainingHubHeader}>
-          <View style={styles.trainingHubTitleRow}>
-            <Ionicons name="fitness-outline" size={16} color={ACCENT_DARK} style={{ marginRight: 6 }} />
-            <Text style={styles.trainingHubTitle}>Тренировки предложений</Text>
-          </View>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.trainingPillsContainer}
-        >
-          <TouchableOpacity
-            testID="growing-sentence-quick-btn"
-            accessibilityRole="button"
-            style={[styles.trainingPill, styles.trainingPillHighlight]}
-            onPress={() => navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode })}
-          >
-            <Ionicons name="trending-up" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
-            <Text style={styles.trainingPillHighlightText}>От короткого к полному</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            testID="new-workout-quick-btn"
-            accessibilityRole="button"
-            style={styles.trainingPill}
-            onPress={startNextWorkout}
-          >
-            <Ionicons name="refresh-outline" size={15} color={ACCENT_DARK} style={{ marginRight: 6 }} />
-            <Text style={styles.trainingPillText}>Новая подборка</Text>
-          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -1005,6 +989,16 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
         </TouchableOpacity>
       </View>
 
+      <TouchableOpacity
+        testID="trainer-next-workout"
+        accessibilityRole="button"
+        disabled={workoutSentences.length === 0}
+        style={[styles.secondaryButton, { marginTop: 8 }, workoutSentences.length === 0 && styles.disabledButton]}
+        onPress={startNextWorkout}
+      >
+        <Text style={styles.secondaryButtonText}>Следующий тур</Text>
+      </TouchableOpacity>
+
       {/* Options Menu Modal */}
       <Modal visible={isMenuVisible} transparent={true} animationType="fade" onRequestClose={() => setIsMenuVisible(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsMenuVisible(false)}>
@@ -1014,9 +1008,6 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
             <TouchableOpacity accessibilityRole="button" style={styles.menuItem} onPress={() => { setIsMenuVisible(false); startNextWorkout(); }}>
               <Ionicons name="refresh" size={20} color="#475569" style={{ marginRight: 10 }} />
               <Text style={styles.menuItemText}>Новая тренировка предложений</Text>
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button" testID="growing-sentence-entry" style={styles.menuItem} onPress={() => { setIsMenuVisible(false); navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode }); }}>
-              <Text style={{ color: ACCENT_DARK, fontWeight: '600' }}>Предложение по нарастающей</Text>
             </TouchableOpacity>
 
             <View testID="trainer-cache-stats" style={styles.menuStats}>
@@ -1130,19 +1121,6 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
             <TouchableOpacity accessibilityRole="button" style={[styles.secondaryButton, { marginTop: 8 }]} onPress={restartCurrentWorkout}>
               <Text style={styles.secondaryButtonText}>Повторить эту тренировку</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              testID="workout-complete-growing-sentence-btn"
-              accessibilityRole="button"
-              style={[styles.secondaryButton, { marginTop: 8, backgroundColor: ACCENT_LIGHT, borderWidth: 1, borderColor: ACCENT_BORDER }]}
-              onPress={() => {
-                setWorkoutCompleteModalVisible(false);
-                navigation.navigate('SentenceWorkshop', { language: selectedLanguageCode });
-              }}
-            >
-              <Text style={[styles.secondaryButtonText, { color: ACCENT_DARK, fontWeight: '700' }]}>
-                Тренировка: От короткого к полному →
-              </Text>
-            </TouchableOpacity>
             <TouchableOpacity accessibilityRole="button" style={[styles.closeModalButton, { marginTop: 6 }]} onPress={() => setWorkoutCompleteModalVisible(false)}>
               <Text style={styles.closeModalButtonText}>Закрыть</Text>
             </TouchableOpacity>
@@ -1237,92 +1215,7 @@ const styles = StyleSheet.create({
   menuHeading: { fontSize: 18, fontWeight: '700', color: '#172033', padding: 15 },
   container: { flex: 1, paddingHorizontal: 16, paddingBottom: 8, backgroundColor: UI.canvas },
   header: { flex: 1, ...UI.heading, color: UI.text },
-  headerWorkoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: ACCENT_LIGHT,
-    borderColor: ACCENT_BORDER,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    marginRight: 4,
-  },
-  headerWorkoutText: {
-    color: ACCENT_DARK,
-    fontSize: 13,
-    fontWeight: '600',
-  },
   languageToolbar: { minHeight: 48, marginBottom: 10, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#E4E7EC' },
-  trainingHubCard: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: UI.border,
-    borderRadius: UI.radius,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  trainingHubHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  trainingHubTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  trainingHubTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: UI.text,
-  },
-  trainingHubAllBtn: {
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-  },
-  trainingHubAllText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: ACCENT_DARK,
-  },
-  trainingPillsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 2,
-  },
-  trainingPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: UI.subtle,
-    borderWidth: 1,
-    borderColor: UI.border,
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  trainingPillText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: UI.body,
-  },
-  trainingPillHighlight: {
-    backgroundColor: ACCENT_DARK,
-    borderColor: ACCENT_DARK,
-  },
-  trainingPillHighlightText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
   sentenceWrapper: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', columnGap: 4, rowGap: 10, paddingTop: 12, paddingBottom: 10 },
   tokenContainer: { maxWidth: '100%' },
   hiddenCard: { backgroundColor: UI.subtle },

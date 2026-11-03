@@ -42,6 +42,7 @@ export const applyWordProgress = (word: Word, progress?: UserWordProgress): Word
     is_learned: progress.is_learned ?? word.is_learned,
     knowledge_stats: progress.knowledge_stats ?? word.knowledge_stats,
     show_stats: progress.show_stats ?? word.show_stats,
+    review_by_lang: progress.review_by_lang ?? word.review_by_lang,
     last_shown: progress.last_shown ?? word.last_shown,
     last_shown_by_lang: progress.last_shown_by_lang ?? word.last_shown_by_lang,
     snoozed_until_by_lang: progress.snoozed_until_by_lang ?? word.snoozed_until_by_lang,

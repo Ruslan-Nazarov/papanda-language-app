@@ -25,9 +25,23 @@ async function main() {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('dialog', dialog => dialog.accept());
+    let auditMode = 'offline';
+    let pendingAudit;
+    let auditStarted;
+    const auditReply = { status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ text: JSON.stringify({ isValid: true, issues: [] }) }) };
     await page.setRequestInterception(true);
     page.on('request', req => {
       if (req.url().startsWith('http://127.0.0.1:') || req.url().startsWith('data:')) return void req.continue();
+      if (auditMode !== 'offline' && req.method() === 'OPTIONS') return void req.respond({ status: 200, headers: {
+        'access-control-allow-origin': '*', 'access-control-allow-headers': 'Content-Type, X-Install-Id',
+        'access-control-allow-methods': 'POST, OPTIONS' } });
+      if (auditMode !== 'offline' && req.postData()?.includes('эксперт-лингвист')) {
+        if (auditMode === 'success') return void req.respond(auditReply);
+        pendingAudit = req;
+        auditStarted();
+        return;
+      }
       return void req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"error":"Offline test","retryable":false}' });
     });
     await page.evaluateOnNewDocument(() => localStorage.setItem('papanda-onboarded', '1'));
@@ -56,7 +70,6 @@ async function main() {
       await openDictionary();
     };
     const input = label => `input[aria-label="${label}"]`;
-    const association = 'textarea[placeholder="Что поможет вам запомнить это слово?"]';
     const visibleField = async selector => {
       for (const element of await page.$$(selector)) if (await element.isVisible()) return element;
       throw new Error(`No visible field: ${selector}`);
@@ -84,8 +97,6 @@ async function main() {
     assert.equal((await state()).customWords.length, 0, 'An empty form must not create a word');
     await page.type(input('Слово (Қазақша)'), '  алма бағы  ');
     await page.type(input('Русский перевод'), '  яблоневый сад  ');
-    await (await visibleField(association)).type('мой сад');
-    assert.equal(await (await visibleField(association)).evaluate(el => el.value), 'мой сад');
     await page.screenshot({ path: path.join(root, 'word-entry-kz.png') });
     await click('Сохранить');
     await saved();
@@ -111,7 +122,7 @@ async function main() {
     assert.ok(!(await page.$eval('body', el => el.innerText)).includes(key));
     assert.equal((await state()).userWordProgress[key].is_favorite, true);
 
-    // Adding the same form again must retain its association, translation and key.
+    // Adding the same form again must retain its translation and key.
     await click('+ Добавить');
     await page.type(input('Слово (Қазақша)'), 'ЖЕМІС БАҒЫ');
     await click('Сохранить');
@@ -120,7 +131,6 @@ async function main() {
     await (await visibleField('[aria-label="Редактировать слово"]')).click();
     await page.waitForFunction(selector => document.querySelector(selector)?.value === 'яблоневый сад', {}, input('Русский перевод'));
     assert.equal(await page.$eval(input('Русский перевод'), el => el.value), 'яблоневый сад');
-    assert.equal(await (await visibleField(association)).evaluate(el => el.value), 'мой сад');
     await click('Отмена');
 
     // English may be selected but left empty. Only the entered language is required.
@@ -137,6 +147,7 @@ async function main() {
 
     // Existing English keys keep progress when their displayed translation changes.
     await seed({ activeLanguages: ['en'], customWords: [{ eng: 'legacy-key', word: 'orchard', ru: 'сад', translations: { en: 'orchard' }, count: 7, is_learned: 0, knowledge_stats: {}, show_stats: { en: 7 } }] });
+    const legacyShows = (await state()).userWordProgress['legacy-key']?.count ?? 7;
     await search('orchard');
     await (await visibleField('[aria-label="Редактировать слово"]')).click();
     await fill(input('Слово (English)'), 'fruit orchard');
@@ -147,7 +158,7 @@ async function main() {
     await page.reload({ waitUntil: 'networkidle0' });
     await openDictionary();
     await search('fruit orchard');
-    assert.ok((await page.$eval('body', el => el.innerText)).includes('7 пок.'));
+    assert.ok((await page.$eval('body', el => el.innerText)).includes(`${legacyShows} пок.`));
 
     // A disabled English language stays out of the form even for an English source.
     await seed({ activeLanguages: ['kz'], customWords: [{ eng: 'user:en:fixture', word: 'orchard', source_language: 'en', ru: 'сад', translations: { en: 'orchard', kz: 'алма бағы' }, count: 0, is_learned: 0 }] });
@@ -159,8 +170,43 @@ async function main() {
     await click('Сохранить');
     await saved();
     assert.equal((await state()).customWords[0].translations.en, 'orchard');
+
+    // A verdict belongs to the exact draft: neither edits nor reopening can reuse a late result.
+    const auditKey = 'user:en:fixture';
+    await (await visibleField('[aria-label="Редактировать слово"]')).click();
+    auditMode = 'success';
+    await page.click('[data-testid="modal-request-audit"]');
+    await page.waitForFunction(() => document.body.innerText.includes('✓ Проверено ИИ:'));
+    await fill(input('Русский перевод'), 'новый сад');
+    assert.ok(!(await page.$eval('body', el => el.innerText)).includes('✓ Проверено ИИ:'));
+    await click('Сохранить'); await saved();
+    assert.equal((await state()).userWordProgress[auditKey].ai_verification, undefined);
+
+    for (const action of ['edit', 'reopen']) {
+      await (await visibleField('[aria-label="Редактировать слово"]')).click();
+      auditMode = 'delayed';
+      const started = new Promise(resolve => { auditStarted = resolve; });
+      await page.click('[data-testid="modal-request-audit"]');
+      await Promise.race([started, new Promise((_, reject) => setTimeout(() => reject(new Error('Audit did not start')), 10000))]);
+      if (action === 'edit') await fill(input('Русский перевод'), 'изменено во время запроса');
+      else {
+        await click('Отмена');
+        await (await visibleField('[aria-label="Редактировать слово"]')).click();
+      }
+      await pendingAudit.respond(auditReply).catch(() => {}); // A canceled request may already be gone.
+      await new Promise(resolve => setTimeout(resolve, 200));
+      assert.ok(!(await page.$eval('body', el => el.innerText)).includes('✓ Проверено ИИ:'), action);
+      await click('Сохранить'); await saved();
+      assert.equal((await state()).userWordProgress[auditKey].ai_verification, undefined, action);
+    }
+    await (await visibleField('[aria-label="Редактировать слово"]')).click();
+    auditMode = 'success';
+    await page.click('[data-testid="modal-request-audit"]');
+    await page.waitForFunction(() => document.body.innerText.includes('✓ Проверено ИИ:'));
+    await click('Сохранить'); await saved();
+    assert.equal((await state()).userWordProgress[auditKey].ai_verification.status, 'verified');
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('PASS: Kazakh without English, empty validation, generated key, edit/reload, favourite retention, duplicates, optional English, legacy progress.');
+    console.log('PASS: Kazakh without English, empty validation, generated key, edit/reload, favourite retention, duplicates, optional English, legacy progress, draft audit edits/cancel/reopen/save.');
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));

@@ -55,7 +55,7 @@ async function main() {
     const body = () => page.$eval('body', el => el.innerText);
     const hidden = () => page.$$eval('[aria-label^="Раскрыть блок"]', els => els.length);
     const revealLabel = () => page.$eval('[data-testid="trainer-reveal"]', el => el.textContent);
-    const translationLabel = () => page.$eval('[data-testid="trainer-translation"]', el => el.textContent);
+    const translationVisible = () => page.$eval('[data-testid="trainer-step-surface"]', el => el.innerText.includes('Перевод примера.'));
     const blockRects = () => page.$$eval('[data-testid^="trainer-block-"]', els => els.map(el => {
       const { x, y, width, height } = el.getBoundingClientRect();
       return [x, y, width, height].map(value => Math.round(value));
@@ -104,13 +104,10 @@ async function main() {
     assert.equal(await hidden(), count - 1, 'Tap must reveal only that block, even if two words share a role');
     assert.deepEqual(await blockRects(), beforeReveal, 'Revealing a block must preserve every block position and size');
     assert.ok(await page.$('[data-testid="trainer-block-0"][aria-label="Раскрыть блок 1"]'));
-    await page.click('[data-testid="trainer-translation"]');
-    assert.equal(await hidden(), count - 1, 'Translation toggle must not also advance the exercise');
-    const translatedRects = await blockRects();
-    assert.deepEqual(translatedRects.map(rect => rect.slice(2)), beforeReveal.map(rect => rect.slice(2)), 'Translation must preserve block dimensions');
+    assert.equal(await translationVisible(), false, 'A partial reveal must not show the final translation');
     await page.click('[data-testid="trainer-next"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent !== first, {}, first);
-    assert.equal(await page.$eval('[data-testid="trainer-translation"]', el => el.textContent), 'Перевод');
+    assert.equal(await translationVisible(), false);
     assert.equal(await page.$eval('[data-testid="trainer-position"]', el => el.textContent), '2 / 3');
     await page.click('[data-testid="trainer-previous"]');
     await page.waitForFunction(first => document.querySelector('[data-testid="trainer-sentence-text"]').textContent === first, {}, first);
@@ -118,15 +115,17 @@ async function main() {
     for (let i = 0; i < count && await hidden() > 0; i++) await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await hidden(), 0);
     assert.equal(await revealLabel(), 'Перевод');
-    assert.equal(await translationLabel(), 'Перевод');
+    assert.equal(await translationVisible(), false);
     await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await hidden(), 0, 'Final translation step must keep all blocks revealed');
-    assert.equal(await translationLabel(), 'Скрыть перевод');
+    assert.equal(await translationVisible(), true);
+    const translatedRects = await blockRects();
+    assert.deepEqual(translatedRects.map(rect => rect.slice(2)), beforeReveal.map(rect => rect.slice(2)), 'Translation must preserve block dimensions');
     assert.ok((await body()).includes('Перевод примера.'));
     assert.equal(await revealLabel(), 'Повторить с 1 шага');
     await page.click('[data-testid="trainer-reveal"]');
     assert.equal(await hidden(), count);
-    assert.equal(await translationLabel(), 'Перевод', 'Restart must also hide translation');
+    assert.equal(await translationVisible(), false, 'Restart must also hide translation');
     await tapBackground();
     assert.ok(await hidden() < count, 'Blank-space tap must advance a role-group');
     for (let i = 0; i < count && await hidden() > 0; i++) await tapBackground();
@@ -134,10 +133,10 @@ async function main() {
     assert.equal(await revealLabel(), 'Перевод');
     await tapBackground();
     assert.equal(await hidden(), 0);
-    assert.equal(await translationLabel(), 'Скрыть перевод', 'Blank-space tap must show the final translation');
+    assert.equal(await translationVisible(), true, 'Blank-space tap must show the final translation');
     await tapBackground();
     assert.equal(await hidden(), count, 'Blank-space tap must restart after translation');
-    assert.equal(await translationLabel(), 'Перевод');
+    assert.equal(await translationVisible(), false);
     await page.waitForFunction(() => document.body.innerText.includes('Объяснить структуру'));
     for (const width of [320, 430]) {
       await page.setViewport({ width, height: 740, hasTouch: true, isMobile: true });
@@ -165,7 +164,8 @@ async function main() {
     await click('Italiano');
     await page.waitForFunction(() => document.querySelector('[data-testid="trainer-sentence-text"]').textContent === 'Luca legge.');
     assert.equal(await hidden(), 2);
-    assert.equal(await page.$eval('[data-testid="trainer-next"]', el => el.getAttribute('aria-disabled')), 'true');
+    assert.equal(await page.$eval('[data-testid="trainer-next"]', el => el.getAttribute('aria-label')), 'Завершить тренировку');
+    assert.equal(await page.$eval('[data-testid="trainer-previous"]', el => el.getAttribute('aria-disabled')), 'true');
     await openMenu();
     assert.ok((await page.$eval('[data-testid="trainer-cache-stats"]', el => el.innerText)).includes('В кеше: 1'));
     await page.waitForSelector('[data-testid="trainer-cancel-generation"]');
@@ -214,8 +214,8 @@ async function main() {
     await assertClauseFrames();
     assert.equal(await page.$$eval('[data-testid="trainer-sentence-text"] [role="button"]', els => els.length), 0, 'The original sentence is plain text');
     await page.screenshot({ path: path.join(root, 'trainer-long-first-step.png') });
-    await page.click('[data-testid="trainer-translation"]');
     while (await hidden() > 0) await page.click('[data-testid="trainer-reveal"]');
+    await page.click('[data-testid="trainer-reveal"]');
     await assertClauseFrames();
     await page.screenshot({ path: path.join(root, 'trainer-long-revealed.png') });
     await openMenu();
