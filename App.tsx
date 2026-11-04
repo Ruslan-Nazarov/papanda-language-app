@@ -36,7 +36,7 @@ const TABS = {
   Statistics: { icon: 'chart', label: 'Прогресс' },
   'Word Triples': { icon: 'read', label: 'Слова' },
   'Sentence Trainer': { icon: 'language', label: 'Разбор' },
-  'Brain Workout': { icon: 'workout', label: 'Повтор' },
+  'Brain Workout': { icon: 'eye', label: 'Wink' },
   Settings: { icon: 'settings', label: 'Настройки' },
 } as const;
 

@@ -23,7 +23,9 @@ it('explains the displayed inflected form with its lemma and full sentence conte
     assert.deepEqual(payload, { context });
     assert.match(prompt, /похожее по написанию слово или форму/);
     assert.match(prompt, /краткий контраст формы/);
+    assert.match(prompt, /Морфологическая точность/);
     assert.equal(generationConfig.maxOutputTokens, 1536);
+    assert.equal(generationConfig.thinkingConfig?.thinkingBudget, 512);
     return Response.json({ text: 'cuoco → cuochi: множественное число, -i; h сохраняет звук /k/.' });
   };
   assert.match(await explainWordForm(context), /cuoco → cuochi/);

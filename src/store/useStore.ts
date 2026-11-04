@@ -79,6 +79,8 @@ interface AppState extends PersistedProgress {
   setWorkoutWordCount: (count: number) => void;
   setWorkoutLearnedWordCount: (count: number) => void;
   setWorkoutFavoritesOnly: (onlyFavorites: boolean) => void;
+  wordsFavoritesOnly: boolean;
+  setWordsFavoritesOnly: (onlyFavorites: boolean) => void;
   setHasSeenSnoozeHint: (hasSeen: boolean) => void;
   toggleWordFavorite: (wordEng: string) => void;
   restoreWordProgress: (wordEng: string, previousProgress: UserWordProgress | null) => void;
@@ -309,6 +311,7 @@ export const useStore = create<AppState>()(persist<AppState, [], [], PersistedPr
       set({ workoutLearnedWordCount: Math.min(count, get().workoutWordCount) });
     },
     setWorkoutFavoritesOnly: workoutFavoritesOnly => set({ workoutFavoritesOnly }),
+    setWordsFavoritesOnly: wordsFavoritesOnly => set({ wordsFavoritesOnly }),
     setHasSeenSnoozeHint: hasSeenSnoozeHint => set({ hasSeenSnoozeHint }),
     startSentenceLesson: (code, count = 5) => set(state => {
       if (!activeExperimentRun(state.experiments[SENTENCE_LESSON_EXPERIMENT]) || !state.activeLanguages.includes(code) || ![3, 5].includes(count)) return state;

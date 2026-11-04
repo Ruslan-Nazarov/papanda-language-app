@@ -22,6 +22,21 @@ function recoverParts(word: string, lemma: string, code: string): string[] | und
       const suffixes = word.slice(stem.length).match(/^(лар|лер|дар|дер|тар|тер)?(ымыз|іміз|ыңыз|іңіз|мыз|міз|ңыз|ңіз|ым|ім|ың|ің|сы|сі|ы|і|м|ң)?(ның|нің|дың|дің|тың|тің|нан|нен|дан|ден|тан|тен|мен|бен|пен|нда|нде|ға|ге|қа|ке|на|не|ны|ні|ды|ді|ты|ті|да|де|та|те|н)?$/u);
       if (suffixes && suffixes[0]) return [stem, ...suffixes.slice(1).filter(Boolean)];
     }
+    // Verbs: infinitive ending in -у/-ю. Recover past (жедел өткен шақ) and
+    // present-future (ауыспалы) tense inflections, keeping vowel stems intact.
+    if ((lemma.endsWith('у') || lemma.endsWith('ю')) && lemma.length > 2) {
+      const verbStems = [lemma.slice(0, -1)];
+      if (lemma === 'оқу') verbStems.push('оқы');
+      if (lemma.endsWith('ю')) verbStems.push(lemma.slice(0, -1) + 'й');
+      for (const stem of verbStems) {
+        if (!word.startsWith(stem)) continue;
+        const remainder = word.slice(stem.length);
+        const past = remainder.match(/^(ба|бе|па|пе|ма|ме)?(ды|ді|ты|ті)(ңыздар|ңіздер|ңдар|ңдер|ңыз|ңіз|лар|лер|дар|дер|тар|тер|м|ң|қ|к)?$/u);
+        if (past && past[0] === remainder) return [stem, ...past.slice(1).filter(Boolean)];
+        const pres = remainder.match(/^(й|а|е)(ды|ді)(мыз|міз|сыздар|сіздер|сыз|сіз)?$/u);
+        if (pres && pres[0] === remainder) return [stem, ...pres.slice(1).filter(Boolean)];
+      }
+    }
   }
   if (code === 'en') {
     for (const ending of ['s', 'es', 'ed', 'ing', 'er', 'est', "'s", '’s']) {
@@ -40,8 +55,19 @@ function recoverParts(word: string, lemma: string, code: string): string[] | und
       if (word === lemma + ending) return [lemma, ending];
     }
   }
-  if (code === 'it' && /[aoe]$/u.test(lemma) && word.length === lemma.length &&
-      word.slice(0, -1) === lemma.slice(0, -1) && /[ie]$/u.test(word)) return [word.slice(0, -1), word.slice(-1)];
+  if (code === 'it') {
+    if (/[aoe]$/u.test(lemma) && word.length === lemma.length &&
+        word.slice(0, -1) === lemma.slice(0, -1) && /[ie]$/u.test(word)) return [word.slice(0, -1), word.slice(-1)];
+    if (lemma.endsWith('are') && lemma.length > 4) {
+      const stem = lemma.slice(0, -3);
+      if (word.startsWith(stem)) {
+        const ending = word.slice(stem.length);
+        if (['o', 'i', 'a', 'iamo', 'ate', 'ano', 'ato', 'ata', 'ati', 'ate', 'ava', 'avano'].includes(ending)) {
+          return [stem, ending];
+        }
+      }
+    }
+  }
   if (code === 'de' && lemma.endsWith('en')) {
     const stem = lemma.slice(0, -2);
     if (word === 'ge' + stem + 't') return ['ge', stem, 't'];

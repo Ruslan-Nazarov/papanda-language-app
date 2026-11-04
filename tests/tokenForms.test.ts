@@ -28,13 +28,22 @@ it('reveals separate plural, possessive and case markers even in partially split
   assert.deepEqual(getTokenFormParts(token('жазбады', 'жазу', ['жаз', 'ба', 'ды']), 'kz'), ['жаз', 'ба', 'ды']);
 });
 
+it('recovers transparent Kazakh verb past and present inflections keeping vowel stems intact', () => {
+  assert.deepEqual(getTokenFormParts(token('күлімсіреді', 'күлімсіреу'), 'kz'), ['күлімсіре', 'ді']);
+  assert.deepEqual(getTokenFormParts(token('күлімсірейді', 'күлімсіреу'), 'kz'), ['күлімсіре', 'й', 'ді']);
+  assert.deepEqual(getTokenFormParts(token('барды', 'бару'), 'kz'), ['бар', 'ды']);
+  assert.deepEqual(getTokenFormParts(token('келді', 'келу'), 'kz'), ['кел', 'ді']);
+  assert.deepEqual(getTokenFormParts(token('оқыды', 'оқу'), 'kz'), ['оқы', 'ды']);
+  assert.deepEqual(getTokenFormParts(token('жазбады', 'жазу'), 'kz'), ['жаз', 'ба', 'ды']);
+});
+
 it('recovers transparent inflections in other languages without moving stem letters into an ending', () => {
   for (const [code, text, lemma, parts] of [
     ['en', 'cats', 'cat', ['cat', 's']], ['en', 'boxes', 'box', ['box', 'es']],
     ['en', 'studies', 'study', ['studi', 'es']], ['en', 'reading', 'read', ['read', 'ing']],
     ['en', 'stopped', 'stop', ['stopp', 'ed']], ['en', 'happier', 'happy', ['happi', 'er']],
     ['es', 'libros', 'libro', ['libro', 's']], ['fr', 'livres', 'livre', ['livre', 's']],
-    ['it', 'ragazze', 'ragazza', ['ragazz', 'e']], ['de', 'neues', 'neu', ['neu', 'es']],
+    ['it', 'ragazze', 'ragazza', ['ragazz', 'e']], ['it', 'guarda', 'guardare', ['guard', 'a']], ['de', 'neues', 'neu', ['neu', 'es']],
     ['la', 'librum', 'liber', ['libr', 'um']], ['la', 'dormit.', 'dormire', ['dorm', 'it.']],
   ] as const) assert.deepEqual(getTokenFormParts(token(text, lemma), code), parts);
   assert.deepEqual(getTokenFormParts(token('stopped', 'stop', ['stop', 'ped']), 'en'), ['stopp', 'ed']);

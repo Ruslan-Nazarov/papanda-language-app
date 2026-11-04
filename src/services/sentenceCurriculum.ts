@@ -3,6 +3,7 @@
  * This is a batch composition policy, not a claim about learner proficiency.
  */
 export type SentenceFocus = 'core' | 'attribute' | 'object' | 'circumstance' | 'negative' | 'reading' | 'question' | 'complex' | 'usage';
+export type TensePreference = 'present' | 'past' | 'continuous' | 'future' | 'general';
 
 const GOALS: Record<SentenceFocus, string> = {
   core: 'Найдите сказуемое: что происходит? Затем определите, с кем или с чем это происходит.',
@@ -20,6 +21,7 @@ export interface SentenceTask {
   id: string;
   focus: SentenceFocus;
   goal: string;
+  tense?: TensePreference;
   /** Related sentences remain complete utterances; each step adds one detail. */
   develops?: string;
 }
@@ -28,13 +30,23 @@ export type SentenceBatchMode = 'independent' | 'development';
 
 export interface SentenceDraft { taskId: string; sentence: string }
 
+const TENSE_SEQUENCE: TensePreference[] = ['present', 'continuous', 'past', 'present', 'past', 'present', 'future', 'general'];
+
 export const planSentenceBatch = (count: number, targeted = false, mode: SentenceBatchMode = 'independent'): SentenceTask[] => {
   const sequence: SentenceFocus[] = ['core', 'attribute', 'object', 'circumstance', 'negative', 'reading', 'question', 'complex'];
-  return Array.from({ length: count }, (_, i) => ({
-    id: `task-${i + 1}`, focus: targeted && i === 0 ? 'usage' : sequence[i % sequence.length],
-    goal: GOALS[targeted && i === 0 ? 'usage' : sequence[i % sequence.length]],
-    ...(mode === 'development' && count >= 4 && !targeted && i > 0 && i < 4 ? { develops: `task-${i}` } : {}),
-  }));
+  const isDevelopment = mode === 'development' && count >= 4 && !targeted;
+  return Array.from({ length: count }, (_, i) => {
+    const focus = targeted && i === 0 ? 'usage' : sequence[i % sequence.length];
+    const develops = isDevelopment && i > 0 && i < 4 ? `task-${i}` : undefined;
+    const tense = isDevelopment && i < 4 ? 'present' : TENSE_SEQUENCE[i % TENSE_SEQUENCE.length];
+    return {
+      id: `task-${i + 1}`,
+      focus,
+      goal: GOALS[focus],
+      tense,
+      ...(develops ? { develops } : {}),
+    };
+  });
 };
 
 export const parseSentenceDrafts = (value: unknown, tasks: SentenceTask[]): SentenceDraft[] => {

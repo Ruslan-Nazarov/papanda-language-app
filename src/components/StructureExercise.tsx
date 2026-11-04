@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import type { Sentence, SyntaxRole } from '../models/types';
 import type { ExerciseCheckpoint } from '../models/sentenceLessons';
 import { createExerciseCheckpoint } from '../utils/sentenceLessons';
@@ -81,14 +81,39 @@ export default function StructureExercise({ sentence, onNext, checkpoint, onChec
     {translation && <Text style={s.text}>{sentence.literalTranslation || 'Перевод не задан.'}</Text>}
   </View>;
 }
-export function StructureProgress({ language }: { language?: string }) {
+export function StructureProgress({ language, defaultOpen = true }: { language?: string; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   const attempts = useStore(state => state.structureAttempts);
   const rows = structureSummary(attempts, language);
+  if (!rows.length) return null;
   return <View style={s.card}>
-    <Text style={s.title}>Навыки разбора предложения</Text>
-    <Text style={s.small}>Последние 500 ответов. Спорные исключены; эти результаты не меняют знание слов.</Text>
-    {!rows.length && <Text style={s.text}>Статистика появится после самостоятельного разбора.</Text>}
-    {rows.map(row => <Text key={row.language + row.role} style={s.text}>{row.language} · {ROLE_TRANSLATIONS[row.role]}: самостоятельно {row.independent}, с подсказкой {row.assisted}, ошибок {row.errors}.</Text>)}
-    {!!rows[0] && (rows[0].errors > 0 || rows[0].assisted > 0) && <Text style={s.text}>Стоит повторить: {ROLE_TRANSLATIONS[rows[0].role].toLowerCase()}. Следующее упражнение подбирается с этой ролью.</Text>}
+    <TouchableOpacity
+      style={structureProgressStyles.cardHeader}
+      activeOpacity={0.7}
+      onPress={() => setOpen(o => !o)}
+      accessibilityRole="button"
+      accessibilityLabel={`Навыки разбора предложения, ${open ? 'свернуть' : 'развернуть'}`}
+    >
+      <Text style={s.title}>Навыки разбора предложения</Text>
+      <Text style={structureProgressStyles.cardChevron}>{open ? '▾' : '▸'}</Text>
+    </TouchableOpacity>
+    {open && <>
+      <Text style={s.small}>Последние 500 ответов. Спорные исключены; эти результаты не меняют знание слов.</Text>
+      {rows.map(row => <Text key={row.language + row.role} style={s.text}>{row.language} · {ROLE_TRANSLATIONS[row.role]}: самостоятельно {row.independent}, с подсказкой {row.assisted}, ошибок {row.errors}.</Text>)}
+      {!!rows[0] && (rows[0].errors > 0 || rows[0].assisted > 0) && <Text style={s.text}>Стоит повторить: {ROLE_TRANSLATIONS[rows[0].role].toLowerCase()}. Следующее упражнение подбирается с этой ролью.</Text>}
+    </>}
   </View>;
 }
+
+const structureProgressStyles = StyleSheet.create({
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardChevron: {
+    fontSize: 16,
+    color: '#94A3B8',
+    marginLeft: 8,
+  },
+});

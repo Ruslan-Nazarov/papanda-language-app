@@ -236,3 +236,14 @@ it('does not replace a pending lesson when starting an optional three-sentence e
   assert.notEqual(extension.id, pending.id);
   assert.doesNotThrow(() => parseProgress(store.exportProgress()));
 });
+
+it('unlocks complex multi-clause lessons for Italian and Kazakh with rich seeds', () => {
+  for (const code of ['it', 'kz']) {
+    const pool = sentenceLessonCatalog(code, catalog());
+    const complexCards = pool.filter(s => {
+      const groups = lessonGroups(s, 'complex');
+      return new Set(groups.map(g => g.clauseIndex)).size > 1;
+    });
+    assert.ok(complexCards.length >= 3, `Expected at least 3 complex cards for ${code}, found ${complexCards.length}`);
+  }
+});

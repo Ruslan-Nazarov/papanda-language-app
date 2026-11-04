@@ -155,7 +155,7 @@ async function main() {
     await tab('Brain Workout');
     await page.click(auditButton);
     await page.waitForSelector('[data-testid="workout-audit-loading"]');
-    assert.ok(!(await page.$eval('[data-testid="workout-card"]', el => el.innerText)).includes(custom.ru), 'Audit must not reveal the recall answer');
+    assert.ok((await page.$eval('[data-testid="workout-card"]', el => el.innerText)).includes(custom.ru), 'Wink card displays word translation');
     assert.equal(await page.$eval(auditButton, el => el.getAttribute('aria-disabled')), 'true');
     await respondToAudit(null, 400);
     await page.waitForSelector('[data-testid="workout-audit-error"]');

@@ -594,22 +594,26 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     [currentSentence]
   );
 
-  // Per-token badge numbers, unique within each clause. A role-group can hold
-  // several tokens (e.g. two articles revealed together) — numbering them by
-  // group alone would print the same number on two different cards, which
-  // reads as a mistake. Count tokens instead, restarting at 1 per clause.
+  // Step badge numbers per group. Tokens belonging to the same syntactic unit
+  // (e.g. an article and its noun) share the same step number so the breakdown
+  // reads as coherent steps of the sentence basis and its additions.
   const tokenBadgeNumbers = React.useMemo(() => {
     const map = new Map<number, number>();
     const clauseCounters = new Map<number, number>();
     orderedGroups.forEach(group => {
+      const next = (clauseCounters.get(group.clauseIndex) || 0) + 1;
+      clauseCounters.set(group.clauseIndex, next);
       group.tokenIndices.forEach(ti => {
-        const next = (clauseCounters.get(group.clauseIndex) || 0) + 1;
-        clauseCounters.set(group.clauseIndex, next);
         map.set(ti, next);
       });
     });
     return map;
   }, [orderedGroups]);
+
+  const totalExerciseSteps = orderedGroups.length || (currentSentence?.words.length ?? 0);
+  const revealedExerciseSteps = revealedTokens === null
+    ? totalExerciseSteps
+    : orderedGroups.filter(group => group.tokenIndices.some(ti => revealedTokens.has(ti))).length;
 
   const revealBlock = (index: number) => {
     if (!currentSentence) return;
@@ -719,6 +723,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
   const renderTokenCard = (token: Token, index: number, compact = false) => {
     const formSegments = getTokenFormSegments(token, selectedLanguageCode);
     const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
+    const group = groupIndex >= 0 ? orderedGroups[groupIndex] : undefined;
     const isRevealed = revealedTokens === null || revealedTokens.has(index);
     // In a complex (multi-clause) sentence, wrap words of the 2nd+ clause in a
     // second colored frame so the clause boundary reads at a glance.
@@ -726,6 +731,8 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     const clauseIndex = groupIndex >= 0 ? (orderedGroups[groupIndex]?.clauseIndex ?? 0) : 0;
     const secondaryClause = clauseIndex >= 1;
     const badgeNumber = tokenBadgeNumbers.get(index) ?? (groupIndex >= 0 ? groupIndex + 1 : 1);
+    const effectiveRole = (token.role === 'Article' && group) ? group.role : token.role;
+    const roleColor = getRoleColor(effectiveRole);
 
     // Hidden and revealed blocks share their measured content. Revealing a word
     // changes its visibility, never the surrounding layout or reading position.
@@ -738,11 +745,11 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
           activeOpacity={0.85}
           onPress={event => { event.stopPropagation(); isRevealed ? handleTokenPress(token) : revealBlock(index); }}
           onLongPress={isRevealed ? () => noteSource && navigation.push('NoteEditor', { language: selectedLanguageCode, source: { ...noteSource, token: token.text } }) : undefined}
-          style={[styles.wordCard, { borderColor: isRevealed ? getRoleColor(token.role) : UI.border },
+          style={[styles.wordCard, { borderColor: isRevealed ? roleColor : UI.border },
             compact && { minWidth: 0, paddingVertical: 8, paddingHorizontal: 12 },
             !isRevealed && styles.hiddenCard]}
         >
-          {isRevealed && <View style={[styles.orderBadge, { backgroundColor: getRoleColor(token.role) }]}>
+          {isRevealed && <View style={[styles.orderBadge, { backgroundColor: roleColor }]}>
             <Text style={styles.orderBadgeText}>{badgeNumber}</Text>
           </View>}
           <View aria-hidden={!isRevealed} accessibilityElementsHidden={!isRevealed}
@@ -755,7 +762,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
             </Text>
             {!compact && <>
               <Text aria-hidden={!showTranslations} numberOfLines={2} ellipsizeMode="tail" style={[styles.translationText, { opacity: showTranslations ? 1 : 0 }]}>{formatTokenTranslation(token)}</Text>
-              <Text style={[styles.roleText, { color: getRoleColor(token.role) }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
+              <Text style={[styles.roleText, { color: roleColor }]}>{ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}</Text>
             </>}
           </View>
           {!isRevealed && <View style={styles.hiddenMark} />}
@@ -764,7 +771,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
     );
 
     return secondaryClause ? (
-      <View style={[styles.clauseFrame, { borderColor: isRevealed ? getRoleColor(token.role) : '#94A3B8' }]}>{card}</View>
+      <View style={[styles.clauseFrame, { borderColor: isRevealed ? roleColor : '#94A3B8' }]}>{card}</View>
     ) : card;
   };
 
@@ -774,6 +781,10 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 
   const renderTokenTableMode = (token: Token, index: number) => {
     const isRevealed = revealedTokens === null || revealedTokens.has(index);
+    const groupIndex = orderedGroups.findIndex(g => g.tokenIndices.includes(index));
+    const group = groupIndex >= 0 ? orderedGroups[groupIndex] : undefined;
+    const effectiveRole = (token.role === 'Article' && group) ? group.role : token.role;
+    const roleColor = getRoleColor(effectiveRole);
 
     return (
       <View key={`${index}-${token.text}`} style={styles.tableRow}>
@@ -790,7 +801,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
         <View style={styles.tableColRole}>
           {isRevealed && (
             <View testID={`trainer-role-${index}`} style={styles.tableRoleActions}>
-              <Text style={[styles.roleText, { color: getRoleColor(token.role), marginTop: 0, maxWidth: '100%', textAlign: 'right' }]}>
+              <Text style={[styles.roleText, { color: roleColor, marginTop: 0, maxWidth: '100%', textAlign: 'right' }]}>
                 {ROLE_TRANSLATIONS[token.role] || token.role.replace('_', ' ')}
               </Text>
               {renderDictionaryAction(token, true)}
@@ -898,7 +909,7 @@ function FreeSentenceTrainerScreen({ onLessons }: { onLessons?: () => void }) {
 
               <View style={styles.exerciseHeading}>
                 <Text style={styles.exerciseLabel}>Разбор по шагам</Text>
-                <Text style={styles.exerciseProgress}>{revealedTokens === null ? currentSentence?.words.length : revealedTokens.size} / {currentSentence?.words.length}</Text>
+                <Text style={styles.exerciseProgress}>{revealedExerciseSteps} / {totalExerciseSteps}</Text>
               </View>
               <View style={isTableMode ? styles.tableContainer : styles.sentenceWrapper}>
                 {isTableMode

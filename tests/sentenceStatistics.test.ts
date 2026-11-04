@@ -2,7 +2,7 @@ import './setup';
 import { beforeEach, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Sentence, Token } from '../src/models/types';
-import { snapshotSentenceAnalysis, summarizeSentenceAnalyses } from '../src/utils/sentenceStatistics';
+import { snapshotSentenceAnalysis, summarizeSentenceAnalyses, formatTimes } from '../src/utils/sentenceStatistics';
 import { useStore } from '../src/store/useStore';
 import { createDefaultProgress } from '../src/store/progressTypes';
 import { parseProgress } from '../src/store/progressValidation';
@@ -38,6 +38,15 @@ it('merges equivalent labels without counting an analysis twice and preserves un
   assert.deepEqual(summary.forms[0], { title: 'Отрицательная форма', form: true, count: 2, sentences: 1, examples: ['one', 'two'] });
   assert.equal(summary.forms[1].title, 'Passato prossimo');
   assert.equal(summary.categories[0].title, 'Глагол');
+
+  const kazakhCase = snapshotSentenceAnalysis({ ...sentence, words: [token('Қонақ', 'Noun (Nominative)')] }, 'kz', now);
+  assert.equal(summarizeSentenceAnalyses([kazakhCase]).forms[0].title, 'Именительный падеж');
+  assert.equal(formatTimes(1), '1 раз');
+  assert.equal(formatTimes(2), '2 раза');
+  assert.equal(formatTimes(4), '4 раза');
+  assert.equal(formatTimes(5), '5 раз');
+  assert.equal(formatTimes(12), '12 раз');
+  assert.equal(formatTimes(22), '22 раза');
 });
 
 it('records once per presentation, allows a repeated analysis, and keeps snapshots after card changes or cache clearing', () => {

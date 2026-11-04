@@ -91,7 +91,7 @@ const schema = shape({ userWordProgress: dictionary(progress) }, {
   sentenceWorkoutCount: value => integer(value) && (value as number) >= 1 && (value as number) <= 100,
   workoutWordCount: value => integer(value) && (value as number) >= 1 && (value as number) <= 100,
   workoutLearnedWordCount: value => integer(value) && (value as number) <= 100,
-  workoutFavoritesOnly: boolean, hasSeenSnoozeHint: boolean,
+  workoutFavoritesOnly: boolean, wordsFavoritesOnly: boolean, hasSeenSnoozeHint: boolean,
 });
 
 /** Validate completely before changing live state. Missing legacy fields get defaults. */

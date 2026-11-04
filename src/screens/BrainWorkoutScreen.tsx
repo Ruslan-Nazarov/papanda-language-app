@@ -56,7 +56,6 @@ export default function BrainWorkoutScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const actionLocked = React.useRef(false);
   React.useLayoutEffect(() => { actionLocked.current = false; }, [queue, currentIndex]);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState({ known: 0, unknown: 0 });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingWord, setEditingWord] = useState<Word | null>(null);
@@ -124,7 +123,6 @@ export default function BrainWorkoutScreen() {
     initializedScope.current = scope;
     setQueue(buildWorkoutQueue(useStore.getState()));
     setCurrentIndex(0);
-    setShowAnswer(false);
     setHistory([]);
     setScore({ known: 0, unknown: 0 });
     setResultModalVisible(false);
@@ -212,7 +210,6 @@ export default function BrainWorkoutScreen() {
       (word.eng || word.word) === (item.word.eng || item.word.word) && canStudyWord(word, [item.langCode])));
     if (nextIndex >= 0) {
       setCurrentIndex(nextIndex);
-      setShowAnswer(false);
       setPronunciationExplanation(null);
     } else {
       if (known + unknown > 0) {
@@ -296,7 +293,6 @@ export default function BrainWorkoutScreen() {
 
       setHistory(prev => prev.slice(0, -1));
       setCurrentIndex(lastAction.index);
-      setShowAnswer(false);
       setPronunciationExplanation(null);
     }
   };
@@ -339,6 +335,21 @@ export default function BrainWorkoutScreen() {
     outputRange: [0.15, 1, 0.15],
     extrapolate: 'clamp',
   });
+  const cardRotate = cardTranslateX.interpolate({
+    inputRange: [-SWIPE_EXIT_DISTANCE, 0, SWIPE_EXIT_DISTANCE],
+    outputRange: ['-10deg', '0deg', '10deg'],
+    extrapolate: 'clamp',
+  });
+  const knownStampOpacity = cardTranslateX.interpolate({
+    inputRange: [10, 45, 90],
+    outputRange: [0, 0.5, 1],
+    extrapolate: 'clamp',
+  });
+  const unknownStampOpacity = cardTranslateX.interpolate({
+    inputRange: [-90, -45, -10],
+    outputRange: [1, 0.5, 0],
+    extrapolate: 'clamp',
+  });
 
   callbacks.current.handleSwipe = handleSwipe;
   callbacks.current.resetCardPosition = resetCardPosition;
@@ -373,7 +384,10 @@ export default function BrainWorkoutScreen() {
             styles.cardMotion,
             {
               opacity: cardOpacity,
-              transform: [{ translateX: cardTranslateX }],
+              transform: [
+                { translateX: cardTranslateX },
+                { rotate: cardRotate },
+              ],
             },
           ]}
         >
@@ -395,8 +409,35 @@ export default function BrainWorkoutScreen() {
             testID="workout-card"
             style={styles.card}
             activeOpacity={0.85}
-            onPress={() => setShowAnswer(!showAnswer)}
+            onPress={() => {
+              if (targetTranslation && currentLang) {
+                handlePronunciation(targetTranslation, currentLang, currentWord.ru || currentWord.meaning || '');
+              }
+            }}
           >
+            {/* Visual feedback stamps during swipe */}
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.swipeStamp,
+                styles.swipeStampKnown,
+                { opacity: knownStampOpacity },
+              ]}
+            >
+              <Text style={styles.swipeStampKnownText}>✓ ЗНАЮ</Text>
+            </Animated.View>
+
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.swipeStamp,
+                styles.swipeStampUnknown,
+                { opacity: unknownStampOpacity },
+              ]}
+            >
+              <Text style={styles.swipeStampUnknownText}>✕ НЕ ЗНАЮ</Text>
+            </Animated.View>
+
             <View style={styles.cardToolbar}>
               <Text testID="workout-show-count" accessibilityLabel={`Показов слова: ${totalShows}`} style={styles.showCount}>
                 👁 {totalShows}
@@ -495,35 +536,28 @@ export default function BrainWorkoutScreen() {
 
             <View style={styles.divider} />
 
-            {showAnswer ? (
-              <View style={styles.answerBox}>
-                <View style={styles.answerBoxHeader}>
-                  <Text style={styles.nativeRu}>{currentWord.ru}</Text>
-                  {targetTranslation && (
-                    <TouchableOpacity
-                      style={styles.workoutPronunciationBtn}
-                      accessibilityRole="button"
-                      accessibilityLabel="Разбор произношения"
-                      activeOpacity={0.7}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handlePronunciation(targetTranslation, currentLang, currentWord.ru || currentWord.meaning || '');
-                      }}
-                    >
-                      <PapandaIcon name="microphone" />
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {!!currentWord.meaning && (
-                  <Text style={styles.meaningText}>Контекст: {currentWord.meaning}</Text>
+            <View style={styles.answerBox}>
+              <View style={styles.answerBoxHeader}>
+                <Text testID="workout-translation" style={styles.nativeRu}>{currentWord.ru}</Text>
+                {targetTranslation && (
+                  <TouchableOpacity
+                    style={styles.workoutPronunciationBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="Разбор произношения"
+                    activeOpacity={0.7}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handlePronunciation(targetTranslation, currentLang, currentWord.ru || currentWord.meaning || '');
+                    }}
+                  >
+                    <PapandaIcon name="microphone" />
+                  </TouchableOpacity>
                 )}
               </View>
-            ) : (
-              <View style={styles.tapToRevealContainer}>
-                <PapandaIcon name="eye" size={24} />
-                <Text style={styles.tapToRevealText}>Нажмите на карточку, чтобы увидеть перевод</Text>
-              </View>
-            )}
+              {!!currentWord.meaning && (
+                <Text style={styles.meaningText}>Контекст: {currentWord.meaning}</Text>
+              )}
+            </View>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -545,18 +579,28 @@ export default function BrainWorkoutScreen() {
           </View>
         </View>
 
+        {/* Swipe Hint Guide */}
+        <View style={styles.swipeHintRow} pointerEvents="none">
+          <Text style={styles.swipeHintText}>👈 влево — «Не знаю»</Text>
+          <Text style={styles.swipeHintDot}>•</Text>
+          <Text style={styles.swipeHintText}>«Знаю» — вправо 👉</Text>
+        </View>
+
         <View style={styles.actionButtons}>
           <TouchableOpacity
+            testID="workout-btn-unknown"
             style={[styles.actionBtn, styles.btnUnknown]}
             activeOpacity={0.8}
             onPress={() => handleSwipe('left')}
             disabled={!targetTranslation}
           >
+            <Text style={styles.btnArrow}>←</Text>
             <Text style={styles.btnIcon}>✕</Text>
             <Text style={styles.btnText}>Не знаю</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
+            testID="workout-btn-snooze"
             style={[styles.actionBtn, styles.btnSnooze]}
             activeOpacity={0.8}
             onPress={handleSnooze}
@@ -567,6 +611,7 @@ export default function BrainWorkoutScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            testID="workout-btn-known"
             style={[styles.actionBtn, styles.btnKnown]}
             activeOpacity={0.8}
             onPress={() => handleSwipe('right')}
@@ -574,6 +619,7 @@ export default function BrainWorkoutScreen() {
           >
             <Text style={styles.btnIcon}>✓</Text>
             <Text style={styles.btnText}>Знаю</Text>
+            <Text style={[styles.btnArrow, styles.btnArrowKnown]}>→</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -646,17 +692,17 @@ export default function BrainWorkoutScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.resultModalCard}>
             <PapandaIcon name="check" size={28} />
-            <Text style={styles.resultTitle}>Тренировка завершена!</Text>
+            <Text style={styles.resultTitle}>Сессия Wink завершена!</Text>
 
             <View style={styles.resultStatsRow}>
               <View style={styles.resultStatBox}>
                 <Text style={styles.resultStatValueKnown}>{workoutResult.known}</Text>
-                <Text style={styles.resultStatLabel}>Вспомнили</Text>
+                <Text style={styles.resultStatLabel}>Знаю</Text>
               </View>
               <View style={styles.resultStatDivider} />
               <View style={styles.resultStatBox}>
                 <Text style={styles.resultStatValueUnknown}>{workoutResult.unknown}</Text>
-                <Text style={styles.resultStatLabel}>Повторить</Text>
+                <Text style={styles.resultStatLabel}>Не знаю</Text>
               </View>
             </View>
 
@@ -914,6 +960,40 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: ACCENT,
   },
+  swipeStamp: {
+    position: 'absolute',
+    top: 52,
+    zIndex: 99,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 2,
+    elevation: 4,
+  },
+  swipeStampKnown: {
+    left: 16,
+    borderColor: '#16A34A',
+    backgroundColor: 'rgba(240, 253, 244, 0.95)',
+    transform: [{ rotate: '-12deg' }],
+  },
+  swipeStampKnownText: {
+    color: '#16A34A',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  swipeStampUnknown: {
+    right: 16,
+    borderColor: '#DC2626',
+    backgroundColor: 'rgba(254, 242, 242, 0.95)',
+    transform: [{ rotate: '12deg' }],
+  },
+  swipeStampUnknownText: {
+    color: '#DC2626',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
   scoreKnown: {
     fontSize: 14,
     fontWeight: '600',
@@ -923,6 +1003,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#DC3545',
+  },
+  swipeHintRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    marginBottom: 8,
+  },
+  swipeHintText: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  swipeHintDot: {
+    fontSize: 12,
+    color: '#CBD5E1',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -948,6 +1044,16 @@ const styles = StyleSheet.create({
   },
   btnKnown: {
     backgroundColor: ACCENT,
+  },
+  btnArrow: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: UI.onAccent,
+    marginRight: 4,
+  },
+  btnArrowKnown: {
+    marginRight: 0,
+    marginLeft: 4,
   },
   btnIcon: {
     color: UI.onAccent,

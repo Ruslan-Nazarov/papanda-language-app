@@ -23,8 +23,10 @@ const LABELS: Record<string, string> = {
   'present perfect': 'Present Perfect', 'past perfect': 'Past Perfect',
   'present continuous': 'Present Continuous', 'past continuous': 'Past Continuous',
   passive: 'Страдательный залог', plural: 'Множественное число', singular: 'Единственное число',
+  nominative: 'Именительный падеж',
   accusative: 'Винительный падеж', dative: 'Дательный падеж', genitive: 'Родительный падеж',
   locative: 'Местный падеж', ablative: 'Исходный падеж', instrumental: 'Творительный падеж',
+  prepositional: 'Предложный падеж', vocative: 'Звательный падеж',
   conditional: 'Условное наклонение', imperative: 'Повелительное наклонение',
 };
 const normalize = (label: string) => label.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -37,6 +39,16 @@ export function grammarLabel(label: string): { title: string; form: boolean } {
       'adjective', 'subject', 'object', 'particle', 'place', 'time', 'conjunction', 'pronoun',
       'auxiliary', 'verb', 'adverb', 'postposition', 'article', 'noun', 'preposition',
     ].includes(key)) };
+}
+
+export function formatTimes(count: number): string {
+  const abs = Math.abs(count);
+  const mod10 = abs % 10;
+  const mod100 = abs % 100;
+  if (mod100 >= 11 && mod100 <= 14) return `${count} раз`;
+  if (mod10 === 1) return `${count} раз`;
+  if (mod10 >= 2 && mod10 <= 4) return `${count} раза`;
+  return `${count} раз`;
 }
 
 export function snapshotSentenceAnalysis(sentence: Sentence, id: string, now = Date.now()): SentenceAnalysis {

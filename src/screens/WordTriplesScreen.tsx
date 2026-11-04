@@ -10,7 +10,7 @@ import { Word } from '../models/types';
 import { LANGUAGES } from '../constants/languages';
 import EditWordModal from '../components/EditWordModal';
 import { getWordKey, getWordTranslation } from '../utils/words';
-import { readWordStats } from '../utils/statistics';
+import { readWordStats, calculateFullyLearned } from '../utils/statistics';
 import { buildWordTour } from '../utils/wordCards';
 import { canStudyWord } from '../utils/wordStudy';
 import { captureKnowledgeUndo, type KnowledgeUndo } from '../utils/wordProgress';
@@ -32,10 +32,12 @@ const isHorizontalSwipe = (gesture: { dx: number; dy: number }) =>
 export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps) {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
-  const { words, activeLanguages, wordTourSize, markTripleKnown, recordTripleCardShow, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
+  const { words, activeLanguages, wordTourSize, wordsFavoritesOnly, setWordsFavoritesOnly, markTripleKnown, recordTripleCardShow, undoWordKnowledge, toggleWordFavorite, userWordProgress, setTargetSentenceInfo } = useStore(useShallow(state => ({
     words: state.words,
     activeLanguages: state.activeLanguages,
     wordTourSize: state.wordTourSize,
+    wordsFavoritesOnly: state.wordsFavoritesOnly ?? false,
+    setWordsFavoritesOnly: state.setWordsFavoritesOnly,
     markTripleKnown: state.markTripleKnown,
     recordTripleCardShow: state.recordTripleCardShow,
     undoWordKnowledge: state.undoWordKnowledge,
@@ -49,7 +51,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   const [editingWord, setEditingWord] = useState<Word | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const tourKeys = React.useRef<string[] | null>(null);
-  const tourScope = JSON.stringify([activeLanguages, wordTourSize]);
+  const tourScope = JSON.stringify([activeLanguages, wordTourSize, wordsFavoritesOnly]);
   const previousScope = React.useRef(tourScope);
   const actionLocked = React.useRef(false);
   React.useLayoutEffect(() => { actionLocked.current = false; }, [sessionCount, currentWord?.eng, currentWord?.word, tourScope]);
@@ -76,7 +78,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   });
   const transition = useCardTransition({
     enabled: isFocused && !isModalVisible && !isStatsVisible && !isPronunciationModalVisible,
-    scope: JSON.stringify([activeLanguages, wordTourSize]), cardKey: currentWord?.eng || currentWord?.word || '',
+    scope: tourScope, cardKey: currentWord?.eng || currentWord?.word || '',
     onSwipe: direction => direction === 'left' ? handleNext() : handlePrev(),
     canSwipe: direction => direction === 'left' ? !!currentWord && !isTourComplete : history.length > 0,
     distance: SWIPE_EXIT_DISTANCE, entryOffset: SWIPE_ENTRY_OFFSET, duration: 210,
@@ -117,7 +119,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
     // Remove unavailable pending cards without rebuilding or revisiting the tour.
     while (tourKeys.current && index < tourKeys.current.length) {
       chosen = words.find(word => getWordKey(word) === tourKeys.current![index]);
-      if (chosen && canStudyWord(chosen, activeLanguages)) break;
+      if (chosen && canStudyWord(chosen, activeLanguages) && (!wordsFavoritesOnly || chosen.is_favorite)) break;
       tourKeys.current.splice(index, 1);
       chosen = undefined;
     }
@@ -133,7 +135,7 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
 
   const resetTour = () => {
     const state = useStore.getState();
-    tourKeys.current = buildWordTour(state.words, state.activeLanguages, state.wordTourSize).map(getWordKey);
+    tourKeys.current = buildWordTour(state.words, state.activeLanguages, state.wordTourSize, { favoritesOnly: state.wordsFavoritesOnly }).map(getWordKey);
     setHistory([]);
     setSessionCount(0);
     showTourWord(0);
@@ -339,10 +341,46 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   }
 
   if (isTourComplete) {
+    const learnedInTour = history.filter(item => Boolean(item.undo)).length;
+    const repeatedInTour = Math.max(0, sessionCount - learnedInTour);
+    const totalLearned = calculateFullyLearned(words, activeLanguages);
+
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]} testID="word-tour-complete">
+        <View style={[styles.topHeader, { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }]}>
+          <View>
+            <Text style={styles.headerTitle}>Слова</Text>
+          </View>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              testID="words-favorite-toggle"
+              style={[styles.favoriteToggleBtn, wordsFavoritesOnly && styles.favoriteToggleBtnActive]}
+              onPress={() => setWordsFavoritesOnly(!wordsFavoritesOnly)}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.favoriteToggleText, wordsFavoritesOnly && styles.favoriteToggleTextActive]}>
+                {wordsFavoritesOnly ? '★ Избранные' : '☆ Все слова'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
+              onPress={() => navigation.navigate('Dictionary')}
+            >
+              <PapandaIcon name="read" size={24} />
+            </TouchableOpacity>
+          </View>
+        </View>
         <Text style={styles.headerTitle}>Тур завершён</Text>
-        <Text style={styles.info}>Пройдено карточек: {sessionCount}</Text>
+        <View style={styles.tourSummaryContainer}>
+          <Text style={styles.info}>Пройдено карточек: {sessionCount}</Text>
+          <Text style={[styles.info, styles.tourLearnedInfo]}>
+            Выучено за тур: <Text style={styles.tourLearnedCount}>{learnedInTour}</Text>
+          </Text>
+          {repeatedInTour > 0 ? (
+            <Text style={styles.tourRepeatedInfo}>Отложено на повтор: {repeatedInTour}</Text>
+          ) : null}
+          <Text style={styles.tourTotalInfo}>Всего выучено: {totalLearned}</Text>
+        </View>
         {previousWordButton}
         <TouchableOpacity style={[styles.button, styles.btnKnown, styles.tourStartButton]} onPress={startNewTour} accessibilityRole="button">
           <Text style={styles.buttonText}>Следующий тур</Text>
@@ -354,9 +392,38 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
   if (!currentWord) {
     return (
       <View style={[styles.centerContainer, { paddingTop: topPadding }]}>
-        <Text style={styles.info}>Нет доступных слов для выбранной комбинации языков!</Text>
+        <View style={[styles.topHeader, { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }]}>
+          <View>
+            <Text style={styles.headerTitle}>Слова</Text>
+          </View>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              testID="words-favorite-toggle"
+              style={[styles.favoriteToggleBtn, wordsFavoritesOnly && styles.favoriteToggleBtnActive]}
+              onPress={() => setWordsFavoritesOnly(!wordsFavoritesOnly)}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.favoriteToggleText, wordsFavoritesOnly && styles.favoriteToggleTextActive]}>
+                {wordsFavoritesOnly ? '★ Избранные' : '☆ Все слова'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
+              onPress={() => navigation.navigate('Dictionary')}
+            >
+              <PapandaIcon name="read" size={24} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text style={styles.info}>
+          {wordsFavoritesOnly
+            ? 'В избранном пока нет доступных слов.\nОтметьте слова звёздочкой ☆ в словаре или переключите на «Все слова».'
+            : 'Нет доступных слов для выбранной комбинации языков!'}
+        </Text>
         {previousWordButton}
-        <TouchableOpacity onPress={startNewTour} accessibilityRole="button"><Text>Проверить снова</Text></TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.btnKnown, styles.tourStartButton]} onPress={startNewTour} accessibilityRole="button">
+          <Text style={styles.buttonText}>Проверить снова</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -374,12 +441,25 @@ export default function WordTriplesScreen({ navigation }: WordTriplesScreenProps
             <Text style={styles.headerTitle}>Слова</Text>
             <Text testID="word-tour-progress" style={styles.sessionCountText}>Пройдено: {sessionCount} / {tourKeys.current?.length ?? wordTourSize}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
-            onPress={() => navigation.navigate('Dictionary')}
-          >
-            <PapandaIcon name="read" size={24} />
-          </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              testID="words-favorite-toggle"
+              style={[styles.favoriteToggleBtn, wordsFavoritesOnly && styles.favoriteToggleBtnActive]}
+              onPress={() => setWordsFavoritesOnly(!wordsFavoritesOnly)}
+              accessibilityRole="button"
+              accessibilityLabel={wordsFavoritesOnly ? 'Показывать все слова' : 'Показывать только избранные'}
+            >
+              <Text style={[styles.favoriteToggleText, wordsFavoritesOnly && styles.favoriteToggleTextActive]}>
+                {wordsFavoritesOnly ? '★ Избранные' : '☆ Все слова'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dictionaryBtn} accessibilityLabel="Открыть словарь" accessibilityRole="button"
+              onPress={() => navigation.navigate('Dictionary')}
+            >
+              <PapandaIcon name="read" size={24} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Main Card */}
@@ -710,6 +790,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  favoriteToggleBtn: {
+    backgroundColor: papanda.color.surface,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: papanda.color.borderSubtle,
+  },
+  favoriteToggleBtnActive: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+  },
+  favoriteToggleText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: papanda.color.textSecondary,
+    fontWeight: '600',
+  },
+  favoriteToggleTextActive: {
+    color: papanda.color.accentHover,
+    fontWeight: '600',
+  },
   headerTitle: {
     fontSize: 22,
     lineHeight: 30,
@@ -727,6 +834,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: papanda.learningColumnWidth,
     lineHeight: 24,
+  },
+  tourSummaryContainer: {
+    marginVertical: 12,
+    alignItems: 'center',
+  },
+  tourLearnedInfo: {
+    marginTop: 4,
+  },
+  tourLearnedCount: {
+    fontWeight: '700',
+    color: '#059669',
+  },
+  tourRepeatedInfo: {
+    fontSize: 14,
+    color: papanda.color.textSecondary,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  tourTotalInfo: {
+    fontSize: 14,
+    color: papanda.color.textSecondary,
+    textAlign: 'center',
+    marginTop: 8,
   },
   card: {
     backgroundColor: papanda.color.surface,

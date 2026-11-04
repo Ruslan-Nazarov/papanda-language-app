@@ -1,6 +1,7 @@
 import { useScreenClock } from '../hooks/useScreenClock';
-import { StructureProgress } from '../components/StructureExercise';
 import SentenceStatistics from '../components/SentenceStatistics';
+import { StructureProgress } from '../components/StructureExercise';
+import AiStatisticsSection from '../components/AiStatisticsSection';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../navigation/types';
 import { useShallow } from 'zustand/react/shallow';
@@ -9,8 +10,12 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../store/useStore';
 import { LANGUAGES } from '../constants/languages';
-import { Word } from '../models/types';
+import { Word, SyntaxRole } from '../models/types';
 import { getWordTranslation } from '../utils/words';
+import { summarizeSentenceAnalyses } from '../utils/sentenceStatistics';
+import { structureSummary } from '../utils/structureStudy';
+import { ROLE_TRANSLATIONS } from '../constants/sentencePresentation';
+import type { StatisticsReportPayload } from '../services/statisticsAiService';
 import {
   calculateTotalVolume,
   calculateSeenWords,
@@ -185,12 +190,79 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
     [words]
   );
 
+  const sentenceAnalyses = useStore(state => state.sentenceAnalyses);
+  const structureAttempts = useStore(state => state.structureAttempts);
+
+  const aiPayload = useMemo<StatisticsReportPayload>(() => {
+    const sentenceSummary = summarizeSentenceAnalyses(sentenceAnalyses, undefined, nowMs);
+    const structRows = structureSummary(structureAttempts);
+
+    return {
+      summary: {
+        totalWords: summary.total,
+        seenWords: summary.seen,
+        learnedWords: summary.learned,
+        showsToday: summary.today,
+      },
+      activity: {
+        totalShows14Days: activityTotal,
+        activeDays: activity.filter(d => d.shows > 0).length,
+      },
+      languages: byLanguage.map(l => ({ code: l.code, label: l.label, knownWords: l.known })),
+      repetition: {
+        unseenWords: repetition.new,
+        buckets: repetition.buckets.map(b => ({ label: b.label, count: b.count })),
+      },
+      imw: {
+        overall: imw.overall,
+        byLanguage: imw.langs.map(l => ({ code: l.code, label: l.label, score: l.pct })),
+      },
+      workoutEfficiency: efficiencyTotal > 0 ? {
+        totalAnswers: efficiencyTotal,
+        knownAnswers: efficiencyKnown,
+        percent: Math.round((efficiencyKnown / efficiencyTotal) * 100),
+      } : undefined,
+      sentenceStatistics: {
+        totalAnalyses: sentenceSummary.total,
+        uniqueSentences: sentenceSummary.unique,
+        todayAnalyses: sentenceSummary.today,
+        topForms: sentenceSummary.forms.slice(0, 5).map(f => ({
+          title: f.title,
+          count: f.count,
+          sentences: f.sentences,
+        })),
+        topCategories: sentenceSummary.categories.slice(0, 5).map(c => ({
+          title: c.title,
+          count: c.count,
+        })),
+      },
+      structureSkills: structRows.map(r => ({
+        role: r.role,
+        roleLabel: ROLE_TRANSLATIONS[r.role as SyntaxRole] || r.role,
+        language: r.language,
+        independent: r.independent,
+        assisted: r.assisted,
+        errors: r.errors,
+      })),
+    };
+  }, [
+    summary,
+    activityTotal,
+    activity,
+    byLanguage,
+    repetition,
+    imw,
+    efficiencyTotal,
+    efficiencyKnown,
+    sentenceAnalyses,
+    structureAttempts,
+    nowMs,
+  ]);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={[styles.scroll, { paddingTop: topPadding }]}>
       <Text style={styles.screenTitle}>Статистика обучения</Text>
 
-      <SentenceStatistics now={nowMs} />
-      <StructureProgress />
       {/* Summary tiles */}
       <View style={styles.tilesRow}>
         <View style={styles.tile}>
@@ -213,10 +285,16 @@ export default function StatisticsScreen({ navigation }: BottomTabScreenProps<Ma
         </View>
       </View>
 
+      {/* AI Analysis and Recommendations */}
+      <AiStatisticsSection payload={aiPayload} />
+
+      <SentenceStatistics now={nowMs} />
+      <StructureProgress />
+
       {/* Activity */}
       <Section
         title={`Активность за ${ACTIVITY_DAYS} дней`}
-        help={'Количество учтённых показов слов за каждый день. В разделе «Слова» показ засчитывается при открытии карточки, в тренировке — после ответа «Знаю» или «Не знаю». В тренажёре предложений учитывается каждое найденное в словаре слово: повтор одного слова внутри предложения считается один раз.\n\nЭто число показов, а не уникальных слов и не правильных ответов. Повторные показы учитываются снова. Самостоятельный разбор и чтение своего текста в этот график не входят; их результаты видны в «Навыках разбора». Ранее накопленная история сохранена.'}
+        help={'Количество учтённых показов слов за каждый день. В разделе «Слова» показ засчитывается при открытии карточки, в тренировке — после ответа «Знаю» или «Не знаю». В тренажёре предложений учитывается каждое найденное в словаре слово: повтор одного слова внутри предложения считается один раз.\n\nЭто число показов, а не уникальных слов и не правильных ответов. Повторные показы учитываются снова. Самостоятельный разбор и чтение своего текста в этот график не входят. Ранее накопленная история сохранена.'}
       >
         <Text style={styles.sectionNote}>Всего показов за период: {activityTotal}</Text>
         <View style={styles.activityChart}>

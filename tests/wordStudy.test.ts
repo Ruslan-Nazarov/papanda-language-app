@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import type { Word } from '../src/models/types';
 import { buildStudyQueue, FAILURE_DELAY, nextWordReview, wordStudyState } from '../src/utils/wordStudy';
 import { buildWordTour } from '../src/utils/wordCards';
-import { buildWorkoutQueue } from '../src/utils/workout';
 import { captureKnowledgeUndo } from '../src/utils/wordProgress';
 import { createDefaultProgress } from '../src/store/progressTypes';
 import { useStore } from '../src/store/useStore';
@@ -14,6 +13,8 @@ const DAY = 86400000;
 const word = (key: string, patch: Partial<Word> = {}): Word => ({ eng: key,
   translations: { en: key, it: `it-${key}` }, count: 0, is_learned: 0, ...patch });
 const options = { activeLanguages: ['en', 'it'], workoutWordCount: 10, workoutFavoritesOnly: false };
+const buildWorkoutQueue = (opts: any, time = now, random = Math.random) =>
+  buildStudyQueue({ words: opts.words, languages: opts.activeLanguages, count: opts.workoutWordCount ?? 10, mode: 'workout', favoritesOnly: opts.workoutFavoritesOnly }, time, random);
 beforeEach(() => { useStore.getState().importProgress(createDefaultProgress()); });
 
 it('advances intervals only for successful recall when due, and resets after failure', () => {
@@ -34,7 +35,7 @@ it('advances intervals only for successful recall when due, and resets after fai
   assert.equal(nextWordReview(review, true, now + FAILURE_DELAY).streak, 1);
 });
 
-it('prioritizes difficult words without starving new words or maintenance', () => {
+it('prioritizes maximum variety and new words without starving maintenance', () => {
   const words = [
     ...Array.from({ length: 40 }, (_, i) => word(`failed-${i}`, { knowledge_stats: { en: false, it: false } })),
     ...Array.from({ length: 200 }, (_, i) => word(`new-${i}`)),
@@ -42,12 +43,65 @@ it('prioritizes difficult words without starving new words or maintenance', () =
   ];
   const queue = buildWorkoutQueue({ ...options, words }, now, () => 0.5);
   assert.equal(queue.length, 10);
-  assert.equal(queue.filter(c => c.word.eng!.startsWith('failed')).length, 6);
+  assert.equal(queue.filter(c => c.word.eng!.startsWith('failed')).length, 4);
   assert.equal(queue.filter(c => c.word.eng!.startsWith('new')).length, 2);
-  assert.equal(queue.filter(c => c.word.eng!.startsWith('known')).length, 2);
+  assert.equal(queue.filter(c => c.word.eng!.startsWith('known')).length, 4);
   const cards = buildWordTour(words, ['en', 'it'], 10, now, () => 0.5);
-  assert.equal(cards.filter(w => w.eng!.startsWith('failed')).length, 8);
-  assert.equal(cards.filter(w => w.eng!.startsWith('new')).length, 2);
+  // Word tour prioritizes variety and vocabulary exploration: fresh new words fill the tour when available
+  assert.equal(cards.filter(w => w.eng!.startsWith('new')).length, 10);
+  assert.equal(cards.filter(w => w.eng!.startsWith('failed')).length, 0);
+});
+
+it('consecutive word tours rotate through different words without repeating cards from previous tour', () => {
+  const catalog = Array.from({ length: 40 }, (_, i) => word(`tour-${i}`));
+  const tour1 = buildWordTour(catalog, ['en', 'it'], 10, now, () => 0.5);
+  assert.equal(tour1.length, 10);
+  const tour1Keys = new Set(tour1.map(w => w.eng));
+
+  // Simulate user viewing tour 1 cards
+  const updatedCatalog = catalog.map(w => {
+    if (tour1Keys.has(w.eng)) {
+      return {
+        ...w,
+        count: (w.count ?? 0) + 1,
+        show_stats: { en: 1, it: 1 },
+        last_shown: new Date(now).toISOString(),
+        last_shown_by_lang: { en: new Date(now).toISOString(), it: new Date(now).toISOString() },
+      };
+    }
+    return w;
+  });
+
+  // Tour 2 immediately follows Tour 1
+  const tour2 = buildWordTour(updatedCatalog, ['en', 'it'], 10, now + 60000, () => 0.5);
+  assert.equal(tour2.length, 10);
+  for (const item of tour2) {
+    assert.equal(tour1Keys.has(item.eng), false, `Word ${item.eng} was repeated in consecutive tour!`);
+  }
+});
+
+it('a frequently shown failed word is deprioritized in favor of unshown or rarely shown words', () => {
+  const overshownFailedWord = word('overshown-know', {
+    count: 7,
+    knowledge_stats: { en: false },
+    show_stats: { en: 7 },
+    review_by_lang: { en: { streak: 0, lapses: 5, answeredAt: new Date(now - 3600000).toISOString(), dueAt: new Date(now - 1800000).toISOString() } },
+  });
+  const freshWords = Array.from({ length: 15 }, (_, i) => word(`fresh-${i}`));
+
+  // In word tour, unshown words must be picked before the 7-times-shown word
+  const tour = buildWordTour([overshownFailedWord, ...freshWords], ['en'], 10, now, () => 0.5);
+  assert.equal(tour.some(w => w.eng === 'overshown-know'), false);
+
+  // In workout queue, when choosing among practice words, rarely shown words precede heavily shown ones
+  const rarelyShownFailed = word('rare-failed', {
+    count: 1,
+    knowledge_stats: { en: false },
+    show_stats: { en: 1 },
+    review_by_lang: { en: { streak: 0, lapses: 1, answeredAt: new Date(now - 3600000).toISOString(), dueAt: new Date(now - 1800000).toISOString() } },
+  });
+  const queue = buildWorkoutQueue({ ...options, words: [overshownFailedWord, rarelyShownFailed], workoutWordCount: 1 }, now, () => 0.5);
+  assert.equal(queue[0].word.eng, 'rare-failed');
 });
 
 it('never repeats a word across languages or repeats the same visible form in a tour', () => {
@@ -129,4 +183,24 @@ it('schedules survive backup round trips, reject malformed data, and clear with 
   assert.equal(store.importProgress(broken).ok, false);
   store.resetStatistics();
   assert.equal(useStore.getState().words.find(w => w.eng === 'schedule-backup')?.review_by_lang, undefined);
+});
+
+it('buildWordTour filters by favorites and includes known favorite words when favoritesOnly is true', () => {
+  const normal = word('normal-word', { is_favorite: false });
+  const favoriteNew = word('fav-new', { is_favorite: true });
+  const favoriteKnown = word('fav-known', { is_favorite: true, knowledge_stats: { en: true, it: true } });
+
+  const allWords = [normal, favoriteNew, favoriteKnown];
+  const tourAll = buildWordTour(allWords, ['en', 'it'], 10, now);
+  // Normal tour excludes fully known words and includes non-favorites
+  assert.ok(tourAll.some(w => w.eng === 'normal-word'));
+  assert.ok(tourAll.some(w => w.eng === 'fav-new'));
+  assert.equal(tourAll.some(w => w.eng === 'fav-known'), false);
+
+  // Favorites-only tour includes both new and known favorites, and excludes normal words
+  const tourFavs = buildWordTour(allWords, ['en', 'it'], 10, { favoritesOnly: true, now });
+  assert.equal(tourFavs.length, 2);
+  assert.equal(tourFavs.some(w => w.eng === 'normal-word'), false);
+  assert.ok(tourFavs.some(w => w.eng === 'fav-new'));
+  assert.ok(tourFavs.some(w => w.eng === 'fav-known'));
 });

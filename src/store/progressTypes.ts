@@ -56,6 +56,7 @@ export interface PersistedProgress {
   workoutWordCount: number;
   workoutLearnedWordCount: number;
   workoutFavoritesOnly: boolean;
+  wordsFavoritesOnly: boolean;
   hasSeenSnoozeHint: boolean;
 }
 
@@ -68,7 +69,7 @@ export const createDefaultProgress = (): PersistedProgress => ({
   userWordProgress: {}, customSentences: [], generatedSentences: [], customWords: [],
   activeLanguages: ['en', 'kz', 'it'], dailyShows: {}, workoutSnapshots: [], imwSnapshots: [],
   wordTourSize: 10, sentenceWorkoutCount: 5, workoutWordCount: 10, workoutLearnedWordCount: 5,
-  workoutFavoritesOnly: false, hasSeenSnoozeHint: false,
+  workoutFavoritesOnly: false, wordsFavoritesOnly: false, hasSeenSnoozeHint: false,
 });
 
 export const pickPersistedFields = (state: PersistedProgress): PersistedProgress => ({
@@ -90,5 +91,6 @@ export const pickPersistedFields = (state: PersistedProgress): PersistedProgress
   workoutWordCount: state.workoutWordCount,
   workoutLearnedWordCount: state.workoutLearnedWordCount,
   workoutFavoritesOnly: state.workoutFavoritesOnly,
+  wordsFavoritesOnly: Boolean(state.wordsFavoritesOnly),
   hasSeenSnoozeHint: state.hasSeenSnoozeHint,
 });

@@ -19,7 +19,7 @@ export function nextWordReview(previous: WordReview | undefined, known: boolean,
 }
 
 export type StudyKind = 'weak' | 'new' | 'known';
-export function wordStudyState(word: Word, lang: string, now = Date.now()) {
+export function wordStudyState(word: Word, lang: string, now = Date.now(), mode: 'words' | 'workout' = 'workout') {
   const knowledge = readWordStats(word.knowledge_stats)[lang];
   const shows = Number(readWordStats(word.show_stats)[lang]) || 0;
   const review = word.review_by_lang?.[lang];
@@ -27,13 +27,31 @@ export function wordStudyState(word: Word, lang: string, now = Date.now()) {
   const kind: StudyKind = knowledge === true ? 'known' : knowledge === false || shows > 0 ? 'weak' : 'new';
   // Old backups have no answer schedule: use a conservative fixed interval,
   // never the number of passive exposures as evidence of successful recall.
-  const dueAt = review ? Date.parse(review.dueAt) : !Number.isFinite(last) ? 0
+  const scheduledDue = review ? Date.parse(review.dueAt) : !Number.isFinite(last) ? 0
     : last + (knowledge === true ? 3 * DAY : knowledge === false ? FAILURE_DELAY : DAY);
-  const overdue = Math.max(0, now - (dueAt || now)) / DAY;
-  const priority = (knowledge === false ? 4 : 1) + Math.min(4, review?.lapses ?? 0)
-    + Math.log1p(overdue);
-  return { kind, dueAt, ready: dueAt <= now, priority,
-    encountered: shows > 0 || typeof knowledge === 'boolean' || !!review };
+
+  // Recency cooldown: a word shown recently cannot immediately repeat in the next tour or workout.
+  // In 'words' mode (vocabulary discovery), already shown words cool down for DAY so unshown words take precedence.
+  // In 'workout' mode, words just tested cool down for at least FAILURE_DELAY.
+  const cooldown = mode === 'words' ? DAY : FAILURE_DELAY;
+  const dueAt = Number.isFinite(last) ? Math.max(scheduledDue, last + cooldown) : scheduledDue;
+
+  const overdue = Math.max(0, now - (scheduledDue || now)) / DAY;
+
+  // Maximum variety:
+  // - High exposures reduce priority so heavily shown words step aside for unshown or less-shown words.
+  // - Lapses / "не знаю" MUST NOT inflate priority (that previously caused failed words to be shoved constantly).
+  // - Modest boost for overdue retention decay.
+  const priority = 1 + Math.log1p(overdue) - Math.min(3, shows * 0.3);
+
+  return {
+    kind,
+    dueAt,
+    ready: dueAt <= now,
+    priority,
+    shows,
+    encountered: shows > 0 || typeof knowledge === 'boolean' || !!review,
+  };
 }
 
 export const canStudyWord = (word: Word, languages: string[], now = Date.now()) =>
@@ -64,8 +82,8 @@ export function buildStudyQueue(options: {
     if (options.mode === 'words' && !canStudyWord(word, languages, now)) continue;
     for (const langCode of languages) {
       if (!canStudyWord(word, [langCode], now)) continue;
-      const state = wordStudyState(word, langCode, now);
-      if (options.mode === 'words' && state.kind === 'known') continue;
+      const state = wordStudyState(word, langCode, now, options.mode);
+      if (options.mode === 'words' && !options.favoritesOnly && state.kind === 'known') continue;
       candidates.push({ word, langCode, state, jitter: random(), key: getWordKey(word),
         forms: (options.mode === 'words' ? languages : [langCode]).map(lang => studyFormKey(word, lang)) });
     }
@@ -82,14 +100,17 @@ export function buildStudyQueue(options: {
     if (!buckets.has(key)) buckets.set(key, { cards: [], index: 0 });
     buckets.get(key)!.cards.push(candidate);
   }
-  // Sort each language/category once, then compare only their heads. Large
-  // dictionaries must not be re-sorted for every card of a hundred-card tour.
+  // Sort each language/category once, then compare only their heads.
+  // Prioritize readiness, then lowest exposures (maximum variety), then priority & jitter.
   for (const bucket of buckets.values()) bucket.cards.sort((a, b) =>
     (!a.state.ready ? a.state.dueAt - b.state.dueAt : 0)
-      || (b.state.priority + b.jitter) - (a.state.priority + a.jitter));
+      || (a.state.shows - b.state.shows)
+      || ((a.word.count ?? 0) - (b.word.count ?? 0))
+      || ((b.state.priority + b.jitter) - (a.state.priority + a.jitter)));
   const peek = (ready: boolean, kind: StudyKind): Candidate | undefined => {
     let best: Candidate | undefined;
-    const score = (c: Candidate) => c.state.priority + c.jitter - (languageCounts.get(c.langCode) ?? 0) * 0.5;
+    const score = (c: Candidate) =>
+      c.state.priority + c.jitter - c.state.shows * 0.5 - (languageCounts.get(c.langCode) ?? 0) * 0.5;
     for (const lang of languages) {
       const bucket = buckets.get(bucketKey(ready, kind, lang));
       if (!bucket) continue;
@@ -104,14 +125,36 @@ export function buildStudyQueue(options: {
     }
     return best;
   };
-  // Weak words get three opportunities out of five; new and known get one.
-  // Missing categories lend their slots to others. Ready cards always precede cooling cards.
-  const pattern: StudyKind[] = ['weak', 'weak', 'new', 'weak', 'known'];
+
+  // Selection pattern tailored for maximum variety:
+  // - In 'words' mode (vocabulary discovery), the priority is unshown words ('new') so that
+  //   the user explores the entire dictionary with maximum variety. Once unshown words are
+  //   exhausted, it falls back to 'weak' sorted by fewest exposures.
+  // - In 'workout' mode, balances review, known maintenance, and new introductions.
+  const pattern: StudyKind[] = options.mode === 'words'
+    ? (options.favoritesOnly ? ['new', 'weak', 'known'] : ['new'])
+    : ['weak', 'known', 'new', 'weak', 'known'];
+  const fallbackOrder: StudyKind[] = options.mode === 'words'
+    ? (options.favoritesOnly ? ['new', 'weak', 'known'] : ['new', 'weak'])
+    : ['weak', 'known', 'new'];
+
+  const resolveCard = (ready: boolean, preferred: StudyKind): Candidate | undefined => {
+    const direct = peek(ready, preferred);
+    if (direct) return direct;
+    for (const alt of fallbackOrder) {
+      if (alt !== preferred) {
+        const candidate = peek(ready, alt);
+        if (candidate) return candidate;
+      }
+    }
+    return undefined;
+  };
+
   for (const ready of [true, false]) {
     let slot = 0;
     while (result.length < count) {
       const preferred = pattern[slot++ % pattern.length];
-      const chosen = peek(ready, preferred) ?? peek(ready, 'weak') ?? peek(ready, 'new') ?? peek(ready, 'known');
+      const chosen = resolveCard(ready, preferred);
       if (!chosen) break;
       pickedWords.add(chosen.key);
       chosen.forms.forEach(form => pickedForms.add(form));

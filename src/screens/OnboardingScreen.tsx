@@ -82,13 +82,14 @@ export default function OnboardingScreen({ onDone }: Props) {
   const PAGE_COUNT = 3;
 
   const groups = useMemo(() => computeSentenceRevealGroups(EXAMPLE_TOKENS), []);
-  // A reveal group includes a head and its article. Number cards by token
-  // position, not by group, so two different
-  // cards never show the same badge number.
+  // Step badge numbers per group. Tokens belonging to the same syntactic unit
+  // (e.g. an article and its noun) share the same step number.
   const cardNumbers = useMemo(() => {
     const map = new Map<number, number>();
-    let n = 0;
-    groups.forEach(group => group.tokenIndices.forEach(ti => map.set(ti, ++n)));
+    groups.forEach((group, gi) => {
+      const step = gi + 1;
+      group.tokenIndices.forEach(ti => map.set(ti, step));
+    });
     return map;
   }, [groups]);
   const [revealed, setRevealed] = useState(0);
@@ -257,17 +258,18 @@ export default function OnboardingScreen({ onDone }: Props) {
                     </View>
                   );
                 }
+                const effectiveRole = (token.role === 'Article' && group.role) ? group.role : token.role;
                 return (
                   <View
                     key={`${gi}-${ti}`}
-                    style={[styles.wordCard, { borderColor: roleColor(token.role) }]}
+                    style={[styles.wordCard, { borderColor: roleColor(effectiveRole) }]}
                   >
-                    <View style={[styles.orderBadge, { backgroundColor: roleColor(token.role) }]}>
+                    <View style={[styles.orderBadge, { backgroundColor: roleColor(effectiveRole) }]}>
                       <Text style={styles.orderBadgeText}>{cardNumbers.get(ti) ?? gi + 1}</Text>
                     </View>
                     <Text style={styles.wordText}>{token.text}</Text>
                     <Text style={styles.translationText}>{token.translation}</Text>
-                    <Text style={[styles.roleText, { color: roleColor(token.role) }]}>
+                    <Text style={[styles.roleText, { color: roleColor(effectiveRole) }]}>
                       {ROLE_RU[token.role]}
                     </Text>
                   </View>
